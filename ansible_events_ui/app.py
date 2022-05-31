@@ -6,7 +6,14 @@ from aiokafka import AIOKafkaProducer
 from .schemas import ProducerMessage
 from .schemas import ProducerResponse
 from .schemas import RuleSetBook, Inventory, Activation, ActivationLog, Extravars
-from .models import metadata, rulesets, inventories, extravars, activations
+from .models import (
+    metadata,
+    rulesets,
+    inventories,
+    extravars,
+    activations,
+    activation_logs,
+)
 from .manager import activate_rulesets
 import json
 
@@ -30,6 +37,14 @@ app = FastAPI()
 
 loop = asyncio.get_event_loop()
 aioproducer = AIOKafkaProducer(loop=loop, bootstrap_servers="localhost:9092")
+
+class TaskManager:
+
+    def __init__(self):
+
+        self.tasks = []
+
+taskmanager = TaskManager()
 
 
 @app.on_event("startup")
@@ -141,17 +156,14 @@ async def create_extravars(e: Extravars):
 
 @app.post("/activation/")
 async def create_activation(a: Activation):
-    query = rulesets.select().where(rulesets.c.id==a.rulesetbook_id)
+    query = rulesets.select().where(rulesets.c.id == a.rulesetbook_id)
     r = await database.fetch_one(query)
-    query = inventories.select().where(inventories.c.id==a.inventory_id)
+    query = inventories.select().where(inventories.c.id == a.inventory_id)
     i = await database.fetch_one(query)
-    query = extravars.select().where(extravars.c.id==a.extravars_id)
+    query = extravars.select().where(extravars.c.id == a.extravars_id)
     e = await database.fetch_one(query)
-    await activate_rulesets(
-        "quay.io/bthomass/events-demo-ci-cd:latest",
-        r.rules,
-        i.inventory,
-        e.extravars
+    cmd, proc = await activate_rulesets(
+        "quay.io/bthomass/events-demo-ci-cd:latest", r.rules, i.inventory, e.extravars
     )
 
     query = activations.insert().values(
@@ -161,9 +173,31 @@ async def create_activation(a: Activation):
         extravars_id=a.extravars_id,
     )
     last_record_id = await database.execute(query)
+
+    task1 = asyncio.create_task(read_output(proc, last_record_id))
+    taskmanager.tasks.append(task1)
+
     return {**a.dict(), "id": last_record_id}
 
 
-@app.post("/activationlog/")
-async def create_activation_log(al: ActivationLog):
-    return {**al.dict(), "id": last_record_id}
+async def read_output(proc, activation_id):
+    line_number = 0
+    done = False
+    while not done:
+        line = await proc.stdout.readline()
+        if len(line) == 0:
+            break
+        line = line.decode()
+        print(f"{line}", end="")
+        query = activation_logs.insert().values(
+            line_number=line_number,
+            log=line,
+            activation_id=activation_id,
+        )
+        await database.execute(query)
+
+
+@app.get("/activation_logs/")
+async def read_activation_logs(activation_id: int):
+    q = activation_logs.select().where(activation_logs.c.activation_id==activation_id)
+    return await database.fetch_all(q)

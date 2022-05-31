@@ -52,17 +52,12 @@ async def activate_rulesets(execution_environment, rulesets, inventory, extravar
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE)
 
-        stdout, stderr = await proc.communicate()
-
-        print(f'[{cmd!r} exited with {proc.returncode}]')
-        if stdout:
-            print(f'[stdout]\n{stdout.decode()}')
-        if stderr:
-            print(f'[stderr]\n{stderr.decode()}')
 
         activated_rulesets[next(activated_rulesets_seq)] = proc
+
+        return cmd, proc
     finally:
-        shutil.rmtree(tempdir)
+        pass
 
 
 async def inactivate_rulesets(rulesets_id):

@@ -47,3 +47,13 @@ activations = sqlalchemy.Table(
 )
 
 
+activation_logs = sqlalchemy.Table(
+    "activation_log",
+    metadata,
+    sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True),
+    sqlalchemy.Column("activation_id", sqlalchemy.Integer),
+    sqlalchemy.Column("line_number", sqlalchemy.Integer),
+    sqlalchemy.Column("log", sqlalchemy.String),
+)
+
+
