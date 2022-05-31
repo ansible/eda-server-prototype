@@ -1,5 +1,6 @@
 from fastapi import FastAPI, WebSocket
 from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
 from typing import List
 import asyncio
 from aiokafka import AIOKafkaProducer
@@ -31,6 +32,8 @@ metadata.create_all(engine)
 
 
 app = FastAPI()
+
+app.mount("/static", StaticFiles(directory="ui/dist"), name="static")
 
 
 loop = asyncio.get_event_loop()
