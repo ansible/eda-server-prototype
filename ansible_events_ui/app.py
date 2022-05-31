@@ -19,8 +19,6 @@ import json
 
 import databases
 import sqlalchemy
-from sqlalchemy import select
-from pydantic import BaseModel
 
 DATABASE_URL = "sqlite:///./test.db"
 
@@ -38,13 +36,36 @@ app = FastAPI()
 loop = asyncio.get_event_loop()
 aioproducer = AIOKafkaProducer(loop=loop, bootstrap_servers="localhost:9092")
 
-class TaskManager:
 
+class TaskManager:
     def __init__(self):
 
         self.tasks = []
 
+
 taskmanager = TaskManager()
+
+
+class ConnectionManager:
+    def __init__(self):
+        self.active_connections: List[WebSocket] = []
+
+    async def connect(self, websocket: WebSocket):
+        await websocket.accept()
+        self.active_connections.append(websocket)
+
+    def disconnect(self, websocket: WebSocket):
+        self.active_connections.remove(websocket)
+
+    async def send_personal_message(self, message: str, websocket: WebSocket):
+        await websocket.send_text(message)
+
+    async def broadcast(self, message: str):
+        for connection in self.active_connections:
+            await connection.send_text(message)
+
+
+connnectionmanager = ConnectionManager()
 
 
 @app.on_event("startup")
@@ -106,10 +127,13 @@ async def get():
 
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
-    await websocket.accept()
-    while True:
-        data = await websocket.receive_text()
-        await websocket.send_text(f"Message text was: {data}")
+    await connnectionmanager.connect(websocket)
+    try:
+        while True:
+            data = await websocket.receive_text()
+            await websocket.send_text(f"Message text was: {data}")
+    except WebSocketDisconnect:
+        connnectionmanager.disconnect(websocket)
 
 
 @app.get("/ping")
@@ -174,7 +198,9 @@ async def create_activation(a: Activation):
     )
     last_record_id = await database.execute(query)
 
-    task1 = asyncio.create_task(read_output(proc, last_record_id))
+    task1 = asyncio.create_task(
+        read_output(proc, last_record_id), name=f"read_output {proc.pid}"
+    )
     taskmanager.tasks.append(task1)
 
     return {**a.dict(), "id": last_record_id}
@@ -195,9 +221,20 @@ async def read_output(proc, activation_id):
             activation_id=activation_id,
         )
         await database.execute(query)
+        line_number += 1
+        await connnectionmanager.broadcast(line)
 
 
-@app.get("/activation_logs/")
+@app.get("/activation_logs/", response_model=List[ActivationLog])
 async def read_activation_logs(activation_id: int):
-    q = activation_logs.select().where(activation_logs.c.activation_id==activation_id)
+    q = activation_logs.select().where(activation_logs.c.activation_id == activation_id)
     return await database.fetch_all(q)
+
+
+@app.get("/tasks/")
+async def read_tasks():
+    tasks = [
+        dict(name=task.get_name(), done=task.done(), cancelled=task.cancelled())
+        for task in taskmanager.tasks
+    ]
+    return tasks
