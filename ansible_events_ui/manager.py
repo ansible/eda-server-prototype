@@ -20,6 +20,7 @@ Functions:
 import tempfile
 import os
 import asyncio
+import shutil
 
 from itertools import count
 
@@ -44,9 +45,7 @@ async def activate_rulesets(execution_environment, rulesets, inventory, extravar
         with open(vars_file, 'w') as f:
             f.write(extravars)
 
-        #cmd = f"docker run -v {rules_file}:rules.yml -v {inventory_file}:inventory.yml -v {vars_file}:vars.yml -it {execution_environment} ansible-events --rules rules.yml -i inventory.yml --vars vars.yml"
-        cmd = f"docker run -it {execution_environment} ansible-events --rules benthomasson.eda.hello_events -i inventory.yml"
-        #cmd = "docker run -it quay.io/bthomass/events-demo-ci-cd:latest ansible-events --rules benthomasson.eda.hello_events -i inventory.yml"
+        cmd = f"docker run -v {rules_file}:/rules.yml -v {inventory_file}:/inventory.yml -v {vars_file}:/vars.yml -it {execution_environment} ansible-events --rules /rules.yml -i /inventory.yml --vars /vars.yml"
 
         proc = await asyncio.create_subprocess_shell(
             cmd,
@@ -63,7 +62,7 @@ async def activate_rulesets(execution_environment, rulesets, inventory, extravar
 
         activated_rulesets[next(activated_rulesets_seq)] = proc
     finally:
-        pass
+        shutil.rmtree(tempdir)
 
 
 async def inactivate_rulesets(rulesets_id):
