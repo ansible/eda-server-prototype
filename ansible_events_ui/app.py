@@ -241,3 +241,34 @@ async def create_project(p: Project):
     query = projects.insert().values(url=p.url, git_hash=p.git_hash)
     last_record_id = await database.execute(query)
     return {**p.dict(), "id": last_record_id}
+
+
+@app.get("/projects/")
+async def read_projects():
+    query = projects.select()
+    return await database.fetch_all(query)
+
+
+@app.get("/inventories/")
+async def read_inventories():
+    query = inventories.select()
+    return await database.fetch_all(query)
+
+
+@app.get("/rulesetbooks/")
+async def read_rulesetbooks():
+    query = rulesets.select()
+    return await database.fetch_all(query)
+
+
+@app.get("/extravars/")
+async def read_extravars():
+    query = extravars.select()
+    return await database.fetch_all(query)
+
+
+@app.get("/activations/")
+async def read_activations():
+    query = activations.select()
+    return await database.fetch_all(query)
+
