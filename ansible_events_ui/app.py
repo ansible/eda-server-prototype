@@ -1,4 +1,4 @@
-from fastapi import FastAPI, WebSocket
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from typing import List
@@ -33,7 +33,7 @@ metadata.create_all(engine)
 
 app = FastAPI()
 
-app.mount("/static", StaticFiles(directory="ui/dist"), name="static")
+app.mount("/eda", StaticFiles(directory="ui/dist", html=True), name="eda")
 
 
 loop = asyncio.get_event_loop()
@@ -225,7 +225,7 @@ async def read_output(proc, activation_id):
         )
         await database.execute(query)
         line_number += 1
-        await connnectionmanager.broadcast(line)
+        await connnectionmanager.broadcast(json.dumps(['Stdout', dict(stdout=line)]))
 
 
 @app.get("/activation_logs/", response_model=List[ActivationLog])
