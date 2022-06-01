@@ -6,7 +6,7 @@ import { AppRoutes } from '@app/routes';
 import '@app/app.css';
 
 const App: React.FunctionComponent = () => (
-  <Router basename="/static">
+  <Router basename="/eda">
     <AppLayout>
       <AppRoutes />
     </AppLayout>

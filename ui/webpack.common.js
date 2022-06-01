@@ -4,14 +4,14 @@ const CopyPlugin = require('copy-webpack-plugin');
 const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 const Dotenv = require('dotenv-webpack');
 const BG_IMAGES_DIRNAME = 'bgimages';
-const ASSET_PATH = process.env.ASSET_PATH || '/static/';
+const ASSET_PATH = process.env.ASSET_PATH || '/eda/';
 module.exports = env => {
 
   return {
     module: {
       rules: [
         {
-          test: /\.(tsx|ts|jsx)?$/,
+          test: /\.(tsx|ts|jsx|js)?$/,
           use: [
             {
               loader: 'ts-loader',
