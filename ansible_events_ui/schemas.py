@@ -69,3 +69,9 @@ class ActivationLog(BaseModel):
     activation_id: int
     log: StrictStr
     id: Optional[int]
+
+
+class Project(BaseModel):
+    id: Optional[int]
+    git_hash: Optional[StrictStr]
+    url: StrictStr

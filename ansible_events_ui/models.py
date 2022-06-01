@@ -57,3 +57,13 @@ activation_logs = sqlalchemy.Table(
 )
 
 
+
+projects = sqlalchemy.Table(
+    "project",
+    metadata,
+    sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True),
+    sqlalchemy.Column("git_hash", sqlalchemy.String),
+    sqlalchemy.Column("url", sqlalchemy.Integer),
+)
+
+

@@ -7,28 +7,19 @@ from aiokafka import AIOKafkaProducer
 from .schemas import ProducerMessage
 from .schemas import ProducerResponse
 from .schemas import RuleSetBook, Inventory, Activation, ActivationLog, Extravars
+from .schemas import Project
 from .models import (
-    metadata,
     rulesets,
     inventories,
     extravars,
     activations,
     activation_logs,
+    projects,
 )
 from .manager import activate_rulesets
+from .project import clone_project
+from .database import database
 import json
-
-import databases
-import sqlalchemy
-
-DATABASE_URL = "sqlite:///./test.db"
-
-database = databases.Database(DATABASE_URL)
-
-engine = sqlalchemy.create_engine(
-    DATABASE_URL, connect_args={"check_same_thread": False}
-)
-metadata.create_all(engine)
 
 
 app = FastAPI()
@@ -225,7 +216,7 @@ async def read_output(proc, activation_id):
         )
         await database.execute(query)
         line_number += 1
-        await connnectionmanager.broadcast(json.dumps(['Stdout', dict(stdout=line)]))
+        await connnectionmanager.broadcast(json.dumps(["Stdout", dict(stdout=line)]))
 
 
 @app.get("/activation_logs/", response_model=List[ActivationLog])
@@ -241,3 +232,12 @@ async def read_tasks():
         for task in taskmanager.tasks
     ]
     return tasks
+
+
+@app.post("/project/")
+async def create_project(p: Project):
+    found_hash = await clone_project(p.url, p.git_hash)
+    p.git_hash = found_hash
+    query = projects.insert().values(url=p.url, git_hash=p.git_hash)
+    last_record_id = await database.execute(query)
+    return {**p.dict(), "id": last_record_id}
