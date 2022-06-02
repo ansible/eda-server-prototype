@@ -2,6 +2,13 @@ import * as React from 'react';
 import { Route, RouteComponentProps, Switch } from 'react-router-dom';
 import { accessibleRouteChangeHandler } from '@app/utils/utils';
 import { Dashboard } from '@app/Dashboard/Dashboard';
+import { Projects } from '@app/Projects/Projects';
+import { Activations } from '@app/Activations/Activations';
+import { Jobs } from '@app/Jobs/Jobs';
+import { Rules } from '@app/Rules/Rules';
+import { Inventories } from '@app/Inventories/Inventories';
+import { Vars } from '@app/Vars/Vars';
+import { Playbooks } from '@app/Playbooks/Playbooks';
 import { Support } from '@app/Support/Support';
 import { GeneralSettings } from '@app/Settings/General/GeneralSettings';
 import { ProfileSettings } from '@app/Settings/Profile/ProfileSettings';
@@ -35,7 +42,56 @@ const routes: AppRouteConfig[] = [
     exact: true,
     label: 'Dashboard',
     path: '/',
-    title: 'PatternFly Seed | Main Dashboard',
+    title: 'Main Dashboard',
+  },
+  {
+    component: Projects,
+    exact: true,
+    label: 'Projects',
+    path: '/projects',
+    title: 'Projects',
+  },
+  {
+    component: Activations,
+    exact: true,
+    label: 'Activations',
+    path: '/activations',
+    title: 'Activations',
+  },
+  {
+    component: Jobs,
+    exact: true,
+    label: 'Jobs',
+    path: '/jobs',
+    title: 'Jobs',
+  },
+  {
+    component: Rules,
+    exact: true,
+    label: 'Rules',
+    path: '/rules',
+    title: 'Rules',
+  },
+  {
+    component: Inventories,
+    exact: true,
+    label: 'Inventories',
+    path: '/inventories',
+    title: 'Inventories',
+  },
+  {
+    component: Vars,
+    exact: true,
+    label: 'Vars',
+    path: '/vars',
+    title: 'Vars',
+  },
+  {
+    component: Playbooks,
+    exact: true,
+    label: 'Playbooks',
+    path: '/playbooks',
+    title: 'Playbooks',
   },
   {
     component: Support,
