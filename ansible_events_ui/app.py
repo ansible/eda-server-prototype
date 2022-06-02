@@ -3,7 +3,6 @@ from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from typing import List
 import asyncio
-from aiokafka import AIOKafkaProducer
 from .schemas import ProducerMessage
 from .schemas import ProducerResponse
 from .schemas import RuleSetBook, Inventory, Activation, ActivationLog, Extravars
@@ -25,10 +24,6 @@ import json
 app = FastAPI()
 
 app.mount("/eda", StaticFiles(directory="ui/dist", html=True), name="eda")
-
-
-loop = asyncio.get_event_loop()
-aioproducer = AIOKafkaProducer(loop=loop, bootstrap_servers="localhost:9092")
 
 
 class TaskManager:
@@ -64,14 +59,12 @@ connnectionmanager = ConnectionManager()
 
 @app.on_event("startup")
 async def startup():
-    await aioproducer.start()
     await database.connect()
 
 
 @app.on_event("shutdown")
 async def shutdown():
     await database.disconnect()
-    await aioproducer.stop()
 
 
 @app.get("/")
@@ -133,22 +126,6 @@ async def websocket_endpoint(websocket: WebSocket):
 @app.get("/ping")
 def ping():
     return {"ping": "pong!"}
-
-
-@app.post("/producer/{topicname}")
-async def kafka_produce(msg: ProducerMessage, topicname: str):
-    """
-    Produce a message into <topicname>
-    This will produce a message into a Apache Kafka topic
-    And this path operation will:
-    * return ProducerResponse
-    """
-
-    await aioproducer.send(topicname, json.dumps(msg.dict()).encode("ascii"))
-    response = ProducerResponse(
-        name=msg.name, message_id=msg.message_id, topic=topicname
-    )
-    return response
 
 
 @app.post("/rulesetbook/")
