@@ -1,6 +1,7 @@
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
+from fastapi.middleware.cors import CORSMiddleware
 from typing import List
 import asyncio
 from .schemas import ProducerMessage
@@ -24,6 +25,20 @@ import json
 app = FastAPI()
 
 app.mount("/eda", StaticFiles(directory="ui/dist", html=True), name="eda")
+
+origins = [
+    "http://localhost",
+    "http://localhost:8000",
+    "http://localhost:9000",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 class TaskManager:
@@ -158,7 +173,7 @@ async def create_activation(a: Activation):
     query = extravars.select().where(extravars.c.id == a.extravars_id)
     e = await database.fetch_one(query)
     cmd, proc = await activate_rulesets(
-        "quay.io/bthomass/events-demo-ci-cd:latest", r.rules, i.inventory, e.extravars
+        "quay.io/bthomass/ansible-events:latest", r.rules, i.inventory, e.extravars
     )
 
     query = activations.insert().values(
