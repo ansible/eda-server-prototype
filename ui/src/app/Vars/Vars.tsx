@@ -1,7 +1,8 @@
 import * as React from 'react';
 import { PageSection, Title } from '@patternfly/react-core';
 import { useDispatch } from 'react-redux';
-import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
 import Ansi from "ansi-to-react";
 import {
   Card,
@@ -22,15 +23,45 @@ const SimpleList = styled(PFSimpleList)`
   white-space: pre-wrap;
 `
 
+const endpoint = 'http://localhost:8000/extravars/';
 
 const Vars: React.FunctionComponent = () => {
 
 
+
+  const [extravars, setRules] = useState([]);
+
+  useEffect(() => {
+     fetch(endpoint, {
+       headers: {
+         'Content-Type': 'application/json',
+       },
+     }).then(response => response.json())
+    .then(data => setRules(data));
+  }, []);
+
   return (
   <React.Fragment>
   <PageSection>
-    <Title headingLevel="h1" size="lg">Event Driven Automation | Vars</Title>
+    <Title headingLevel="h1" size="lg">Event Driven Automation | Rules</Title>
   </PageSection>
+
+	<Stack>
+            <StackItem>
+              <Card>
+                <CardTitle>Rule Sets</CardTitle>
+                <CardBody>
+                  {extravars.length !== 0 && (
+                    <SimpleList style={{ whiteSpace: 'pre-wrap' }}>
+                      {extravars.map((item, i) => (
+                        <SimpleListItem key={i}><Link to={"/extravars/" + item.id}>{item.name} </Link></SimpleListItem>
+                      ))}
+                    </SimpleList>
+                  )}
+                </CardBody>
+              </Card>
+            </StackItem>
+	</Stack>
   </React.Fragment>
 )
 }
