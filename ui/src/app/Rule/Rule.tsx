@@ -3,6 +3,8 @@ import { PageSection, Title } from '@patternfly/react-core';
 import { useDispatch } from 'react-redux';
 import { Link, useParams } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
+import { CodeBlock, CodeBlockCode  } from '@patternfly/react-core';
+
 import Ansi from "ansi-to-react";
 import {
   Card,
@@ -46,9 +48,9 @@ const RuleSet: React.FunctionComponent = () => {
   <PageSection>
     <Title headingLevel="h1" size="lg">Event Driven Automation | Rule Set {ruleset.name}</Title>
   </PageSection>
-  <pre>
-    {ruleset.rules}
-  </pre>
+    <CodeBlock>
+      <CodeBlockCode id="code-content">{ruleset.rules}</CodeBlockCode>
+    </CodeBlock>
   </React.Fragment>
 )
 }

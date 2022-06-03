@@ -13,6 +13,7 @@ import {
   Stack,
   StackItem,
 } from '@patternfly/react-core';
+import { CodeBlock, CodeBlockCode  } from '@patternfly/react-core';
 import styled from 'styled-components';
 
 
@@ -46,9 +47,9 @@ const Var: React.FunctionComponent = () => {
   <PageSection>
     <Title headingLevel="h1" size="lg">Event Driven Automation | Var {extravar.name}</Title>
   </PageSection>
-  <pre>
-    {extravar.extravars}
-  </pre>
+    <CodeBlock>
+      <CodeBlockCode id="code-content">{extravar.extravars}</CodeBlockCode>
+    </CodeBlock>
   </React.Fragment>
 )
 }
