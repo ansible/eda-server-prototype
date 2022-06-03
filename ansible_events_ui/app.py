@@ -267,7 +267,7 @@ async def read_rulesetbooks():
 
 @app.get("/rulesetbook/{rulesetbook_id}")
 async def read_rulesetbook(rulesetbook_id: int):
-    query = rulesetbooks.select().where(rulesetbooks.c.id == rulesetbook_id)
+    query = rulesets.select().where(rulesets.c.id == rulesetbook_id)
     return await database.fetch_one(query)
 
 
