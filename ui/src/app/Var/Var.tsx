@@ -27,7 +27,7 @@ const endpoint = 'http://localhost:8000/extravar/';
 
 const Var: React.FunctionComponent = () => {
 
-  const [extrvar, setVar] = useState([]);
+  const [extravar, setVar] = useState([]);
 
   let { id } = useParams();
   console.log(id);
@@ -44,8 +44,11 @@ const Var: React.FunctionComponent = () => {
   return (
   <React.Fragment>
   <PageSection>
-    <Title headingLevel="h1" size="lg">Event Driven Automation | Var {extrvar.name}</Title>
+    <Title headingLevel="h1" size="lg">Event Driven Automation | Var {extravar.name}</Title>
   </PageSection>
+  <pre>
+    {extravar.extravars}
+  </pre>
   </React.Fragment>
 )
 }

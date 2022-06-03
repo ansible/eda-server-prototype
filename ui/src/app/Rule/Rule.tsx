@@ -46,6 +46,9 @@ const RuleSet: React.FunctionComponent = () => {
   <PageSection>
     <Title headingLevel="h1" size="lg">Event Driven Automation | Rule Set {ruleset.name}</Title>
   </PageSection>
+  <pre>
+    {ruleset.rules}
+  </pre>
   </React.Fragment>
 )
 }

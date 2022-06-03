@@ -46,6 +46,9 @@ const Inventory: React.FunctionComponent = () => {
   <PageSection>
     <Title headingLevel="h1" size="lg">Event Driven Automation | Inventory {inventory.name}</Title>
   </PageSection>
+  <pre>
+    {inventory.inventory}
+  </pre>
   </React.Fragment>
 )
 }
