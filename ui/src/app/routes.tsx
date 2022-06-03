@@ -3,12 +3,19 @@ import { Route, RouteComponentProps, Switch } from 'react-router-dom';
 import { accessibleRouteChangeHandler } from '@app/utils/utils';
 import { Dashboard } from '@app/Dashboard/Dashboard';
 import { Projects } from '@app/Projects/Projects';
+import { Project } from '@app/Project/Project';
 import { Activations } from '@app/Activations/Activations';
+import { Activation } from '@app/Activation/Activation';
 import { Jobs } from '@app/Jobs/Jobs';
+import { Job } from '@app/Job/Job';
 import { Rules } from '@app/Rules/Rules';
+import { RuleSet } from '@app/Rule/Rule';
 import { Inventories } from '@app/Inventories/Inventories';
+import { Inventory } from '@app/Inventory/Inventory';
 import { Vars } from '@app/Vars/Vars';
+import { Var } from '@app/Var/Var';
 import { Playbooks } from '@app/Playbooks/Playbooks';
+import { Playbook } from '@app/Playbook/Playbook';
 import { Support } from '@app/Support/Support';
 import { GeneralSettings } from '@app/Settings/General/GeneralSettings';
 import { ProfileSettings } from '@app/Settings/Profile/ProfileSettings';
@@ -52,11 +59,22 @@ const routes: AppRouteConfig[] = [
     title: 'Projects',
   },
   {
+    component: Project,
+    path: '/project/:id',
+    title: 'Project',
+  },
+  {
     component: Activations,
     exact: true,
     label: 'Activations',
     path: '/activations',
     title: 'Activations',
+  },
+  {
+    component: Activation,
+    exact: true,
+    path: '/activation/:id',
+    title: 'Activation',
   },
   {
     component: Jobs,
@@ -66,11 +84,23 @@ const routes: AppRouteConfig[] = [
     title: 'Jobs',
   },
   {
+    component: Job,
+    exact: true,
+    path: '/job/:id',
+    title: 'Job',
+  },
+  {
     component: Rules,
     exact: true,
-    label: 'Rules',
+    label: 'Rule Sets',
     path: '/rules',
     title: 'Rules',
+  },
+  {
+    component: RuleSet,
+    exact: true,
+    path: '/rule/:id',
+    title: 'RuleSet',
   },
   {
     component: Inventories,
@@ -80,6 +110,12 @@ const routes: AppRouteConfig[] = [
     title: 'Inventories',
   },
   {
+    component: Inventory,
+    exact: true,
+    path: '/inventory/:id',
+    title: 'Inventory',
+  },
+  {
     component: Vars,
     exact: true,
     label: 'Vars',
@@ -87,11 +123,23 @@ const routes: AppRouteConfig[] = [
     title: 'Vars',
   },
   {
+    component: Var,
+    exact: true,
+    path: '/var/:id',
+    title: 'Var',
+  },
+  {
     component: Playbooks,
     exact: true,
     label: 'Playbooks',
     path: '/playbooks',
     title: 'Playbooks',
+  },
+  {
+    component: Playbook,
+    exact: true,
+    path: '/playbooks/:id',
+    title: 'Playbook',
   },
   {
     component: Support,

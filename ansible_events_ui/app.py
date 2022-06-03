@@ -235,6 +235,12 @@ async def create_project(p: Project):
     return {**p.dict(), "id": last_record_id}
 
 
+@app.get("/project/{project_id}")
+async def read_project(project_id: int):
+    query = projects.select().where(projects.c.id == project_id)
+    return await database.fetch_one(query)
+
+
 @app.get("/projects/")
 async def read_projects():
     query = projects.select()
@@ -247,10 +253,22 @@ async def read_inventories():
     return await database.fetch_all(query)
 
 
+@app.get("/inventory/{inventory_id}")
+async def read_inventory(inventory_id: int):
+    query = inventories.select().where(inventories.c.id == inventory_id)
+    return await database.fetch_one(query)
+
+
 @app.get("/rulesetbooks/")
 async def read_rulesetbooks():
     query = rulesets.select()
     return await database.fetch_all(query)
+
+
+@app.get("/rulesetbook/{rulesetbook_id}")
+async def read_rulesetbook(rulesetbook_id: int):
+    query = rulesetbooks.select().where(rulesetbooks.c.id == rulesetbook_id)
+    return await database.fetch_one(query)
 
 
 @app.get("/extravars/")
@@ -259,8 +277,19 @@ async def read_extravars():
     return await database.fetch_all(query)
 
 
+@app.get("/extravar/{extravar_id}")
+async def read_extrvar(extravar_id: int):
+    query = extravars.select().where(extravars.c.id == extravar_id)
+    return await database.fetch_one(query)
+
+
 @app.get("/activations/")
 async def read_activations():
     query = activations.select()
     return await database.fetch_all(query)
 
+
+@app.get("/activation/{activation_id}")
+async def read_activation(activation_id: int):
+    query = activations.select().where(activations.c.id == activation_id)
+    return await database.fetch_one(query)

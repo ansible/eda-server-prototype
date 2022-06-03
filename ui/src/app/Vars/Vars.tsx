@@ -54,7 +54,7 @@ const Vars: React.FunctionComponent = () => {
                   {extravars.length !== 0 && (
                     <SimpleList style={{ whiteSpace: 'pre-wrap' }}>
                       {extravars.map((item, i) => (
-                        <SimpleListItem key={i}><Link to={"/extravars/" + item.id}>{item.name} </Link></SimpleListItem>
+                        <SimpleListItem key={i}><Link to={"/var/" + item.id}>{item.name} </Link></SimpleListItem>
                       ))}
                     </SimpleList>
                   )}
