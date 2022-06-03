@@ -45,7 +45,16 @@ async def activate_rulesets(execution_environment, rulesets, inventory, extravar
         with open(vars_file, 'w') as f:
             f.write(extravars)
 
-        cmd = f"docker run -v {rules_file}:/rules.yml -v {inventory_file}:/inventory.yml -v {vars_file}:/vars.yml -it {execution_environment} ansible-events --rules /rules.yml -i /inventory.yml --vars /vars.yml"
+        # initial version using docker
+        # mounting volumes is probably the wrong way to do this
+        # it would be better to build it into the container or pass it through a stream (stdin or socket)
+        #cmd = f"docker run -v {rules_file}:/rules.yml -v {inventory_file}:/inventory.yml -v {vars_file}:/vars.yml -it {execution_environment} ansible-events --rules /rules.yml -i /inventory.yml --vars /vars.yml"
+
+        # try this with podman
+        #cmd = f"podman run -v {rules_file}:/rules.yml -v {inventory_file}:/inventory.yml -v {vars_file}:/vars.yml -it {execution_environment} ansible-events --rules /rules.yml -i /inventory.yml --vars /vars.yml"
+
+        # for local development this is better
+        cmd = f"ansible-events --rules {rules_file} -i {inventory_file} --vars {vars_file} --websocket-address ws://localhost:8000/ws2"
 
         proc = await asyncio.create_subprocess_shell(
             cmd,

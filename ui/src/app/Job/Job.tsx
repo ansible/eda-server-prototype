@@ -24,10 +24,12 @@ const SimpleList = styled(PFSimpleList)`
 `
 
 const endpoint = 'http://localhost:8000/job/';
+const event_endpoint = 'http://localhost:8000/job_events/';
 
 const Job: React.FunctionComponent = () => {
 
   const [job, setJob] = useState([]);
+  const [stdout, setStdout] = useState([]);
 
   let { id } = useParams();
   console.log(id);
@@ -39,13 +41,35 @@ const Job: React.FunctionComponent = () => {
        },
      }).then(response => response.json())
     .then(data => setJob(data));
+     fetch(event_endpoint + id, {
+       headers: {
+         'Content-Type': 'application/json',
+       },
+     }).then(response => response.json())
+    .then(data => setStdout(data));
   }, []);
 
   return (
   <React.Fragment>
   <PageSection>
-    <Title headingLevel="h1" size="lg">Event Driven Automation | Job {job.url}</Title>
+    <Title headingLevel="h1" size="lg">Event Driven Automation | Job {job.id}</Title>
   </PageSection>
+  <Stack>
+            <StackItem>
+              <Card>
+                <CardTitle>Standard Out</CardTitle>
+                <CardBody>
+                  {stdout.length !== 0 && (
+                    <SimpleList style={{ whiteSpace: 'pre-wrap' }}>
+                      {stdout.map((item, i) => (
+                        <SimpleListItem key={i}><Ansi>{item.stdout}</Ansi></SimpleListItem>
+                      ))}
+                    </SimpleList>
+                  )}
+                </CardBody>
+              </Card>
+            </StackItem>
+  </Stack>
   </React.Fragment>
 )
 }

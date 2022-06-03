@@ -15,6 +15,8 @@ from .models import (
     activations,
     activation_logs,
     projects,
+    jobs,
+    job_events,
 )
 from .manager import activate_rulesets
 from .project import clone_project
@@ -30,6 +32,9 @@ origins = [
     "http://localhost",
     "http://localhost:8000",
     "http://localhost:9000",
+    "http://127.0.0.1",
+    "http://127.0.0.1:8000",
+    "http://127.0.0.1:9000",
 ]
 
 app.add_middleware(
@@ -137,6 +142,26 @@ async def websocket_endpoint(websocket: WebSocket):
     except WebSocketDisconnect:
         connnectionmanager.disconnect(websocket)
 
+@app.websocket("/ws2")
+async def websocket_endpoint(websocket: WebSocket):
+    await websocket.accept()
+    try:
+        while True:
+            data = await websocket.receive_text()
+            data = json.loads(data)
+            data_type = data.get('type')
+            if data_type == 'Job':
+                query = jobs.insert().values(uuid=data.get('job_id'))
+                await database.execute(query)
+            elif data_type == 'AnsibleEvent':
+                event_data = data.get('event', {})
+                query = job_events.insert().values(job_uuid=event_data.get('job_id'),
+                                                   counter=event_data.get('counter'),
+                                                   stdout=event_data.get('stdout'))
+                await database.execute(query)
+            print(data)
+    except WebSocketDisconnect:
+        pass
 
 @app.get("/ping")
 def ping():
@@ -293,3 +318,23 @@ async def read_activations():
 async def read_activation(activation_id: int):
     query = activations.select().where(activations.c.id == activation_id)
     return await database.fetch_one(query)
+
+
+@app.get("/jobs/")
+async def read_jobs():
+    query = jobs.select()
+    return await database.fetch_all(query)
+
+
+@app.get("/job/{job_id}")
+async def read_job(job_id: int):
+    query = jobs.select().where(jobs.c.id == job_id)
+    return await database.fetch_one(query)
+
+
+@app.get("/job_events/{job_id}")
+async def read_job_events(job_id: int):
+    query1 = jobs.select().where(jobs.c.id == job_id)
+    job = await database.fetch_one(query1)
+    query2 = job_events.select().where(job_events.c.job_uuid == job.uuid)
+    return await database.fetch_all(query2)

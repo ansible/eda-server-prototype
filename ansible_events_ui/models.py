@@ -67,3 +67,22 @@ projects = sqlalchemy.Table(
 )
 
 
+
+jobs = sqlalchemy.Table(
+    "job",
+    metadata,
+    sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True),
+    sqlalchemy.Column("uuid", sqlalchemy.String),
+)
+
+
+job_events = sqlalchemy.Table(
+    "job_event",
+    metadata,
+    sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True),
+    sqlalchemy.Column("job_uuid", sqlalchemy.String),
+    sqlalchemy.Column("counter", sqlalchemy.Integer),
+    sqlalchemy.Column("stdout", sqlalchemy.String),
+)
+
+
