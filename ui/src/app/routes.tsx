@@ -4,6 +4,7 @@ import { accessibleRouteChangeHandler } from '@app/utils/utils';
 import { Dashboard } from '@app/Dashboard/Dashboard';
 import { Projects } from '@app/Projects/Projects';
 import { Project } from '@app/Project/Project';
+import { NewProject } from '@app/NewProject/NewProject';
 import { Activations } from '@app/Activations/Activations';
 import { Activation } from '@app/Activation/Activation';
 import { Jobs } from '@app/Jobs/Jobs';
@@ -62,6 +63,11 @@ const routes: AppRouteConfig[] = [
     component: Project,
     path: '/project/:id',
     title: 'Project',
+  },
+  {
+    component: NewProject,
+    path: '/new-project/',
+    title: 'NewProject',
   },
   {
     component: Activations,

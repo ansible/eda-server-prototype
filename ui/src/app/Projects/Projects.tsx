@@ -13,6 +13,8 @@ import {
   Stack,
   StackItem,
 } from '@patternfly/react-core';
+import { Button } from '@patternfly/react-core';
+import PlusCircleIcon from '@patternfly/react-icons/dist/esm/icons/plus-circle-icon';
 import styled from 'styled-components';
 
 
@@ -44,6 +46,11 @@ const Projects: React.FunctionComponent = () => {
     <Title headingLevel="h1" size="lg">Event Driven Automation | Projects</Title>
   </PageSection>
 
+  <Link to="/new-project">
+  <Button variant="link" icon={<PlusCircleIcon />}>
+      New Project
+  </Button>
+  </Link>
 	<Stack>
             <StackItem>
               <Card>
