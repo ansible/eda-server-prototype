@@ -4,6 +4,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from typing import List
 import asyncio
+from sqlalchemy import select
 from .schemas import ProducerMessage
 from .schemas import ProducerResponse
 from .schemas import RuleSetBook, Inventory, Activation, ActivationLog, Extravars
@@ -17,9 +18,12 @@ from .models import (
     projects,
     jobs,
     job_events,
+    projectrules,
+    projectinventories,
+    projectvars,
 )
 from .manager import activate_rulesets
-from .project import clone_project
+from .project import clone_project, sync_project
 from .database import database
 import json
 
@@ -142,6 +146,7 @@ async def websocket_endpoint(websocket: WebSocket):
     except WebSocketDisconnect:
         connnectionmanager.disconnect(websocket)
 
+
 @app.websocket("/ws2")
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
@@ -149,19 +154,22 @@ async def websocket_endpoint(websocket: WebSocket):
         while True:
             data = await websocket.receive_text()
             data = json.loads(data)
-            data_type = data.get('type')
-            if data_type == 'Job':
-                query = jobs.insert().values(uuid=data.get('job_id'))
+            data_type = data.get("type")
+            if data_type == "Job":
+                query = jobs.insert().values(uuid=data.get("job_id"))
                 await database.execute(query)
-            elif data_type == 'AnsibleEvent':
-                event_data = data.get('event', {})
-                query = job_events.insert().values(job_uuid=event_data.get('job_id'),
-                                                   counter=event_data.get('counter'),
-                                                   stdout=event_data.get('stdout'))
+            elif data_type == "AnsibleEvent":
+                event_data = data.get("event", {})
+                query = job_events.insert().values(
+                    job_uuid=event_data.get("job_id"),
+                    counter=event_data.get("counter"),
+                    stdout=event_data.get("stdout"),
+                )
                 await database.execute(query)
             print(data)
     except WebSocketDisconnect:
         pass
+
 
 @app.get("/ping")
 def ping():
@@ -253,17 +261,35 @@ async def read_tasks():
 
 @app.post("/project/")
 async def create_project(p: Project):
-    found_hash = await clone_project(p.url, p.git_hash)
+    found_hash, tempdir = await clone_project(p.url, p.git_hash)
     p.git_hash = found_hash
     query = projects.insert().values(url=p.url, git_hash=p.git_hash)
     last_record_id = await database.execute(query)
+    await sync_project(last_record_id, tempdir)
     return {**p.dict(), "id": last_record_id}
 
 
 @app.get("/project/{project_id}")
 async def read_project(project_id: int):
     query = projects.select().where(projects.c.id == project_id)
-    return await database.fetch_one(query)
+    result = dict(await database.fetch_one(query))
+    result["rules"] = await database.fetch_all(
+        select(rulesets.c.id, rulesets.c.name).select_from(
+            projects.join(projectrules).join(rulesets)
+        ).where(projects.c.id == project_id)
+    )
+    result["inventories"] = await database.fetch_all(
+        select(inventories.c.id, inventories.c.name).select_from(
+            projects.join(projectinventories).join(inventories)
+        ).where(projects.c.id == project_id)
+    )
+    result["vars"] = await database.fetch_all(
+        select(extravars.c.id, extravars.c.name).select_from(
+            projects.join(projectvars).join(extravars)
+        ).where(projects.c.id == project_id)
+    )
+    print(result)
+    return result
 
 
 @app.get("/projects/")
@@ -317,7 +343,9 @@ async def read_activations():
 @app.get("/activation/{activation_id}")
 async def read_activation(activation_id: int):
     query = activations.select().where(activations.c.id == activation_id)
-    return await database.fetch_one(query)
+    result = dict(await database.fetch_one(query))
+    print(dict(result))
+    return result
 
 
 @app.get("/jobs/")

@@ -9,6 +9,9 @@ from .models import (
     rulesets,
     inventories,
     extravars,
+    projectinventories,
+    projectrules,
+    projectvars,
 )
 
 from .database import database
@@ -35,16 +38,6 @@ async def clone_project(url, git_hash=None):
         if stderr:
             print(stderr.decode())
 
-        return await sync_project(url, tempdir)
-
-    finally:
-        pass
-
-
-async def sync_project(url, tempdir):
-
-    try:
-
         cmd = "git rev-parse HEAD"
 
         proc = await asyncio.create_subprocess_shell(
@@ -56,16 +49,24 @@ async def sync_project(url, tempdir):
 
         stdout, stderr = await proc.communicate()
 
-        await find_rules(tempdir)
-        await find_inventory(tempdir)
-        await find_extravars(tempdir)
-
         if stdout:
             # print(stdout.decode())
-            return stdout.decode().strip()
+            return stdout.decode().strip(), tempdir
         if stderr:
             # print(stderr.decode())
-            return stderr.decode().strip()
+            return stderr.decode().strip(), tempdir
+
+    finally:
+        pass
+
+
+async def sync_project(project_id, tempdir):
+
+    try:
+
+        await find_rules(project_id, tempdir)
+        await find_inventory(project_id, tempdir)
+        await find_extravars(project_id, tempdir)
 
     finally:
         pass
@@ -99,7 +100,7 @@ def yield_files(project_dir):
 
 
 
-async def find_rules(project_dir):
+async def find_rules(project_id, project_dir):
 
     for directory, filename in yield_files(project_dir):
         full_path = os.path.join(directory, filename)
@@ -108,6 +109,9 @@ async def find_rules(project_dir):
             with open(full_path) as f:
                 rules = f.read()
             query = rulesets.insert().values(name=filename, rules=rules)
+            last_record_id = await database.execute(query)
+            print(last_record_id)
+            query = projectrules.insert().values(project_id=project_id, rules_id=last_record_id)
             last_record_id = await database.execute(query)
             print(last_record_id)
 
@@ -129,7 +133,7 @@ def is_inventory_file(filename):
     return True
 
 
-async def find_inventory(project_dir):
+async def find_inventory(project_id, project_dir):
 
     for directory, filename in yield_files(project_dir):
         full_path = os.path.join(directory, filename)
@@ -138,6 +142,9 @@ async def find_inventory(project_dir):
             with open(full_path) as f:
                 inventory = f.read()
             query = inventories.insert().values(name=filename, inventory=inventory)
+            last_record_id = await database.execute(query)
+            print(last_record_id)
+            query = projectinventories.insert().values(project_id=project_id, inventory_id=last_record_id)
             last_record_id = await database.execute(query)
             print(last_record_id)
 
@@ -172,7 +179,7 @@ def is_extravars_file(filename):
     )
 
 
-async def find_extravars(project_dir):
+async def find_extravars(project_id, project_dir):
 
     for directory, filename in yield_files(project_dir):
         full_path = os.path.join(directory, filename)
@@ -181,5 +188,8 @@ async def find_extravars(project_dir):
             with open(full_path) as f:
                 extravar = f.read()
             query = extravars.insert().values(name=filename, extravars=extravar)
+            last_record_id = await database.execute(query)
+            print(last_record_id)
+            query = projectvars.insert().values(project_id=project_id, vars_id=last_record_id)
             last_record_id = await database.execute(query)
             print(last_record_id)

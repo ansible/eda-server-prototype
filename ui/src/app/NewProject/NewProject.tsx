@@ -15,6 +15,7 @@ import {
   StackItem,
 } from '@patternfly/react-core';
 import { ActionGroup, Button, Form, FormGroup, TextInput } from '@patternfly/react-core';
+import { postData } from '@app/utils/utils';
 
 import styled from 'styled-components';
 
@@ -36,7 +37,11 @@ const NewProject: React.FunctionComponent = () => {
 
   const handleSubmit = () => {
       console.log('submit ' + value);
-      history.push("/projects");
+			postData(endpoint, { url: value })
+				.then(data => {
+					console.log(data);
+          history.push("/project/" + data.id);
+			});
   };
 
   return (

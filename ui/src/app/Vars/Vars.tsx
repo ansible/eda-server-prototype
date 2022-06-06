@@ -29,7 +29,7 @@ const Vars: React.FunctionComponent = () => {
 
 
 
-  const [extravars, setRules] = useState([]);
+  const [extravars, setVars] = useState([]);
 
   useEffect(() => {
      fetch(endpoint, {
@@ -37,7 +37,7 @@ const Vars: React.FunctionComponent = () => {
          'Content-Type': 'application/json',
        },
      }).then(response => response.json())
-    .then(data => setRules(data));
+    .then(data => setVars(data));
   }, []);
 
   return (

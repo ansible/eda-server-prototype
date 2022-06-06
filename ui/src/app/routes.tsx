@@ -7,6 +7,7 @@ import { Project } from '@app/Project/Project';
 import { NewProject } from '@app/NewProject/NewProject';
 import { Activations } from '@app/Activations/Activations';
 import { Activation } from '@app/Activation/Activation';
+import { NewActivation } from '@app/NewActivation/NewActivation';
 import { Jobs } from '@app/Jobs/Jobs';
 import { Job } from '@app/Job/Job';
 import { Rules } from '@app/Rules/Rules';
@@ -81,6 +82,11 @@ const routes: AppRouteConfig[] = [
     exact: true,
     path: '/activation/:id',
     title: 'Activation',
+  },
+  {
+    component: NewActivation,
+    path: '/new-activation/',
+    title: 'NewActivation',
   },
   {
     component: Jobs,
