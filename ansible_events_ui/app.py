@@ -274,19 +274,19 @@ async def read_project(project_id: int):
     query = projects.select().where(projects.c.id == project_id)
     result = dict(await database.fetch_one(query))
     result["rules"] = await database.fetch_all(
-        select(rulesets.c.id, rulesets.c.name).select_from(
-            projects.join(projectrules).join(rulesets)
-        ).where(projects.c.id == project_id)
+        select(rulesets.c.id, rulesets.c.name)
+        .select_from(projects.join(projectrules).join(rulesets))
+        .where(projects.c.id == project_id)
     )
     result["inventories"] = await database.fetch_all(
-        select(inventories.c.id, inventories.c.name).select_from(
-            projects.join(projectinventories).join(inventories)
-        ).where(projects.c.id == project_id)
+        select(inventories.c.id, inventories.c.name)
+        .select_from(projects.join(projectinventories).join(inventories))
+        .where(projects.c.id == project_id)
     )
     result["vars"] = await database.fetch_all(
-        select(extravars.c.id, extravars.c.name).select_from(
-            projects.join(projectvars).join(extravars)
-        ).where(projects.c.id == project_id)
+        select(extravars.c.id, extravars.c.name)
+        .select_from(projects.join(projectvars).join(extravars))
+        .where(projects.c.id == project_id)
     )
     print(result)
     return result
@@ -342,7 +342,20 @@ async def read_activations():
 
 @app.get("/activation/{activation_id}")
 async def read_activation(activation_id: int):
-    query = activations.select().where(activations.c.id == activation_id)
+    query = (
+        select(
+            activations.c.id,
+            activations.c.name,
+            rulesets.c.id.label("ruleset_id"),
+            rulesets.c.name.label("ruleset_name"),
+            inventories.c.id.label("inventory_id"),
+            inventories.c.name.label("inventory_name"),
+            extravars.c.id.label("extravars_id"),
+            extravars.c.name.label("extravars_name"),
+        )
+        .select_from(activations.join(rulesets).join(inventories).join(extravars))
+        .where(activations.c.id == activation_id)
+    )
     result = dict(await database.fetch_one(query))
     print(dict(result))
     return result
