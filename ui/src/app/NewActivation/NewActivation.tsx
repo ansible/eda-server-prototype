@@ -50,6 +50,24 @@ const NewActivation: React.FunctionComponent = () => {
     .then(data => setRules(data));
   }, []);
 
+  useEffect(() => {
+     fetch(endpoint2, {
+       headers: {
+         'Content-Type': 'application/json',
+       },
+     }).then(response => response.json())
+    .then(data => setInventories(data));
+  }, []);
+
+  useEffect(() => {
+     fetch(endpoint3, {
+       headers: {
+         'Content-Type': 'application/json',
+       },
+     }).then(response => response.json())
+    .then(data => setExtraVars(data));
+  }, []);
+
   const [name, setName] = useState('');
   const [ruleset, setRuleSet] = useState('');
   const [inventory, setInventory] = useState('');
