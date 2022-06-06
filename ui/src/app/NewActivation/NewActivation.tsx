@@ -39,7 +39,7 @@ const NewActivation: React.FunctionComponent = () => {
 
   const [rules, setRules] = useState([{"id": 0, "name": "???"}]);
   const [inventories, setInventories] = useState([]);
-  const [extravars, setVars] = useState([]);
+  const [extravars, setExtraVars] = useState([]);
 
   useEffect(() => {
      fetch(endpoint1, {
@@ -53,7 +53,7 @@ const NewActivation: React.FunctionComponent = () => {
   const [name, setName] = useState('');
   const [ruleset, setRuleSet] = useState('');
   const [inventory, setInventory] = useState('');
-  const [extravar, setVar] = useState('');
+  const [extravar, setExtraVar] = useState('');
 
   const handleSubmit = () => {
 			postData(endpoint, { name: name,
@@ -86,23 +86,23 @@ const NewActivation: React.FunctionComponent = () => {
         <FormGroup label="Rule Set" >
           <FormSelect value={ruleset} onChange={setRuleSet} aria-label="FormSelect Input">
         {rules.map((option, index) => (
-          <FormSelectOption key={index} value={option.id} label={option.name} />
+          <FormSelectOption key={index} value={option.id} label={"" + option.id + " "+ option.name} />
         ))}
       </FormSelect>
         </FormGroup>
         <FormGroup label="Inventory" >
-          <TextInput
-            id="activation-inventory"
-            onChange={setInventory}
-            value={inventory}
-          />
+          <FormSelect value={inventory} onChange={setInventory} aria-label="FormSelect Input2">
+        {inventories.map((option, index) => (
+          <FormSelectOption key={index} value={option.id} label={"" + option.id + " "+ option.name} />
+        ))}
+      </FormSelect>
         </FormGroup>
         <FormGroup label="Extra Vars" >
-          <TextInput
-            id="activation-vars"
-            onChange={setVar}
-            value={extravar}
-          />
+          <FormSelect value={extravar} onChange={setExtraVar} aria-label="FormSelect Input3">
+        {extravars.map((option, index) => (
+          <FormSelectOption key={index} value={option.id} label={"" + option.id + " "+ option.name} />
+        ))}
+      </FormSelect>
         </FormGroup>
         <ActionGroup>
           <Button variant="primary" onClick={handleSubmit}>Submit</Button>
