@@ -66,8 +66,9 @@ async def activate_rulesets(activation_id, execution_environment, rulesets, inve
 
         proc = await asyncio.create_subprocess_shell(
             cmd,
+            cwd=tempdir,
             stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE)
+            stderr=asyncio.subprocess.STDOUT)
 
 
         activated_rulesets[next(activated_rulesets_seq)] = proc
