@@ -30,7 +30,6 @@ client.onopen = () => {
     console.log('Websocket client connected');
 };
 
-
 const endpoint1 = 'http://' + window.location.hostname  + ':' + '8080' + '/activation/';
 const endpoint2 = 'http://' + window.location.hostname  + ':' + '8080' + '/activation_jobs/';
 
@@ -52,19 +51,30 @@ const Activation: React.FunctionComponent = () => {
   }, []);
 
   const [stdout, setStdout] = useState([]);
+  const [newStdout, setNewStdout] = useState('');
 
-  client.onmessage = (message) => {
-          console.log(message.data);
-          const [messageType, data] = JSON.parse(message.data);
-
-          if (messageType === 'Stdout') {
-              console.log(stdout);
-              const { stdout: dataStdout } = data;
-              console.log(data);
-              console.log(dataStdout);
-              setStdout([...stdout, dataStdout])
-          }
+  const [websocket_client, setWebsocketClient] = useState([]);
+  useEffect(() => {
+    const wc = new WebSocket('ws://' + window.location.hostname  + ':' + '8080' + '/ws');
+    setWebsocketClient(wc);
+    wc.onopen = () => {
+        console.log('Websocket client connected');
+    };
+    wc.onmessage = (message) => {
+        console.log('update: ' + message.data);
+        const [messageType, data] = JSON.parse(message.data);
+        if (messageType === 'Stdout') {
+          const { stdout: dataStdout } = data;
+          setNewStdout(dataStdout);
+        }
     }
+  }, []);
+
+  useEffect(() => {
+    console.log(["newStdout: ",  newStdout]);
+    console.log(["stdout: ",  stdout]);
+    setStdout([...stdout, newStdout]);
+  }, [newStdout]);
 
   const [jobs, setJobs] = useState([]);
   const [newJob, setNewJob] = useState([]);
