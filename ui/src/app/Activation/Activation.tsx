@@ -30,6 +30,7 @@ client.onopen = () => {
     console.log('Websocket client connected');
 };
 
+
 const endpoint1 = 'http://localhost:8000/activation/';
 const endpoint2 = 'http://localhost:8000/activation_jobs/';
 
@@ -39,6 +40,7 @@ const Activation: React.FunctionComponent = () => {
 
   let { id } = useParams();
   console.log(id);
+
 
   useEffect(() => {
      fetch(endpoint1 + id, {
@@ -75,6 +77,22 @@ const Activation: React.FunctionComponent = () => {
     .then(data => setJobs(data));
   }, []);
 
+  const [update_client, setUpdateClient] = useState([]);
+  useEffect(() => {
+    const uc = new WebSocket('ws://' + 'localhost' + ':8000/ws-activation/' + id);
+    setUpdateClient(uc);
+    uc.onopen = () => {
+        console.log('Update client connected');
+    };
+    uc.onmessage = (message) => {
+        console.log('update: ' + message.data);
+        const [messageType, data] = JSON.parse(message.data);
+        if (messageType === 'Job') {
+          setJobs([...jobs, data]);
+        }
+    }
+  }, []);
+
   return (
   <React.Fragment>
   <PageSection>
@@ -86,12 +104,12 @@ const Activation: React.FunctionComponent = () => {
 	<Stack>
             <StackItem>
               <Card>
-                <CardTitle>Standard Out</CardTitle>
+                <CardTitle>Jobs</CardTitle>
                 <CardBody>
-                  {stdout.length !== 0 && (
+                  {jobs.length !== 0 && (
                     <SimpleList style={{ whiteSpace: 'pre-wrap' }}>
-                      {stdout.map((item, i) => (
-                        <SimpleListItem key={i}><Ansi>{item}</Ansi></SimpleListItem>
+                      {jobs.map((item, i) => (
+                        <SimpleListItem key={i}><Link to={"/job/" + item.id}>{item.id} </Link></SimpleListItem>
                       ))}
                     </SimpleList>
                   )}
@@ -100,12 +118,12 @@ const Activation: React.FunctionComponent = () => {
             </StackItem>
             <StackItem>
               <Card>
-                <CardTitle>Jobs</CardTitle>
+                <CardTitle>Standard Out</CardTitle>
                 <CardBody>
-                  {jobs.length !== 0 && (
+                  {stdout.length !== 0 && (
                     <SimpleList style={{ whiteSpace: 'pre-wrap' }}>
-                      {jobs.map((item, i) => (
-                        <SimpleListItem key={i}><Link to={"/job/" + item.id}>{item.id} </Link></SimpleListItem>
+                      {stdout.map((item, i) => (
+                        <SimpleListItem key={i}><Ansi>{item}</Ansi></SimpleListItem>
                       ))}
                     </SimpleList>
                   )}

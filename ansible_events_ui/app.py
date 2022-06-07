@@ -4,9 +4,8 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from typing import List
 import asyncio
+from collections import defaultdict
 from sqlalchemy import select
-from .schemas import ProducerMessage
-from .schemas import ProducerResponse
 from .schemas import RuleSetBook, Inventory, Activation, ActivationLog, Extravars
 from .schemas import Project
 from .models import (
@@ -80,6 +79,27 @@ class ConnectionManager:
 
 
 connnectionmanager = ConnectionManager()
+
+
+class UpdateManager:
+    def __init__(self):
+        self.active_connections = defaultdict(list)
+
+    async def connect(self, page, websocket: WebSocket):
+        await websocket.accept()
+        self.active_connections[page].append(websocket)
+        print("connect", page, self.active_connections[page])
+
+    def disconnect(self, page, websocket: WebSocket):
+        self.active_connections[page].remove(websocket)
+
+    async def broadcast(self, page, message: str):
+        print("broadcast", page, message, "->", self.active_connections[page])
+        for connection in self.active_connections[page]:
+            await connection.send_text(message)
+
+
+updatemanager = UpdateManager()
 
 
 @app.on_event("startup")
@@ -160,9 +180,16 @@ async def websocket_endpoint2(websocket: WebSocket):
             if data_type == "Job":
                 query = jobs.insert().values(uuid=data.get("job_id"))
                 last_record_id = await database.execute(query)
-                query = activationjobs.insert().values(job_id=last_record_id,
-                                                       activation_id=int(data.get("ansible_events_id")))
+                activation_id = int(data.get("ansible_events_id"))
+                query = activationjobs.insert().values(
+                    job_id=last_record_id,
+                    activation_id=activation_id,
+                )
                 await database.execute(query)
+                await updatemanager.broadcast(
+                    f"/activation/{activation_id}",
+                    json.dumps(["Job", dict(id=last_record_id)]),
+                )
             elif data_type == "AnsibleEvent":
                 event_data = data.get("event", {})
                 query = job_events.insert().values(
@@ -174,6 +201,18 @@ async def websocket_endpoint2(websocket: WebSocket):
             print(data)
     except WebSocketDisconnect:
         pass
+
+
+@app.websocket("/ws-activation/{activation_id}")
+async def websocket_activation_endpoint(websocket: WebSocket, activation_id):
+    page = f"/activation/{activation_id}"
+    await updatemanager.connect(page, websocket)
+    try:
+        while True:
+            data = await websocket.receive_text()
+            print(data)
+    except WebSocketDisconnect:
+        updatemanager.disconnect(page, websocket)
 
 
 @app.get("/ping")
@@ -388,7 +427,8 @@ async def read_job_events(job_id: int):
     query2 = job_events.select().where(job_events.c.job_uuid == job.uuid)
     return await database.fetch_all(query2)
 
+
 @app.get("/activation_jobs/{activation_id}")
 async def read_activation_jobs(activation_id: int):
-    query1 = activationjobs.select(activationjobs.c.activation_id==activation_id)
+    query1 = activationjobs.select(activationjobs.c.activation_id == activation_id)
     return await database.fetch_all(query1)
