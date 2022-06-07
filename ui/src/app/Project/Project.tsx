@@ -29,7 +29,8 @@ const Project: React.FunctionComponent = () => {
 
   const [project, setProject] = useState({'rules': [],
                                           'inventories': [],
-                                          'vars': []});
+                                          'vars': [],
+                                          'playbooks': []});
 
   let { id } = useParams();
   console.log(id);
@@ -87,6 +88,20 @@ const Project: React.FunctionComponent = () => {
                     <SimpleList style={{ whiteSpace: 'pre-wrap' }}>
                       {project.vars.map((item, i) => (
                         <SimpleListItem key={i}><Link to={"/var/" + item.id}>{item.name} </Link></SimpleListItem>
+                      ))}
+                    </SimpleList>
+                  )}
+                </CardBody>
+              </Card>
+            </StackItem>
+            <StackItem>
+              <Card>
+                <CardTitle>Playbooks</CardTitle>
+                <CardBody>
+                  {project.playbooks.length !== 0 && (
+                    <SimpleList style={{ whiteSpace: 'pre-wrap' }}>
+                      {project.playbooks.map((item, i) => (
+                        <SimpleListItem key={i}><Link to={"/playbook/" + item.id}>{item.name} </Link></SimpleListItem>
                       ))}
                     </SimpleList>
                   )}

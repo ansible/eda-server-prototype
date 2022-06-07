@@ -15,12 +15,14 @@ from .models import (
     activations,
     activation_logs,
     projects,
+    playbooks,
     jobs,
     job_events,
     activationjobs,
     projectrules,
     projectinventories,
     projectvars,
+    projectplaybooks,
 )
 from .manager import activate_rulesets
 from .project import clone_project, sync_project
@@ -335,6 +337,11 @@ async def read_project(project_id: int):
         .select_from(projects.join(projectvars).join(extravars))
         .where(projects.c.id == project_id)
     )
+    result["playbooks"] = await database.fetch_all(
+        select(playbooks.c.id, playbooks.c.name)
+        .select_from(projects.join(projectplaybooks).join(playbooks))
+        .where(projects.c.id == project_id)
+    )
     print(result)
     return result
 
@@ -344,6 +351,17 @@ async def read_projects():
     query = projects.select()
     return await database.fetch_all(query)
 
+
+@app.get("/playbooks/")
+async def read_playbooks():
+    query = playbooks.select()
+    return await database.fetch_all(query)
+
+
+@app.get("/playbook/{playbook_id}")
+async def read_playbook(playbook_id: int):
+    query = playbooks.select().where(playbooks.c.id == playbook_id)
+    return await database.fetch_one(query)
 
 @app.get("/inventories/")
 async def read_inventories():

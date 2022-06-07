@@ -150,7 +150,7 @@ const routes: AppRouteConfig[] = [
   {
     component: Playbook,
     exact: true,
-    path: '/playbooks/:id',
+    path: '/playbook/:id',
     title: 'Playbook',
   },
   {

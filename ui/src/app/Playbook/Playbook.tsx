@@ -14,6 +14,7 @@ import {
   StackItem,
 } from '@patternfly/react-core';
 import styled from 'styled-components';
+import { CodeBlock, CodeBlockCode  } from '@patternfly/react-core';
 
 
 const CardBody = styled(PFCardBody)`
@@ -46,6 +47,9 @@ const Playbook: React.FunctionComponent = () => {
   <PageSection>
     <Title headingLevel="h1" size="lg">Event Driven Automation | Playbook {playbook.url}</Title>
   </PageSection>
+    <CodeBlock>
+      <CodeBlockCode id="code-content">{playbook.playbook}</CodeBlockCode>
+    </CodeBlock>
   </React.Fragment>
 )
 }

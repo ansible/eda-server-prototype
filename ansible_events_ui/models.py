@@ -118,3 +118,19 @@ job_events = sqlalchemy.Table(
 )
 
 
+playbooks = sqlalchemy.Table(
+    "playbook",
+    metadata,
+    sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True),
+    sqlalchemy.Column("name", sqlalchemy.String),
+    sqlalchemy.Column("playbook", sqlalchemy.String),
+)
+
+
+projectplaybooks = sqlalchemy.Table(
+    "projectplaybook",
+    metadata,
+    sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True),
+    sqlalchemy.Column("project_id", sqlalchemy.ForeignKey('project.id')),
+    sqlalchemy.Column("playbook_id", sqlalchemy.ForeignKey('playbook.id')),
+)

@@ -24,6 +24,9 @@ import shutil
 
 from itertools import count
 
+from .models import playbooks
+from .database import database
+
 activated_rulesets = dict()
 activated_rulesets_seq = count(1)
 
@@ -35,6 +38,10 @@ async def activate_rulesets(activation_id, execution_environment, rulesets, inve
 
     try:
         tempdir = tempfile.mkdtemp(prefix='ruleset_manager')
+        query = playbooks.select()
+        for playbook in await database.fetch_all(query):
+            with open(os.path.join(tempdir, playbook.name), 'w') as f:
+                f.write(playbook.playbook)
         rules_file = os.path.join(tempdir, "rules.yml")
         with open(rules_file, 'w') as f:
             f.write(rulesets)
