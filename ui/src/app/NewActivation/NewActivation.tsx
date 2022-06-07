@@ -37,9 +37,9 @@ const NewActivation: React.FunctionComponent = () => {
 
   const history = useHistory();
 
-  const [rules, setRules] = useState([{"id": 0, "name": "???"}]);
-  const [inventories, setInventories] = useState([]);
-  const [extravars, setExtraVars] = useState([]);
+  const [rules, setRules] = useState([{"id": 0, "name": "Please select a rule set"}])
+  const [inventories, setInventories] = useState([{"id": 0, "name": "Please select an inventory"}]);
+  const [extravars, setExtraVars] = useState([{"id": 0, "name": "Please select vars"}]);
 
   useEffect(() => {
      fetch(endpoint1, {
@@ -47,7 +47,7 @@ const NewActivation: React.FunctionComponent = () => {
          'Content-Type': 'application/json',
        },
      }).then(response => response.json())
-    .then(data => setRules(data));
+    .then(data => setRules([...rules, ...data]));
   }, []);
 
   useEffect(() => {
@@ -56,7 +56,7 @@ const NewActivation: React.FunctionComponent = () => {
          'Content-Type': 'application/json',
        },
      }).then(response => response.json())
-    .then(data => setInventories(data));
+    .then(data => setInventories([...inventories, ...data]));
   }, []);
 
   useEffect(() => {
@@ -65,7 +65,7 @@ const NewActivation: React.FunctionComponent = () => {
          'Content-Type': 'application/json',
        },
      }).then(response => response.json())
-    .then(data => setExtraVars(data));
+    .then(data => setExtraVars([...extravars, ...data]));
   }, []);
 
   const [name, setName] = useState('');
