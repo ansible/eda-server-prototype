@@ -23,7 +23,7 @@ const SimpleList = styled(PFSimpleList)`
 `
 
 
-const client = new WebSocket('ws://' + window.location.hostname  + ':' + process.env.SERVER_PORT + '/ws');
+const client = new WebSocket('ws://' + window.location.hostname  + ':' + '8080' + '/ws');
 
 client.onopen = () => {
     console.log('Websocket client connected');

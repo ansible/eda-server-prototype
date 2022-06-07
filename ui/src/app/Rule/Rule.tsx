@@ -25,7 +25,7 @@ const SimpleList = styled(PFSimpleList)`
   white-space: pre-wrap;
 `
 
-const endpoint = 'http://' + window.location.hostname  + ':' + process.env.SERVER_PORT + '/rulesetbook/';
+const endpoint = 'http://' + window.location.hostname  + ':' + '8080' + '/rulesetbook/';
 
 const RuleSet: React.FunctionComponent = () => {
 
