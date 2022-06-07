@@ -149,7 +149,7 @@ async def websocket_endpoint(websocket: WebSocket):
 
 
 @app.websocket("/ws2")
-async def websocket_endpoint(websocket: WebSocket):
+async def websocket_endpoint2(websocket: WebSocket):
     await websocket.accept()
     try:
         while True:
