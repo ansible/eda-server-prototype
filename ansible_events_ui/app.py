@@ -18,6 +18,7 @@ from .models import (
     projects,
     jobs,
     job_events,
+    activationjobs,
     projectrules,
     projectinventories,
     projectvars,
@@ -154,9 +155,13 @@ async def websocket_endpoint(websocket: WebSocket):
         while True:
             data = await websocket.receive_text()
             data = json.loads(data)
+            print(data)
             data_type = data.get("type")
             if data_type == "Job":
                 query = jobs.insert().values(uuid=data.get("job_id"))
+                last_record_id = await database.execute(query)
+                query = activationjobs.insert().values(job_id=last_record_id,
+                                                       activation_id=int(data.get("ansible_events_id")))
                 await database.execute(query)
             elif data_type == "AnsibleEvent":
                 event_data = data.get("event", {})
@@ -205,10 +210,6 @@ async def create_activation(a: Activation):
     i = await database.fetch_one(query)
     query = extravars.select().where(extravars.c.id == a.extravars_id)
     e = await database.fetch_one(query)
-    cmd, proc = await activate_rulesets(
-        "quay.io/bthomass/ansible-events:latest", r.rules, i.inventory, e.extravars
-    )
-
     query = activations.insert().values(
         name=a.name,
         rulesetbook_id=a.rulesetbook_id,
@@ -216,6 +217,13 @@ async def create_activation(a: Activation):
         extravars_id=a.extravars_id,
     )
     last_record_id = await database.execute(query)
+    cmd, proc = await activate_rulesets(
+        last_record_id,
+        "quay.io/bthomass/ansible-events:latest",
+        r.rules,
+        i.inventory,
+        e.extravars,
+    )
 
     task1 = asyncio.create_task(
         read_output(proc, last_record_id), name=f"read_output {proc.pid}"
@@ -379,3 +387,8 @@ async def read_job_events(job_id: int):
     job = await database.fetch_one(query1)
     query2 = job_events.select().where(job_events.c.job_uuid == job.uuid)
     return await database.fetch_all(query2)
+
+@app.get("/activation_jobs/{activation_id}")
+async def read_activation_jobs(activation_id: int):
+    query1 = activationjobs.select(activationjobs.c.activation_id==activation_id)
+    return await database.fetch_all(query1)

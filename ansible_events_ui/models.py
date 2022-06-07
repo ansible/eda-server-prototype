@@ -99,6 +99,14 @@ jobs = sqlalchemy.Table(
     sqlalchemy.Column("uuid", sqlalchemy.String),
 )
 
+activationjobs = sqlalchemy.Table(
+    "activationjob",
+    metadata,
+    sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True),
+    sqlalchemy.Column("activation_id", sqlalchemy.ForeignKey('activation.id')),
+    sqlalchemy.Column("job_id", sqlalchemy.ForeignKey('job.id')),
+)
+
 
 job_events = sqlalchemy.Table(
     "job_event",

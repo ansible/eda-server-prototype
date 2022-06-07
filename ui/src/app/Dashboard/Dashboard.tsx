@@ -25,17 +25,8 @@ const SimpleList = styled(PFSimpleList)`
 
 const client = new WebSocket('ws://' + 'localhost' + ':8000/ws');
 
-const endpoint = 'http://localhost:8000/activations/';
-
 client.onopen = () => {
     console.log('Websocket client connected');
-
-     fetch(endpoint, {
-       headers: {
-         'Content-Type': 'application/json',
-       },
-     }).then(response => response.text())
-    .then(data => console.log(data));
 };
 
 

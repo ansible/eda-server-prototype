@@ -28,7 +28,7 @@ activated_rulesets = dict()
 activated_rulesets_seq = count(1)
 
 
-async def activate_rulesets(execution_environment, rulesets, inventory, extravars):
+async def activate_rulesets(activation_id, execution_environment, rulesets, inventory, extravars):
     """
     Call ansible-events with rulset, inventory, and extravars added as volumes to a container
     """
@@ -54,7 +54,8 @@ async def activate_rulesets(execution_environment, rulesets, inventory, extravar
         #cmd = f"podman run -v {rules_file}:/rules.yml -v {inventory_file}:/inventory.yml -v {vars_file}:/vars.yml -it {execution_environment} ansible-events --rules /rules.yml -i /inventory.yml --vars /vars.yml"
 
         # for local development this is better
-        cmd = f"ansible-events --rules {rules_file} -i {inventory_file} --vars {vars_file} --websocket-address ws://localhost:8000/ws2"
+        cmd = f"ansible-events --rules {rules_file} -i {inventory_file} --vars {vars_file} --websocket-address ws://localhost:8000/ws2 --id {activation_id}"
+        print(cmd)
 
         proc = await asyncio.create_subprocess_shell(
             cmd,
