@@ -24,15 +24,15 @@ const SimpleList = styled(PFSimpleList)`
 `
 
 
-const client = new WebSocket('ws://' + 'localhost' + ':8000/ws');
+const client = new WebSocket('ws://' + window.location.hostname  + ':' + process.env.SERVER_PORT + '/ws');
 
 client.onopen = () => {
     console.log('Websocket client connected');
 };
 
 
-const endpoint1 = 'http://localhost:8000/activation/';
-const endpoint2 = 'http://localhost:8000/activation_jobs/';
+const endpoint1 = 'http://' + window.location.hostname  + ':' + process.env.SERVER_PORT + '/activation/';
+const endpoint2 = 'http://' + window.location.hostname  + ':' + process.env.SERVER_PORT + '/activation_jobs/';
 
 const Activation: React.FunctionComponent = () => {
 
@@ -80,7 +80,7 @@ const Activation: React.FunctionComponent = () => {
 
   const [update_client, setUpdateClient] = useState([]);
   useEffect(() => {
-    const uc = new WebSocket('ws://' + 'localhost' + ':8000/ws-activation/' + id);
+    const uc = new WebSocket('ws://' + window.location.hostname  + ':' + process.env.SERVER_PORT + '/ws-activation/' + id);
     setUpdateClient(uc);
     uc.onopen = () => {
         console.log('Update client connected');

@@ -24,7 +24,7 @@ const SimpleList = styled(PFSimpleList)`
   white-space: pre-wrap;
 `
 
-const endpoint = 'http://localhost:8000/inventory/';
+const endpoint = 'http://' + window.location.hostname  + ':' + process.env.SERVER_PORT + '/inventory/';
 
 const Inventory: React.FunctionComponent = () => {
 

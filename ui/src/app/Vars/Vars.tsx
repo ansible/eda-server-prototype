@@ -23,7 +23,7 @@ const SimpleList = styled(PFSimpleList)`
   white-space: pre-wrap;
 `
 
-const endpoint = 'http://localhost:8000/extravars/';
+const endpoint = 'http://' + window.location.hostname  + ':' + process.env.SERVER_PORT + '/extravars/';
 
 const Vars: React.FunctionComponent = () => {
 

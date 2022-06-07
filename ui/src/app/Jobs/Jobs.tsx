@@ -23,7 +23,7 @@ const SimpleList = styled(PFSimpleList)`
   white-space: pre-wrap;
 `
 
-const endpoint = 'http://localhost:8000/jobs/';
+const endpoint = 'http://' + window.location.hostname  + ':' + process.env.SERVER_PORT + '/jobs/';
 
 const Jobs: React.FunctionComponent = () => {
 
