@@ -104,9 +104,9 @@ const routes: AppRouteConfig[] = [
   {
     component: Rules,
     exact: true,
-    label: 'Rule Sets',
+    label: 'Rules Files',
     path: '/rules',
-    title: 'Rules',
+    title: 'Rules Files',
   },
   {
     component: RuleSet,
@@ -130,9 +130,9 @@ const routes: AppRouteConfig[] = [
   {
     component: Vars,
     exact: true,
-    label: 'Vars',
+    label: 'Extra Vars',
     path: '/vars',
-    title: 'Vars',
+    title: 'Extra Vars',
   },
   {
     component: Var,

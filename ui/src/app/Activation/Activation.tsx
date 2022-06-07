@@ -67,6 +67,7 @@ const Activation: React.FunctionComponent = () => {
     }
 
   const [jobs, setJobs] = useState([]);
+  const [newJob, setNewJob] = useState([]);
 
   useEffect(() => {
      fetch(endpoint2 + id, {
@@ -88,10 +89,14 @@ const Activation: React.FunctionComponent = () => {
         console.log('update: ' + message.data);
         const [messageType, data] = JSON.parse(message.data);
         if (messageType === 'Job') {
-          setJobs([...jobs, data]);
+          setNewJob(data);
         }
     }
   }, []);
+
+  useEffect(() => {
+    setJobs([...jobs, newJob]);
+  }, [newJob]);
 
   return (
   <React.Fragment>

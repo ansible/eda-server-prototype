@@ -43,13 +43,13 @@ const Vars: React.FunctionComponent = () => {
   return (
   <React.Fragment>
   <PageSection>
-    <Title headingLevel="h1" size="lg">Event Driven Automation | Rules</Title>
+    <Title headingLevel="h1" size="lg">Event Driven Automation | Extra Vars</Title>
   </PageSection>
 
 	<Stack>
             <StackItem>
               <Card>
-                <CardTitle>Rule Sets</CardTitle>
+                <CardTitle>Extra Vars</CardTitle>
                 <CardBody>
                   {extravars.length !== 0 && (
                     <SimpleList style={{ whiteSpace: 'pre-wrap' }}>
