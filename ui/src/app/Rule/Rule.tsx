@@ -16,6 +16,7 @@ import {
   StackItem,
 } from '@patternfly/react-core';
 import styled from 'styled-components';
+import {getServer} from '@app/utils/utils';
 
 
 const CardBody = styled(PFCardBody)`
@@ -25,7 +26,7 @@ const SimpleList = styled(PFSimpleList)`
   white-space: pre-wrap;
 `
 
-const endpoint = 'http://' + window.location.hostname  + ':' + '8080' + '/api/rulesetbook/';
+const endpoint = 'http://' + getServer() + '/api/rulesetbook/';
 
 const RuleSet: React.FunctionComponent = () => {
 

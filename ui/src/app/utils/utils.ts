@@ -22,3 +22,7 @@ export async function postData(url = '', data = {}) {
   });
   return response.json();
 }
+
+export function getServer() {
+    return window.location.hostname + ":" + window.location.port
+}

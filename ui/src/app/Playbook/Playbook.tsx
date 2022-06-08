@@ -15,6 +15,7 @@ import {
 } from '@patternfly/react-core';
 import styled from 'styled-components';
 import { CodeBlock, CodeBlockCode  } from '@patternfly/react-core';
+import {getServer} from '@app/utils/utils';
 
 
 const CardBody = styled(PFCardBody)`
@@ -24,7 +25,7 @@ const SimpleList = styled(PFSimpleList)`
   white-space: pre-wrap;
 `
 
-const endpoint = 'http://' + window.location.hostname  + ':' + '8080' + '/api/playbook/';
+const endpoint = 'http://' + getServer() + '/api/playbook/';
 
 const Playbook: React.FunctionComponent = () => {
 

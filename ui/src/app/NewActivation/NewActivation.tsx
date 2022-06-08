@@ -17,6 +17,7 @@ import {
 import { ActionGroup, Button, Form, FormGroup, TextInput } from '@patternfly/react-core';
 import { FormSelect, FormSelectOption, FormSelectOptionGroup } from '@patternfly/react-core';
 import { postData } from '@app/utils/utils';
+import {getServer} from '@app/utils/utils';
 
 import styled from 'styled-components';
 
@@ -28,10 +29,10 @@ const SimpleList = styled(PFSimpleList)`
   white-space: pre-wrap;
 `
 
-const endpoint = 'http://' + window.location.hostname  + ':' + '8080' + '/api/activation/';
-const endpoint1 = 'http://' + window.location.hostname  + ':' + '8080' + '/api/rulesetbooks/';
-const endpoint2 = 'http://' + window.location.hostname  + ':' + '8080' + '/api/inventories/';
-const endpoint3 = 'http://' + window.location.hostname  + ':' + '8080' + '/api/extravars/';
+const endpoint = 'http://' + getServer() + '/api/activation/';
+const endpoint1 = 'http://' + getServer() + '/api/rulesetbooks/';
+const endpoint2 = 'http://' + getServer() + '/api/inventories/';
+const endpoint3 = 'http://' + getServer() + '/api/extravars/';
 
 const NewActivation: React.FunctionComponent = () => {
 

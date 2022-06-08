@@ -16,6 +16,7 @@ import {
 } from '@patternfly/react-core';
 import { ActionGroup, Button, Form, FormGroup, TextInput } from '@patternfly/react-core';
 import { postData } from '@app/utils/utils';
+import {getServer} from '@app/utils/utils';
 
 import styled from 'styled-components';
 
@@ -27,7 +28,7 @@ const SimpleList = styled(PFSimpleList)`
   white-space: pre-wrap;
 `
 
-const endpoint = 'http://' + window.location.hostname  + ':' + '8080' + '/project/';
+const endpoint = 'http://' + getServer() + '/project/';
 
 const NewProject: React.FunctionComponent = () => {
 

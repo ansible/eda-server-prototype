@@ -16,6 +16,7 @@ import {
 import { Button } from '@patternfly/react-core';
 import PlusCircleIcon from '@patternfly/react-icons/dist/esm/icons/plus-circle-icon';
 import styled from 'styled-components';
+import {getServer} from '@app/utils/utils';
 
 
 const CardBody = styled(PFCardBody)`
@@ -25,7 +26,7 @@ const SimpleList = styled(PFSimpleList)`
   white-space: pre-wrap;
 `
 
-const endpoint = 'http://' + window.location.hostname  + ':' + '8080' + '/api/projects/';
+const endpoint = 'http://' + getServer() + '/api/projects/';
 
 const Projects: React.FunctionComponent = () => {
 

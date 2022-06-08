@@ -13,6 +13,7 @@ import {
   StackItem,
 } from '@patternfly/react-core';
 import styled from 'styled-components';
+import {getServer} from '@app/utils/utils';
 
 
 const CardBody = styled(PFCardBody)`
@@ -23,7 +24,7 @@ const SimpleList = styled(PFSimpleList)`
 `
 
 
-const client = new WebSocket('ws://' + window.location.hostname  + ':' + '8080' + '/ws');
+const client = new WebSocket('ws://' + getServer() + '/ws');
 
 client.onopen = () => {
     console.log('Websocket client connected');

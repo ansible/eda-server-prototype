@@ -14,6 +14,7 @@ import {
   StackItem,
 } from '@patternfly/react-core';
 import styled from 'styled-components';
+import {getServer} from '@app/utils/utils';
 
 
 const CardBody = styled(PFCardBody)`
@@ -24,14 +25,14 @@ const SimpleList = styled(PFSimpleList)`
 `
 
 
-const client = new WebSocket('ws://' + window.location.hostname  + ':' + '8080' + '/api/ws');
+const client = new WebSocket('ws://' + getServer() + '/api/ws');
 
 client.onopen = () => {
     console.log('Websocket client connected');
 };
 
-const endpoint1 = 'http://' + window.location.hostname  + ':' + '8080' + '/api/activation/';
-const endpoint2 = 'http://' + window.location.hostname  + ':' + '8080' + '/api/activation_jobs/';
+const endpoint1 = 'http://' + getServer() + '/api/activation/';
+const endpoint2 = 'http://' + getServer() + '/api/activation_jobs/';
 
 const Activation: React.FunctionComponent = () => {
 
@@ -55,7 +56,7 @@ const Activation: React.FunctionComponent = () => {
 
   const [websocket_client, setWebsocketClient] = useState([]);
   useEffect(() => {
-    const wc = new WebSocket('ws://' + window.location.hostname  + ':' + '8080' + '/ws');
+    const wc = new WebSocket('ws://' + getServer() + '/ws');
     setWebsocketClient(wc);
     wc.onopen = () => {
         console.log('Websocket client connected');
@@ -90,7 +91,7 @@ const Activation: React.FunctionComponent = () => {
 
   const [update_client, setUpdateClient] = useState([]);
   useEffect(() => {
-    const uc = new WebSocket('ws://' + window.location.hostname  + ':' + '8080' + '/ws-activation/' + id);
+    const uc = new WebSocket('ws://' + getServer() + '/ws-activation/' + id);
     setUpdateClient(uc);
     uc.onopen = () => {
         console.log('Update client connected');

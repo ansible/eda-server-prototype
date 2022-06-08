@@ -14,6 +14,7 @@ import {
   StackItem,
 } from '@patternfly/react-core';
 import styled from 'styled-components';
+import {getServer} from '@app/utils/utils';
 
 
 const CardBody = styled(PFCardBody)`
@@ -23,7 +24,7 @@ const SimpleList = styled(PFSimpleList)`
   white-space: pre-wrap;
 `
 
-const endpoint = 'http://' + window.location.hostname  + ':' + '8080' + '/api/inventories/';
+const endpoint = 'http://' + getServer() + '/api/inventories/';
 
 const Inventories: React.FunctionComponent = () => {
 
