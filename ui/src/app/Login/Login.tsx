@@ -10,6 +10,7 @@ import {
 } from '@patternfly/react-core';
 import ExclamationCircleIcon from '@patternfly/react-icons/dist/esm/icons/exclamation-circle-icon';
 import { useHistory } from 'react-router-dom';
+import { getServer } from '@app/utils/utils';
 
 function Login(props) {
 
@@ -39,8 +40,38 @@ function Login(props) {
       setIsValidUsername(!!usernameValue);
       setIsValidPassword(!!passwordValue);
       setShowHelperText(!usernameValue || !passwordValue);
-      console.log('login!');
-      history.push('/dashboard');
+      if (!!usernameValue && !!passwordValue) {
+
+				var details = {
+					'username': usernameValue,
+					'password': passwordValue,
+				};
+
+				var formBody = [];
+				for (var property in details) {
+					var encodedKey = encodeURIComponent(property);
+					var encodedValue = encodeURIComponent(details[property]);
+					formBody.push(encodedKey + "=" + encodedValue);
+				}
+				formBody = formBody.join("&");
+				fetch('http://' + getServer() + '/api/auth/jwt/login', 
+						{
+							method: 'POST',
+							headers: {
+								'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+							},
+							body: formBody
+						}
+				).then((response) => {
+          if(!response.ok) {
+            setIsValidUsername(false);
+            setIsValidPassword(false);
+            setShowHelperText(true);
+          } else {
+            history.push('/dashboard');
+          }
+        });
+      }
     };
 
     const helperText = (
