@@ -28,10 +28,10 @@ const SimpleList = styled(PFSimpleList)`
   white-space: pre-wrap;
 `
 
-const endpoint = 'http://' + window.location.hostname  + ':' + '8080' + '/activation/';
-const endpoint1 = 'http://' + window.location.hostname  + ':' + '8080' + '/rulesetbooks/';
-const endpoint2 = 'http://' + window.location.hostname  + ':' + '8080' + '/inventories/';
-const endpoint3 = 'http://' + window.location.hostname  + ':' + '8080' + '/extravars/';
+const endpoint = 'http://' + window.location.hostname  + ':' + '8080' + '/api/activation/';
+const endpoint1 = 'http://' + window.location.hostname  + ':' + '8080' + '/api/rulesetbooks/';
+const endpoint2 = 'http://' + window.location.hostname  + ':' + '8080' + '/api/inventories/';
+const endpoint3 = 'http://' + window.location.hostname  + ':' + '8080' + '/api/extravars/';
 
 const NewActivation: React.FunctionComponent = () => {
 

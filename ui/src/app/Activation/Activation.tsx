@@ -24,14 +24,14 @@ const SimpleList = styled(PFSimpleList)`
 `
 
 
-const client = new WebSocket('ws://' + window.location.hostname  + ':' + '8080' + '/ws');
+const client = new WebSocket('ws://' + window.location.hostname  + ':' + '8080' + '/api/ws');
 
 client.onopen = () => {
     console.log('Websocket client connected');
 };
 
-const endpoint1 = 'http://' + window.location.hostname  + ':' + '8080' + '/activation/';
-const endpoint2 = 'http://' + window.location.hostname  + ':' + '8080' + '/activation_jobs/';
+const endpoint1 = 'http://' + window.location.hostname  + ':' + '8080' + '/api/activation/';
+const endpoint2 = 'http://' + window.location.hostname  + ':' + '8080' + '/api/activation_jobs/';
 
 const Activation: React.FunctionComponent = () => {
 

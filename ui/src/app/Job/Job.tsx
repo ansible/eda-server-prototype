@@ -23,8 +23,8 @@ const SimpleList = styled(PFSimpleList)`
   white-space: pre-wrap;
 `
 
-const endpoint = 'http://' + window.location.hostname  + ':' + '8080' + '/job/';
-const event_endpoint = 'http://' + window.location.hostname  + ':' + '8080' + '/job_events/';
+const endpoint = 'http://' + window.location.hostname  + ':' + '8080' + '/api/job/';
+const event_endpoint = 'http://' + window.location.hostname  + ':' + '8080' + '/api/job_events/';
 
 const Job: React.FunctionComponent = () => {
 

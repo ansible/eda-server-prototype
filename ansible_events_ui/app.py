@@ -35,7 +35,7 @@ from .models import User
 from .schemas import UserCreate, UserRead, UserUpdate
 from .users import auth_backend, current_active_user, fastapi_users
 
-app = FastAPI()
+app = FastAPI(title="Ansible Events API")
 
 app.mount("/eda", StaticFiles(directory="ui/dist", html=True), name="eda")
 
@@ -124,47 +124,7 @@ async def root():
     return {"message": "Hello World"}
 
 
-html = """
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>Chat</title>
-    </head>
-    <body>
-        <h1>WebSocket Chat</h1>
-        <form action="" onsubmit="sendMessage(event)">
-            <input type="text" id="messageText" autocomplete="off"/>
-            <button>Send</button>
-        </form>
-        <ul id='messages'>
-        </ul>
-        <script>
-            var ws = new WebSocket("ws://localhost:8000/ws");
-            ws.onmessage = function(event) {
-                var messages = document.getElementById('messages')
-                var message = document.createElement('li')
-                var content = document.createTextNode(event.data)
-                message.appendChild(content)
-                messages.appendChild(message)
-            };
-            function sendMessage(event) {
-                var input = document.getElementById("messageText")
-                ws.send(input.value)
-                input.value = ''
-                event.preventDefault()
-            }
-        </script>
-    </body>
-</html>
-"""
-
-
-@app.get("/demo")
-async def get():
-    return HTMLResponse(html)
-
-
-@app.websocket("/ws")
+@app.websocket("/api/ws")
 async def websocket_endpoint(websocket: WebSocket):
     await connnectionmanager.connect(websocket)
     try:
@@ -175,7 +135,7 @@ async def websocket_endpoint(websocket: WebSocket):
         connnectionmanager.disconnect(websocket)
 
 
-@app.websocket("/ws2")
+@app.websocket("/api/ws2")
 async def websocket_endpoint2(websocket: WebSocket):
     await websocket.accept()
     try:
@@ -210,7 +170,7 @@ async def websocket_endpoint2(websocket: WebSocket):
         pass
 
 
-@app.websocket("/ws-activation/{activation_id}")
+@app.websocket("/api/ws-activation/{activation_id}")
 async def websocket_activation_endpoint(websocket: WebSocket, activation_id):
     page = f"/activation/{activation_id}"
     await updatemanager.connect(page, websocket)
@@ -227,28 +187,28 @@ def ping():
     return {"ping": "pong!"}
 
 
-@app.post("/rulesetbook/")
+@app.post("/api/rulesetbook/")
 async def create_rulesetbook(rsb: RuleSetBook):
     query = rulesets.insert().values(name=rsb.name, rules=rsb.rules)
     last_record_id = await database.execute(query)
     return {**rsb.dict(), "id": last_record_id}
 
 
-@app.post("/inventory/")
+@app.post("/api/inventory/")
 async def create_inventory(i: Inventory):
     query = inventories.insert().values(name=i.name, inventory=i.inventory)
     last_record_id = await database.execute(query)
     return {**i.dict(), "id": last_record_id}
 
 
-@app.post("/extravars/")
+@app.post("/api/extravars/")
 async def create_extravars(e: Extravars):
     query = extravars.insert().values(name=e.name, extravars=e.extravars)
     last_record_id = await database.execute(query)
     return {**e.dict(), "id": last_record_id}
 
 
-@app.post("/activation/")
+@app.post("/api/activation/")
 async def create_activation(a: Activation):
     query = rulesets.select().where(rulesets.c.id == a.rulesetbook_id)
     r = await database.fetch_one(query)
@@ -298,13 +258,13 @@ async def read_output(proc, activation_id):
         await connnectionmanager.broadcast(json.dumps(["Stdout", dict(stdout=line)]))
 
 
-@app.get("/activation_logs/", response_model=List[ActivationLog])
+@app.get("/api/activation_logs/", response_model=List[ActivationLog])
 async def read_activation_logs(activation_id: int):
     q = activation_logs.select().where(activation_logs.c.activation_id == activation_id)
     return await database.fetch_all(q)
 
 
-@app.get("/tasks/")
+@app.get("/api/tasks/")
 async def read_tasks():
     tasks = [
         dict(name=task.get_name(), done=task.done(), cancelled=task.cancelled())
@@ -313,7 +273,7 @@ async def read_tasks():
     return tasks
 
 
-@app.post("/project/")
+@app.post("/api/project/")
 async def create_project(p: Project):
     found_hash, tempdir = await clone_project(p.url, p.git_hash)
     p.git_hash = found_hash
@@ -323,7 +283,7 @@ async def create_project(p: Project):
     return {**p.dict(), "id": last_record_id}
 
 
-@app.get("/project/{project_id}")
+@app.get("/api/project/{project_id}")
 async def read_project(project_id: int):
     query = projects.select().where(projects.c.id == project_id)
     result = dict(await database.fetch_one(query))
@@ -351,66 +311,66 @@ async def read_project(project_id: int):
     return result
 
 
-@app.get("/projects/")
+@app.get("/api/projects/")
 async def read_projects():
     query = projects.select()
     return await database.fetch_all(query)
 
 
-@app.get("/playbooks/")
+@app.get("/api/playbooks/")
 async def read_playbooks():
     query = playbooks.select()
     return await database.fetch_all(query)
 
 
-@app.get("/playbook/{playbook_id}")
+@app.get("/api/playbook/{playbook_id}")
 async def read_playbook(playbook_id: int):
     query = playbooks.select().where(playbooks.c.id == playbook_id)
     return await database.fetch_one(query)
 
-@app.get("/inventories/")
+@app.get("/api/inventories/")
 async def read_inventories():
     query = inventories.select()
     return await database.fetch_all(query)
 
 
-@app.get("/inventory/{inventory_id}")
+@app.get("/api/inventory/{inventory_id}")
 async def read_inventory(inventory_id: int):
     query = inventories.select().where(inventories.c.id == inventory_id)
     return await database.fetch_one(query)
 
 
-@app.get("/rulesetbooks/")
+@app.get("/api/rulesetbooks/")
 async def read_rulesetbooks():
     query = rulesets.select()
     return await database.fetch_all(query)
 
 
-@app.get("/rulesetbook/{rulesetbook_id}")
+@app.get("/api/rulesetbook/{rulesetbook_id}")
 async def read_rulesetbook(rulesetbook_id: int):
     query = rulesets.select().where(rulesets.c.id == rulesetbook_id)
     return await database.fetch_one(query)
 
 
-@app.get("/extravars/")
+@app.get("/api/extravars/")
 async def read_extravars():
     query = extravars.select()
     return await database.fetch_all(query)
 
 
-@app.get("/extravar/{extravar_id}")
+@app.get("/api/extravar/{extravar_id}")
 async def read_extrvar(extravar_id: int):
     query = extravars.select().where(extravars.c.id == extravar_id)
     return await database.fetch_one(query)
 
 
-@app.get("/activations/")
+@app.get("/api/activations/")
 async def read_activations():
     query = activations.select()
     return await database.fetch_all(query)
 
 
-@app.get("/activation/{activation_id}")
+@app.get("/api/activation/{activation_id}")
 async def read_activation(activation_id: int):
     query = (
         select(
@@ -431,19 +391,19 @@ async def read_activation(activation_id: int):
     return result
 
 
-@app.get("/jobs/")
+@app.get("/api/jobs/")
 async def read_jobs():
     query = jobs.select()
     return await database.fetch_all(query)
 
 
-@app.get("/job/{job_id}")
+@app.get("/api/job/{job_id}")
 async def read_job(job_id: int):
     query = jobs.select().where(jobs.c.id == job_id)
     return await database.fetch_one(query)
 
 
-@app.get("/job_events/{job_id}")
+@app.get("/api/job_events/{job_id}")
 async def read_job_events(job_id: int):
     query1 = jobs.select().where(jobs.c.id == job_id)
     job = await database.fetch_one(query1)
@@ -451,7 +411,7 @@ async def read_job_events(job_id: int):
     return await database.fetch_all(query2)
 
 
-@app.get("/activation_jobs/{activation_id}")
+@app.get("/api/activation_jobs/{activation_id}")
 async def read_activation_jobs(activation_id: int):
     query1 = activationjobs.select(activationjobs.c.activation_id == activation_id)
     return await database.fetch_all(query1)
@@ -461,31 +421,31 @@ async def read_activation_jobs(activation_id: int):
 
 
 app.include_router(
-    fastapi_users.get_auth_router(auth_backend), prefix="/auth/jwt", tags=["auth"]
+    fastapi_users.get_auth_router(auth_backend), prefix="/api/auth/jwt", tags=["auth"]
 )
 app.include_router(
     fastapi_users.get_register_router(UserRead, UserCreate),
-    prefix="/auth",
+    prefix="/api/auth",
     tags=["auth"],
 )
 app.include_router(
     fastapi_users.get_reset_password_router(),
-    prefix="/auth",
+    prefix="/api/auth",
     tags=["auth"],
 )
 app.include_router(
     fastapi_users.get_verify_router(UserRead),
-    prefix="/auth",
+    prefix="/api/auth",
     tags=["auth"],
 )
 app.include_router(
     fastapi_users.get_users_router(UserRead, UserUpdate),
-    prefix="/users",
+    prefix="/api/users",
     tags=["users"],
 )
 
 
-@app.get("/authenticated-route")
+@app.get("/api/authenticated-route")
 async def authenticated_route(user: User = Depends(current_active_user)):
     return {"message": f"Hello {user.email}!"}
 
