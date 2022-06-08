@@ -1,8 +1,11 @@
 
 import sqlalchemy
+from sqlalchemy.ext.declarative import DeclarativeMeta, declarative_base
+from fastapi_users.db import SQLAlchemyBaseUserTableUUID
 
 
 metadata = sqlalchemy.MetaData()
+Base: DeclarativeMeta = declarative_base()
 
 
 rulesets = sqlalchemy.Table(
@@ -134,3 +137,9 @@ projectplaybooks = sqlalchemy.Table(
     sqlalchemy.Column("project_id", sqlalchemy.ForeignKey('project.id')),
     sqlalchemy.Column("playbook_id", sqlalchemy.ForeignKey('playbook.id')),
 )
+
+
+# FastAPI Users 
+
+class User(SQLAlchemyBaseUserTableUUID, Base):
+    pass

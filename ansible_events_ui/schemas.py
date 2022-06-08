@@ -8,6 +8,8 @@ from pydantic import validator
 
 from typing import Optional
 
+from fastapi_users import schemas
+
 
 class ProducerMessage(BaseModel):
     name: StrictStr
@@ -75,3 +77,18 @@ class Project(BaseModel):
     id: Optional[int]
     git_hash: Optional[StrictStr]
     url: StrictStr
+
+
+
+# Fast API Users
+
+class UserRead(schemas.BaseUser[uuid.UUID]):
+    pass
+
+
+class UserCreate(schemas.BaseUserCreate):
+    pass
+
+
+class UserUpdate(schemas.BaseUserUpdate):
+    pass

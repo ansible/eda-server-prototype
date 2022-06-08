@@ -1,4 +1,4 @@
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi import Depends, FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
@@ -29,6 +29,11 @@ from .project import clone_project, sync_project
 from .database import database
 import json
 
+
+
+from .models import User
+from .schemas import UserCreate, UserRead, UserUpdate
+from .users import auth_backend, current_active_user, fastapi_users
 
 app = FastAPI()
 
@@ -450,3 +455,37 @@ async def read_job_events(job_id: int):
 async def read_activation_jobs(activation_id: int):
     query1 = activationjobs.select(activationjobs.c.activation_id == activation_id)
     return await database.fetch_all(query1)
+
+
+# FastAPI Users
+
+
+app.include_router(
+    fastapi_users.get_auth_router(auth_backend), prefix="/auth/jwt", tags=["auth"]
+)
+app.include_router(
+    fastapi_users.get_register_router(UserRead, UserCreate),
+    prefix="/auth",
+    tags=["auth"],
+)
+app.include_router(
+    fastapi_users.get_reset_password_router(),
+    prefix="/auth",
+    tags=["auth"],
+)
+app.include_router(
+    fastapi_users.get_verify_router(UserRead),
+    prefix="/auth",
+    tags=["auth"],
+)
+app.include_router(
+    fastapi_users.get_users_router(UserRead, UserUpdate),
+    prefix="/users",
+    tags=["users"],
+)
+
+
+@app.get("/authenticated-route")
+async def authenticated_route(user: User = Depends(current_active_user)):
+    return {"message": f"Hello {user.email}!"}
+

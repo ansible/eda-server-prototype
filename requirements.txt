@@ -14,3 +14,5 @@ requests==2.27.1
 SQLAlchemy==1.4.36
 uvicorn==0.17.6
 websockets==10.3
+fastapi-users[sqlalchemy]
+alembic

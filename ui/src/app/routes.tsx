@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Route, RouteComponentProps, Switch } from 'react-router-dom';
 import { accessibleRouteChangeHandler } from '@app/utils/utils';
+import { Login } from '@app/Login/Login';
 import { Dashboard } from '@app/Dashboard/Dashboard';
 import { Projects } from '@app/Projects/Projects';
 import { Project } from '@app/Project/Project';
@@ -50,7 +51,7 @@ const routes: AppRouteConfig[] = [
     component: Dashboard,
     exact: true,
     label: 'Dashboard',
-    path: '/',
+    path: '/dashboard',
     title: 'Main Dashboard',
   },
   {
