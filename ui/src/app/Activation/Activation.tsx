@@ -114,7 +114,7 @@ const Activation: React.FunctionComponent = () => {
   <PageSection>
     <Title headingLevel="h1" size="lg">Event Driven Automation | Activation {activation.name}</Title>
   </PageSection>
-  <Link to={"/rule/" + activation.ruleset_id}>{activation.ruleset_name}</Link>
+  <Link to={"/rulesetfile/" + activation.ruleset_id}>{activation.ruleset_name}</Link>
   <Link to={"/inventory/" + activation.inventory_id}>{activation.inventory_name}</Link>
   <Link to={"/var/" + activation.extravars_id}>{activation.extravars_name}</Link>
 	<Stack>
