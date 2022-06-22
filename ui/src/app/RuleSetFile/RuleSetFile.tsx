@@ -28,9 +28,9 @@ const SimpleList = styled(PFSimpleList)`
 
 const endpoint = 'http://' + getServer() + '/api/rulesetfile/';
 
-const RuleSet: React.FunctionComponent = () => {
+const RuleSetFile: React.FunctionComponent = () => {
 
-  const [ruleset, setRuleSet] = useState([]);
+  const [rulesetfile, setRuleSetFile] = useState([]);
 
   let { id } = useParams();
   console.log(id);
@@ -41,19 +41,19 @@ const RuleSet: React.FunctionComponent = () => {
          'Content-Type': 'application/json',
        },
      }).then(response => response.json())
-    .then(data => setRuleSet(data));
+    .then(data => setRuleSetFile(data));
   }, []);
 
   return (
   <React.Fragment>
   <PageSection>
-    <Title headingLevel="h1" size="lg">Event Driven Automation | Rule Set {ruleset.name}</Title>
+    <Title headingLevel="h1" size="lg">Event Driven Automation | Rule Set {rulesetfile.name}</Title>
   </PageSection>
     <CodeBlock>
-      <CodeBlockCode id="code-content">{ruleset.rules}</CodeBlockCode>
+      <CodeBlockCode id="code-content">{rulesetfile.rulesets}</CodeBlockCode>
     </CodeBlock>
   </React.Fragment>
 )
 }
 
-export { RuleSet };
+export { RuleSetFile };

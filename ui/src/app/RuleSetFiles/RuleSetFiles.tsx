@@ -26,10 +26,10 @@ const SimpleList = styled(PFSimpleList)`
 
 const endpoint = 'http://' + getServer() + '/api/rulesetfiles/';
 
-const Rules: React.FunctionComponent = () => {
+const RuleSetFiles: React.FunctionComponent = () => {
 
 
-  const [rules, setRules] = useState([]);
+  const [rulesetfiles, setRuleSetFiles] = useState([]);
 
   useEffect(() => {
      fetch(endpoint, {
@@ -37,13 +37,13 @@ const Rules: React.FunctionComponent = () => {
          'Content-Type': 'application/json',
        },
      }).then(response => response.json())
-    .then(data => setRules(data));
+    .then(data => setRuleSetFiles(data));
   }, []);
 
   return (
   <React.Fragment>
   <PageSection>
-    <Title headingLevel="h1" size="lg">Event Driven Automation | Rules</Title>
+    <Title headingLevel="h1" size="lg">Event Driven Automation | Rule Set Files</Title>
   </PageSection>
 
 	<Stack>
@@ -51,10 +51,10 @@ const Rules: React.FunctionComponent = () => {
               <Card>
                 <CardTitle>Rule Sets</CardTitle>
                 <CardBody>
-                  {rules.length !== 0 && (
+                  {rulesetfiles.length !== 0 && (
                     <SimpleList style={{ whiteSpace: 'pre-wrap' }}>
-                      {rules.map((item, i) => (
-                        <SimpleListItem key={i}><Link to={"/rule/" + item.id}>{item.name} </Link></SimpleListItem>
+                      {rulesetfiles.map((item, i) => (
+                        <SimpleListItem key={i}><Link to={"/rulesetfile/" + item.id}>{item.name} </Link></SimpleListItem>
                       ))}
                     </SimpleList>
                   )}
@@ -66,4 +66,4 @@ const Rules: React.FunctionComponent = () => {
 )
 }
 
-export { Rules };
+export { RuleSetFiles };

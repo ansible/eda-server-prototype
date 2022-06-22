@@ -43,7 +43,7 @@ class ProducerResponse(BaseModel):
 
 class RuleSetFile(BaseModel):
     name: StrictStr
-    rules: StrictStr
+    rulesets: StrictStr
     id: Optional[int]
 
 

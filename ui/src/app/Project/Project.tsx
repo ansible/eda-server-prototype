@@ -28,7 +28,7 @@ const endpoint = 'http://' + getServer() + '/api/project/';
 
 const Project: React.FunctionComponent = () => {
 
-  const [project, setProject] = useState({'rules': [],
+  const [project, setProject] = useState({'rulesets': [],
                                           'inventories': [],
                                           'vars': [],
                                           'playbooks': []});
@@ -57,9 +57,9 @@ const Project: React.FunctionComponent = () => {
               <Card>
                 <CardTitle>Rule Sets</CardTitle>
                 <CardBody>
-                  {project.rules.length !== 0 && (
+                  {project.rulesets.length !== 0 && (
                     <SimpleList style={{ whiteSpace: 'pre-wrap' }}>
-                      {project.rules.map((item, i) => (
+                      {project.rulesets.map((item, i) => (
                         <SimpleListItem key={i}><Link to={"/rule/" + item.id}>{item.name} </Link></SimpleListItem>
                       ))}
                     </SimpleList>

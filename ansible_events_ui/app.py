@@ -27,6 +27,7 @@ from .manager import activate_rulesets
 from .project import clone_project, sync_project
 from .database import database
 import json
+import yaml
 
 from .models import User
 from .schemas import UserCreate, UserRead, UserUpdate
@@ -186,7 +187,7 @@ def ping():
 
 @app.post("/api/rulesetfile/")
 async def create_rulesetfile(rsf: RuleSetFile):
-    query = rulesetfiles.insert().values(name=rsf.name, rules=rsf.rules)
+    query = rulesetfiles.insert().values(name=rsf.name, rulesets=rsf.rulesets)
     last_record_id = await database.execute(query)
     return {**rsf.dict(), "id": last_record_id}
 
@@ -223,7 +224,7 @@ async def create_activation(a: Activation):
     cmd, proc = await activate_rulesets(
         last_record_id,
         "quay.io/bthomass/ansible-events:latest",
-        r.rules,
+        r.rulesets,
         i.inventory,
         e.extravars,
     )
@@ -284,7 +285,7 @@ async def create_project(p: Project):
 async def read_project(project_id: int):
     query = projects.select().where(projects.c.id == project_id)
     result = dict(await database.fetch_one(query))
-    result["rules"] = await database.fetch_all(
+    result["rulesets"] = await database.fetch_all(
         select(rulesetfiles.c.id, rulesetfiles.c.name)
         .select_from(projects.join(projectrules).join(rulesetfiles))
         .where(projects.c.id == project_id)
@@ -348,6 +349,14 @@ async def read_rulesetfiles():
 async def read_rulesetfile(rulesetfile_id: int):
     query = rulesetfiles.select().where(rulesetfiles.c.id == rulesetfile_id)
     return await database.fetch_one(query)
+
+
+@app.get("/api/rulesetfile_json/{rulesetfile_id}")
+async def read_rulesetfile_json(rulesetfile_id: int):
+    query = rulesetfiles.select().where(rulesetfiles.c.id == rulesetfile_id)
+    result = dict(await database.fetch_one(query))
+    result["rulesets"] = yaml.safe_load(result["rulesets"])
+    return result
 
 
 @app.get("/api/extravars/")

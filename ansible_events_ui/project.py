@@ -108,8 +108,8 @@ async def find_rules(project_id, project_dir):
         print(filename)
         if is_rules_file(full_path):
             with open(full_path) as f:
-                rules = f.read()
-            query = rulesetfiles.insert().values(name=filename, rules=rules)
+                rulesets = f.read()
+            query = rulesetfiles.insert().values(name=filename, rulesets=rulesets)
             last_record_id = await database.execute(query)
             print(last_record_id)
             query = projectrules.insert().values(
