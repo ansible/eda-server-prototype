@@ -1,15 +1,14 @@
 from fastapi import Depends, FastAPI, WebSocket, WebSocketDisconnect
-from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from typing import List
 import asyncio
 from collections import defaultdict
 from sqlalchemy import select
-from .schemas import RuleSetBook, Inventory, Activation, ActivationLog, Extravars
+from .schemas import RuleSetFile, Inventory, Activation, ActivationLog, Extravars
 from .schemas import Project
 from .models import (
-    rulesets,
+    rulesetfiles,
     inventories,
     extravars,
     activations,
@@ -28,8 +27,6 @@ from .manager import activate_rulesets
 from .project import clone_project, sync_project
 from .database import database
 import json
-
-
 
 from .models import User
 from .schemas import UserCreate, UserRead, UserUpdate
@@ -187,11 +184,11 @@ def ping():
     return {"ping": "pong!"}
 
 
-@app.post("/api/rulesetbook/")
-async def create_rulesetbook(rsb: RuleSetBook):
-    query = rulesets.insert().values(name=rsb.name, rules=rsb.rules)
+@app.post("/api/rulesetfile/")
+async def create_rulesetfile(rsf: RuleSetFile):
+    query = rulesetfiles.insert().values(name=rsf.name, rules=rsf.rules)
     last_record_id = await database.execute(query)
-    return {**rsb.dict(), "id": last_record_id}
+    return {**rsf.dict(), "id": last_record_id}
 
 
 @app.post("/api/inventory/")
@@ -210,7 +207,7 @@ async def create_extravars(e: Extravars):
 
 @app.post("/api/activation/")
 async def create_activation(a: Activation):
-    query = rulesets.select().where(rulesets.c.id == a.rulesetbook_id)
+    query = rulesetfiles.select().where(rulesetfiles.c.id == a.rulesetfile_id)
     r = await database.fetch_one(query)
     query = inventories.select().where(inventories.c.id == a.inventory_id)
     i = await database.fetch_one(query)
@@ -218,7 +215,7 @@ async def create_activation(a: Activation):
     e = await database.fetch_one(query)
     query = activations.insert().values(
         name=a.name,
-        rulesetbook_id=a.rulesetbook_id,
+        rulesetfile_id=a.rulesetfile_id,
         inventory_id=a.inventory_id,
         extravars_id=a.extravars_id,
     )
@@ -288,8 +285,8 @@ async def read_project(project_id: int):
     query = projects.select().where(projects.c.id == project_id)
     result = dict(await database.fetch_one(query))
     result["rules"] = await database.fetch_all(
-        select(rulesets.c.id, rulesets.c.name)
-        .select_from(projects.join(projectrules).join(rulesets))
+        select(rulesetfiles.c.id, rulesetfiles.c.name)
+        .select_from(projects.join(projectrules).join(rulesetfiles))
         .where(projects.c.id == project_id)
     )
     result["inventories"] = await database.fetch_all(
@@ -328,6 +325,7 @@ async def read_playbook(playbook_id: int):
     query = playbooks.select().where(playbooks.c.id == playbook_id)
     return await database.fetch_one(query)
 
+
 @app.get("/api/inventories/")
 async def read_inventories():
     query = inventories.select()
@@ -340,15 +338,15 @@ async def read_inventory(inventory_id: int):
     return await database.fetch_one(query)
 
 
-@app.get("/api/rulesetbooks/")
-async def read_rulesetbooks():
-    query = rulesets.select()
+@app.get("/api/rulesetfiles/")
+async def read_rulesetfiles():
+    query = rulesetfiles.select()
     return await database.fetch_all(query)
 
 
-@app.get("/api/rulesetbook/{rulesetbook_id}")
-async def read_rulesetbook(rulesetbook_id: int):
-    query = rulesets.select().where(rulesets.c.id == rulesetbook_id)
+@app.get("/api/rulesetfile/{rulesetfile_id}")
+async def read_rulesetfile(rulesetfile_id: int):
+    query = rulesetfiles.select().where(rulesetfiles.c.id == rulesetfile_id)
     return await database.fetch_one(query)
 
 
@@ -376,14 +374,14 @@ async def read_activation(activation_id: int):
         select(
             activations.c.id,
             activations.c.name,
-            rulesets.c.id.label("ruleset_id"),
-            rulesets.c.name.label("ruleset_name"),
+            rulesetfiles.c.id.label("ruleset_id"),
+            rulesetfiles.c.name.label("ruleset_name"),
             inventories.c.id.label("inventory_id"),
             inventories.c.name.label("inventory_name"),
             extravars.c.id.label("extravars_id"),
             extravars.c.name.label("extravars_name"),
         )
-        .select_from(activations.join(rulesets).join(inventories).join(extravars))
+        .select_from(activations.join(rulesetfiles).join(inventories).join(extravars))
         .where(activations.c.id == activation_id)
     )
     result = dict(await database.fetch_one(query))
@@ -448,4 +446,3 @@ app.include_router(
 @app.get("/api/authenticated-route")
 async def authenticated_route(user: User = Depends(current_active_user)):
     return {"message": f"Hello {user.email}!"}
-

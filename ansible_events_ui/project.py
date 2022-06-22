@@ -4,7 +4,7 @@ import asyncio
 import yaml
 
 from .models import (
-    rulesets,
+    rulesetfiles,
     inventories,
     playbooks,
     extravars,
@@ -109,7 +109,7 @@ async def find_rules(project_id, project_dir):
         if is_rules_file(full_path):
             with open(full_path) as f:
                 rules = f.read()
-            query = rulesets.insert().values(name=filename, rules=rules)
+            query = rulesetfiles.insert().values(name=filename, rules=rules)
             last_record_id = await database.execute(query)
             print(last_record_id)
             query = projectrules.insert().values(

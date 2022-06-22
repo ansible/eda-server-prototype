@@ -8,8 +8,8 @@ metadata = sqlalchemy.MetaData()
 Base: DeclarativeMeta = declarative_base()
 
 
-rulesets = sqlalchemy.Table(
-    "ruleset",
+rulesetfiles = sqlalchemy.Table(
+    "rulesetfile",
     metadata,
     sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True),
     sqlalchemy.Column("name", sqlalchemy.String),
@@ -44,7 +44,7 @@ activations = sqlalchemy.Table(
     metadata,
     sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True),
     sqlalchemy.Column("name", sqlalchemy.String),
-    sqlalchemy.Column("rulesetbook_id", sqlalchemy.ForeignKey('ruleset.id')),
+    sqlalchemy.Column("rulesetfile_id", sqlalchemy.ForeignKey('rulesetfile.id')),
     sqlalchemy.Column("inventory_id", sqlalchemy.ForeignKey('inventory.id')),
     sqlalchemy.Column("extravars_id", sqlalchemy.ForeignKey('extravar.id')),
 )
@@ -91,7 +91,7 @@ projectrules = sqlalchemy.Table(
     metadata,
     sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True),
     sqlalchemy.Column("project_id", sqlalchemy.ForeignKey('project.id')),
-    sqlalchemy.Column("rules_id", sqlalchemy.ForeignKey('ruleset.id')),
+    sqlalchemy.Column("rules_id", sqlalchemy.ForeignKey('rulesetfile.id')),
 )
 
 

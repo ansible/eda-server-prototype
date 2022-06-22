@@ -41,7 +41,7 @@ class ProducerResponse(BaseModel):
         return str(datetime.utcnow())
 
 
-class RuleSetBook(BaseModel):
+class RuleSetFile(BaseModel):
     name: StrictStr
     rules: StrictStr
     id: Optional[int]
@@ -62,7 +62,7 @@ class Extravars(BaseModel):
 class Activation(BaseModel):
     id: Optional[int]
     name: StrictStr
-    rulesetbook_id: int
+    rulesetfile_id: int
     inventory_id: int
     extravars_id: int
 

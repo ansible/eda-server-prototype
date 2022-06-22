@@ -28,7 +28,7 @@ const SimpleList = styled(PFSimpleList)`
   white-space: pre-wrap;
 `
 
-const endpoint = 'http://' + getServer() + '/project/';
+const endpoint = 'http://' + getServer() + '/api/project/';
 
 const NewProject: React.FunctionComponent = () => {
 
