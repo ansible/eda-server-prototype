@@ -27,10 +27,12 @@ const SimpleList = styled(PFSimpleList)`
 `
 
 const endpoint = 'http://' + getServer() + '/api/rulesetfile/';
+const endpoint2 = 'http://' + getServer() + '/api/rulesetfile_json/';
 
 const RuleSetFile: React.FunctionComponent = () => {
 
   const [rulesetfile, setRuleSetFile] = useState([]);
+  const [rulesets, setRuleSets] = useState([]);
 
   let { id } = useParams();
   console.log(id);
@@ -42,6 +44,12 @@ const RuleSetFile: React.FunctionComponent = () => {
        },
      }).then(response => response.json())
     .then(data => setRuleSetFile(data));
+     fetch(endpoint2 + id, {
+       headers: {
+         'Content-Type': 'application/json',
+       },
+     }).then(response => response.json())
+    .then(data => setRuleSets(data.rulesets));
   }, []);
 
   return (
@@ -49,9 +57,38 @@ const RuleSetFile: React.FunctionComponent = () => {
   <PageSection>
     <Title headingLevel="h1" size="lg">Event Driven Automation | Rule Set {rulesetfile.name}</Title>
   </PageSection>
+
+	<Stack>
+
+            <StackItem>
+              <Card>
+                <CardTitle>Rule Sets</CardTitle>
+                <CardBody>
+                  {rulesets.length !== 0 && (
+                    <SimpleList style={{ whiteSpace: 'pre-wrap' }}>
+                      {rulesets.map((item, i) => (
+                        <SimpleListItem>{item.name}
+                        <div>
+                        { item.sources.map((source, j) => (
+                        <div> {source.name} </div>))}
+                        { item.rules.map((rule, j) => (
+                        <div> {rule.name} {Object.keys(rule.action)} </div>))}
+                        </div>
+                        </SimpleListItem>
+                      )) }
+                    </SimpleList>
+                  )}
+                </CardBody>
+              </Card>
+            </StackItem>
+            <StackItem>
+              <Card>
     <CodeBlock>
       <CodeBlockCode id="code-content">{rulesetfile.rulesets}</CodeBlockCode>
     </CodeBlock>
+              </Card>
+            </StackItem>
+	</Stack>
   </React.Fragment>
 )
 }
