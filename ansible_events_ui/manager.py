@@ -61,7 +61,7 @@ async def activate_rulesets(activation_id, execution_environment, rulesets, inve
         #cmd = f"podman run -v {rules_file}:/rules.yml -v {inventory_file}:/inventory.yml -v {vars_file}:/vars.yml -it {execution_environment} ansible-events --rules /rules.yml -i /inventory.yml --vars /vars.yml"
 
         # for local development this is better
-        cmd = f"ansible-events --rules {rules_file} -i {inventory_file} --vars {vars_file} --websocket-address ws://localhost:8000/ws2 --id {activation_id}"
+        cmd = f"ansible-events --rules {rules_file} -i {inventory_file} --vars {vars_file} --websocket-address ws://localhost:8080/api/ws2 --id {activation_id}"
         print(cmd)
 
         proc = await asyncio.create_subprocess_shell(

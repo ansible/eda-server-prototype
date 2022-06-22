@@ -56,7 +56,7 @@ const Activation: React.FunctionComponent = () => {
 
   const [websocket_client, setWebsocketClient] = useState([]);
   useEffect(() => {
-    const wc = new WebSocket('ws://' + getServer() + '/ws');
+    const wc = new WebSocket('ws://' + getServer() + '/api/ws');
     setWebsocketClient(wc);
     wc.onopen = () => {
         console.log('Websocket client connected');
@@ -91,7 +91,7 @@ const Activation: React.FunctionComponent = () => {
 
   const [update_client, setUpdateClient] = useState([]);
   useEffect(() => {
-    const uc = new WebSocket('ws://' + getServer() + '/ws-activation/' + id);
+    const uc = new WebSocket('ws://' + getServer() + '/api/ws-activation/' + id);
     setUpdateClient(uc);
     uc.onopen = () => {
         console.log('Update client connected');

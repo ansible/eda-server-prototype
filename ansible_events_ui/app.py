@@ -39,10 +39,10 @@ app.mount("/eda", StaticFiles(directory="ui/dist", html=True), name="eda")
 
 origins = [
     "http://localhost",
-    "http://localhost:8000",
+    "http://localhost:8080",
     "http://localhost:9000",
     "http://127.0.0.1",
-    "http://127.0.0.1:8000",
+    "http://127.0.0.1:8080",
     "http://127.0.0.1:9000",
 ]
 
@@ -124,6 +124,7 @@ async def root():
 
 @app.websocket("/api/ws")
 async def websocket_endpoint(websocket: WebSocket):
+    print('starting ws')
     await connnectionmanager.connect(websocket)
     try:
         while True:
@@ -135,6 +136,7 @@ async def websocket_endpoint(websocket: WebSocket):
 
 @app.websocket("/api/ws2")
 async def websocket_endpoint2(websocket: WebSocket):
+    print('starting ws2')
     await websocket.accept()
     try:
         while True:

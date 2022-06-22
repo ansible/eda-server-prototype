@@ -24,7 +24,7 @@ const SimpleList = styled(PFSimpleList)`
 `
 
 
-const client = new WebSocket('ws://' + getServer() + '/ws');
+const client = new WebSocket('ws://' + getServer() + '/api/ws');
 
 client.onopen = () => {
     console.log('Websocket client connected');
