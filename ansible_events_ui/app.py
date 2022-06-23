@@ -1,4 +1,5 @@
 from fastapi import Depends, FastAPI, WebSocket, WebSocketDisconnect
+from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from typing import List
@@ -119,7 +120,7 @@ async def shutdown():
 
 @app.get("/")
 async def root():
-    return {"message": "Hello World"}
+    return RedirectResponse("/eda")
 
 
 @app.websocket("/api/ws")
