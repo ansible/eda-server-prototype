@@ -5,7 +5,8 @@ A UI for ansible-events
 
 Run these commands:
 
-    git clone
+    git clone https://github.com/benthomasson/ansible-events-ui.git
+    cd ansible-events-ui
     python 3.9 -m venv .venv
     source .venv/bin/activate
     pip install -r requirements.txt

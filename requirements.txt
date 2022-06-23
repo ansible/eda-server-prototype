@@ -16,3 +16,4 @@ uvicorn==0.17.6
 websockets==10.3
 fastapi-users[sqlalchemy]
 alembic
+ansible-events
