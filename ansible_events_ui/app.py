@@ -24,7 +24,7 @@ from .models import (
     projectvars,
     projectplaybooks,
 )
-from .manager import activate_rulesets
+from .manager import activate_rulesets, inactivate_rulesets
 from .project import clone_project, sync_project
 from .database import database
 import json
@@ -238,6 +238,11 @@ async def create_activation(a: Activation):
     taskmanager.tasks.append(task1)
 
     return {**a.dict(), "id": last_record_id}
+
+@app.post("/api/deactivate/")
+async def deactivate(activation_id: int):
+    await inactivate_rulesets(activation_id)
+    return 
 
 
 async def read_output(proc, activation_id):

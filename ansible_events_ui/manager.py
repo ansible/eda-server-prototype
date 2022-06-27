@@ -28,7 +28,7 @@ from .models import playbooks
 from .database import database
 
 activated_rulesets = dict()
-activated_rulesets_seq = count(1)
+ansible_events = shutil.which('ansible-events')
 
 
 async def activate_rulesets(activation_id, execution_environment, rulesets, inventory, extravars):
@@ -55,28 +55,33 @@ async def activate_rulesets(activation_id, execution_environment, rulesets, inve
         # initial version using docker
         # mounting volumes is probably the wrong way to do this
         # it would be better to build it into the container or pass it through a stream (stdin or socket)
-        #cmd = f"docker run -v {rules_file}:/rules.yml -v {inventory_file}:/inventory.yml -v {vars_file}:/vars.yml -it {execution_environment} ansible-events --rules /rules.yml -i /inventory.yml --vars /vars.yml"
+        # cmd = f"docker run -v {rules_file}:/rules.yml -v {inventory_file}:/inventory.yml -v {vars_file}:/vars.yml -it {execution_environment} ansible-events --rules /rules.yml -i /inventory.yml --vars /vars.yml"
 
         # try this with podman
-        #cmd = f"podman run -v {rules_file}:/rules.yml -v {inventory_file}:/inventory.yml -v {vars_file}:/vars.yml -it {execution_environment} ansible-events --rules /rules.yml -i /inventory.yml --vars /vars.yml"
+        # cmd = f"podman run -v {rules_file}:/rules.yml -v {inventory_file}:/inventory.yml -v {vars_file}:/vars.yml -it {execution_environment} ansible-events --rules /rules.yml -i /inventory.yml --vars /vars.yml"
 
         # for local development this is better
-        cmd = f"ansible-events --rules {rules_file} -i {inventory_file} --vars {vars_file} --websocket-address ws://localhost:8080/api/ws2 --id {activation_id}"
+        cmd = ["--rules", rules_file, "-i", inventory_file, "--vars", vars_file, "--websocket-address", "ws://localhost:8080/api/ws2", "--id", str(activation_id)]
+        print(ansible_events)
         print(cmd)
 
-        proc = await asyncio.create_subprocess_shell(
-            cmd,
+        proc = await asyncio.create_subprocess_exec(
+            ansible_events,
+            *cmd,
             cwd=tempdir,
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.STDOUT)
 
-
-        activated_rulesets[next(activated_rulesets_seq)] = proc
+        activated_rulesets[activation_id] = proc
 
         return cmd, proc
     finally:
         pass
 
 
-async def inactivate_rulesets(rulesets_id):
-    pass
+async def inactivate_rulesets(activation_id):
+
+    try:
+        activated_rulesets[activation_id].kill()
+    except ProcessLookupError:
+        pass
