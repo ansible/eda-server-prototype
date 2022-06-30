@@ -1,6 +1,6 @@
-A UI for ansible-events
+# A UI for ansible-events
 
-# Setting up a development environment
+## Setting up a development environment
 
 
 Run these commands:
@@ -9,12 +9,12 @@ Run these commands:
     cd ansible-events-ui
     python3.9 -m venv .venv
     source .venv/bin/activate
-    pip install -r requirements.txt
+    pip install -e '.[sqlite]'
     cd ui
     npm install
     npm run build
     cd ..
-    ./run_server.py
+    ansible-events-ui
 
 
 Visit this url:
