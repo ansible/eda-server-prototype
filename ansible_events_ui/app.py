@@ -175,7 +175,7 @@ async def websocket_endpoint2(websocket: WebSocket):
 
 @app.websocket("/api/ws-activation/{activation_instance_id}")
 async def websocket_activation_endpoint(websocket: WebSocket, activation_instance_id):
-    page = f"/activation/{activation_instance_id}"
+    page = f"/activation_instance/{activation_instance_id}"
     await updatemanager.connect(page, websocket)
     try:
         while True:
