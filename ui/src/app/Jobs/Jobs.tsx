@@ -24,7 +24,7 @@ const SimpleList = styled(PFSimpleList)`
   white-space: pre-wrap;
 `
 
-const endpoint = 'http://' + getServer() + '/api/jobs/';
+const endpoint = 'http://' + getServer() + '/api/job_instances/';
 
 const Jobs: React.FunctionComponent = () => {
 

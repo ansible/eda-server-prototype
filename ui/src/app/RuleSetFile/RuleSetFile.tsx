@@ -26,12 +26,12 @@ const SimpleList = styled(PFSimpleList)`
   white-space: pre-wrap;
 `
 
-const endpoint = 'http://' + getServer() + '/api/rulesetfile/';
-const endpoint2 = 'http://' + getServer() + '/api/rulesetfile_json/';
+const endpoint = 'http://' + getServer() + '/api/rule_set_file/';
+const endpoint2 = 'http://' + getServer() + '/api/rule_set_file_json/';
 
 const RuleSetFile: React.FunctionComponent = () => {
 
-  const [rulesetfile, setRuleSetFile] = useState([]);
+  const [ruleSetFile, setRuleSetFile] = useState([]);
   const [rulesets, setRuleSets] = useState([]);
 
   let { id } = useParams();
@@ -55,7 +55,7 @@ const RuleSetFile: React.FunctionComponent = () => {
   return (
   <React.Fragment>
   <PageSection>
-    <Title headingLevel="h1" size="lg">Event Driven Automation | Rule Set {rulesetfile.name}</Title>
+    <Title headingLevel="h1" size="lg">Event Driven Automation | Rule Set {ruleSetFile.name}</Title>
   </PageSection>
 
 	<Stack>
@@ -84,7 +84,7 @@ const RuleSetFile: React.FunctionComponent = () => {
             <StackItem>
               <Card>
     <CodeBlock>
-      <CodeBlockCode id="code-content">{rulesetfile.rulesets}</CodeBlockCode>
+      <CodeBlockCode id="code-content">{ruleSetFile.rulesets}</CodeBlockCode>
     </CodeBlock>
               </Card>
             </StackItem>

@@ -9,20 +9,22 @@ from sqlalchemy import select
 from .schemas import RuleSetFile, Inventory, Activation, ActivationLog, Extravars
 from .schemas import Project
 from .models import (
-    rulesetfiles,
+    rule_set_files,
     inventories,
-    extravars,
+    extra_vars,
     activations,
-    activation_logs,
+    activation_instances,
+    activation_instance_logs,
     projects,
     playbooks,
     jobs,
-    job_events,
-    activationjobs,
-    projectrules,
-    projectinventories,
-    projectvars,
-    projectplaybooks,
+    job_instances,
+    job_instance_events,
+    activation_instance_job_instances,
+    project_rules,
+    project_inventories,
+    project_vars,
+    project_playbooks,
 )
 from .manager import activate_rulesets, inactivate_rulesets
 from .project import clone_project, sync_project
@@ -146,21 +148,21 @@ async def websocket_endpoint2(websocket: WebSocket):
             print(data)
             data_type = data.get("type")
             if data_type == "Job":
-                query = jobs.insert().values(uuid=data.get("job_id"))
+                query = job_instances.insert().values(uuid=data.get("job_id"))
                 last_record_id = await database.execute(query)
-                activation_id = int(data.get("ansible_events_id"))
-                query = activationjobs.insert().values(
-                    job_id=last_record_id,
-                    activation_id=activation_id,
+                activation_instance_id = int(data.get("ansible_events_id"))
+                query = activation_instance_job_instances.insert().values(
+                    job_instance_id=last_record_id,
+                    activation_instance_id=activation_instance_id,
                 )
                 await database.execute(query)
                 await updatemanager.broadcast(
-                    f"/activation/{activation_id}",
+                    f"/activation_instance/{activation_instance_id}",
                     json.dumps(["Job", dict(id=last_record_id)]),
                 )
             elif data_type == "AnsibleEvent":
                 event_data = data.get("event", {})
-                query = job_events.insert().values(
+                query = job_instance_events.insert().values(
                     job_uuid=event_data.get("job_id"),
                     counter=event_data.get("counter"),
                     stdout=event_data.get("stdout"),
@@ -171,9 +173,9 @@ async def websocket_endpoint2(websocket: WebSocket):
         pass
 
 
-@app.websocket("/api/ws-activation/{activation_id}")
-async def websocket_activation_endpoint(websocket: WebSocket, activation_id):
-    page = f"/activation/{activation_id}"
+@app.websocket("/api/ws-activation/{activation_instance_id}")
+async def websocket_activation_endpoint(websocket: WebSocket, activation_instance_id):
+    page = f"/activation/{activation_instance_id}"
     await updatemanager.connect(page, websocket)
     try:
         while True:
@@ -188,9 +190,9 @@ def ping():
     return {"ping": "pong!"}
 
 
-@app.post("/api/rulesetfile/")
-async def create_rulesetfile(rsf: RuleSetFile):
-    query = rulesetfiles.insert().values(name=rsf.name, rulesets=rsf.rulesets)
+@app.post("/api/rule_set_file/")
+async def create_rule_set_file(rsf: RuleSetFile):
+    query = rule_set_files.insert().values(name=rsf.name, rulesets=rsf.rulesets)
     last_record_id = await database.execute(query)
     return {**rsf.dict(), "id": last_record_id}
 
@@ -202,26 +204,26 @@ async def create_inventory(i: Inventory):
     return {**i.dict(), "id": last_record_id}
 
 
-@app.post("/api/extravars/")
-async def create_extravars(e: Extravars):
-    query = extravars.insert().values(name=e.name, extravars=e.extravars)
+@app.post("/api/extra_vars/")
+async def create_extra_vars(e: Extravars):
+    query = extra_vars.insert().values(name=e.name, extra_vars=e.extra_vars)
     last_record_id = await database.execute(query)
     return {**e.dict(), "id": last_record_id}
 
 
-@app.post("/api/activation/")
-async def create_activation(a: Activation):
-    query = rulesetfiles.select().where(rulesetfiles.c.id == a.rulesetfile_id)
+@app.post("/api/activation_instance/")
+async def create_activation_instance(a: Activation):
+    query = rule_set_files.select().where(rule_set_files.c.id == a.rule_set_file_id)
     r = await database.fetch_one(query)
     query = inventories.select().where(inventories.c.id == a.inventory_id)
     i = await database.fetch_one(query)
-    query = extravars.select().where(extravars.c.id == a.extravars_id)
+    query = extra_vars.select().where(extra_vars.c.id == a.extra_var_id)
     e = await database.fetch_one(query)
-    query = activations.insert().values(
+    query = activation_instances.insert().values(
         name=a.name,
-        rulesetfile_id=a.rulesetfile_id,
+        rule_set_file_id=a.rule_set_file_id,
         inventory_id=a.inventory_id,
-        extravars_id=a.extravars_id,
+        extra_var_id=a.extra_var_id,
     )
     last_record_id = await database.execute(query)
     cmd, proc = await activate_rulesets(
@@ -229,7 +231,7 @@ async def create_activation(a: Activation):
         "quay.io/bthomass/ansible-events:latest",
         r.rulesets,
         i.inventory,
-        e.extravars,
+        e.extra_var,
     )
 
     task1 = asyncio.create_task(
@@ -239,13 +241,14 @@ async def create_activation(a: Activation):
 
     return {**a.dict(), "id": last_record_id}
 
+
 @app.post("/api/deactivate/")
-async def deactivate(activation_id: int):
-    await inactivate_rulesets(activation_id)
+async def deactivate(activation_instance_id: int):
+    await inactivate_rulesets(activation_instance_id)
     return
 
 
-async def read_output(proc, activation_id):
+async def read_output(proc, activation_instance_id):
     line_number = 0
     done = False
     while not done:
@@ -254,24 +257,24 @@ async def read_output(proc, activation_id):
             break
         line = line.decode()
         print(f"{line}", end="")
-        query = activation_logs.insert().values(
+        query = activation_instance_logs.insert().values(
             line_number=line_number,
             log=line,
-            activation_id=activation_id,
+            activation_instance_id=activation_instance_id,
         )
         await database.execute(query)
         line_number += 1
         await connnectionmanager.broadcast(json.dumps(["Stdout", dict(stdout=line)]))
 
 
-@app.get("/api/activation_logs/", response_model=List[ActivationLog])
-async def read_activation_logs(activation_id: int):
-    q = activation_logs.select().where(activation_logs.c.activation_id == activation_id)
+@app.get("/api/activation_instance_logs/", response_model=List[ActivationLog])
+async def list_activation_instance_logs(activation_instance_id: int):
+    q = activation_instance_logs.select().where(activation_instance_logs.c.activation_instance_id == activation_instance_id)
     return await database.fetch_all(q)
 
 
 @app.get("/api/tasks/")
-async def read_tasks():
+async def list_tasks():
     tasks = [
         dict(name=task.get_name(), done=task.done(), cancelled=task.cancelled())
         for task in taskmanager.tasks
@@ -294,23 +297,23 @@ async def read_project(project_id: int):
     query = projects.select().where(projects.c.id == project_id)
     result = dict(await database.fetch_one(query))
     result["rulesets"] = await database.fetch_all(
-        select(rulesetfiles.c.id, rulesetfiles.c.name)
-        .select_from(projects.join(projectrules).join(rulesetfiles))
+        select(rule_set_files.c.id, rule_set_files.c.name)
+        .select_from(projects.join(project_rules).join(rule_set_files))
         .where(projects.c.id == project_id)
     )
     result["inventories"] = await database.fetch_all(
         select(inventories.c.id, inventories.c.name)
-        .select_from(projects.join(projectinventories).join(inventories))
+        .select_from(projects.join(project_inventories).join(inventories))
         .where(projects.c.id == project_id)
     )
     result["vars"] = await database.fetch_all(
-        select(extravars.c.id, extravars.c.name)
-        .select_from(projects.join(projectvars).join(extravars))
+        select(extra_vars.c.id, extra_vars.c.name)
+        .select_from(projects.join(project_vars).join(extra_vars))
         .where(projects.c.id == project_id)
     )
     result["playbooks"] = await database.fetch_all(
         select(playbooks.c.id, playbooks.c.name)
-        .select_from(projects.join(projectplaybooks).join(playbooks))
+        .select_from(projects.join(project_playbooks).join(playbooks))
         .where(projects.c.id == project_id)
     )
     print(result)
@@ -318,13 +321,13 @@ async def read_project(project_id: int):
 
 
 @app.get("/api/projects/")
-async def read_projects():
+async def list_projects():
     query = projects.select()
     return await database.fetch_all(query)
 
 
 @app.get("/api/playbooks/")
-async def read_playbooks():
+async def list_playbooks():
     query = playbooks.select()
     return await database.fetch_all(query)
 
@@ -336,7 +339,7 @@ async def read_playbook(playbook_id: int):
 
 
 @app.get("/api/inventories/")
-async def read_inventories():
+async def list_inventories():
     query = inventories.select()
     return await database.fetch_all(query)
 
@@ -347,88 +350,89 @@ async def read_inventory(inventory_id: int):
     return await database.fetch_one(query)
 
 
-@app.get("/api/rulesetfiles/")
-async def read_rulesetfiles():
-    query = rulesetfiles.select()
+@app.get("/api/rule_set_files/")
+async def list_rule_set_files():
+    query = rule_set_files.select()
     return await database.fetch_all(query)
 
 
-@app.get("/api/rulesetfile/{rulesetfile_id}")
-async def read_rulesetfile(rulesetfile_id: int):
-    query = rulesetfiles.select().where(rulesetfiles.c.id == rulesetfile_id)
+@app.get("/api/rule_set_file/{rule_set_file_id}")
+async def read_rule_set_file(rule_set_file_id: int):
+    query = rule_set_files.select().where(rule_set_files.c.id == rule_set_file_id)
     return await database.fetch_one(query)
 
 
-@app.get("/api/rulesetfile_json/{rulesetfile_id}")
-async def read_rulesetfile_json(rulesetfile_id: int):
-    query = rulesetfiles.select().where(rulesetfiles.c.id == rulesetfile_id)
+@app.get("/api/rule_set_file_json/{rule_set_file_id}")
+async def read_rule_set_file_json(rule_set_file_id: int):
+    query = rule_set_files.select().where(rule_set_files.c.id == rule_set_file_id)
     result = dict(await database.fetch_one(query))
     result["rulesets"] = yaml.safe_load(result["rulesets"])
     return result
 
 
-@app.get("/api/extravars/")
-async def read_extravars():
-    query = extravars.select()
+@app.get("/api/extra_vars/")
+async def list_extra_vars():
+    query = extra_vars.select()
     return await database.fetch_all(query)
 
 
-@app.get("/api/extravar/{extravar_id}")
-async def read_extrvar(extravar_id: int):
-    query = extravars.select().where(extravars.c.id == extravar_id)
+@app.get("/api/extra_var/{extra_var_id}")
+async def read_extravar(extra_var_id: int):
+    query = extra_vars.select().where(extra_vars.c.id == extra_var_id)
     return await database.fetch_one(query)
 
 
-@app.get("/api/activations/")
-async def read_activations():
-    query = activations.select()
+@app.get("/api/activation_instances/")
+async def list_activation_instances():
+    query = activation_instances.select()
     return await database.fetch_all(query)
 
 
-@app.get("/api/activation/{activation_id}")
-async def read_activation(activation_id: int):
+@app.get("/api/activation_instance/{activation_instance_id}")
+async def read_activation_instance(activation_instance_id: int):
     query = (
         select(
-            activations.c.id,
-            activations.c.name,
-            rulesetfiles.c.id.label("ruleset_id"),
-            rulesetfiles.c.name.label("ruleset_name"),
+            activation_instances.c.id,
+            activation_instances.c.name,
+            rule_set_files.c.id.label("ruleset_id"),
+            rule_set_files.c.name.label("ruleset_name"),
             inventories.c.id.label("inventory_id"),
             inventories.c.name.label("inventory_name"),
-            extravars.c.id.label("extravars_id"),
-            extravars.c.name.label("extravars_name"),
+            extra_vars.c.id.label("extra_var_id"),
+            extra_vars.c.name.label("extra_vars_name"),
         )
-        .select_from(activations.join(rulesetfiles).join(inventories).join(extravars))
-        .where(activations.c.id == activation_id)
+        .select_from(activation_instances.join(rule_set_files).join(inventories).join(extra_vars))
+        .where(activation_instances.c.id == activation_instance_id)
     )
     result = dict(await database.fetch_one(query))
     print(dict(result))
     return result
 
 
-@app.get("/api/jobs/")
-async def read_jobs():
-    query = jobs.select()
+@app.get("/api/job_instances/")
+async def list_job_instances():
+    query = job_instances.select()
     return await database.fetch_all(query)
 
 
-@app.get("/api/job/{job_id}")
-async def read_job(job_id: int):
-    query = jobs.select().where(jobs.c.id == job_id)
+@app.get("/api/job_instance/{job_instance_id}")
+async def read_job_instance(job_instance_id: int):
+    query = job_instances.select().where(job_instances.c.id == job_instance_id)
     return await database.fetch_one(query)
 
 
-@app.get("/api/job_events/{job_id}")
-async def read_job_events(job_id: int):
-    query1 = jobs.select().where(jobs.c.id == job_id)
+@app.get("/api/job_instance_events/{job_instance_id}")
+async def read_job_instance_events(job_instance_id: int):
+    query1 = job_instances.select().where(job_instances.c.id == job_instance_id)
     job = await database.fetch_one(query1)
-    query2 = job_events.select().where(job_events.c.job_uuid == job.uuid)
+    query2 = job_instance_events.select().where(job_instance_events.c.job_uuid == job.uuid)
     return await database.fetch_all(query2)
 
 
-@app.get("/api/activation_jobs/{activation_id}")
-async def read_activation_jobs(activation_id: int):
-    query1 = activationjobs.select(activationjobs.c.activation_id == activation_id)
+@app.get("/api/activation_instance_job_instances/{activation_instance_id}")
+async def read_activation_instance_job_instances(activation_instance_id: int):
+    query1 = activation_instance_job_instances.select(
+        activation_instance_job_instances.c.activation_instance_id == activation_instance_id)
     return await database.fetch_all(query1)
 
 

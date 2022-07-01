@@ -25,7 +25,7 @@ const SimpleList = styled(PFSimpleList)`
 `
 
 const endpoint = 'http://' + getServer() + '/api/job/';
-const event_endpoint = 'http://' + getServer() + '/api/job_events/';
+const event_endpoint = 'http://' + getServer() + '/api/job_instance_events/';
 
 const Job: React.FunctionComponent = () => {
 

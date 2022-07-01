@@ -4,14 +4,14 @@ import asyncio
 import yaml
 
 from .models import (
-    rulesetfiles,
+    rule_set_files,
     inventories,
     playbooks,
-    extravars,
-    projectinventories,
-    projectrules,
-    projectvars,
-    projectplaybooks,
+    extra_vars,
+    project_inventories,
+    project_rules,
+    project_vars,
+    project_playbooks,
 )
 
 from .database import database
@@ -67,7 +67,7 @@ async def sync_project(project_id, tempdir):
 
         await find_rules(project_id, tempdir)
         await find_inventory(project_id, tempdir)
-        await find_extravars(project_id, tempdir)
+        await find_extra_vars(project_id, tempdir)
         await find_playbook(project_id, tempdir)
 
     finally:
@@ -109,11 +109,12 @@ async def find_rules(project_id, project_dir):
         if is_rules_file(full_path):
             with open(full_path) as f:
                 rulesets = f.read()
-            query = rulesetfiles.insert().values(name=filename, rulesets=rulesets)
+            query = rule_set_files.insert().values(name=filename,
+                                                   rulesets=rulesets)
             last_record_id = await database.execute(query)
             print(last_record_id)
-            query = projectrules.insert().values(
-                project_id=project_id, rules_id=last_record_id
+            query = project_rules.insert().values(
+                project_id=project_id, rule_set_file_id=last_record_id
             )
             last_record_id = await database.execute(query)
             print(last_record_id)
@@ -144,10 +145,11 @@ async def find_inventory(project_id, project_dir):
         if is_inventory_file(full_path):
             with open(full_path) as f:
                 inventory = f.read()
-            query = inventories.insert().values(name=filename, inventory=inventory)
+            query = inventories.insert().values(name=filename,
+                                                inventory=inventory)
             last_record_id = await database.execute(query)
             print(last_record_id)
-            query = projectinventories.insert().values(
+            query = project_inventories.insert().values(
                 project_id=project_id, inventory_id=last_record_id
             )
             last_record_id = await database.execute(query)
@@ -173,7 +175,7 @@ def is_playbook_file(filename):
     return False
 
 
-def is_extravars_file(filename):
+def is_extra_vars_file(filename):
     if not filename.endswith(".yml"):
         return False
     return (
@@ -183,18 +185,19 @@ def is_extravars_file(filename):
     )
 
 
-async def find_extravars(project_id, project_dir):
+async def find_extra_vars(project_id, project_dir):
 
     for directory, filename in yield_files(project_dir):
         full_path = os.path.join(directory, filename)
         print(filename)
-        if is_extravars_file(full_path):
+        if is_extra_vars_file(full_path):
             with open(full_path) as f:
-                extravar = f.read()
-            query = extravars.insert().values(name=filename, extravars=extravar)
+                extra_var = f.read()
+            query = extra_vars.insert().values(name=filename,
+                                               extra_var=extra_var)
             last_record_id = await database.execute(query)
             print(last_record_id)
-            query = projectvars.insert().values(
+            query = project_vars.insert().values(
                 project_id=project_id, vars_id=last_record_id
             )
             last_record_id = await database.execute(query)
@@ -212,7 +215,7 @@ async def find_playbook(project_id, project_dir):
             query = playbooks.insert().values(name=filename, playbook=playbook)
             last_record_id = await database.execute(query)
             print(last_record_id)
-            query = projectplaybooks.insert().values(
+            query = project_playbooks.insert().values(
                 project_id=project_id, playbook_id=last_record_id
             )
             last_record_id = await database.execute(query)

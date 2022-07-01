@@ -24,12 +24,12 @@ const SimpleList = styled(PFSimpleList)`
   white-space: pre-wrap;
 `
 
-const endpoint = 'http://' + getServer() + '/api/rulesetfiles/';
+const endpoint = 'http://' + getServer() + '/api/rule_set_files/';
 
 const RuleSetFiles: React.FunctionComponent = () => {
 
 
-  const [rulesetfiles, setRuleSetFiles] = useState([]);
+  const [ruleSetFiles, setRuleSetFiles] = useState([]);
 
   useEffect(() => {
      fetch(endpoint, {
@@ -51,9 +51,9 @@ const RuleSetFiles: React.FunctionComponent = () => {
               <Card>
                 <CardTitle>Rule Sets</CardTitle>
                 <CardBody>
-                  {rulesetfiles.length !== 0 && (
+                  {ruleSetFiles.length !== 0 && (
                     <SimpleList style={{ whiteSpace: 'pre-wrap' }}>
-                      {rulesetfiles.map((item, i) => (
+                      {ruleSetFiles.map((item, i) => (
                         <SimpleListItem key={i}><Link to={"/rulesetfile/" + item.id}>{item.name} </Link></SimpleListItem>
                       ))}
                     </SimpleList>

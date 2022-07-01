@@ -15,6 +15,8 @@ import {
 } from '@patternfly/react-core';
 import styled from 'styled-components';
 import {getServer} from '@app/utils/utils';
+import { Button } from '@patternfly/react-core';
+import { PlayIcon, PauseIcon } from '@patternfly/react-icons';
 
 
 const CardBody = styled(PFCardBody)`
@@ -31,8 +33,8 @@ client.onopen = () => {
     console.log('Websocket client connected');
 };
 
-const endpoint1 = 'http://' + getServer() + '/api/activation/';
-const endpoint2 = 'http://' + getServer() + '/api/activation_jobs/';
+const endpoint1 = 'http://' + getServer() + '/api/activation_instance/';
+const endpoint2 = 'http://' + getServer() + '/api/activation_instance_job_instances/';
 
 const Activation: React.FunctionComponent = () => {
 
@@ -114,9 +116,15 @@ const Activation: React.FunctionComponent = () => {
   <PageSection>
     <Title headingLevel="h1" size="lg">Event Driven Automation | Activation {activation.name}</Title>
   </PageSection>
+  <Button variant="link" icon={<PlayIcon />}>
+      Start
+  </Button>
+  <Button variant="link" icon={<PauseIcon />}>
+      Stop
+  </Button>
   <Link to={"/rulesetfile/" + activation.ruleset_id}>{activation.ruleset_name}</Link>
   <Link to={"/inventory/" + activation.inventory_id}>{activation.inventory_name}</Link>
-  <Link to={"/var/" + activation.extravars_id}>{activation.extravars_name}</Link>
+  <Link to={"/var/" + activation.extra_var_id}>{activation.extra_vars_name}</Link>
 	<Stack>
             <StackItem>
               <Card>

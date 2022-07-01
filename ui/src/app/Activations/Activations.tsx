@@ -26,7 +26,7 @@ const SimpleList = styled(PFSimpleList)`
   white-space: pre-wrap;
 `
 
-const endpoint = 'http://' + getServer()+ '/api/activations/';
+const endpoint = 'http://' + getServer()+ '/api/activation_instances/';
 
 const Activations: React.FunctionComponent = () => {
 

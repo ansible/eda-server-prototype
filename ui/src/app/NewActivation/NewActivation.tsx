@@ -29,10 +29,10 @@ const SimpleList = styled(PFSimpleList)`
   white-space: pre-wrap;
 `
 
-const endpoint = 'http://' + getServer() + '/api/activation/';
-const endpoint1 = 'http://' + getServer() + '/api/rulesetfiles/';
+const endpoint = 'http://' + getServer() + '/api/activation_instance/';
+const endpoint1 = 'http://' + getServer() + '/api/rule_set_files/';
 const endpoint2 = 'http://' + getServer() + '/api/inventories/';
-const endpoint3 = 'http://' + getServer() + '/api/extravars/';
+const endpoint3 = 'http://' + getServer() + '/api/extra_vars/';
 
 const NewActivation: React.FunctionComponent = () => {
 
@@ -76,9 +76,9 @@ const NewActivation: React.FunctionComponent = () => {
 
   const handleSubmit = () => {
 			postData(endpoint, { name: name,
-                           rulesetfile_id: ruleset,
+                           rule_set_file_id: ruleset,
                            inventory_id: inventory,
-                           extravars_id: extravar})
+                           extra_var_id: extravar})
 				.then(data => {
 					console.log(data);
           history.push("/activation/" + data.id);

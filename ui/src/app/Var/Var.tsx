@@ -25,11 +25,11 @@ const SimpleList = styled(PFSimpleList)`
   white-space: pre-wrap;
 `
 
-const endpoint = 'http://' + getServer() + '/api/extravar/';
+const endpoint = 'http://' + getServer() + '/api/extra_var/';
 
 const Var: React.FunctionComponent = () => {
 
-  const [extravar, setVar] = useState([]);
+  const [extraVar, setVar] = useState([]);
 
   let { id } = useParams();
   console.log(id);
@@ -46,10 +46,10 @@ const Var: React.FunctionComponent = () => {
   return (
   <React.Fragment>
   <PageSection>
-    <Title headingLevel="h1" size="lg">Event Driven Automation | Var {extravar.name}</Title>
+    <Title headingLevel="h1" size="lg">Event Driven Automation | Var {extraVar.name}</Title>
   </PageSection>
     <CodeBlock>
-      <CodeBlockCode id="code-content">{extravar.extravars}</CodeBlockCode>
+      <CodeBlockCode id="code-content">{extraVar.extra_var}</CodeBlockCode>
     </CodeBlock>
   </React.Fragment>
 )

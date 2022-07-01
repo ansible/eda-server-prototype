@@ -1,4 +1,3 @@
-
 import sqlalchemy
 from sqlalchemy.ext.declarative import DeclarativeMeta, declarative_base
 from fastapi_users.db import SQLAlchemyBaseUserTableUUID
@@ -8,14 +7,13 @@ metadata = sqlalchemy.MetaData()
 Base: DeclarativeMeta = declarative_base()
 
 
-rulesetfiles = sqlalchemy.Table(
-    "rulesetfile",
+rule_set_files = sqlalchemy.Table(
+    "rule_set_file",
     metadata,
     sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True),
     sqlalchemy.Column("name", sqlalchemy.String),
     sqlalchemy.Column("rulesets", sqlalchemy.String),
 )
-
 
 
 inventories = sqlalchemy.Table(
@@ -27,16 +25,13 @@ inventories = sqlalchemy.Table(
 )
 
 
-
-extravars = sqlalchemy.Table(
-    "extravar",
+extra_vars = sqlalchemy.Table(
+    "extra_var",
     metadata,
     sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True),
     sqlalchemy.Column("name", sqlalchemy.String),
-    sqlalchemy.Column("extravars", sqlalchemy.String),
+    sqlalchemy.Column("extra_var", sqlalchemy.String),
 )
-
-
 
 
 activations = sqlalchemy.Table(
@@ -44,21 +39,34 @@ activations = sqlalchemy.Table(
     metadata,
     sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True),
     sqlalchemy.Column("name", sqlalchemy.String),
-    sqlalchemy.Column("rulesetfile_id", sqlalchemy.ForeignKey('rulesetfile.id')),
-    sqlalchemy.Column("inventory_id", sqlalchemy.ForeignKey('inventory.id')),
-    sqlalchemy.Column("extravars_id", sqlalchemy.ForeignKey('extravar.id')),
+    sqlalchemy.Column("rule_set_file_id",
+                      sqlalchemy.ForeignKey("rule_set_file.id")),
+    sqlalchemy.Column("inventory_id", sqlalchemy.ForeignKey("inventory.id")),
+    sqlalchemy.Column("extra_var_id", sqlalchemy.ForeignKey("extra_var.id")),
 )
 
 
-activation_logs = sqlalchemy.Table(
-    "activation_log",
+activation_instances = sqlalchemy.Table(
+    "activation_instance",
     metadata,
     sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True),
-    sqlalchemy.Column("activation_id", sqlalchemy.ForeignKey('activation.id')),
+    sqlalchemy.Column("name", sqlalchemy.String),
+    sqlalchemy.Column("rule_set_file_id",
+                      sqlalchemy.ForeignKey("rule_set_file.id")),
+    sqlalchemy.Column("inventory_id", sqlalchemy.ForeignKey("inventory.id")),
+    sqlalchemy.Column("extra_var_id", sqlalchemy.ForeignKey("extra_var.id")),
+    #sqlalchemy.Column("activation_id", sqlalchemy.ForeignKey("activation.id")),
+)
+
+
+activation_instance_logs = sqlalchemy.Table(
+    "activation_instance_log",
+    metadata,
+    sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True),
+    sqlalchemy.Column("activation_instance_id", sqlalchemy.ForeignKey("activation_instance.id")),
     sqlalchemy.Column("line_number", sqlalchemy.Integer),
     sqlalchemy.Column("log", sqlalchemy.String),
 )
-
 
 
 projects = sqlalchemy.Table(
@@ -70,28 +78,28 @@ projects = sqlalchemy.Table(
 )
 
 
-projectinventories = sqlalchemy.Table(
-    "projectinventory",
+project_inventories = sqlalchemy.Table(
+    "project_inventory",
     metadata,
     sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True),
-    sqlalchemy.Column("project_id", sqlalchemy.ForeignKey('project.id')),
-    sqlalchemy.Column("inventory_id", sqlalchemy.ForeignKey('inventory.id')),
+    sqlalchemy.Column("project_id", sqlalchemy.ForeignKey("project.id")),
+    sqlalchemy.Column("inventory_id", sqlalchemy.ForeignKey("inventory.id")),
 )
 
-projectvars = sqlalchemy.Table(
-    "projectvar",
+project_vars = sqlalchemy.Table(
+    "project_var",
     metadata,
     sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True),
-    sqlalchemy.Column("project_id", sqlalchemy.ForeignKey('project.id')),
-    sqlalchemy.Column("vars_id", sqlalchemy.ForeignKey('extravar.id')),
+    sqlalchemy.Column("project_id", sqlalchemy.ForeignKey("project.id")),
+    sqlalchemy.Column("vars_id", sqlalchemy.ForeignKey("extra_var.id")),
 )
 
-projectrules = sqlalchemy.Table(
-    "projectrule",
+project_rules = sqlalchemy.Table(
+    "project_rule",
     metadata,
     sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True),
-    sqlalchemy.Column("project_id", sqlalchemy.ForeignKey('project.id')),
-    sqlalchemy.Column("rules_id", sqlalchemy.ForeignKey('rulesetfile.id')),
+    sqlalchemy.Column("project_id", sqlalchemy.ForeignKey("project.id")),
+    sqlalchemy.Column("rule_set_file_id", sqlalchemy.ForeignKey("rule_set_file.id")),
 )
 
 
@@ -102,17 +110,25 @@ jobs = sqlalchemy.Table(
     sqlalchemy.Column("uuid", sqlalchemy.String),
 )
 
-activationjobs = sqlalchemy.Table(
-    "activationjob",
+job_instances = sqlalchemy.Table(
+    "job_instance",
     metadata,
     sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True),
-    sqlalchemy.Column("activation_id", sqlalchemy.ForeignKey('activation.id')),
-    sqlalchemy.Column("job_id", sqlalchemy.ForeignKey('job.id')),
+    sqlalchemy.Column("uuid", sqlalchemy.String),
+    #sqlalchemy.Column("job_id", sqlalchemy.ForeignKey("job.id")),
+)
+
+activation_instance_job_instances = sqlalchemy.Table(
+    "activation_instance_job_instance",
+    metadata,
+    sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True),
+    sqlalchemy.Column("activation_instance_id", sqlalchemy.ForeignKey("activation_instance.id")),
+    sqlalchemy.Column("job_instance_id", sqlalchemy.ForeignKey("job_instance.id")),
 )
 
 
-job_events = sqlalchemy.Table(
-    "job_event",
+job_instance_events = sqlalchemy.Table(
+    "job_instance_event",
     metadata,
     sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True),
     sqlalchemy.Column("job_uuid", sqlalchemy.String),
@@ -130,16 +146,17 @@ playbooks = sqlalchemy.Table(
 )
 
 
-projectplaybooks = sqlalchemy.Table(
-    "projectplaybook",
+project_playbooks = sqlalchemy.Table(
+    "project_playbook",
     metadata,
     sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True),
-    sqlalchemy.Column("project_id", sqlalchemy.ForeignKey('project.id')),
-    sqlalchemy.Column("playbook_id", sqlalchemy.ForeignKey('playbook.id')),
+    sqlalchemy.Column("project_id", sqlalchemy.ForeignKey("project.id")),
+    sqlalchemy.Column("playbook_id", sqlalchemy.ForeignKey("playbook.id")),
 )
 
 
-# FastAPI Users 
+# FastAPI Users
+
 
 class User(SQLAlchemyBaseUserTableUUID, Base):
     pass

@@ -24,13 +24,13 @@ const SimpleList = styled(PFSimpleList)`
   white-space: pre-wrap;
 `
 
-const endpoint = 'http://' + getServer() + '/api/extravars/';
+const endpoint = 'http://' + getServer() + '/api/extra_vars/';
 
 const Vars: React.FunctionComponent = () => {
 
 
 
-  const [extravars, setVars] = useState([]);
+  const [extraVars, setVars] = useState([]);
 
   useEffect(() => {
      fetch(endpoint, {
@@ -52,9 +52,9 @@ const Vars: React.FunctionComponent = () => {
               <Card>
                 <CardTitle>Extra Vars</CardTitle>
                 <CardBody>
-                  {extravars.length !== 0 && (
+                  {extraVars.length !== 0 && (
                     <SimpleList style={{ whiteSpace: 'pre-wrap' }}>
-                      {extravars.map((item, i) => (
+                      {extraVars.map((item, i) => (
                         <SimpleListItem key={i}><Link to={"/var/" + item.id}>{item.name} </Link></SimpleListItem>
                       ))}
                     </SimpleList>

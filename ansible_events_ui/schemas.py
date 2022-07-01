@@ -62,13 +62,20 @@ class Extravars(BaseModel):
 class Activation(BaseModel):
     id: Optional[int]
     name: StrictStr
-    rulesetfile_id: int
+    rule_set_file_id: int
     inventory_id: int
-    extravars_id: int
+    extra_var_id: int
+
+class ActivationInstance(BaseModel):
+    id: Optional[int]
+    name: StrictStr
+    rule_set_file_id: int
+    inventory_id: int
+    extra_var_id: int
 
 
 class ActivationLog(BaseModel):
-    activation_id: int
+    activation_instance_id: int
     log: StrictStr
     id: Optional[int]
 
