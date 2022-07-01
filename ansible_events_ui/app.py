@@ -242,7 +242,7 @@ async def create_activation(a: Activation):
 @app.post("/api/deactivate/")
 async def deactivate(activation_id: int):
     await inactivate_rulesets(activation_id)
-    return 
+    return
 
 
 async def read_output(proc, activation_id):

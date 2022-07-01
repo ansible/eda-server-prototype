@@ -7,13 +7,15 @@ Activates rulesets together with an inventory and extravars.
 Functions:
 * activate_rulesets
     Arguments:
-        - rulesets:
-        - inventory:
-        - extravars:
-    Returns a rulesets id
+        - activation_id
+        - execution_environment
+        - rulesets
+        - inventory
+        - extravars
+    Returns a tuple of the command run and the process
 * inactivate_ruleset
     Arguments:
-        - rulesets_id
+        - activation_id
     Returns None
 '''
 
