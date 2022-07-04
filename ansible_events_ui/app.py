@@ -6,18 +6,22 @@ from typing import List
 import asyncio
 from collections import defaultdict
 from sqlalchemy import select
-from .schemas import RuleSetFile, Inventory, Activation, ActivationLog, Extravars
+from .schemas import (
+    RuleSetFile,
+    Inventory,
+    Activation,
+    ActivationLog,
+    Extravars,
+)
 from .schemas import Project
 from .models import (
     rule_set_files,
     inventories,
     extra_vars,
-    activations,
     activation_instances,
     activation_instance_logs,
     projects,
     playbooks,
-    jobs,
     job_instances,
     job_instance_events,
     activation_instance_job_instances,
@@ -127,7 +131,7 @@ async def root():
 
 @app.websocket("/api/ws")
 async def websocket_endpoint(websocket: WebSocket):
-    print('starting ws')
+    print("starting ws")
     await connnectionmanager.connect(websocket)
     try:
         while True:
@@ -139,7 +143,7 @@ async def websocket_endpoint(websocket: WebSocket):
 
 @app.websocket("/api/ws2")
 async def websocket_endpoint2(websocket: WebSocket):
-    print('starting ws2')
+    print("starting ws2")
     await websocket.accept()
     try:
         while True:
@@ -174,7 +178,9 @@ async def websocket_endpoint2(websocket: WebSocket):
 
 
 @app.websocket("/api/ws-activation/{activation_instance_id}")
-async def websocket_activation_endpoint(websocket: WebSocket, activation_instance_id):
+async def websocket_activation_endpoint(
+    websocket: WebSocket, activation_instance_id
+):
     page = f"/activation_instance/{activation_instance_id}"
     await updatemanager.connect(page, websocket)
     try:
@@ -192,7 +198,9 @@ def ping():
 
 @app.post("/api/rule_set_file/")
 async def create_rule_set_file(rsf: RuleSetFile):
-    query = rule_set_files.insert().values(name=rsf.name, rulesets=rsf.rulesets)
+    query = rule_set_files.insert().values(
+        name=rsf.name, rulesets=rsf.rulesets
+    )
     last_record_id = await database.execute(query)
     return {**rsf.dict(), "id": last_record_id}
 
@@ -213,7 +221,9 @@ async def create_extra_vars(e: Extravars):
 
 @app.post("/api/activation_instance/")
 async def create_activation_instance(a: Activation):
-    query = rule_set_files.select().where(rule_set_files.c.id == a.rule_set_file_id)
+    query = rule_set_files.select().where(
+        rule_set_files.c.id == a.rule_set_file_id
+    )
     r = await database.fetch_one(query)
     query = inventories.select().where(inventories.c.id == a.inventory_id)
     i = await database.fetch_one(query)
@@ -264,19 +274,26 @@ async def read_output(proc, activation_instance_id):
         )
         await database.execute(query)
         line_number += 1
-        await connnectionmanager.broadcast(json.dumps(["Stdout", dict(stdout=line)]))
+        await connnectionmanager.broadcast(
+            json.dumps(["Stdout", dict(stdout=line)])
+        )
 
 
 @app.get("/api/activation_instance_logs/", response_model=List[ActivationLog])
 async def list_activation_instance_logs(activation_instance_id: int):
-    q = activation_instance_logs.select().where(activation_instance_logs.c.activation_instance_id == activation_instance_id)
+    q = activation_instance_logs.select().where(
+        activation_instance_logs.c.activation_instance_id
+        == activation_instance_id
+    )
     return await database.fetch_all(q)
 
 
 @app.get("/api/tasks/")
 async def list_tasks():
     tasks = [
-        dict(name=task.get_name(), done=task.done(), cancelled=task.cancelled())
+        dict(
+            name=task.get_name(), done=task.done(), cancelled=task.cancelled()
+        )
         for task in taskmanager.tasks
     ]
     return tasks
@@ -358,13 +375,17 @@ async def list_rule_set_files():
 
 @app.get("/api/rule_set_file/{rule_set_file_id}")
 async def read_rule_set_file(rule_set_file_id: int):
-    query = rule_set_files.select().where(rule_set_files.c.id == rule_set_file_id)
+    query = rule_set_files.select().where(
+        rule_set_files.c.id == rule_set_file_id
+    )
     return await database.fetch_one(query)
 
 
 @app.get("/api/rule_set_file_json/{rule_set_file_id}")
 async def read_rule_set_file_json(rule_set_file_id: int):
-    query = rule_set_files.select().where(rule_set_files.c.id == rule_set_file_id)
+    query = rule_set_files.select().where(
+        rule_set_files.c.id == rule_set_file_id
+    )
     result = dict(await database.fetch_one(query))
     result["rulesets"] = yaml.safe_load(result["rulesets"])
     return result
@@ -401,7 +422,11 @@ async def read_activation_instance(activation_instance_id: int):
             extra_vars.c.id.label("extra_var_id"),
             extra_vars.c.name.label("extra_vars_name"),
         )
-        .select_from(activation_instances.join(rule_set_files).join(inventories).join(extra_vars))
+        .select_from(
+            activation_instances.join(rule_set_files)
+            .join(inventories)
+            .join(extra_vars)
+        )
         .where(activation_instances.c.id == activation_instance_id)
     )
     result = dict(await database.fetch_one(query))
@@ -423,16 +448,22 @@ async def read_job_instance(job_instance_id: int):
 
 @app.get("/api/job_instance_events/{job_instance_id}")
 async def read_job_instance_events(job_instance_id: int):
-    query1 = job_instances.select().where(job_instances.c.id == job_instance_id)
+    query1 = job_instances.select().where(
+        job_instances.c.id == job_instance_id
+    )
     job = await database.fetch_one(query1)
-    query2 = job_instance_events.select().where(job_instance_events.c.job_uuid == job.uuid)
+    query2 = job_instance_events.select().where(
+        job_instance_events.c.job_uuid == job.uuid
+    )
     return await database.fetch_all(query2)
 
 
 @app.get("/api/activation_instance_job_instances/{activation_instance_id}")
 async def read_activation_instance_job_instances(activation_instance_id: int):
     query1 = activation_instance_job_instances.select(
-        activation_instance_job_instances.c.activation_instance_id == activation_instance_id)
+        activation_instance_job_instances.c.activation_instance_id
+        == activation_instance_id
+    )
     return await database.fetch_all(query1)
 
 
@@ -440,7 +471,9 @@ async def read_activation_instance_job_instances(activation_instance_id: int):
 
 
 app.include_router(
-    fastapi_users.get_auth_router(auth_backend), prefix="/api/auth/jwt", tags=["auth"]
+    fastapi_users.get_auth_router(auth_backend),
+    prefix="/api/auth/jwt",
+    tags=["auth"],
 )
 app.include_router(
     fastapi_users.get_register_router(UserRead, UserCreate),

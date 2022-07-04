@@ -109,8 +109,9 @@ async def find_rules(project_id, project_dir):
         if is_rules_file(full_path):
             with open(full_path) as f:
                 rulesets = f.read()
-            query = rule_set_files.insert().values(name=filename,
-                                                   rulesets=rulesets)
+            query = rule_set_files.insert().values(
+                name=filename, rulesets=rulesets
+            )
             last_record_id = await database.execute(query)
             print(last_record_id)
             query = project_rules.insert().values(
@@ -145,8 +146,9 @@ async def find_inventory(project_id, project_dir):
         if is_inventory_file(full_path):
             with open(full_path) as f:
                 inventory = f.read()
-            query = inventories.insert().values(name=filename,
-                                                inventory=inventory)
+            query = inventories.insert().values(
+                name=filename, inventory=inventory
+            )
             last_record_id = await database.execute(query)
             print(last_record_id)
             query = project_inventories.insert().values(
@@ -193,8 +195,9 @@ async def find_extra_vars(project_id, project_dir):
         if is_extra_vars_file(full_path):
             with open(full_path) as f:
                 extra_var = f.read()
-            query = extra_vars.insert().values(name=filename,
-                                               extra_var=extra_var)
+            query = extra_vars.insert().values(
+                name=filename, extra_var=extra_var
+            )
             last_record_id = await database.execute(query)
             print(last_record_id)
             query = project_vars.insert().values(
