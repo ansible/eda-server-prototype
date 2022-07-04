@@ -1,14 +1,9 @@
 import uuid
 from datetime import datetime
-
-from pydantic import BaseModel
-from pydantic import confloat
-from pydantic import StrictStr
-from pydantic import validator
-
 from typing import Optional
 
 from fastapi_users import schemas
+from pydantic import BaseModel, StrictStr, confloat, validator
 
 
 class ProducerMessage(BaseModel):

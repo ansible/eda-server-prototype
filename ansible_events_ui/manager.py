@@ -1,5 +1,4 @@
 """
-
 Ruleset manager
 
 Activates rulesets together with an inventory and extravars.
@@ -19,13 +18,13 @@ Functions:
     Returns None
 """
 
-import tempfile
-import os
 import asyncio
+import os
 import shutil
+import tempfile
 
-from .models import playbooks
 from .database import database
+from .models import playbooks
 
 activated_rulesets = {}
 ansible_events = shutil.which("ansible-events")
@@ -90,7 +89,6 @@ async def activate_rulesets(
     activated_rulesets[activation_id] = proc
 
     return cmd, proc
-
 
 
 async def inactivate_rulesets(activation_id):
