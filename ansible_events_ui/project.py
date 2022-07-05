@@ -1,20 +1,20 @@
-import tempfile
-import os
 import asyncio
+import os
+import tempfile
+
 import yaml
 
+from .database import database
 from .models import (
-    rule_set_files,
+    extra_vars,
     inventories,
     playbooks,
-    extra_vars,
     project_inventories,
+    project_playbooks,
     project_rules,
     project_vars,
-    project_playbooks,
+    rule_set_files,
 )
-
-from .database import database
 
 
 async def clone_project(url, git_hash=None):

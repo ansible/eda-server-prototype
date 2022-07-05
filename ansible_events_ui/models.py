@@ -1,7 +1,6 @@
 import sqlalchemy
-from sqlalchemy.ext.declarative import DeclarativeMeta, declarative_base
 from fastapi_users.db import SQLAlchemyBaseUserTableUUID
-
+from sqlalchemy.ext.declarative import DeclarativeMeta, declarative_base
 
 metadata = sqlalchemy.MetaData()
 Base: DeclarativeMeta = declarative_base()

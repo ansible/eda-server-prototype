@@ -1,43 +1,46 @@
+import asyncio
+import json
+from collections import defaultdict
+from typing import List
+
+import yaml
 from fastapi import Depends, FastAPI, WebSocket, WebSocketDisconnect
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
-from fastapi.middleware.cors import CORSMiddleware
-from typing import List
-import asyncio
-from collections import defaultdict
 from sqlalchemy import select
+
+from .database import database
+from .manager import activate_rulesets, inactivate_rulesets
+from .models import (
+    User,
+    activation_instance_job_instances,
+    activation_instance_logs,
+    activation_instances,
+    extra_vars,
+    inventories,
+    job_instance_events,
+    job_instances,
+    playbooks,
+    project_inventories,
+    project_playbooks,
+    project_rules,
+    project_vars,
+    projects,
+    rule_set_files,
+)
+from .project import clone_project, sync_project
 from .schemas import (
-    RuleSetFile,
-    Inventory,
     Activation,
     ActivationLog,
     Extravars,
+    Inventory,
+    Project,
+    RuleSetFile,
+    UserCreate,
+    UserRead,
+    UserUpdate,
 )
-from .schemas import Project
-from .models import (
-    rule_set_files,
-    inventories,
-    extra_vars,
-    activation_instances,
-    activation_instance_logs,
-    projects,
-    playbooks,
-    job_instances,
-    job_instance_events,
-    activation_instance_job_instances,
-    project_rules,
-    project_inventories,
-    project_vars,
-    project_playbooks,
-)
-from .manager import activate_rulesets, inactivate_rulesets
-from .project import clone_project, sync_project
-from .database import database
-import json
-import yaml
-
-from .models import User
-from .schemas import UserCreate, UserRead, UserUpdate
 from .users import auth_backend, current_active_user, fastapi_users
 
 app = FastAPI(title="Ansible Events API")

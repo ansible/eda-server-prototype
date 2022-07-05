@@ -5,16 +5,14 @@ from fastapi import Depends, Request
 from fastapi_users import BaseUserManager, FastAPIUsers, UUIDIDMixin
 from fastapi_users.authentication import (
     AuthenticationBackend,
+    CookieTransport,
     JWTStrategy,
 )
 from fastapi_users.db import SQLAlchemyUserDatabase
 
-from fastapi_users.authentication import CookieTransport
-
-
-from .models import User
-from .database import get_user_db
 from .conf import settings
+from .database import get_user_db
+from .models import User
 
 
 class UserManager(UUIDIDMixin, BaseUserManager[User, uuid.UUID]):

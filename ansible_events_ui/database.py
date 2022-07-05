@@ -1,11 +1,13 @@
-from .models import metadata, Base, User
+from typing import AsyncGenerator
+
 import databases
 import sqlalchemy
+from fastapi import Depends
+from fastapi_users.db import SQLAlchemyUserDatabase
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
-from fastapi import Depends
-from typing import AsyncGenerator
-from fastapi_users.db import SQLAlchemyUserDatabase
+
+from .models import Base, User, metadata
 
 DATABASE_URL = "sqlite:///./test.db"
 ASYNC_DATABASE_URL = "sqlite+aiosqlite:///./test.db"
