@@ -7,7 +7,7 @@ from fastapi_users.db import SQLAlchemyUserDatabase
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 
-from .models import Base, User, metadata
+from .models import User, metadata
 
 DATABASE_URL = "sqlite:///./test.db"
 ASYNC_DATABASE_URL = "sqlite+aiosqlite:///./test.db"
@@ -18,7 +18,6 @@ engine = sqlalchemy.create_engine(
     DATABASE_URL, connect_args={"check_same_thread": False}
 )
 metadata.create_all(engine)
-Base.metadata.create_all(engine)
 
 async_engine = create_async_engine(ASYNC_DATABASE_URL)
 async_session_maker = sessionmaker(

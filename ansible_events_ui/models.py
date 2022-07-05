@@ -1,9 +1,9 @@
 import sqlalchemy
 from fastapi_users.db import SQLAlchemyBaseUserTableUUID
-from sqlalchemy.ext.declarative import DeclarativeMeta, declarative_base
+from sqlalchemy.ext.declarative import declarative_base
 
 metadata = sqlalchemy.MetaData()
-Base: DeclarativeMeta = declarative_base()
+Base = declarative_base(metadata=metadata)
 
 
 rule_set_files = sqlalchemy.Table(
