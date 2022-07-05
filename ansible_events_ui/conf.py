@@ -1,9 +1,8 @@
-
 import os
 
-class _Settings():
 
-    def  __init__(self):
+class _Settings:
+    def __init__(self):
         self.SECRET = "SECRET"
         self.load_env()
 
@@ -13,5 +12,6 @@ class _Settings():
                 for line in f.readlines():
                     key, _, value = line.partition("=")
                     setattr(self, key, value.strip())
+
 
 settings = _Settings()

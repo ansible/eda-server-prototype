@@ -39,8 +39,9 @@ activations = sqlalchemy.Table(
     metadata,
     sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True),
     sqlalchemy.Column("name", sqlalchemy.String),
-    sqlalchemy.Column("rule_set_file_id",
-                      sqlalchemy.ForeignKey("rule_set_file.id")),
+    sqlalchemy.Column(
+        "rule_set_file_id", sqlalchemy.ForeignKey("rule_set_file.id")
+    ),
     sqlalchemy.Column("inventory_id", sqlalchemy.ForeignKey("inventory.id")),
     sqlalchemy.Column("extra_var_id", sqlalchemy.ForeignKey("extra_var.id")),
 )
@@ -51,11 +52,14 @@ activation_instances = sqlalchemy.Table(
     metadata,
     sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True),
     sqlalchemy.Column("name", sqlalchemy.String),
-    sqlalchemy.Column("rule_set_file_id",
-                      sqlalchemy.ForeignKey("rule_set_file.id")),
+    sqlalchemy.Column(
+        "rule_set_file_id", sqlalchemy.ForeignKey("rule_set_file.id")
+    ),
     sqlalchemy.Column("inventory_id", sqlalchemy.ForeignKey("inventory.id")),
     sqlalchemy.Column("extra_var_id", sqlalchemy.ForeignKey("extra_var.id")),
-    #sqlalchemy.Column("activation_id", sqlalchemy.ForeignKey("activation.id")),
+    # sqlalchemy.Column(
+    #     "activation_id", sqlalchemy.ForeignKey("activation.id")
+    # ),
 )
 
 
@@ -63,7 +67,10 @@ activation_instance_logs = sqlalchemy.Table(
     "activation_instance_log",
     metadata,
     sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True),
-    sqlalchemy.Column("activation_instance_id", sqlalchemy.ForeignKey("activation_instance.id")),
+    sqlalchemy.Column(
+        "activation_instance_id",
+        sqlalchemy.ForeignKey("activation_instance.id"),
+    ),
     sqlalchemy.Column("line_number", sqlalchemy.Integer),
     sqlalchemy.Column("log", sqlalchemy.String),
 )
@@ -99,7 +106,9 @@ project_rules = sqlalchemy.Table(
     metadata,
     sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True),
     sqlalchemy.Column("project_id", sqlalchemy.ForeignKey("project.id")),
-    sqlalchemy.Column("rule_set_file_id", sqlalchemy.ForeignKey("rule_set_file.id")),
+    sqlalchemy.Column(
+        "rule_set_file_id", sqlalchemy.ForeignKey("rule_set_file.id")
+    ),
 )
 
 
@@ -115,15 +124,20 @@ job_instances = sqlalchemy.Table(
     metadata,
     sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True),
     sqlalchemy.Column("uuid", sqlalchemy.String),
-    #sqlalchemy.Column("job_id", sqlalchemy.ForeignKey("job.id")),
+    # sqlalchemy.Column("job_id", sqlalchemy.ForeignKey("job.id")),
 )
 
 activation_instance_job_instances = sqlalchemy.Table(
     "activation_instance_job_instance",
     metadata,
     sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True),
-    sqlalchemy.Column("activation_instance_id", sqlalchemy.ForeignKey("activation_instance.id")),
-    sqlalchemy.Column("job_instance_id", sqlalchemy.ForeignKey("job_instance.id")),
+    sqlalchemy.Column(
+        "activation_instance_id",
+        sqlalchemy.ForeignKey("activation_instance.id"),
+    ),
+    sqlalchemy.Column(
+        "job_instance_id", sqlalchemy.ForeignKey("job_instance.id")
+    ),
 )
 
 

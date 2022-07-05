@@ -66,6 +66,7 @@ class Activation(BaseModel):
     inventory_id: int
     extra_var_id: int
 
+
 class ActivationInstance(BaseModel):
     id: Optional[int]
     name: StrictStr
@@ -86,8 +87,8 @@ class Project(BaseModel):
     url: StrictStr
 
 
-
 # Fast API Users
+
 
 class UserRead(schemas.BaseUser[uuid.UUID]):
     pass
