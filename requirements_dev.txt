@@ -3,3 +3,5 @@ pytest
 flake8
 black
 isort
+
+sqlalchemy[mypy] ~= 1.4
