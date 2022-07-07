@@ -1,4 +1,4 @@
-pytest
+-r requirements_test.txt
 
 flake8
 black
