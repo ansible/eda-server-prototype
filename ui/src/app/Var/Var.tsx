@@ -31,7 +31,7 @@ const Var: React.FunctionComponent = () => {
 
   const [extraVar, setVar] = useState([]);
 
-  let { id } = useParams();
+  const { id } = useParams();
   console.log(id);
 
   useEffect(() => {
