@@ -9,7 +9,7 @@ export class SmallLogo extends React.Component<IProps> {
   render() {
     return (
       <img
-        style={{ height: '60px' }}
+        style={{ height: '50px' }}
         src={SmallLogoImage}
         alt={this.props.alt}
       />

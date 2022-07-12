@@ -8,11 +8,11 @@ import {
   TextListVariants
 } from '@patternfly/react-core';
 import Logo from '../../assets/images/logo-masthead.svg';
-import bgImg from '../../assets/images/logo-large.svg';
 import { detect } from 'detect-browser';
 
 interface IProps {
   isOpen: boolean;
+  user: {email: string};
   trademark: string;
   brandImageSrc: string;
   onClose: () => void;
@@ -25,7 +25,7 @@ interface IState {
 }
 
 export const AboutModalWindow = (props: IProps) => {
-  const { isOpen, onClose, brandImageAlt, productName } = props;
+  const { isOpen, onClose, user, brandImageAlt, productName } = props;
   const browser = detect();
   return (
     <AboutModal
@@ -39,10 +39,10 @@ export const AboutModalWindow = (props: IProps) => {
       <TextContent>
         <TextList component={TextListVariants.dl}>
           <TextListItem component={TextListItemVariants.dt}>
-            {`Username`}
+            {`User`}
           </TextListItem>
           <TextListItem component={TextListItemVariants.dd}>
-            {'User'}
+            {user?.email}
           </TextListItem>
           <TextListItem component={TextListItemVariants.dt}>
             {`Browser Version`}

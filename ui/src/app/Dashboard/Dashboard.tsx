@@ -52,7 +52,7 @@ const Dashboard: React.FunctionComponent = () => {
   <React.Fragment>
 
     <TopToolbar>
-      <Title headingLevel={"h2"}>Event driven automation</Title>
+      <Title headingLevel={"h2"}>Dashboard</Title>
     </TopToolbar>
 	<Stack>
             <StackItem>

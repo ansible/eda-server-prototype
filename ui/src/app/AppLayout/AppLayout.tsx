@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
+import {NavLink, useLocation} from 'react-router-dom';
 import {
   Nav,
   NavList,
@@ -10,16 +10,18 @@ import {
   PageSidebar,
   SkipToContent,
   PageHeaderTools,
-  DropdownItem
+  DropdownItem,
+  NavGroup
 } from '@patternfly/react-core';
 import { routes, IAppRoute, IAppRouteGroup } from '@app/routes';
 import {ExternalLinkAltIcon, QuestionCircleIcon } from '@patternfly/react-icons';
-import { useState } from 'react';
+import {useEffect, useState} from 'react';
 import { AboutModalWindow } from './about-modal';
 import Logo from '../../assets/images/logo-large.svg';
 import { SmallLogo } from './small-logo';
 import { APPLICATION_TITLE } from '../utils/constants';
 import { StatefulDropdown } from './stateful-dropdown';
+import {getUser, loginUser, logoutUser} from '@app/shared/auth';
 
 interface IAppLayout {
   children: React.ReactNode;
@@ -32,6 +34,7 @@ const AppLayout: React.FunctionComponent<IAppLayout> = ({ children }) => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isNavOpenMobile, setIsNavOpenMobile] = useState(false);
   const [aboutModalVisible, setAboutModalVisible] = useState(false);
+  const [user, setUser] = useState(null);
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const onPageResize = (props: { mobileView: boolean; windowSize: number }) => {
@@ -42,6 +45,7 @@ const AppLayout: React.FunctionComponent<IAppLayout> = ({ children }) => {
     return (
       <AboutModalWindow
         isOpen={aboutModalVisible}
+        user={user}
         trademark=""
         brandImageSrc={Logo}
         onClose={() => setAboutModalVisible(false)}
@@ -50,6 +54,46 @@ const AppLayout: React.FunctionComponent<IAppLayout> = ({ children }) => {
       />
     );
   };
+
+  let userName = '';
+  const location = useLocation();
+  const index = window.location.href.indexOf(window.location.pathname);
+  const baseUrl = window.location.href.substr(0, index);
+
+  useEffect(() => {
+    getUser()
+      .then(response => response.json())
+      .then(data => setUser(data));
+  }, []);
+
+  if (user) {
+    if (user.first_name || user.last_name) {
+      userName = user.first_name + ' ' + user.last_name;
+    } else {
+      userName = user.email;
+    }
+  }
+
+  console.log('Debug - user', user);
+  const userDropdownItems = [
+      <DropdownItem isDisabled key="username">
+        Username: {user?.email || ''}
+      </DropdownItem>,
+      <DropdownItem
+        key="logout"
+        aria-label={'logout'}
+        onClick={() =>
+          logoutUser().then(() => {
+            setUser(null);
+            window.location.replace(
+              baseUrl
+            );
+          })
+        }
+      >
+        {`Logout`}
+      </DropdownItem>
+    ];
 
   const docsDropdownItems = [
     <DropdownItem
@@ -83,14 +127,19 @@ const AppLayout: React.FunctionComponent<IAppLayout> = ({ children }) => {
               items={docsDropdownItems}
               toggleType="icon"
             />
+            <StatefulDropdown
+              ariaLabel={'user-dropdown'}
+              defaultText={user?.email}
+              items={userDropdownItems}
+              toggleType="dropdown"
+            />
+
           </div>
         </PageHeaderTools>
       }
       showNavToggle
     />
   );
-
-  const location = useLocation();
 
   const renderNavItem = (route: IAppRoute, index: number) => (
     <NavItem key={`${route.label}-${index}`} id={`${route.label}-${index}`} isActive={route.path === location.pathname}>
@@ -113,6 +162,7 @@ const AppLayout: React.FunctionComponent<IAppLayout> = ({ children }) => {
 
   const Navigation = (
     <Nav id="nav-primary-simple" theme="dark">
+      <NavGroup title={APPLICATION_TITLE}/>
       <NavList id="nav-list-simple">
         {routes.map(
           (route, idx) => route.label && (!route.routes ? renderNavItem(route, idx) : renderNavGroup(route, idx))
