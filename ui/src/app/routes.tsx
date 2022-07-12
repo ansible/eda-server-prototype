@@ -19,8 +19,6 @@ import { Vars } from '@app/Vars/Vars';
 import { Var } from '@app/Var/Var';
 import { Playbooks } from '@app/Playbooks/Playbooks';
 import { Playbook } from '@app/Playbook/Playbook';
-import { Support } from '@app/Support/Support';
-import { GeneralSettings } from '@app/Settings/General/GeneralSettings';
 import { ProfileSettings } from '@app/Settings/Profile/ProfileSettings';
 import { NotFound } from '@app/NotFound/NotFound';
 import { useDocumentTitle } from '@app/utils/useDocumentTitle';
@@ -153,34 +151,7 @@ const routes: AppRouteConfig[] = [
     exact: true,
     path: '/playbook/:id',
     title: 'Playbook',
-  },
-  {
-    component: Support,
-    exact: true,
-    isAsync: true,
-    label: 'Support',
-    path: '/support',
-    title: 'PatternFly Seed | Support Page',
-  },
-  {
-    label: 'Settings',
-    routes: [
-      {
-        component: GeneralSettings,
-        exact: true,
-        label: 'General',
-        path: '/settings/general',
-        title: 'PatternFly Seed | General Settings',
-      },
-      {
-        component: ProfileSettings,
-        exact: true,
-        label: 'Profile',
-        path: '/settings/profile',
-        title: 'PatternFly Seed | Profile Settings',
-      },
-    ],
-  },
+  }
 ];
 
 // a custom hook for sending focus to the primary content container

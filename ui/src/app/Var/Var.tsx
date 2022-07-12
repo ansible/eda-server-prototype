@@ -1,4 +1,3 @@
-import * as React from 'react';
 import { PageSection, Title } from '@patternfly/react-core';
 import { useDispatch } from 'react-redux';
 import { Link, useParams } from 'react-router-dom';
@@ -16,6 +15,7 @@ import {
 import { CodeBlock, CodeBlockCode  } from '@patternfly/react-core';
 import styled from 'styled-components';
 import {getServer} from '@app/utils/utils';
+import {TopToolbar} from "@app/shared/top-toolbar";
 
 
 const CardBody = styled(PFCardBody)`
@@ -45,9 +45,9 @@ const Var: React.FunctionComponent = () => {
 
   return (
   <React.Fragment>
-  <PageSection>
-    <Title headingLevel="h1" size="lg">Event Driven Automation | Var {extraVar.name}</Title>
-  </PageSection>
+    <TopToolbar>
+      <Title headingLevel={"h2"}>{`Var ${extraVar.name}`}</Title>
+    </TopToolbar>
     <CodeBlock>
       <CodeBlockCode id="code-content">{extraVar.extra_var}</CodeBlockCode>
     </CodeBlock>

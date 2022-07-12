@@ -18,7 +18,7 @@ import { useState } from 'react';
 import { AboutModalWindow } from './about-modal';
 import Logo from '../../assets/images/logo-large.svg';
 import { SmallLogo } from './small-logo';
-import { APPLICATION_TITLE } from '../utils/constants.ts';
+import { APPLICATION_TITLE } from '../utils/constants';
 import { StatefulDropdown } from './stateful-dropdown';
 
 interface IAppLayout {

@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
 import { CodeBlock, CodeBlockCode  } from '@patternfly/react-core';
 import {getServer} from '@app/utils/utils';
+import {TopToolbar} from "@app/shared/top-toolbar";
 
 const endpoint = 'http://' + getServer() + '/api/playbook/';
 
@@ -24,9 +25,9 @@ const Playbook: React.FunctionComponent = () => {
 
   return (
   <React.Fragment>
-  <PageSection>
-    <Title headingLevel="h1" size="lg">Event Driven Automation | Playbook {playbook.url}</Title>
-  </PageSection>
+    <TopToolbar>
+      <Title headingLevel={"h2"}>{`Playbook ${playbook.url}`}</Title>
+    </TopToolbar>
     <CodeBlock>
       <CodeBlockCode id="code-content">{playbook.playbook}</CodeBlockCode>
     </CodeBlock>

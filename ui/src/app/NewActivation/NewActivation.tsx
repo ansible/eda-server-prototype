@@ -16,6 +16,7 @@ import { postData } from '@app/utils/utils';
 import {getServer} from '@app/utils/utils';
 
 import styled from 'styled-components';
+import {TopToolbar} from "@app/shared/top-toolbar";
 
 
 const CardBody = styled(PFCardBody)`
@@ -87,32 +88,32 @@ const NewActivation: React.FunctionComponent = () => {
 
   return (
   <React.Fragment>
-  <PageSection>
-    <Title headingLevel="h1" size="lg">Event Driven Automation | New Project</Title>
-  </PageSection>
+    <TopToolbar>
+      <Title headingLevel={"h2"}>New activation</Title>
+    </TopToolbar>
      <Form>
-        <FormGroup label="Name" >
+        <FormGroup label="Name"  fieldId={`activation-name`}>
           <TextInput
             id="activation-name"
             onChange={setName}
             value={name}
           />
         </FormGroup>
-        <FormGroup label="Rule Set" >
+        <FormGroup label="Rule Set"  fieldId={`rule-set-${ruleset}`}>
           <FormSelect value={ruleset} onChange={setRuleSet} aria-label="FormSelect Input">
         {rules.map((option, index) => (
           <FormSelectOption key={index} value={option.id} label={"" + option.id + " "+ option.name} />
         ))}
       </FormSelect>
         </FormGroup>
-        <FormGroup label="Inventory" >
+        <FormGroup label="Inventory" fieldId={'activation-name'}>
           <FormSelect value={inventory} onChange={setInventory} aria-label="FormSelect Input2">
         {inventories.map((option, index) => (
           <FormSelectOption key={index} value={option.id} label={"" + option.id + " "+ option.name} />
         ))}
       </FormSelect>
         </FormGroup>
-        <FormGroup label="Extra Vars" >
+        <FormGroup label="Extra Vars" fieldId={'activation-vars'}>
           <FormSelect value={extravar} onChange={setExtraVar} aria-label="FormSelect Input3">
         {extravars.map((option, index) => (
           <FormSelectOption key={index} value={option.id} label={"" + option.id + " "+ option.name} />

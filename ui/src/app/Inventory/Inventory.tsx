@@ -13,6 +13,7 @@ import {
 import { CodeBlock, CodeBlockCode  } from '@patternfly/react-core';
 import styled from 'styled-components';
 import {getServer} from '@app/utils/utils';
+import {TopToolbar} from "@app/shared/top-toolbar";
 
 
 const CardBody = styled(PFCardBody)`
@@ -28,7 +29,7 @@ const Inventory: React.FunctionComponent = () => {
 
   const [inventory, setInventory] = useState([]);
 
-  let { id } = useParams();
+  const { id } =  useParams<Record<string, string | undefined>>()
   console.log(id);
 
   useEffect(() => {
@@ -42,9 +43,9 @@ const Inventory: React.FunctionComponent = () => {
 
   return (
   <React.Fragment>
-  <PageSection>
-    <Title headingLevel="h1" size="lg">Event Driven Automation | Inventory {inventory.name}</Title>
-  </PageSection>
+    <TopToolbar>
+      <Title headingLevel={"h2"}>Inventory</Title>
+    </TopToolbar>
     <CodeBlock>
       <CodeBlockCode id="code-content">{inventory.inventory}</CodeBlockCode>
     </CodeBlock>
