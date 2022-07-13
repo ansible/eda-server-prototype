@@ -19,10 +19,8 @@ import { Vars } from '@app/Vars/Vars';
 import { Var } from '@app/Var/Var';
 import { Playbooks } from '@app/Playbooks/Playbooks';
 import { Playbook } from '@app/Playbook/Playbook';
-import { ProfileSettings } from '@app/Settings/Profile/ProfileSettings';
 import { NotFound } from '@app/NotFound/NotFound';
 import { useDocumentTitle } from '@app/utils/useDocumentTitle';
-import { LastLocationProvider, useLastLocation } from 'react-router-last-location';
 
 let routeFocusTimer: number;
 export interface IAppRoute {
@@ -154,23 +152,7 @@ const routes: AppRouteConfig[] = [
   }
 ];
 
-// a custom hook for sending focus to the primary content container
-// after a view has loaded so that subsequent press of tab key
-// sends focus directly to relevant content
-const useA11yRouteChange = (isAsync: boolean) => {
-  const lastNavigation = useLastLocation();
-  React.useEffect(() => {
-    if (!isAsync && lastNavigation !== null) {
-      routeFocusTimer = accessibleRouteChangeHandler();
-    }
-    return () => {
-      window.clearTimeout(routeFocusTimer);
-    };
-  }, [isAsync, lastNavigation]);
-};
-
 const RouteWithTitleUpdates = ({ component: Component, isAsync = false, title, ...rest }: IAppRoute) => {
-  useA11yRouteChange(isAsync);
   useDocumentTitle(title);
 
   function routeWithTitle(routeProps: RouteComponentProps) {
@@ -191,7 +173,6 @@ const flattenedRoutes: IAppRoute[] = routes.reduce(
 );
 
 const AppRoutes = (): React.ReactElement => (
-  <LastLocationProvider>
     <Switch>
       {flattenedRoutes.map(({ path, exact, component, title, isAsync }, idx) => (
         <RouteWithTitleUpdates
@@ -205,7 +186,6 @@ const AppRoutes = (): React.ReactElement => (
       ))}
       <PageNotFound title="404 Page Not Found" />
     </Switch>
-  </LastLocationProvider>
 );
 
 export { AppRoutes, routes };
