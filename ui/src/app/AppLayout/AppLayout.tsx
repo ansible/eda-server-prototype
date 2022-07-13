@@ -74,7 +74,6 @@ const AppLayout: React.FunctionComponent<IAppLayout> = ({ children }) => {
     }
   }
 
-  console.log('Debug - user', user);
   const userDropdownItems = [
       <DropdownItem isDisabled key="username">
         Username: {user?.email || ''}
