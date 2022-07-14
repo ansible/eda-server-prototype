@@ -1,6 +1,6 @@
 #!/bin/bash
 USER=${1}
-read -s PASSWORD
+PASSWORD=${2}
 curl -X 'POST' \
   'http://localhost:8080/api/auth/register' \
   -H 'accept: application/json' \

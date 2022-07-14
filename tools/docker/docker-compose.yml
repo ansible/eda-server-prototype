@@ -1,0 +1,17 @@
+version: '3.9'
+
+services:
+  app:
+    image: ansible-events-ui
+    build:
+      context: ../../
+      dockerfile: tools/docker/Dockerfile
+    ports:
+      - "8080:8080"
+    volumes:
+      - sqlite_db:/opt/app-root/src/sqlite
+    environment:
+      - DATABASE_URL=sqlite:///./sqlite/test.db
+      - ASYNC_DATABASE_URL=sqlite+aiosqlite:///./sqlite/test.db
+volumes:
+  sqlite_db: {}

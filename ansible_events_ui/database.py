@@ -8,9 +8,12 @@ from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 
 from .models import User, metadata
+from .conf import env
 
-DATABASE_URL = "sqlite:///./test.db"
-ASYNC_DATABASE_URL = "sqlite+aiosqlite:///./test.db"
+DATABASE_URL = env.str("DATABASE_URL", default="sqlite:///./test.db")
+ASYNC_DATABASE_URL = env.str(
+    "ASYNC_DATABASE_URL", default="sqlite+aiosqlite:///./test.db"
+)
 
 database = databases.Database(DATABASE_URL)
 

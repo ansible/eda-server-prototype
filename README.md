@@ -37,4 +37,11 @@ Visit this url:
 
 You have set up the development environment.
 
+## Run the application with docker-compose
 
+Requires docker-compose installed. [See the documentation](https://docs.docker.com/compose/install/) for instructions.
+
+```sh
+cd tools/docker
+docker-compose up --build
+```
