@@ -7,8 +7,8 @@ from fastapi_users.db import SQLAlchemyUserDatabase
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 
-from .models import User, metadata
 from .conf import env
+from .models import User, metadata
 
 DATABASE_URL = env.str("DATABASE_URL", default="sqlite:///./test.db")
 ASYNC_DATABASE_URL = env.str(
