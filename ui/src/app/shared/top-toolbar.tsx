@@ -6,7 +6,7 @@ import {
   PageSection,
   PageSectionVariants,
   Text,
-  TextContent, Title,
+  TextContent, TextVariants, Title,
 } from '@patternfly/react-core';
 import Breadcrumbs from './breadcrumbs';
 

@@ -13,7 +13,7 @@ const App: React.FunctionComponent = () => (
   <GlobalStyle />
   <Router basename="/eda">
     <Switch>
-    <Route path="/" exact="true">
+    <Route path="/" exact={true}>
        <Login />
     </Route>
     <Route>

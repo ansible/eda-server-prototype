@@ -43,6 +43,7 @@ export type NotificationPayload =
   type: string;
   payload: any;
 };
+
 export type FormatMessage = (
   message: MessageDescriptor,
   values?: AnyObject
@@ -53,3 +54,10 @@ export interface SortBy {
   property: string;
   direction: SortByDirection;
 }
+
+export type User = {
+  first_name?: string,
+  last_name?: string,
+  email: string
+};
+

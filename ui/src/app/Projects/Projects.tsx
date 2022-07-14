@@ -11,11 +11,16 @@ import {
   StackItem,
 } from '@patternfly/react-core';
 import { Button } from '@patternfly/react-core';
-import PlusCircleIcon from '@patternfly/react-icons/dist/esm/icons/plus-circle-icon';
 import styled from 'styled-components';
 import {getServer} from '@app/utils/utils';
-import { TopToolbar } from '../shared/top-toolbar';
+import {TopToolbar} from '../shared/top-toolbar';
+import { PlusCircleIcon } from '@patternfly/react-icons';
 
+interface ProjectType {
+  id: string;
+  git_hash?: string;
+  url: string;
+}
 
 const CardBody = styled(PFCardBody)`
   white-space: pre-wrap;
@@ -28,7 +33,7 @@ const endpoint = 'http://' + getServer() + '/api/projects/';
 
 const Projects: React.FunctionComponent = () => {
 
-  const [projects, setProjects] = useState([]);
+  const [projects, setProjects] = useState<ProjectType[]>([]);
 
   useEffect(() => {
      fetch(endpoint, {
