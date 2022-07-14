@@ -1,29 +1,9 @@
-import * as React from 'react';
 import { PageSection, Title } from '@patternfly/react-core';
-import { useDispatch } from 'react-redux';
-import { Link, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
-import Ansi from "ansi-to-react";
-import {
-  Card,
-  CardBody as PFCardBody,
-  CardTitle,
-  SimpleList as PFSimpleList,
-  SimpleListItem,
-  Stack,
-  StackItem,
-} from '@patternfly/react-core';
-import styled from 'styled-components';
 import { CodeBlock, CodeBlockCode  } from '@patternfly/react-core';
 import {getServer} from '@app/utils/utils';
-
-
-const CardBody = styled(PFCardBody)`
-  white-space: pre-wrap;
-  `
-const SimpleList = styled(PFSimpleList)`
-  white-space: pre-wrap;
-`
+import {TopToolbar} from "@app/shared/top-toolbar";
 
 const endpoint = 'http://' + getServer() + '/api/playbook/';
 
@@ -31,7 +11,7 @@ const Playbook: React.FunctionComponent = () => {
 
   const [playbook, setPlaybook] = useState([]);
 
-  let { id } = useParams();
+  const { id } = useParams();
   console.log(id);
 
   useEffect(() => {
@@ -45,9 +25,9 @@ const Playbook: React.FunctionComponent = () => {
 
   return (
   <React.Fragment>
-  <PageSection>
-    <Title headingLevel="h1" size="lg">Event Driven Automation | Playbook {playbook.url}</Title>
-  </PageSection>
+    <TopToolbar>
+      <Title headingLevel={"h2"}>{`Playbook ${playbook.url}`}</Title>
+    </TopToolbar>
     <CodeBlock>
       <CodeBlockCode id="code-content">{playbook.playbook}</CodeBlockCode>
     </CodeBlock>

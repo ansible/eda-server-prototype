@@ -1,9 +1,6 @@
-import * as React from 'react';
-import { PageSection, Title } from '@patternfly/react-core';
-import { useDispatch } from 'react-redux';
+import {PageHeader, PageSection, Title } from '@patternfly/react-core';
 import { Link } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
-import Ansi from "ansi-to-react";
 import {
   Card,
   CardBody as PFCardBody,
@@ -17,6 +14,7 @@ import { Button } from '@patternfly/react-core';
 import PlusCircleIcon from '@patternfly/react-icons/dist/esm/icons/plus-circle-icon';
 import styled from 'styled-components';
 import {getServer} from '@app/utils/utils';
+import { TopToolbar } from '../shared/top-toolbar';
 
 
 const CardBody = styled(PFCardBody)`
@@ -43,9 +41,9 @@ const Projects: React.FunctionComponent = () => {
 
   return (
   <React.Fragment>
-  <PageSection>
-    <Title headingLevel="h1" size="lg">Event Driven Automation | Projects</Title>
-  </PageSection>
+    <TopToolbar>
+      <Title headingLevel={"h2"}>Projects</Title>
+    </TopToolbar>
 
   <Link to="/new-project">
   <Button variant="link" icon={<PlusCircleIcon />}>
@@ -53,20 +51,20 @@ const Projects: React.FunctionComponent = () => {
   </Button>
   </Link>
 	<Stack>
-            <StackItem>
-              <Card>
-                <CardTitle>Projects</CardTitle>
-                <CardBody>
-                  {projects.length !== 0 && (
-                    <SimpleList style={{ whiteSpace: 'pre-wrap' }}>
-                      {projects.map((item, i) => (
-                        <SimpleListItem key={i}><Link to={"/project/" + item.id}>{item.url} </Link></SimpleListItem>
-                      ))}
-                    </SimpleList>
-                  )}
-                </CardBody>
-              </Card>
-            </StackItem>
+    <StackItem>
+      <Card>
+        <CardTitle>Projects</CardTitle>
+        <CardBody>
+          {projects.length !== 0 && (
+            <SimpleList style={{ whiteSpace: 'pre-wrap' }}>
+              {projects.map((item, i) => (
+                <SimpleListItem key={i}><Link to={"/project/" + item.id}>{item.url} </Link></SimpleListItem>
+              ))}
+            </SimpleList>
+          )}
+        </CardBody>
+      </Card>
+    </StackItem>
 	</Stack>
   </React.Fragment>
 )

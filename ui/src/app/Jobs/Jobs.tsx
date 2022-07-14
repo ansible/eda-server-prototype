@@ -1,9 +1,6 @@
-import * as React from 'react';
 import { PageSection, Title } from '@patternfly/react-core';
-import { useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
-import Ansi from "ansi-to-react";
 import {
   Card,
   CardBody as PFCardBody,
@@ -15,6 +12,7 @@ import {
 } from '@patternfly/react-core';
 import styled from 'styled-components';
 import {getServer} from '@app/utils/utils';
+import {TopToolbar} from "@app/shared/top-toolbar";
 
 
 const CardBody = styled(PFCardBody)`
@@ -41,25 +39,24 @@ const Jobs: React.FunctionComponent = () => {
 
   return (
   <React.Fragment>
-  <PageSection>
-    <Title headingLevel="h1" size="lg">Event Driven Automation | Jobs</Title>
-  </PageSection>
-
-	<Stack>
-            <StackItem>
-              <Card>
-                <CardTitle>Jobs</CardTitle>
-                <CardBody>
-                  {jobs.length !== 0 && (
-                    <SimpleList style={{ whiteSpace: 'pre-wrap' }}>
-                      {jobs.map((item, i) => (
-                        <SimpleListItem key={i}><Link to={"/job/" + item.id}>{item.id} </Link></SimpleListItem>
-                      ))}
-                    </SimpleList>
-                  )}
-                </CardBody>
-              </Card>
-            </StackItem>
+    <TopToolbar>
+      <Title headingLevel={"h2"}>Jobs</Title>
+    </TopToolbar>
+    <Stack>
+      <StackItem>
+        <Card>
+          <CardTitle>Jobs</CardTitle>
+          <CardBody>
+            {jobs.length !== 0 && (
+              <SimpleList style={{ whiteSpace: 'pre-wrap' }}>
+                {jobs.map((item, i) => (
+                  <SimpleListItem key={i}><Link to={"/job/" + item.id}>{item.id} </Link></SimpleListItem>
+                ))}
+              </SimpleList>
+            )}
+          </CardBody>
+        </Card>
+      </StackItem>
 	</Stack>
   </React.Fragment>
 )

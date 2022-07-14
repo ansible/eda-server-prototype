@@ -1,6 +1,4 @@
-import * as React from 'react';
 import { PageSection, Title } from '@patternfly/react-core';
-import { useDispatch } from 'react-redux';
 import { Link, useParams } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
 import Ansi from "ansi-to-react";
@@ -17,7 +15,7 @@ import styled from 'styled-components';
 import {getServer} from '@app/utils/utils';
 import { Button } from '@patternfly/react-core';
 import { PlayIcon, PauseIcon } from '@patternfly/react-icons';
-
+import {TopToolbar} from "@app/shared/top-toolbar";
 
 const CardBody = styled(PFCardBody)`
   white-space: pre-wrap;
@@ -40,7 +38,7 @@ const Activation: React.FunctionComponent = () => {
 
   const [activation, setActivation] = useState([]);
 
-  let { id } = useParams();
+  const { id } = useParams();
   console.log(id);
 
 
@@ -113,9 +111,9 @@ const Activation: React.FunctionComponent = () => {
 
   return (
   <React.Fragment>
-  <PageSection>
-    <Title headingLevel="h1" size="lg">Event Driven Automation | Activation {activation.name}</Title>
-  </PageSection>
+    <TopToolbar>
+      <Title headingLevel={"h2"}>{`Activation ${activation.name}`}</Title>
+    </TopToolbar>
   <Button variant="link" icon={<PlayIcon />}>
       Start
   </Button>

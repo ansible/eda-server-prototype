@@ -15,6 +15,7 @@ import {
 } from '@patternfly/react-core';
 import styled from 'styled-components';
 import {getServer} from '@app/utils/utils';
+import {TopToolbar} from "@app/shared/top-toolbar";
 
 
 const CardBody = styled(PFCardBody)`
@@ -43,10 +44,9 @@ const Vars: React.FunctionComponent = () => {
 
   return (
   <React.Fragment>
-  <PageSection>
-    <Title headingLevel="h1" size="lg">Event Driven Automation | Extra Vars</Title>
-  </PageSection>
-
+    <TopToolbar>
+      <Title headingLevel={"h2"}>Extra vars</Title>
+    </TopToolbar>
 	<Stack>
             <StackItem>
               <Card>

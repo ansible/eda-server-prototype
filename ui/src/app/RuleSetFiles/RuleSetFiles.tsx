@@ -15,7 +15,7 @@ import {
 } from '@patternfly/react-core';
 import styled from 'styled-components';
 import {getServer} from '@app/utils/utils';
-
+import {TopToolbar} from "@app/shared/top-toolbar";
 
 const CardBody = styled(PFCardBody)`
   white-space: pre-wrap;
@@ -42,25 +42,24 @@ const RuleSetFiles: React.FunctionComponent = () => {
 
   return (
   <React.Fragment>
-  <PageSection>
-    <Title headingLevel="h1" size="lg">Event Driven Automation | Rule Set Files</Title>
-  </PageSection>
-
-	<Stack>
-            <StackItem>
-              <Card>
-                <CardTitle>Rule Sets</CardTitle>
-                <CardBody>
-                  {ruleSetFiles.length !== 0 && (
-                    <SimpleList style={{ whiteSpace: 'pre-wrap' }}>
-                      {ruleSetFiles.map((item, i) => (
-                        <SimpleListItem key={i}><Link to={"/rulesetfile/" + item.id}>{item.name} </Link></SimpleListItem>
-                      ))}
-                    </SimpleList>
-                  )}
-                </CardBody>
-              </Card>
-            </StackItem>
+    <TopToolbar>
+      <Title headingLevel={"h2"}>Rule set files</Title>
+    </TopToolbar>
+    <Stack>
+      <StackItem>
+        <Card>
+          <CardTitle>Rule Sets</CardTitle>
+          <CardBody>
+            {ruleSetFiles.length !== 0 && (
+              <SimpleList style={{ whiteSpace: 'pre-wrap' }}>
+                {ruleSetFiles.map((item, i) => (
+                  <SimpleListItem key={i}><Link to={"/rulesetfile/" + item.id}>{item.name} </Link></SimpleListItem>
+                ))}
+              </SimpleList>
+            )}
+          </CardBody>
+        </Card>
+      </StackItem>
 	</Stack>
   </React.Fragment>
 )

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { NavLink, useLocation, useHistory } from 'react-router-dom';
+import {NavLink, useLocation} from 'react-router-dom';
 import {
   Nav,
   NavList,
@@ -8,49 +8,137 @@ import {
   Page,
   PageHeader,
   PageSidebar,
-  SkipToContent
+  SkipToContent,
+  PageHeaderTools,
+  DropdownItem,
+  NavGroup
 } from '@patternfly/react-core';
 import { routes, IAppRoute, IAppRouteGroup } from '@app/routes';
-import logo from '@app/bgimages/Patternfly-Logo.svg';
+import {ExternalLinkAltIcon, QuestionCircleIcon } from '@patternfly/react-icons';
+import {useEffect, useState} from 'react';
+import { AboutModalWindow } from './about-modal';
+import Logo from '../../assets/images/logo-large.svg';
+import { SmallLogo } from './small-logo';
+import { APPLICATION_TITLE } from '../utils/constants';
+import { StatefulDropdown } from './stateful-dropdown';
+import {getUser, loginUser, logoutUser} from '@app/shared/auth';
 
 interface IAppLayout {
   children: React.ReactNode;
 }
 
 const AppLayout: React.FunctionComponent<IAppLayout> = ({ children }) => {
-  const [isNavOpen, setIsNavOpen] = React.useState(true);
-  const [isMobileView, setIsMobileView] = React.useState(true);
-  const [isNavOpenMobile, setIsNavOpenMobile] = React.useState(false);
-  const onNavToggleMobile = () => {
-    setIsNavOpenMobile(!isNavOpenMobile);
-  };
-  const onNavToggle = () => {
-    setIsNavOpen(!isNavOpen);
-  };
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [isNavOpen, setIsNavOpen] = useState(true);
+  const [isMobileView, setIsMobileView] = useState(true);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [isNavOpenMobile, setIsNavOpenMobile] = useState(false);
+  const [aboutModalVisible, setAboutModalVisible] = useState(false);
+  const [user, setUser] = useState(null);
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const onPageResize = (props: { mobileView: boolean; windowSize: number }) => {
     setIsMobileView(props.mobileView);
   };
 
-  function LogoImg() {
-    const history = useHistory();
-    function handleClick() {
-      history.push('/');
-    }
+  const aboutModal = () => {
     return (
-      <img src={logo} onClick={handleClick} alt="PatternFly Logo" />
+      <AboutModalWindow
+        isOpen={aboutModalVisible}
+        user={user}
+        trademark=""
+        brandImageSrc={Logo}
+        onClose={() => setAboutModalVisible(false)}
+        brandImageAlt={`Application Logo`}
+        productName={APPLICATION_TITLE}
+      />
     );
+  };
+
+  let userName = '';
+  const location = useLocation();
+  const index = window.location.href.indexOf(window.location.pathname);
+  const baseUrl = window.location.href.substr(0, index);
+
+  useEffect(() => {
+    getUser()
+      .then(response => response.json())
+      .then(data => setUser(data));
+  }, []);
+
+  if (user) {
+    if (user.first_name || user.last_name) {
+      userName = user.first_name + ' ' + user.last_name;
+    } else {
+      userName = user.email;
+    }
   }
 
-  const Header = (
+  const userDropdownItems = [
+      <DropdownItem isDisabled key="username">
+        Username: {user?.email || ''}
+      </DropdownItem>,
+      <DropdownItem
+        key="logout"
+        aria-label={'logout'}
+        onClick={() =>
+          logoutUser().then(() => {
+            setUser(null);
+            window.location.replace(
+              baseUrl
+            );
+          })
+        }
+      >
+        {`Logout`}
+      </DropdownItem>
+    ];
+
+  const docsDropdownItems = [
+    <DropdownItem
+      key="customer_support"
+      href="https://access.redhat.com/support"
+      target="_blank"
+    >
+      Customer Support <ExternalLinkAltIcon />
+    </DropdownItem>,
+    <DropdownItem
+      key="training"
+      href="https://www.ansible.com/resources/webinars-training"
+      target="_blank"
+    >
+      Training <ExternalLinkAltIcon />
+    </DropdownItem>,
+    <DropdownItem key="about" onClick={() => setAboutModalVisible(true)}>
+      {`About`}
+    </DropdownItem>
+  ];
+
+  const headerNav = () => (
     <PageHeader
-      logo={<LogoImg />}
+      logo={<SmallLogo alt={APPLICATION_TITLE} />}
+      headerTools={
+        <PageHeaderTools>
+          <div>
+            <StatefulDropdown
+              ariaLabel={'docs-dropdown'}
+              defaultText={<QuestionCircleIcon />}
+              items={docsDropdownItems}
+              toggleType="icon"
+            />
+            <StatefulDropdown
+              ariaLabel={'user-dropdown'}
+              defaultText={user?.email}
+              items={userDropdownItems}
+              toggleType="dropdown"
+            />
+
+          </div>
+        </PageHeaderTools>
+      }
       showNavToggle
-      isNavOpen={isNavOpen}
-      onNavToggle={isMobileView ? onNavToggleMobile : onNavToggle}
     />
   );
-
-  const location = useLocation();
 
   const renderNavItem = (route: IAppRoute, index: number) => (
     <NavItem key={`${route.label}-${index}`} id={`${route.label}-${index}`} isActive={route.path === location.pathname}>
@@ -73,6 +161,7 @@ const AppLayout: React.FunctionComponent<IAppLayout> = ({ children }) => {
 
   const Navigation = (
     <Nav id="nav-primary-simple" theme="dark">
+      <NavGroup title={APPLICATION_TITLE}/>
       <NavList id="nav-list-simple">
         {routes.map(
           (route, idx) => route.label && (!route.routes ? renderNavItem(route, idx) : renderNavGroup(route, idx))
@@ -102,10 +191,11 @@ const AppLayout: React.FunctionComponent<IAppLayout> = ({ children }) => {
   return (
     <Page
       mainContainerId={pageId}
-      header={Header}
+      header={headerNav()}
       sidebar={Sidebar}
       onPageResize={onPageResize}
       skipToContent={PageSkipToContent}>
+      {aboutModalVisible && aboutModal()}
       {children}
     </Page>
   );

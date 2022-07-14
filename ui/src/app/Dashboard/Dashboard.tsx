@@ -1,6 +1,4 @@
-import * as React from 'react';
 import { PageSection, Title } from '@patternfly/react-core';
-import { useDispatch } from 'react-redux';
 import React, { useState } from 'react';
 import Ansi from "ansi-to-react";
 import {
@@ -14,6 +12,7 @@ import {
 } from '@patternfly/react-core';
 import styled from 'styled-components';
 import {getServer} from '@app/utils/utils';
+import {TopToolbar} from "@app/shared/top-toolbar";
 
 
 const CardBody = styled(PFCardBody)`
@@ -51,10 +50,10 @@ const Dashboard: React.FunctionComponent = () => {
 
   return (
   <React.Fragment>
-  <PageSection>
-    <Title headingLevel="h1" size="lg">Event Driven Automation</Title>
-  </PageSection> 
 
+    <TopToolbar>
+      <Title headingLevel={"h2"}>Dashboard</Title>
+    </TopToolbar>
 	<Stack>
             <StackItem>
               <Card>

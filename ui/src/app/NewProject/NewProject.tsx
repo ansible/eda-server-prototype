@@ -1,10 +1,6 @@
-import * as React from 'react';
 import { PageSection, Title } from '@patternfly/react-core';
-import { useDispatch } from 'react-redux';
 import { useHistory } from "react-router-dom";
-import { Link, useParams } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
-import Ansi from "ansi-to-react";
 import {
   Card,
   CardBody as PFCardBody,
@@ -19,6 +15,7 @@ import { postData } from '@app/utils/utils';
 import {getServer} from '@app/utils/utils';
 
 import styled from 'styled-components';
+import {TopToolbar} from "@app/shared/top-toolbar";
 
 
 const CardBody = styled(PFCardBody)`
@@ -47,9 +44,9 @@ const NewProject: React.FunctionComponent = () => {
 
   return (
   <React.Fragment>
-  <PageSection>
-    <Title headingLevel="h1" size="lg">Event Driven Automation | New Project</Title>
-  </PageSection>
+    <TopToolbar>
+      <Title headingLevel={"h2"}>New project</Title>
+    </TopToolbar>
      <Form>
         <FormGroup
           label="Git URL"

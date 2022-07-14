@@ -1,4 +1,3 @@
-import React from 'react';
 import React, { useState } from 'react';
 import {
   LoginFooterItem,
@@ -54,7 +53,7 @@ function Login(props) {
 					formBody.push(encodedKey + "=" + encodedValue);
 				}
 				formBody = formBody.join("&");
-				fetch('http://' + getServer() + '/api/auth/jwt/login', 
+				fetch('http://' + getServer() + '/api/auth/jwt/login',
 						{
 							method: 'POST',
 							headers: {

@@ -6,8 +6,11 @@ import { AppLayout } from '@app/AppLayout/AppLayout';
 import { AppRoutes } from '@app/routes';
 import { Login } from '@app/Login/Login';
 import '@app/app.css';
+import GlobalStyle from '../global-styles';
 
 const App: React.FunctionComponent = () => (
+  <React.Fragment>
+  <GlobalStyle />
   <Router basename="/eda">
     <Switch>
     <Route path="/" exact="true">
@@ -20,6 +23,7 @@ const App: React.FunctionComponent = () => (
     </Route>
     </Switch>
   </Router>
+  </React.Fragment>
 );
 
 export default App;
