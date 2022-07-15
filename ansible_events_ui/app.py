@@ -11,7 +11,7 @@ from fastapi.staticfiles import StaticFiles
 from sqlalchemy import insert, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from .database import async_session_maker, database, get_async_session
+from .database import async_session_maker, get_async_session
 from .manager import activate_rulesets, inactivate_rulesets
 from .models import (
     User,
@@ -118,16 +118,6 @@ class UpdateManager:
 
 
 updatemanager = UpdateManager()
-
-
-@app.on_event("startup")
-async def startup():
-    await database.connect()
-
-
-@app.on_event("shutdown")
-async def shutdown():
-    await database.disconnect()
 
 
 @app.get("/")
@@ -269,6 +259,7 @@ async def create_activation_instance(
 
     cmd, proc = await activate_rulesets(
         id_,
+        # TODO(cutwater): Hardcoded container image link
         "quay.io/bthomass/ansible-events:latest",
         rule_set_file_row.rulesets,
         inventory_row.inventory,
