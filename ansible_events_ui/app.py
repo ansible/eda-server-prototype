@@ -437,12 +437,14 @@ async def read_rule_set_file(
 async def read_rule_set_file_json(
     rule_set_file_id: int, db: AsyncSession = Depends(get_async_session)
 ):
-    query = rule_set_files.select().where(
+    query = select(rule_set_files).where(
         rule_set_files.c.id == rule_set_file_id
     )
-    result = dict(await database.fetch_one(query))
-    result["rulesets"] = yaml.safe_load(result["rulesets"])
-    return result
+    result = await db.execute(query)
+
+    response = dict(result.first())
+    response["rulesets"] = yaml.safe_load(response["rulesets"])
+    return response
 
 
 @app.get("/api/extra_vars/")
