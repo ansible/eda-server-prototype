@@ -297,11 +297,12 @@ async def read_output(proc, activation_instance_id, db: AsyncSession):
 async def list_activation_instance_logs(
     activation_instance_id: int, db: AsyncSession = Depends(get_async_session)
 ):
-    q = activation_instance_logs.select().where(
+    query = select(activation_instance_logs).where(
         activation_instance_logs.c.activation_instance_id
         == activation_instance_id
     )
-    return await database.fetch_all(q)
+    result = await db.execute(query)
+    return result.all()
 
 
 @app.get("/api/tasks/")
