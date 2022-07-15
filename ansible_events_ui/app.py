@@ -366,8 +366,9 @@ async def list_projects(db: AsyncSession = Depends(get_async_session)):
 
 @app.get("/api/playbooks/")
 async def list_playbooks(db: AsyncSession = Depends(get_async_session)):
-    query = playbooks.select()
-    return await database.fetch_all(query)
+    query = select(playbooks)
+    result = await db.execute(query)
+    return result.all()
 
 
 @app.get("/api/playbook/{playbook_id}")
