@@ -402,16 +402,19 @@ async def read_playbook(
 
 @app.get("/api/inventories/")
 async def list_inventories(db: AsyncSession = Depends(get_async_session)):
-    query = inventories.select()
-    return await database.fetch_all(query)
+    # FIXME(cutwater): Return HTTP 404 if project doesn't exist
+    query = select(inventories)
+    result = await db.execute(query)
+    return result.all()
 
 
 @app.get("/api/inventory/{inventory_id}")
 async def read_inventory(
     inventory_id: int, db: AsyncSession = Depends(get_async_session)
 ):
-    query = inventories.select().where(inventories.c.id == inventory_id)
-    return await database.fetch_one(query)
+    query = select(inventories).where(inventories.c.id == inventory_id)
+    result = await db.execute(query)
+    return result.first()
 
 
 @app.get("/api/rule_set_files/")
