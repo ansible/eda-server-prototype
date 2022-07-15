@@ -8,7 +8,7 @@ from fastapi import Depends, FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
-from sqlalchemy import select
+from sqlalchemy import select, insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from .database import database, get_async_session
@@ -206,11 +206,11 @@ def ping():
 async def create_rule_set_file(
     rsf: RuleSetFile, db: AsyncSession = Depends(get_async_session)
 ):
-    query = rule_set_files.insert().values(
-        name=rsf.name, rulesets=rsf.rulesets
-    )
-    last_record_id = await database.execute(query)
-    return {**rsf.dict(), "id": last_record_id}
+    query = insert(rule_set_files).values(name=rsf.name, rulesets=rsf.rulesets)
+    result = await db.execute(query)
+    await db.commit()
+    (id_,) = result.inserted_primary_key
+    return {**rsf.dict(), "id": id_}
 
 
 @app.post("/api/inventory/")
