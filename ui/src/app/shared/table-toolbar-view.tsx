@@ -18,11 +18,9 @@ import {
 } from '../shared/pagination';
 import { useIntl } from 'react-intl';
 import {
-  PrimaryToolbar,
-  ActiveFiltersConfig,
-  FilterItem
+  PrimaryToolbar
 } from '@redhat-cloud-services/frontend-components/PrimaryToolbar';
-import sharedMessages from '../messages/shared.messages';
+import sharedMessages from '../../../messages/shared.messages';
 import { PageSection } from '@patternfly/react-core';
 
 export interface TableToolbarViewProps {
@@ -40,8 +38,6 @@ export interface TableToolbarViewProps {
   renderEmptyState?: () => ReactNode;
   sortBy?: ISortBy;
   onSort?: OnSort;
-  activeFiltersConfig?: ActiveFiltersConfig;
-  filterConfig?: FilterItem[];
   rows: IRow[];
   ouiaId?: string;
 }
@@ -59,8 +55,6 @@ export const TableToolbarView: React.ComponentType<TableToolbarViewProps> = ({
   renderEmptyState = () => null,
   sortBy,
   onSort,
-  activeFiltersConfig,
-  filterConfig = [],
   rows,
   ouiaId
 }) => {
@@ -98,10 +92,10 @@ export const TableToolbarView: React.ComponentType<TableToolbarViewProps> = ({
             filterValues: {
               id: 'filter-by-name',
               placeholder: intl.formatMessage(
-                sharedMessages.projectsFilter
+                sharedMessages.filterByTitle
               ),
               'aria-label': intl.formatMessage(
-                sharedMessages.projectsFilter
+                sharedMessages.filterByTitle
               ),
               onChange: (
                 _event: React.SyntheticEvent<Element, Event>,
@@ -109,11 +103,9 @@ export const TableToolbarView: React.ComponentType<TableToolbarViewProps> = ({
               ) => onFilterChange(value),
               value: filterValue
             }
-          },
-          ...filterConfig
+          }
         ]
       }}
-      activeFiltersConfig={activeFiltersConfig}
     />
   );
 
@@ -121,7 +113,6 @@ export const TableToolbarView: React.ComponentType<TableToolbarViewProps> = ({
     <PageSection page-type={`tab-${plural}`} id={`tab-${plural}`}>
       {routes()}
       {renderToolbar()}
-      {isLoading && <ListLoader />}
       {!isLoading && rows.length === 0 ? (
         renderEmptyState()
       ) : (
