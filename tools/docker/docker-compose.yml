@@ -11,7 +11,8 @@ services:
     volumes:
       - sqlite_db:/opt/app-root/src/sqlite
     environment:
-      - DATABASE_URL=sqlite:///./sqlite/test.db
-      - ASYNC_DATABASE_URL=sqlite+aiosqlite:///./sqlite/test.db
+      - AE_HOST=0.0.0.0
+      - AE_DATABASE_URL=sqlite:///./sqlite/test.db
+      - AE_ASYNC_DATABASE_URL=sqlite+aiosqlite:///./sqlite/test.db
 volumes:
   sqlite_db: {}

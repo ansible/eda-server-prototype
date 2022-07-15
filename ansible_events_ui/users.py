@@ -10,14 +10,14 @@ from fastapi_users.authentication import (
 )
 from fastapi_users.db import SQLAlchemyUserDatabase
 
-from .conf import settings
+from .config import settings
 from .database import get_user_db
 from .models import User
 
 
 class UserManager(UUIDIDMixin, BaseUserManager[User, uuid.UUID]):
-    reset_password_token_secret = settings.SECRET
-    verification_token_secret = settings.SECRET
+    reset_password_token_secret = settings.secret
+    verification_token_secret = settings.secret
 
     async def on_after_register(
         self, user: User, request: Optional[Request] = None
@@ -51,7 +51,7 @@ cookie_transport = CookieTransport(cookie_max_age=3600)
 
 
 def get_jwt_strategy() -> JWTStrategy:
-    return JWTStrategy(secret=settings.SECRET, lifetime_seconds=3600)
+    return JWTStrategy(secret=settings.secret, lifetime_seconds=3600)
 
 
 auth_backend = AuthenticationBackend(

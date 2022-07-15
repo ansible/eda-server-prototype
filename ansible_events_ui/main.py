@@ -1,12 +1,12 @@
 import uvicorn
 
-from .conf import env
+from .config import settings
 
 
 def main():
     uvicorn.run(
         "ansible_events_ui.app:app",
-        host=env.str("HTTP_ADDR", default="0.0.0.0"),
-        port=env.int("HTTP_PORT", default=8080),
-        log_level=env.str("LOG_LEVEL", default="info"),
+        host=settings.host,
+        port=settings.port,
+        log_level=settings.log_level.lower(),
     )
