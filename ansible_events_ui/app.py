@@ -447,8 +447,9 @@ async def read_rule_set_file_json(
 
 @app.get("/api/extra_vars/")
 async def list_extra_vars(db: AsyncSession = Depends(get_async_session)):
-    query = extra_vars.select()
-    return await database.fetch_all(query)
+    query = select(extra_vars)
+    result = await db.execute(query)
+    return result.all()
 
 
 @app.get("/api/extra_var/{extra_var_id}")
