@@ -217,9 +217,11 @@ async def create_rule_set_file(
 async def create_inventory(
     i: Inventory, db: AsyncSession = Depends(get_async_session)
 ):
-    query = inventories.insert().values(name=i.name, inventory=i.inventory)
-    last_record_id = await database.execute(query)
-    return {**i.dict(), "id": last_record_id}
+    query = insert(inventories).values(name=i.name, inventory=i.inventory)
+    result = await db.execute(query)
+    await db.commit()
+    (id_,) = result.inserted_primary_key
+    return {**i.dict(), "id": id_}
 
 
 # FIXME(cutwater): Inconsistent attribute
