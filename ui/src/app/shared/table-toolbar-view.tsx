@@ -20,7 +20,7 @@ import { useIntl } from 'react-intl';
 import {
   PrimaryToolbar
 } from '@redhat-cloud-services/frontend-components/PrimaryToolbar';
-import sharedMessages from '../../../messages/shared.messages';
+import sharedMessages from '../messages/shared.messages';
 import { PageSection } from '@patternfly/react-core';
 
 export interface TableToolbarViewProps {
