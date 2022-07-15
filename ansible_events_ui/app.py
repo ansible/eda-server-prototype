@@ -252,6 +252,7 @@ async def create_activation_instance(
     last_record_id = await database.execute(query)
     cmd, proc = await activate_rulesets(
         last_record_id,
+        # FIXME(cutwater): Hardcoded container image link
         "quay.io/bthomass/ansible-events:latest",
         r.rulesets,
         i.inventory,
@@ -272,7 +273,9 @@ async def deactivate(activation_instance_id: int):
     return
 
 
-async def read_output(proc, activation_instance_id, db: AsyncSession):
+# TODO(cutwater): This method is executed as a background task.
+#  It must create database session.
+async def read_output(proc, activation_instance_id):
     line_number = 0
     done = False
     while not done:
@@ -280,6 +283,7 @@ async def read_output(proc, activation_instance_id, db: AsyncSession):
         if len(line) == 0:
             break
         line = line.decode()
+        # FIXME(cutwater): F-string is not needed here
         print(f"{line}", end="")
         query = activation_instance_logs.insert().values(
             line_number=line_number,
