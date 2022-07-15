@@ -8,7 +8,7 @@ from fastapi import Depends, FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
-from sqlalchemy import select, engine
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from .database import database, get_async_session
@@ -402,7 +402,6 @@ async def read_playbook(
 
 @app.get("/api/inventories/")
 async def list_inventories(db: AsyncSession = Depends(get_async_session)):
-    # FIXME(cutwater): Return HTTP 404 if project doesn't exist
     query = select(inventories)
     result = await db.execute(query)
     return result.all()
@@ -412,6 +411,7 @@ async def list_inventories(db: AsyncSession = Depends(get_async_session)):
 async def read_inventory(
     inventory_id: int, db: AsyncSession = Depends(get_async_session)
 ):
+    # FIXME(cutwater): Return HTTP 404 if inventory doesn't exist
     query = select(inventories).where(inventories.c.id == inventory_id)
     result = await db.execute(query)
     return result.first()
@@ -526,11 +526,12 @@ async def read_job_instance_events(
 async def read_activation_instance_job_instances(
     activation_instance_id: int, db: AsyncSession = Depends(get_async_session)
 ):
-    query1 = activation_instance_job_instances.select(
+    query = select(activation_instance_job_instances).where(
         activation_instance_job_instances.c.activation_instance_id
         == activation_instance_id
     )
-    return await database.fetch_all(query1)
+    result = await db.execute(query)
+    return result.all()
 
 
 # FastAPI Users
