@@ -3,8 +3,9 @@ import os
 import tempfile
 
 import yaml
+from sqlalchemy import insert
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from .database import database
 from .models import (
     extra_vars,
     inventories,
@@ -17,6 +18,7 @@ from .models import (
 )
 
 
+# FIXME(cutwater): Remove try: .. finally: pass
 async def clone_project(url, git_hash=None):
 
     try:
@@ -61,14 +63,15 @@ async def clone_project(url, git_hash=None):
         pass
 
 
-async def sync_project(project_id, tempdir):
+# FIXME(cutwater): Remove try: .. finally: pass
+async def sync_project(project_id, tempdir, db: AsyncSession):
 
     try:
 
-        await find_rules(project_id, tempdir)
-        await find_inventory(project_id, tempdir)
-        await find_extra_vars(project_id, tempdir)
-        await find_playbook(project_id, tempdir)
+        await find_rules(project_id, tempdir, db)
+        await find_inventory(project_id, tempdir, db)
+        await find_extra_vars(project_id, tempdir, db)
+        await find_playbook(project_id, tempdir, db)
 
     finally:
         pass
@@ -101,7 +104,7 @@ def yield_files(project_dir):
             yield root, f
 
 
-async def find_rules(project_id, project_dir):
+async def find_rules(project_id, project_dir, db: AsyncSession):
 
     for directory, filename in yield_files(project_dir):
         full_path = os.path.join(directory, filename)
@@ -109,16 +112,18 @@ async def find_rules(project_id, project_dir):
         if is_rules_file(full_path):
             with open(full_path) as f:
                 rulesets = f.read()
-            query = rule_set_files.insert().values(
+
+            query = insert(rule_set_files).values(
                 name=filename, rulesets=rulesets
             )
-            last_record_id = await database.execute(query)
-            print(last_record_id)
-            query = project_rules.insert().values(
-                project_id=project_id, rule_set_file_id=last_record_id
+            (record_id,) = (await db.execute(query)).inserted_primary_key
+            print(record_id)
+
+            query = insert(project_rules).values(
+                project_id=project_id, rule_set_file_id=record_id
             )
-            last_record_id = await database.execute(query)
-            print(last_record_id)
+            (record_id,) = (await db.execute(query)).inserted_primary_key
+            print(record_id)
 
 
 def is_inventory_file(filename):
@@ -138,7 +143,7 @@ def is_inventory_file(filename):
     return True
 
 
-async def find_inventory(project_id, project_dir):
+async def find_inventory(project_id, project_dir, db: AsyncSession):
 
     for directory, filename in yield_files(project_dir):
         full_path = os.path.join(directory, filename)
@@ -146,16 +151,18 @@ async def find_inventory(project_id, project_dir):
         if is_inventory_file(full_path):
             with open(full_path) as f:
                 inventory = f.read()
-            query = inventories.insert().values(
+
+            query = insert(inventories).values(
                 name=filename, inventory=inventory
             )
-            last_record_id = await database.execute(query)
-            print(last_record_id)
-            query = project_inventories.insert().values(
-                project_id=project_id, inventory_id=last_record_id
+            (record_id,) = (await db.execute(query)).inserted_primary_key
+            print(record_id)
+
+            query = insert(project_inventories).values(
+                project_id=project_id, inventory_id=record_id
             )
-            last_record_id = await database.execute(query)
-            print(last_record_id)
+            (record_id,) = (await db.execute(query)).inserted_primary_key
+            print(record_id)
 
 
 def is_playbook_file(filename):
@@ -187,7 +194,7 @@ def is_extra_vars_file(filename):
     )
 
 
-async def find_extra_vars(project_id, project_dir):
+async def find_extra_vars(project_id, project_dir, db: AsyncSession):
 
     for directory, filename in yield_files(project_dir):
         full_path = os.path.join(directory, filename)
@@ -195,19 +202,21 @@ async def find_extra_vars(project_id, project_dir):
         if is_extra_vars_file(full_path):
             with open(full_path) as f:
                 extra_var = f.read()
-            query = extra_vars.insert().values(
+
+            query = insert(extra_vars).values(
                 name=filename, extra_var=extra_var
             )
-            last_record_id = await database.execute(query)
-            print(last_record_id)
-            query = project_vars.insert().values(
-                project_id=project_id, vars_id=last_record_id
+            (record_id,) = (await db.execute(query)).inserted_primary_key
+            print(record_id)
+
+            query = insert(project_vars).values(
+                project_id=project_id, vars_id=record_id
             )
-            last_record_id = await database.execute(query)
-            print(last_record_id)
+            (record_id,) = (await db.execute(query)).inserted_primary_key
+            print(record_id)
 
 
-async def find_playbook(project_id, project_dir):
+async def find_playbook(project_id, project_dir, db: AsyncSession):
 
     for directory, filename in yield_files(project_dir):
         full_path = os.path.join(directory, filename)
@@ -215,11 +224,13 @@ async def find_playbook(project_id, project_dir):
         if is_playbook_file(full_path):
             with open(full_path) as f:
                 playbook = f.read()
-            query = playbooks.insert().values(name=filename, playbook=playbook)
-            last_record_id = await database.execute(query)
-            print(last_record_id)
-            query = project_playbooks.insert().values(
-                project_id=project_id, playbook_id=last_record_id
+
+            query = insert(playbooks).values(name=filename, playbook=playbook)
+            (record_id,) = (await db.execute(query)).inserted_primary_key
+            print(record_id)
+
+            query = insert(project_playbooks).values(
+                project_id=project_id, playbook_id=record_id
             )
-            last_record_id = await database.execute(query)
-            print(last_record_id)
+            (record_id,) = (await db.execute(query)).inserted_primary_key
+            print(record_id)
