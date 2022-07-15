@@ -23,13 +23,6 @@ module.exports = env => {
           ]
         },
         {
-          test: /\.(css|scss)$/,
-          use: [
-            'style-loader',
-            'css-loader'
-          ],
-        },
-        {
           test: /\.(woff(2)?|ttf|jpg|png|eot|gif|svg)(\?v=\d+\.\d+\.\d+)?$/,
           type: 'asset/resource',
           generator: {
