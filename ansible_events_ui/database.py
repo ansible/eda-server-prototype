@@ -1,6 +1,5 @@
 from typing import AsyncGenerator
 
-import databases
 import sqlalchemy
 from fastapi import Depends
 from fastapi_users.db import SQLAlchemyUserDatabase
@@ -9,8 +8,6 @@ from sqlalchemy.orm import sessionmaker
 
 from .config import settings
 from .models import User, metadata
-
-database = databases.Database(settings.database_url)
 
 engine = sqlalchemy.create_engine(
     settings.database_url, connect_args={"check_same_thread": False}

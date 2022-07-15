@@ -11,7 +11,7 @@ from fastapi.staticfiles import StaticFiles
 from sqlalchemy import select, insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from .database import database, get_async_session, async_session_maker
+from .database import get_async_session, async_session_maker
 from .manager import activate_rulesets, inactivate_rulesets
 from .models import (
     User,
@@ -118,16 +118,6 @@ class UpdateManager:
 
 
 updatemanager = UpdateManager()
-
-
-@app.on_event("startup")
-async def startup():
-    await database.connect()
-
-
-@app.on_event("shutdown")
-async def shutdown():
-    await database.disconnect()
 
 
 @app.get("/")
