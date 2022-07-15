@@ -504,8 +504,9 @@ async def list_job_instances(db: AsyncSession = Depends(get_async_session)):
 async def read_job_instance(
     job_instance_id: int, db: AsyncSession = Depends(get_async_session)
 ):
-    query = job_instances.select().where(job_instances.c.id == job_instance_id)
-    return await database.fetch_one(query)
+    query = select(job_instances).where(job_instances.c.id == job_instance_id)
+    result = await db.execute(query)
+    return result.all()
 
 
 @app.get("/api/job_instance_events/{job_instance_id}")
