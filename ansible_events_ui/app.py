@@ -158,28 +158,33 @@ async def websocket_endpoint2(
             data = await websocket.receive_text()
             data = json.loads(data)
             print(data)
+            # TODO(cutwater): Some data validation is needed
             data_type = data.get("type")
             if data_type == "Job":
-                query = job_instances.insert().values(uuid=data.get("job_id"))
-                last_record_id = await database.execute(query)
+                query = insert(job_instances).values(uuid=data.get("job_id"))
+                result = await db.execute(query)
+                (job_instance_id,) = result.inserted_primary_key
+
                 activation_instance_id = int(data.get("ansible_events_id"))
-                query = activation_instance_job_instances.insert().values(
-                    job_instance_id=last_record_id,
+                query = insert(activation_instance_job_instances).values(
+                    job_instance_id=job_instance_id,
                     activation_instance_id=activation_instance_id,
                 )
-                await database.execute(query)
+                await db.execute(query)
+                await db.commit()
                 await updatemanager.broadcast(
                     f"/activation_instance/{activation_instance_id}",
-                    json.dumps(["Job", dict(id=last_record_id)]),
+                    json.dumps(["Job", {"id": job_instance_id}]),
                 )
             elif data_type == "AnsibleEvent":
                 event_data = data.get("event", {})
-                query = job_instance_events.insert().values(
+                query = insert(job_instance_events).values(
                     job_uuid=event_data.get("job_id"),
                     counter=event_data.get("counter"),
                     stdout=event_data.get("stdout"),
                 )
-                await database.execute(query)
+                await db.execute(query)
+                await db.commit()
             print(data)
     except WebSocketDisconnect:
         pass
