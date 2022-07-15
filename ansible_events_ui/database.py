@@ -15,11 +15,18 @@ database = databases.Database(settings.database_url)
 engine = sqlalchemy.create_engine(
     settings.database_url, connect_args={"check_same_thread": False}
 )
+# FIXME(cutwater): Do not create database schema at the module load time.
 metadata.create_all(engine)
 
+# TODO(cutwater): Do not initialize engine globally
 async_engine = create_async_engine(settings.async_database_url)
+# TODO(cutwater): After migration to SQLAlchemy 2.0 style is complete,
+#   add `future=True` argument to the `sessionmaker(...)` call.
 async_session_maker = sessionmaker(
-    async_engine, class_=AsyncSession, expire_on_commit=False
+    async_engine,
+    class_=AsyncSession,
+    expire_on_commit=False,
+    # future=True,
 )
 
 
