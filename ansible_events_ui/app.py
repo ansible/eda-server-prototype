@@ -496,8 +496,9 @@ async def read_activation_instance(
 
 @app.get("/api/job_instances/")
 async def list_job_instances(db: AsyncSession = Depends(get_async_session)):
-    query = job_instances.select()
-    return await database.fetch_all(query)
+    query = select(job_instances)
+    result = await db.execute(query)
+    return result.all()
 
 
 @app.get("/api/job_instance/{job_instance_id}")
