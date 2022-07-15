@@ -489,9 +489,8 @@ async def read_activation_instance(
         )
         .where(activation_instances.c.id == activation_instance_id)
     )
-    result = dict(await database.fetch_one(query))
-    print(dict(result))
-    return result
+    result = await db.execute(query)
+    return result.first()
 
 
 @app.get("/api/job_instances/")
