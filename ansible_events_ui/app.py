@@ -375,8 +375,9 @@ async def list_playbooks(db: AsyncSession = Depends(get_async_session)):
 async def read_playbook(
     playbook_id: int, db: AsyncSession = Depends(get_async_session)
 ):
-    query = playbooks.select().where(playbooks.c.id == playbook_id)
-    return await database.fetch_one(query)
+    query = select(playbooks).where(playbooks.c.id == playbook_id)
+    result = await db.execute(query)
+    return result.first()
 
 
 @app.get("/api/inventories/")
