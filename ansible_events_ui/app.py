@@ -463,8 +463,9 @@ async def read_extravar(
 async def list_activation_instances(
     db: AsyncSession = Depends(get_async_session),
 ):
-    query = activation_instances.select()
-    return await database.fetch_all(query)
+    query = select(activation_instances)
+    result = await db.execute(query)
+    return result.all()
 
 
 @app.get("/api/activation_instance/{activation_instance_id}")
