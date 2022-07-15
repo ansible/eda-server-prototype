@@ -455,8 +455,9 @@ async def list_extra_vars(db: AsyncSession = Depends(get_async_session)):
 async def read_extravar(
     extra_var_id: int, db: AsyncSession = Depends(get_async_session)
 ):
-    query = extra_vars.select().where(extra_vars.c.id == extra_var_id)
-    return await database.fetch_one(query)
+    query = select(extra_vars).where(extra_vars.c.id == extra_var_id)
+    result = await db.execute(query)
+    return result.first()
 
 
 @app.get("/api/activation_instances/")
