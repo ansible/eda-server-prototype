@@ -50,7 +50,7 @@ class Inventory(BaseModel):
 
 class Extravars(BaseModel):
     name: StrictStr
-    extravars: StrictStr
+    extra_var: StrictStr
     id: Optional[int]
 
 

@@ -217,7 +217,7 @@ async def create_inventory(i: Inventory):
 
 @app.post("/api/extra_vars/")
 async def create_extra_vars(e: Extravars):
-    query = extra_vars.insert().values(name=e.name, extra_vars=e.extra_vars)
+    query = extra_vars.insert().values(name=e.name, extra_var=e.extra_var)
     last_record_id = await database.execute(query)
     return {**e.dict(), "id": last_record_id}
 
