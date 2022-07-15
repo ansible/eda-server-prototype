@@ -8,7 +8,7 @@ from fastapi import Depends, FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
-from sqlalchemy import select
+from sqlalchemy import select, engine
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from .database import database, get_async_session
@@ -331,30 +331,45 @@ async def create_project(
 async def read_project(
     project_id: int, db: AsyncSession = Depends(get_async_session)
 ):
-    query = projects.select().where(projects.c.id == project_id)
-    result = dict(await database.fetch_one(query))
-    result["rulesets"] = await database.fetch_all(
-        select(rule_set_files.c.id, rule_set_files.c.name)
-        .select_from(projects.join(project_rules).join(rule_set_files))
-        .where(projects.c.id == project_id)
-    )
-    result["inventories"] = await database.fetch_all(
-        select(inventories.c.id, inventories.c.name)
-        .select_from(projects.join(project_inventories).join(inventories))
-        .where(projects.c.id == project_id)
-    )
-    result["vars"] = await database.fetch_all(
-        select(extra_vars.c.id, extra_vars.c.name)
-        .select_from(projects.join(project_vars).join(extra_vars))
-        .where(projects.c.id == project_id)
-    )
-    result["playbooks"] = await database.fetch_all(
-        select(playbooks.c.id, playbooks.c.name)
-        .select_from(projects.join(project_playbooks).join(playbooks))
-        .where(projects.c.id == project_id)
-    )
-    print(result)
-    return result
+    # FIXME(cutwater): Return HTTP 404 if project doesn't exist
+    query = select(projects).where(projects.c.id == project_id)
+    project = (await db.execute(query)).first()
+
+    response = dict(project)
+
+    response["rulesets"] = (
+        await db.execute(
+            select(rule_set_files.c.id, rule_set_files.c.name)
+            .select_from(projects.join(project_rules).join(rule_set_files))
+            .where(projects.c.id == project_id)
+        )
+    ).all()
+
+    response["inventories"] = (
+        await db.execute(
+            select(inventories.c.id, inventories.c.name)
+            .select_from(projects.join(project_inventories).join(inventories))
+            .where(projects.c.id == project_id)
+        )
+    ).all()
+
+    response["vars"] = (
+        await db.execute(
+            select(extra_vars.c.id, extra_vars.c.name)
+            .select_from(projects.join(project_vars).join(extra_vars))
+            .where(projects.c.id == project_id)
+        )
+    ).all()
+
+    response["playbooks"] = (
+        await db.execute(
+            select(playbooks.c.id, playbooks.c.name)
+            .select_from(projects.join(project_playbooks).join(playbooks))
+            .where(projects.c.id == project_id)
+        )
+    ).all()
+
+    return response
 
 
 @app.get("/api/projects/")
