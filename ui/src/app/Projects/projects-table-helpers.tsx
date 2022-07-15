@@ -1,7 +1,8 @@
-import React, { useContext } from 'react';
+import React, { Fragment, useContext } from 'react';
 import PropTypes from 'prop-types';
 import { Checkbox } from '@patternfly/react-core';
 import ProjectsTableContext from './projects-table-context';
+import {Link} from "react-router-dom";
 
 export const SelectBox = ({ id }) => {
   const {
@@ -29,6 +30,14 @@ export const createRows = (data) =>
       <React.Fragment key={`${id}-checkbox`}>
         <SelectBox id={id} />
       </React.Fragment>,
-      url
+      <Fragment key={`[project-${id}`}>
+        <Link
+          to={{
+            pathname: `/project/${id}`
+          }}
+        >
+          {url}
+        </Link>
+      </Fragment>
     ]
   }));

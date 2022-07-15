@@ -4,7 +4,7 @@ import React, {useState, useEffect, useReducer, Fragment} from 'react';
 import { Button } from '@patternfly/react-core';
 import {getServer} from '@app/utils/utils';
 import {TopToolbar} from '../shared/top-toolbar';
-import { SearchIcon, PlusCircleIcon } from '@patternfly/react-icons';
+import { PlusCircleIcon } from '@patternfly/react-icons';
 import sharedMessages from '../messages/shared.messages';
 import {cellWidth} from "@patternfly/react-table";
 import ProjectsTableContext from './projects-table-context';
@@ -159,8 +159,9 @@ const Projects: React.FunctionComponent = () => {
 
   useEffect(() => {
     fetchProjects().then(response => response.json())
-      .then(data => setProjects(data));
+      .then(data => { setProjects(data); stateDispatch({type: 'setRows', payload: createRows(projects)});});
   }, []);
+
   useEffect(() => {
     updateProjects(defaultSettings);
   }, []);
@@ -271,12 +272,8 @@ const Projects: React.FunctionComponent = () => {
           isLoading={isFetching || isFiltering}
           renderEmptyState={() => (
             <TableEmptyState
-              title={
-                filterValue === ''
-                  ? intl.formatMessage(sharedMessages.noprojects)
-                  : intl.formatMessage(sharedMessages.noResultsFound)
-              }
-              icon={isEmpty(filterValue) ? PlusCircleIcon : SearchIcon}
+              title={intl.formatMessage(sharedMessages.noprojects)}
+              Icon={PlusCircleIcon}
               PrimaryAction={() =>
                 filterValue !== '' ? (
                   <Button onClick={() => clearFilters()} variant="link">

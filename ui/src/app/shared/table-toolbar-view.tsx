@@ -86,16 +86,16 @@ export const TableToolbarView: React.ComponentType<TableToolbarViewProps> = ({
         items: [
           {
             label: intl.formatMessage({
-              id: 'name',
-              defaultMessage: 'Name'
+              id: 'search',
+              defaultMessage: 'Search'
             }),
             filterValues: {
-              id: 'filter-by-name',
+              id: 'search',
               placeholder: intl.formatMessage(
-                sharedMessages.filterByTitle
+                sharedMessages.search
               ),
               'aria-label': intl.formatMessage(
-                sharedMessages.filterByTitle
+                sharedMessages.search
               ),
               onChange: (
                 _event: React.SyntheticEvent<Element, Event>,

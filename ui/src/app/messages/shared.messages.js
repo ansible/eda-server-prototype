@@ -3,12 +3,12 @@ const { defineMessages } = require('react-intl');
 
 const sharedMessages = defineMessages({
   name: {
-    id: 'shared.url',
-    defaultMessage: 'Url'
-  },
-  url: {
     id: 'shared.name',
     defaultMessage: 'Name'
+  },
+  url: {
+    id: 'shared.url',
+    defaultMessage: 'Url'
   },
   add: {
     id: 'shared.add',
@@ -18,9 +18,13 @@ const sharedMessages = defineMessages({
     id: 'shared.delete',
     defaultMessage: 'Delete'
   },
-  filterByTitle: {
-    id: 'shared.filterByTitle',
-    defaultMessage: 'Filter by {title}'
+  search: {
+    id: 'shared.search',
+    defaultMessage: 'Search'
+  },
+  filterByName: {
+    id: 'shared.filterByName',
+    defaultMessage: 'Filter by {name}'
   },
   noResultsFound: {
     id: 'shared.noResultsFound',
@@ -41,7 +45,7 @@ const sharedMessages = defineMessages({
   },
   ariaLabel: {
     id: 'shared.ariaLabel',
-    defaultMessage: '{title} table'
+    defaultMessage: '{name} table'
   },
   updatedLabel: {
     id: 'shared.updatedLabel',
