@@ -419,8 +419,9 @@ async def read_inventory(
 
 @app.get("/api/rule_set_files/")
 async def list_rule_set_files(db: AsyncSession = Depends(get_async_session)):
-    query = rule_set_files.select()
-    return await database.fetch_all(query)
+    query = select(rule_set_files)
+    result = await db.execute(query)
+    return result.all()
 
 
 @app.get("/api/rule_set_file/{rule_set_file_id}")
