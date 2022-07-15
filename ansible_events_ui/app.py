@@ -222,6 +222,10 @@ async def create_inventory(
     return {**i.dict(), "id": last_record_id}
 
 
+# FIXME(cutwater): Inconsistent attribute
+#   extravars in Extravars pydantic model
+#   extra_vars here
+#   extra_var in table
 @app.post("/api/extra_vars/")
 async def create_extra_vars(
     e: Extravars, db: AsyncSession = Depends(get_async_session)
