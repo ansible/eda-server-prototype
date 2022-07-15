@@ -512,14 +512,13 @@ async def read_job_instance(
 async def read_job_instance_events(
     job_instance_id: int, db: AsyncSession = Depends(get_async_session)
 ):
-    query1 = job_instances.select().where(
-        job_instances.c.id == job_instance_id
-    )
-    job = await database.fetch_one(query1)
-    query2 = job_instance_events.select().where(
+    query = select(job_instances).where(job_instances.c.id == job_instance_id)
+    job = (await db.execute(query)).first()
+
+    query = select(job_instance_events).where(
         job_instance_events.c.job_uuid == job.uuid
     )
-    return await database.fetch_all(query2)
+    return (await db.execute(query)).all()
 
 
 @app.get("/api/activation_instance_job_instances/{activation_instance_id}")
