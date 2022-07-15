@@ -11,7 +11,7 @@ from fastapi.staticfiles import StaticFiles
 from sqlalchemy import insert, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from .database import database, get_async_session
+from .database import async_session_maker, database, get_async_session
 from .manager import activate_rulesets, inactivate_rulesets
 from .models import (
     User,
@@ -66,6 +66,8 @@ app.add_middleware(
 )
 
 
+# TODO(cutwater): A more reliable, scalable and robust tasking system
+#   is probably needed.
 class TaskManager:
     def __init__(self):
 
@@ -241,36 +243,45 @@ async def create_extra_vars(
 
 
 @app.post("/api/activation_instance/")
-async def create_activation_instance(a: Activation):
-    query = rule_set_files.select().where(
+async def create_activation_instance(
+    a: Activation, db: AsyncSession = Depends(get_async_session)
+):
+    query = select(rule_set_files).where(
         rule_set_files.c.id == a.rule_set_file_id
     )
-    r = await database.fetch_one(query)
-    query = inventories.select().where(inventories.c.id == a.inventory_id)
-    i = await database.fetch_one(query)
-    query = extra_vars.select().where(extra_vars.c.id == a.extra_var_id)
-    e = await database.fetch_one(query)
-    query = activation_instances.insert().values(
+    rule_set_file_row = (await db.execute(query)).first()
+
+    query = select(inventories).where(inventories.c.id == a.inventory_id)
+    inventory_row = (await db.execute(query)).first()
+
+    query = select(extra_vars).where(extra_vars.c.id == a.extra_var_id)
+    extra_var_row = (await db.execute(query)).first()
+
+    query = insert(activation_instances).values(
         name=a.name,
         rule_set_file_id=a.rule_set_file_id,
         inventory_id=a.inventory_id,
         extra_var_id=a.extra_var_id,
     )
-    last_record_id = await database.execute(query)
+    result = await db.execute(query)
+    await db.commit()
+    (id_,) = result.inserted_primary_key
+
     cmd, proc = await activate_rulesets(
-        last_record_id,
+        id_,
         "quay.io/bthomass/ansible-events:latest",
-        r.rulesets,
-        i.inventory,
-        e.extra_var,
+        rule_set_file_row.rulesets,
+        inventory_row.inventory,
+        extra_var_row.extra_var,
+        db,
     )
 
-    task1 = asyncio.create_task(
-        read_output(proc, last_record_id), name=f"read_output {proc.pid}"
+    task = asyncio.create_task(
+        read_output(proc, id_), name=f"read_output {proc.pid}"
     )
-    taskmanager.tasks.append(task1)
+    taskmanager.tasks.append(task)
 
-    return {**a.dict(), "id": last_record_id}
+    return {**a.dict(), "id": id_}
 
 
 @app.post("/api/deactivate/")
@@ -280,24 +291,30 @@ async def deactivate(activation_instance_id: int):
 
 
 async def read_output(proc, activation_instance_id):
-    line_number = 0
-    done = False
-    while not done:
-        line = await proc.stdout.readline()
-        if len(line) == 0:
-            break
-        line = line.decode()
-        print(f"{line}", end="")
-        query = activation_instance_logs.insert().values(
-            line_number=line_number,
-            log=line,
-            activation_instance_id=activation_instance_id,
-        )
-        await database.execute(query)
-        line_number += 1
-        await connnectionmanager.broadcast(
-            json.dumps(["Stdout", dict(stdout=line)])
-        )
+    # TODO(cutwater): Replace with FastAPI dependency injections,
+    #   that is available in BackgroundTasks
+    async with async_session_maker() as db:
+        line_number = 0
+        # FIXME(cutwater): The `done` variable is never set to True.
+        done = False
+        while not done:
+            line = await proc.stdout.readline()
+            if len(line) == 0:
+                break
+            line = line.decode()
+            # FIXME(cutwater): F-string is not needed here
+            print(f"{line}", end="")
+            query = insert(activation_instance_logs).values(
+                line_number=line_number,
+                log=line,
+                activation_instance_id=activation_instance_id,
+            )
+            await db.execute(query)
+            await db.commit()
+            line_number += 1
+            await connnectionmanager.broadcast(
+                json.dumps(["Stdout", dict(stdout=line)])
+            )
 
 
 @app.get("/api/activation_instance_logs/", response_model=List[ActivationLog])
