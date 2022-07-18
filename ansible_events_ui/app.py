@@ -9,8 +9,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from .database import database
+from .database import database, get_async_session
 from .manager import activate_rulesets, inactivate_rulesets
 from .models import (
     User,
@@ -283,12 +284,15 @@ async def read_output(proc, activation_instance_id):
 
 
 @app.get("/api/activation_instance_logs/", response_model=List[ActivationLog])
-async def list_activation_instance_logs(activation_instance_id: int):
-    q = activation_instance_logs.select().where(
+async def list_activation_instance_logs(
+    activation_instance_id: int, db: AsyncSession = Depends(get_async_session)
+):
+    query = select(activation_instance_logs).where(
         activation_instance_logs.c.activation_instance_id
         == activation_instance_id
     )
-    return await database.fetch_all(q)
+    result = await db.execute(query)
+    return result.all()
 
 
 @app.get("/api/tasks/")
@@ -341,33 +345,43 @@ async def read_project(project_id: int):
 
 
 @app.get("/api/projects/")
-async def list_projects():
-    query = projects.select()
-    return await database.fetch_all(query)
+async def list_projects(db: AsyncSession = Depends(get_async_session)):
+    query = select(projects)
+    result = await db.execute(query)
+    return result.all()
 
 
 @app.get("/api/playbooks/")
-async def list_playbooks():
-    query = playbooks.select()
-    return await database.fetch_all(query)
+async def list_playbooks(db: AsyncSession = Depends(get_async_session)):
+    query = select(playbooks)
+    result = await db.execute(query)
+    return result.all()
 
 
 @app.get("/api/playbook/{playbook_id}")
-async def read_playbook(playbook_id: int):
-    query = playbooks.select().where(playbooks.c.id == playbook_id)
-    return await database.fetch_one(query)
+async def read_playbook(
+    playbook_id: int, db: AsyncSession = Depends(get_async_session)
+):
+    query = select(playbooks).where(playbooks.c.id == playbook_id)
+    result = await db.execute(query)
+    return result.first()
 
 
 @app.get("/api/inventories/")
-async def list_inventories():
-    query = inventories.select()
-    return await database.fetch_all(query)
+async def list_inventories(db: AsyncSession = Depends(get_async_session)):
+    query = select(inventories)
+    result = await db.execute(query)
+    return result.all()
 
 
 @app.get("/api/inventory/{inventory_id}")
-async def read_inventory(inventory_id: int):
-    query = inventories.select().where(inventories.c.id == inventory_id)
-    return await database.fetch_one(query)
+async def read_inventory(
+    inventory_id: int, db: AsyncSession = Depends(get_async_session)
+):
+    # FIXME(cutwater): Return HTTP 404 if inventory doesn't exist
+    query = select(inventories).where(inventories.c.id == inventory_id)
+    result = await db.execute(query)
+    return result.first()
 
 
 @app.get("/api/rule_set_files/")
@@ -462,12 +476,15 @@ async def read_job_instance_events(job_instance_id: int):
 
 
 @app.get("/api/activation_instance_job_instances/{activation_instance_id}")
-async def read_activation_instance_job_instances(activation_instance_id: int):
-    query1 = activation_instance_job_instances.select(
+async def read_activation_instance_job_instances(
+    activation_instance_id: int, db: AsyncSession = Depends(get_async_session)
+):
+    query = select(activation_instance_job_instances).where(
         activation_instance_job_instances.c.activation_instance_id
         == activation_instance_id
     )
-    return await database.fetch_all(query1)
+    result = await db.execute(query)
+    return result.all()
 
 
 # FastAPI Users
