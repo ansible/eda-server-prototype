@@ -11,12 +11,7 @@ module.exports = merge(common('production'), {
   devtool: 'source-map',
   optimization: {
     minimizer: [
-      new TerserJSPlugin({}),
-      new CssMinimizerPlugin({
-        minimizerOptions: {
-          preset: ['default', { mergeLonghand: false }]
-        }
-      })
+      new TerserJSPlugin({})
     ],
   },
   plugins: [
@@ -28,11 +23,16 @@ module.exports = merge(common('production'), {
   module: {
     rules: [
       {
-        test: /\.css$/,
-        include: [
-          ...stylePaths
+        test: /\.s?[ac]ss$/,
+        use: [
+          MiniCssExtractPlugin.loader,
+          'css-loader',
+          {
+            loader: 'sass-loader',
+
+          },
+          'sass-loader',
         ],
-        use: [MiniCssExtractPlugin.loader, 'css-loader']
       }
     ]
   }

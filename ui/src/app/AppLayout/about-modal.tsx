@@ -9,10 +9,11 @@ import {
 } from '@patternfly/react-core';
 import Logo from '../../assets/images/logo-masthead.svg';
 import { detect } from 'detect-browser';
+import {User} from "@app/shared/types/common-types";
 
 interface IProps {
   isOpen: boolean;
-  user: {email: string};
+  user?: User;
   trademark: string;
   brandImageSrc: string;
   onClose: () => void;

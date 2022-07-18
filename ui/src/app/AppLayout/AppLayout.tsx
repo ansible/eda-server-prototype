@@ -21,7 +21,8 @@ import Logo from '../../assets/images/logo-large.svg';
 import { SmallLogo } from './small-logo';
 import { APPLICATION_TITLE } from '../utils/constants';
 import { StatefulDropdown } from './stateful-dropdown';
-import {getUser, loginUser, logoutUser} from '@app/shared/auth';
+import {getUser, logoutUser} from '@app/shared/auth';
+import {User} from "@app/shared/types/common-types";
 
 interface IAppLayout {
   children: React.ReactNode;
@@ -34,7 +35,7 @@ const AppLayout: React.FunctionComponent<IAppLayout> = ({ children }) => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isNavOpenMobile, setIsNavOpenMobile] = useState(false);
   const [aboutModalVisible, setAboutModalVisible] = useState(false);
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState<User | undefined>(undefined);
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const onPageResize = (props: { mobileView: boolean; windowSize: number }) => {
@@ -63,7 +64,7 @@ const AppLayout: React.FunctionComponent<IAppLayout> = ({ children }) => {
   useEffect(() => {
     getUser()
       .then(response => response.json())
-      .then(data => setUser(data));
+      .then(data => setUser(data || undefined));
   }, []);
 
   if (user) {
@@ -83,7 +84,7 @@ const AppLayout: React.FunctionComponent<IAppLayout> = ({ children }) => {
         aria-label={'logout'}
         onClick={() =>
           logoutUser().then(() => {
-            setUser(null);
+            setUser(undefined);
             window.location.replace(
               baseUrl
             );

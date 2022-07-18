@@ -1,7 +1,5 @@
 import * as React from 'react';
 import { Route, RouteComponentProps, Switch } from 'react-router-dom';
-import { accessibleRouteChangeHandler } from '@app/utils/utils';
-import { Login } from '@app/Login/Login';
 import { Dashboard } from '@app/Dashboard/Dashboard';
 import { Projects } from '@app/Projects/Projects';
 import { Project } from '@app/Project/Project';
@@ -22,7 +20,6 @@ import { Playbook } from '@app/Playbook/Playbook';
 import { NotFound } from '@app/NotFound/NotFound';
 import { useDocumentTitle } from '@app/utils/useDocumentTitle';
 
-let routeFocusTimer: number;
 export interface IAppRoute {
   label?: string; // Excluding the label will exclude the route from the nav sidebar in AppLayout
   /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -152,7 +149,7 @@ const routes: AppRouteConfig[] = [
   }
 ];
 
-const RouteWithTitleUpdates = ({ component: Component, isAsync = false, title, ...rest }: IAppRoute) => {
+const RouteWithTitleUpdates = ({ component: Component, title, ...rest }: IAppRoute) => {
   useDocumentTitle(title);
 
   function routeWithTitle(routeProps: RouteComponentProps) {

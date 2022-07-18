@@ -14,7 +14,6 @@ import styled from 'styled-components';
 import {getServer} from '@app/utils/utils';
 import {TopToolbar} from "@app/shared/top-toolbar";
 
-
 const CardBody = styled(PFCardBody)`
   white-space: pre-wrap;
   `
@@ -33,7 +32,7 @@ client.onopen = () => {
 const Dashboard: React.FunctionComponent = () => {
 
 
-  const [stdout, setStdout] = useState([]);
+  const [stdout, setStdout] = useState<never[]>([]);
 
 
   client.onmessage = (message) => {
@@ -44,7 +43,8 @@ const Dashboard: React.FunctionComponent = () => {
             const { stdout: dataStdout } = data;
             console.log(data);
             console.log(dataStdout);
-            setStdout([...stdout, dataStdout])
+            // @ts-ignore
+          setStdout([...stdout, dataStdout])
         }
   }
 
