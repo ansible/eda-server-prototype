@@ -45,13 +45,14 @@ const NewProject: React.FunctionComponent = () => {
 
   return (
   <React.Fragment>
-    <TopToolbar>
-      <Breadcrumbs breadcrumbs={[
+    <TopToolbar
+      breadcrumbs={[
         {
           title: 'Projects',
           to: '/projects'
         }
-      ]}/>
+        ]
+      }>
       <Title headingLevel={"h2"}>New project</Title>
     </TopToolbar>
     <PageSection>

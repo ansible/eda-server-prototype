@@ -35,7 +35,7 @@ h2.pf-c-nav__section-title {
   flex-direction: column;
 }
 
-.breadcrumb-container {
+.banner-container {
   padding-top: 0px;
   padding-bottom: 0px;
 }
