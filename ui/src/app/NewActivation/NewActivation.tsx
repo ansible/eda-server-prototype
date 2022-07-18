@@ -88,43 +88,56 @@ const NewActivation: React.FunctionComponent = () => {
 
   return (
   <React.Fragment>
-    <TopToolbar>
+    <TopToolbar
+      breadcrumbs={[
+        {
+          title: 'Activations',
+          to: '/activations'
+        }
+      ]
+      }>
       <Title headingLevel={"h2"}>New activation</Title>
     </TopToolbar>
-     <Form>
-        <FormGroup label="Name"  fieldId={`activation-name`}>
-          <TextInput
-            id="activation-name"
-            onChange={setName}
-            value={name}
-          />
-        </FormGroup>
-        <FormGroup label="Rule Set"  fieldId={`rule-set-${ruleset}`}>
-          <FormSelect value={ruleset} onChange={setRuleSet} aria-label="FormSelect Input">
-        {rules.map((option, index) => (
-          <FormSelectOption key={index} value={option.id} label={"" + option.id + " "+ option.name} />
-        ))}
-      </FormSelect>
-        </FormGroup>
-        <FormGroup label="Inventory" fieldId={'activation-name'}>
-          <FormSelect value={inventory} onChange={setInventory} aria-label="FormSelect Input2">
-        {inventories.map((option, index) => (
-          <FormSelectOption key={index} value={option.id} label={"" + option.id + " "+ option.name} />
-        ))}
-      </FormSelect>
-        </FormGroup>
-        <FormGroup label="Extra Vars" fieldId={'activation-vars'}>
-          <FormSelect value={extravar} onChange={setExtraVar} aria-label="FormSelect Input3">
-        {extravars.map((option, index) => (
-          <FormSelectOption key={index} value={option.id} label={"" + option.id + " "+ option.name} />
-        ))}
-      </FormSelect>
-        </FormGroup>
-        <ActionGroup>
-          <Button variant="primary" onClick={handleSubmit}>Submit</Button>
-          <Button variant="link">Cancel</Button>
-        </ActionGroup>
-      </Form>
+    <PageSection>
+      <Card>
+        <CardBody>
+          <Form>
+            <FormGroup label="Name"  fieldId={`activation-name`}>
+              <TextInput
+                id="activation-name"
+                onChange={setName}
+                value={name}
+              />
+          </FormGroup>
+            <FormGroup label="Rule Set"  fieldId={`rule-set-${ruleset}`}>
+              <FormSelect value={ruleset} onChange={setRuleSet} aria-label="FormSelect Input">
+            {rules.map((option, index) => (
+              <FormSelectOption key={index} value={option.id} label={"" + option.id + " "+ option.name} />
+            ))}
+          </FormSelect>
+            </FormGroup>
+            <FormGroup label="Inventory" fieldId={'activation-name'}>
+              <FormSelect value={inventory} onChange={setInventory} aria-label="FormSelect Input2">
+            {inventories.map((option, index) => (
+              <FormSelectOption key={index} value={option.id} label={"" + option.id + " "+ option.name} />
+            ))}
+          </FormSelect>
+            </FormGroup>
+            <FormGroup label="Extra Vars" fieldId={'activation-vars'}>
+              <FormSelect value={extravar} onChange={setExtraVar} aria-label="FormSelect Input3">
+            {extravars.map((option, index) => (
+              <FormSelectOption key={index} value={option.id} label={"" + option.id + " "+ option.name} />
+            ))}
+          </FormSelect>
+            </FormGroup>
+            <ActionGroup>
+              <Button variant="primary" onClick={handleSubmit}>Save</Button>
+              <Button variant="link">Cancel</Button>
+            </ActionGroup>
+          </Form>
+        </CardBody>
+      </Card>
+    </PageSection>
   </React.Fragment>
 )
 }

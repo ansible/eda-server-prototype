@@ -4,11 +4,7 @@ import React, { useState, useEffect } from 'react';
 import {
   Card,
   CardBody as PFCardBody,
-  CardTitle,
   SimpleList as PFSimpleList,
-  SimpleListItem,
-  Stack,
-  StackItem,
 } from '@patternfly/react-core';
 import { ActionGroup, Button, Form, FormGroup, TextInput } from '@patternfly/react-core';
 import { postData } from '@app/utils/utils';
@@ -16,7 +12,6 @@ import {getServer} from '@app/utils/utils';
 
 import styled from 'styled-components';
 import {TopToolbar} from "@app/shared/top-toolbar";
-import Breadcrumbs from '@app/shared/breadcrumbs';
 
 
 const CardBody = styled(PFCardBody)`
@@ -70,7 +65,7 @@ const NewProject: React.FunctionComponent = () => {
             />
           </FormGroup>
           <ActionGroup>
-            <Button variant="primary" onClick={handleSubmit}>Submit</Button>
+            <Button variant="primary" onClick={handleSubmit}>Save</Button>
             <Button variant="link">Cancel</Button>
           </ActionGroup>
         </Form>
