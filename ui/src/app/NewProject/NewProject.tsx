@@ -16,6 +16,7 @@ import {getServer} from '@app/utils/utils';
 
 import styled from 'styled-components';
 import {TopToolbar} from "@app/shared/top-toolbar";
+import Breadcrumbs from '@app/shared/breadcrumbs';
 
 
 const CardBody = styled(PFCardBody)`
@@ -45,24 +46,36 @@ const NewProject: React.FunctionComponent = () => {
   return (
   <React.Fragment>
     <TopToolbar>
+      <Breadcrumbs breadcrumbs={[
+        {
+          title: 'Projects',
+          to: '/projects'
+        }
+      ]}/>
       <Title headingLevel={"h2"}>New project</Title>
     </TopToolbar>
-     <Form>
-        <FormGroup
-          label="Git URL"
-          fieldId="url-1"
-        >
-          <TextInput
-            onChange={setValue}
-            value={value}
-            id="url-1"
-          />
-        </FormGroup>
-        <ActionGroup>
-          <Button variant="primary" onClick={handleSubmit}>Submit</Button>
-          <Button variant="link">Cancel</Button>
-        </ActionGroup>
-      </Form>
+    <PageSection>
+      <Card>
+        <CardBody>
+        <Form>
+          <FormGroup
+            label="Git URL"
+            fieldId="url-1"
+          >
+            <TextInput
+              onChange={setValue}
+              value={value}
+              id="url-1"
+            />
+          </FormGroup>
+          <ActionGroup>
+            <Button variant="primary" onClick={handleSubmit}>Submit</Button>
+            <Button variant="link">Cancel</Button>
+          </ActionGroup>
+        </Form>
+        </CardBody>
+      </Card>
+    </PageSection>
   </React.Fragment>
 )
 }

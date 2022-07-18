@@ -34,6 +34,11 @@ h2.pf-c-nav__section-title {
   display: flex;
   flex-direction: column;
 }
+
+.breadcrumb-container {
+  padding-top: 0px;
+  padding-bottom: 0px;
+}
 `;
 
 export default GlobalStyle;

@@ -11,10 +11,9 @@ import {
 import Breadcrumbs from './breadcrumbs';
 
 export const TopToolbar = ({ children, breadcrumbs }) => (
-  <PageSection variant={PageSectionVariants.light}
-  >
+  <PageSection variant={PageSectionVariants.light}>
     {breadcrumbs && (
-      <Level className="pf-u-mb-md">
+      <Level className="pf-u-mb-md-pb-lg" >
         <Breadcrumbs breadcrumbs={breadcrumbs} />
       </Level>
     )}
