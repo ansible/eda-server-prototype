@@ -9,7 +9,7 @@ import { Activation } from '@app/Activation/Activation';
 import { NewActivation } from '@app/NewActivation/NewActivation';
 import { Jobs } from '@app/Jobs/Jobs';
 import { Job } from '@app/Job/Job';
-import { RuleSetFiles } from '@app/RuleSetFiles/RuleSetFiles';
+import { RuleSets } from '@app/RuleSetFiles/RuleSetFiles';
 import { RuleSetFile } from '@app/RuleSetFile/RuleSetFile';
 import { Inventories } from '@app/Inventories/Inventories';
 import { Inventory } from '@app/Inventory/Inventory';
@@ -96,7 +96,7 @@ const routes: AppRouteConfig[] = [
     title: 'Job',
   },
   {
-    component: RuleSetFiles,
+    component: RuleSets,
     exact: true,
     label: 'Rules Files',
     path: '/rulesetfiles',
