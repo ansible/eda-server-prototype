@@ -218,7 +218,7 @@ async def create_inventory(i: Inventory):
 
 @app.post("/api/extra_vars/")
 async def create_extra_vars(e: Extravars):
-    query = extra_vars.insert().values(name=e.name, extra_var=e.extra_var)
+    query = extra_vars.insert().values(name=e.name, extra_vars=e.extra_vars)
     last_record_id = await database.execute(query)
     return {**e.dict(), "id": last_record_id}
 
@@ -385,49 +385,66 @@ async def read_inventory(
 
 
 @app.get("/api/rule_set_files/")
-async def list_rule_set_files():
-    query = rule_set_files.select()
-    return await database.fetch_all(query)
+async def list_rule_set_files(db: AsyncSession = Depends(get_async_session)):
+    query = select(rule_set_files)
+    result = await db.execute(query)
+    return result.all()
 
 
 @app.get("/api/rule_set_file/{rule_set_file_id}")
-async def read_rule_set_file(rule_set_file_id: int):
-    query = rule_set_files.select().where(
+async def read_rule_set_file(
+    rule_set_file_id: int, db: AsyncSession = Depends(get_async_session)
+):
+    query = select(rule_set_files).where(
         rule_set_files.c.id == rule_set_file_id
     )
-    return await database.fetch_one(query)
+    result = await db.execute(query)
+    return result.first()
 
 
 @app.get("/api/rule_set_file_json/{rule_set_file_id}")
-async def read_rule_set_file_json(rule_set_file_id: int):
-    query = rule_set_files.select().where(
+async def read_rule_set_file_json(
+    rule_set_file_id: int, db: AsyncSession = Depends(get_async_session)
+):
+    query = select(rule_set_files).where(
         rule_set_files.c.id == rule_set_file_id
     )
-    result = dict(await database.fetch_one(query))
-    result["rulesets"] = yaml.safe_load(result["rulesets"])
-    return result
+    result = await db.execute(query)
+
+    response = dict(result.first())
+    response["rulesets"] = yaml.safe_load(response["rulesets"])
+    return response
 
 
 @app.get("/api/extra_vars/")
-async def list_extra_vars():
-    query = extra_vars.select()
-    return await database.fetch_all(query)
+async def list_extra_vars(db: AsyncSession = Depends(get_async_session)):
+    query = select(extra_vars)
+    result = await db.execute(query)
+    return result.all()
 
 
 @app.get("/api/extra_var/{extra_var_id}")
-async def read_extravar(extra_var_id: int):
-    query = extra_vars.select().where(extra_vars.c.id == extra_var_id)
-    return await database.fetch_one(query)
+async def read_extravar(
+    extra_var_id: int, db: AsyncSession = Depends(get_async_session)
+):
+    query = select(extra_vars).where(extra_vars.c.id == extra_var_id)
+    result = await db.execute(query)
+    return result.first()
 
 
 @app.get("/api/activation_instances/")
-async def list_activation_instances():
-    query = activation_instances.select()
-    return await database.fetch_all(query)
+async def list_activation_instances(
+    db: AsyncSession = Depends(get_async_session),
+):
+    query = select(activation_instances)
+    result = await db.execute(query)
+    return result.all()
 
 
 @app.get("/api/activation_instance/{activation_instance_id}")
-async def read_activation_instance(activation_instance_id: int):
+async def read_activation_instance(
+    activation_instance_id: int, db: AsyncSession = Depends(get_async_session)
+):
     query = (
         select(
             activation_instances.c.id,
@@ -446,33 +463,37 @@ async def read_activation_instance(activation_instance_id: int):
         )
         .where(activation_instances.c.id == activation_instance_id)
     )
-    result = dict(await database.fetch_one(query))
-    print(dict(result))
-    return result
+    result = await db.execute(query)
+    return result.first()
 
 
 @app.get("/api/job_instances/")
-async def list_job_instances():
-    query = job_instances.select()
-    return await database.fetch_all(query)
+async def list_job_instances(db: AsyncSession = Depends(get_async_session)):
+    query = select(job_instances)
+    result = await db.execute(query)
+    return result.all()
 
 
 @app.get("/api/job_instance/{job_instance_id}")
-async def read_job_instance(job_instance_id: int):
-    query = job_instances.select().where(job_instances.c.id == job_instance_id)
-    return await database.fetch_one(query)
+async def read_job_instance(
+    job_instance_id: int, db: AsyncSession = Depends(get_async_session)
+):
+    query = select(job_instances).where(job_instances.c.id == job_instance_id)
+    result = await db.execute(query)
+    return result.first()
 
 
 @app.get("/api/job_instance_events/{job_instance_id}")
-async def read_job_instance_events(job_instance_id: int):
-    query1 = job_instances.select().where(
-        job_instances.c.id == job_instance_id
-    )
-    job = await database.fetch_one(query1)
-    query2 = job_instance_events.select().where(
+async def read_job_instance_events(
+    job_instance_id: int, db: AsyncSession = Depends(get_async_session)
+):
+    query = select(job_instances).where(job_instances.c.id == job_instance_id)
+    job = (await db.execute(query)).first()
+
+    query = select(job_instance_events).where(
         job_instance_events.c.job_uuid == job.uuid
     )
-    return await database.fetch_all(query2)
+    return (await db.execute(query)).all()
 
 
 @app.get("/api/activation_instance_job_instances/{activation_instance_id}")
