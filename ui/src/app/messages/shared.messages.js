@@ -70,6 +70,26 @@ const sharedMessages = defineMessages({
   deleteProjectTitle: {
     id: 'project.deleteProject',
     defaultMessage: 'Delete project'
+  },
+  activation: {
+    id: 'activation.activation',
+    defaultMessage: 'Activation'
+  },
+  activations: {
+    id: 'activation.activations',
+    defaultMessage: 'Activations'
+  },
+  noactivations: {
+    id: 'activation.noactivations',
+    defaultMessage: 'No activations'
+  },
+  addActivation: {
+    id: 'activation.addActivation',
+    defaultMessage: 'Add activation'
+  },
+  deleteActivationTitle: {
+    id: 'activation.deleteActivation',
+    defaultMessage: 'Delete activation'
   }
 });
 
