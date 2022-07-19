@@ -8,7 +8,7 @@ from fastapi import Depends, FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
-from sqlalchemy import select
+from sqlalchemy import insert, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from .database import database, get_async_session
@@ -146,7 +146,9 @@ async def websocket_endpoint(websocket: WebSocket):
 
 
 @app.websocket("/api/ws2")
-async def websocket_endpoint2(websocket: WebSocket):
+async def websocket_endpoint2(
+    websocket: WebSocket, db: AsyncSession = Depends(get_async_session)
+):
     print("starting ws2")
     await websocket.accept()
     try:
@@ -154,28 +156,33 @@ async def websocket_endpoint2(websocket: WebSocket):
             data = await websocket.receive_text()
             data = json.loads(data)
             print(data)
+            # TODO(cutwater): Some data validation is needed
             data_type = data.get("type")
             if data_type == "Job":
-                query = job_instances.insert().values(uuid=data.get("job_id"))
-                last_record_id = await database.execute(query)
+                query = insert(job_instances).values(uuid=data.get("job_id"))
+                result = await db.execute(query)
+                (job_instance_id,) = result.inserted_primary_key
+
                 activation_instance_id = int(data.get("ansible_events_id"))
-                query = activation_instance_job_instances.insert().values(
-                    job_instance_id=last_record_id,
+                query = insert(activation_instance_job_instances).values(
+                    job_instance_id=job_instance_id,
                     activation_instance_id=activation_instance_id,
                 )
-                await database.execute(query)
+                await db.execute(query)
+                await db.commit()
                 await updatemanager.broadcast(
                     f"/activation_instance/{activation_instance_id}",
-                    json.dumps(["Job", dict(id=last_record_id)]),
+                    json.dumps(["Job", {"id": job_instance_id}]),
                 )
             elif data_type == "AnsibleEvent":
                 event_data = data.get("event", {})
-                query = job_instance_events.insert().values(
+                query = insert(job_instance_events).values(
                     job_uuid=event_data.get("job_id"),
                     counter=event_data.get("counter"),
                     stdout=event_data.get("stdout"),
                 )
-                await database.execute(query)
+                await db.execute(query)
+                await db.commit()
             print(data)
     except WebSocketDisconnect:
         pass
@@ -201,26 +208,36 @@ def ping():
 
 
 @app.post("/api/rule_set_file/")
-async def create_rule_set_file(rsf: RuleSetFile):
-    query = rule_set_files.insert().values(
-        name=rsf.name, rulesets=rsf.rulesets
-    )
-    last_record_id = await database.execute(query)
-    return {**rsf.dict(), "id": last_record_id}
+async def create_rule_set_file(
+    rsf: RuleSetFile, db: AsyncSession = Depends(get_async_session)
+):
+    query = insert(rule_set_files).values(name=rsf.name, rulesets=rsf.rulesets)
+    result = await db.execute(query)
+    await db.commit()
+    (id_,) = result.inserted_primary_key
+    return {**rsf.dict(), "id": id_}
 
 
 @app.post("/api/inventory/")
-async def create_inventory(i: Inventory):
-    query = inventories.insert().values(name=i.name, inventory=i.inventory)
-    last_record_id = await database.execute(query)
-    return {**i.dict(), "id": last_record_id}
+async def create_inventory(
+    i: Inventory, db: AsyncSession = Depends(get_async_session)
+):
+    query = insert(inventories).values(name=i.name, inventory=i.inventory)
+    result = await db.execute(query)
+    await db.commit()
+    (id_,) = result.inserted_primary_key
+    return {**i.dict(), "id": id_}
 
 
 @app.post("/api/extra_vars/")
-async def create_extra_vars(e: Extravars):
-    query = extra_vars.insert().values(name=e.name, extra_vars=e.extra_vars)
-    last_record_id = await database.execute(query)
-    return {**e.dict(), "id": last_record_id}
+async def create_extra_vars(
+    e: Extravars, db: AsyncSession = Depends(get_async_session)
+):
+    query = insert(extra_vars).values(name=e.name, extra_var=e.extra_var)
+    result = await db.execute(query)
+    await db.commit()
+    (id_,) = result.inserted_primary_key
+    return {**e.dict(), "id": id_}
 
 
 @app.post("/api/activation_instance/")
@@ -317,31 +334,48 @@ async def create_project(p: Project):
 
 
 @app.get("/api/project/{project_id}")
-async def read_project(project_id: int):
-    query = projects.select().where(projects.c.id == project_id)
-    result = dict(await database.fetch_one(query))
-    result["rulesets"] = await database.fetch_all(
-        select(rule_set_files.c.id, rule_set_files.c.name)
-        .select_from(projects.join(project_rules).join(rule_set_files))
-        .where(projects.c.id == project_id)
-    )
-    result["inventories"] = await database.fetch_all(
-        select(inventories.c.id, inventories.c.name)
-        .select_from(projects.join(project_inventories).join(inventories))
-        .where(projects.c.id == project_id)
-    )
-    result["vars"] = await database.fetch_all(
-        select(extra_vars.c.id, extra_vars.c.name)
-        .select_from(projects.join(project_vars).join(extra_vars))
-        .where(projects.c.id == project_id)
-    )
-    result["playbooks"] = await database.fetch_all(
-        select(playbooks.c.id, playbooks.c.name)
-        .select_from(projects.join(project_playbooks).join(playbooks))
-        .where(projects.c.id == project_id)
-    )
-    print(result)
-    return result
+async def read_project(
+    project_id: int, db: AsyncSession = Depends(get_async_session)
+):
+    # FIXME(cutwater): Return HTTP 404 if project doesn't exist
+    query = select(projects).where(projects.c.id == project_id)
+    project = (await db.execute(query)).first()
+
+    response = dict(project)
+
+    response["rulesets"] = (
+        await db.execute(
+            select(rule_set_files.c.id, rule_set_files.c.name)
+            .select_from(projects.join(project_rules).join(rule_set_files))
+            .where(projects.c.id == project_id)
+        )
+    ).all()
+
+    response["inventories"] = (
+        await db.execute(
+            select(inventories.c.id, inventories.c.name)
+            .select_from(projects.join(project_inventories).join(inventories))
+            .where(projects.c.id == project_id)
+        )
+    ).all()
+
+    response["vars"] = (
+        await db.execute(
+            select(extra_vars.c.id, extra_vars.c.name)
+            .select_from(projects.join(project_vars).join(extra_vars))
+            .where(projects.c.id == project_id)
+        )
+    ).all()
+
+    response["playbooks"] = (
+        await db.execute(
+            select(playbooks.c.id, playbooks.c.name)
+            .select_from(projects.join(project_playbooks).join(playbooks))
+            .where(projects.c.id == project_id)
+        )
+    ).all()
+
+    return response
 
 
 @app.get("/api/projects/")
