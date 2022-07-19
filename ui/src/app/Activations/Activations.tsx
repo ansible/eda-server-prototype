@@ -29,10 +29,11 @@ const columns = (intl, selectedAll, selectAll) => [
     title: (
       <Checkbox onChange={selectAll} isChecked={selectedAll} id="select-all" />
     ),
-    transforms: [cellWidth(1)]
+    transforms: [cellWidth(10 )]
   },
   {
-    title: intl.formatMessage(sharedMessages.name)
+  title: (intl.formatMessage(sharedMessages.name)),
+    transforms: [cellWidth(80 )]
   }
 ];
 
