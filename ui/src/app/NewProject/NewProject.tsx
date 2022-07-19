@@ -4,11 +4,7 @@ import React, { useState, useEffect } from 'react';
 import {
   Card,
   CardBody as PFCardBody,
-  CardTitle,
   SimpleList as PFSimpleList,
-  SimpleListItem,
-  Stack,
-  StackItem,
 } from '@patternfly/react-core';
 import { ActionGroup, Button, Form, FormGroup, TextInput } from '@patternfly/react-core';
 import { postData } from '@app/utils/utils';
@@ -44,25 +40,38 @@ const NewProject: React.FunctionComponent = () => {
 
   return (
   <React.Fragment>
-    <TopToolbar>
+    <TopToolbar
+      breadcrumbs={[
+        {
+          title: 'Projects',
+          to: '/projects'
+        }
+        ]
+      }>
       <Title headingLevel={"h2"}>New project</Title>
     </TopToolbar>
-     <Form>
-        <FormGroup
-          label="Git URL"
-          fieldId="url-1"
-        >
-          <TextInput
-            onChange={setValue}
-            value={value}
-            id="url-1"
-          />
-        </FormGroup>
-        <ActionGroup>
-          <Button variant="primary" onClick={handleSubmit}>Submit</Button>
-          <Button variant="link">Cancel</Button>
-        </ActionGroup>
-      </Form>
+    <PageSection>
+      <Card>
+        <CardBody>
+        <Form>
+          <FormGroup
+            label="Git URL"
+            fieldId="url-1"
+          >
+            <TextInput
+              onChange={setValue}
+              value={value}
+              id="url-1"
+            />
+          </FormGroup>
+          <ActionGroup>
+            <Button variant="primary" onClick={handleSubmit}>Save</Button>
+            <Button variant="link">Cancel</Button>
+          </ActionGroup>
+        </Form>
+        </CardBody>
+      </Card>
+    </PageSection>
   </React.Fragment>
 )
 }

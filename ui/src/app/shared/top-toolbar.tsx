@@ -5,18 +5,21 @@ import {
   LevelItem,
   PageSection,
   PageSectionVariants,
+  Stack,
+  StackItem,
   Text,
   TextContent, TextVariants, Title,
 } from '@patternfly/react-core';
 import Breadcrumbs from './breadcrumbs';
 
 export const TopToolbar = ({ children, breadcrumbs }) => (
-  <PageSection variant={PageSectionVariants.light}
-  >
-    {breadcrumbs && (
-      <Level className="pf-u-mb-md">
-        <Breadcrumbs breadcrumbs={breadcrumbs} />
-      </Level>
+  <PageSection variant={PageSectionVariants.light}>
+     {breadcrumbs && (
+       <Level>
+         <LevelItem>
+            <Breadcrumbs breadcrumbs={breadcrumbs} />
+         </LevelItem>
+       </Level>
     )}
     {children}
   </PageSection>
