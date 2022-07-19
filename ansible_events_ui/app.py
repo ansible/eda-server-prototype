@@ -341,13 +341,17 @@ async def list_tasks():
 
 
 @app.post("/api/project/")
-async def create_project(p: Project):
+async def create_project(
+    p: Project, db: AsyncSession = Depends(get_async_session)
+):
     found_hash, tempdir = await clone_project(p.url, p.git_hash)
     p.git_hash = found_hash
-    query = projects.insert().values(url=p.url, git_hash=p.git_hash)
-    last_record_id = await database.execute(query)
-    await sync_project(last_record_id, tempdir)
-    return {**p.dict(), "id": last_record_id}
+    query = insert(projects).values(url=p.url, git_hash=p.git_hash)
+    result = await db.execute(query)
+    (project_id,) = result.inserted_primary_key
+    await sync_project(project_id, tempdir, db)
+    await db.commit()
+    return {**p.dict(), "id": project_id}
 
 
 @app.get("/api/project/{project_id}")
