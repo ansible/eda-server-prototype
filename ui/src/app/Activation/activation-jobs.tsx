@@ -1,48 +1,20 @@
-import { PageSection, Title } from '@patternfly/react-core';
-import { Link, Route, Switch, useParams } from 'react-router-dom';
+import {CardBody, PageSection, Title} from '@patternfly/react-core';
+import { Link, useParams } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
 import Ansi from "ansi-to-react";
 import {
   Card,
-  CardBody as PFCardBody,
   CardTitle,
-  SimpleList as PFSimpleList,
   SimpleListItem,
   Stack,
   StackItem,
 } from '@patternfly/react-core';
-import styled from 'styled-components';
 import {getServer} from '@app/utils/utils';
-import { Button } from '@patternfly/react-core';
-import { PlayIcon, PauseIcon } from '@patternfly/react-icons';
-import {TopToolbar} from "@app/shared/top-toolbar";
-import AppTabs from "@app/shared/app-tabs";
-import {ActivationDetails} from "@app/Activation/activation-details";
-import {ActivationJobs} from "@app/Activation/activation-jobs";
-
-const activation_tabs = [
-  {
-    eventKey: 0,
-    title: 'Details',
-    name: '/activation/details'
-  },
-  {
-    eventKey: 1,
-    title: 'Jobs',
-    name: '/activation/jobs'
-  }
-];
 
 const client = new WebSocket('ws://' + getServer() + '/api/ws');
-
-client.onopen = () => {
-    console.log('Websocket client connected');
-};
-
-const endpoint1 = 'http://' + getServer() + '/api/activation_instance/';
 const endpoint2 = 'http://' + getServer() + '/api/activation_instance_job_instances/';
 
-const Activation: React.FunctionComponent = () => {
+const ActivationJobs: React.FunctionComponent = () => {
 
   const [activation, setActivation] = useState([]);
 
@@ -78,13 +50,6 @@ const Activation: React.FunctionComponent = () => {
         }
     }
   }, []);
-
-  useEffect(() => {
-    console.log(["newStdout: ",  newStdout]);
-    console.log(["stdout: ",  stdout]);
-    setStdout([...stdout, newStdout]);
-  }, [newStdout]);
-
   const [jobs, setJobs] = useState([]);
   const [newJob, setNewJob] = useState([]);
 
@@ -118,25 +83,23 @@ const Activation: React.FunctionComponent = () => {
   }, [newJob]);
 
   return (
-  <React.Fragment>
-    <TopToolbar>
-      <Title headingLevel={"h2"}>{`Activation ${activation.name}`}</Title>
-    </TopToolbar>
-
     <Stack>
-      <AppTabs tabItems={activation_tabs}/>
-      <StackItem className="pf-u-pl-lg pf-u-pr-lg pf-u-mb-lg pf-u-mt-0 pf-u-pt-0">
-        <Switch>
-          <Route
-            path={`/activation/jobs`}
-            component={ActivationJobs}
-          />
-          <Route path={'/activation'} component={ActivationDetails} />
-        </Switch>
+      <StackItem>
+        <Card>
+          <CardTitle>Jobs</CardTitle>
+          <CardBody>
+            {jobs.length !== 0 && (
+              <SimpleList style={{whiteSpace: 'pre-wrap'}}>
+                {jobs.map((item, i) => (
+                  <SimpleListItem key={i}><Link to={"/job/" + item.id}>{item.id} </Link></SimpleListItem>
+                ))}
+              </SimpleList>
+            )}
+          </CardBody>
+        </Card>
       </StackItem>
     </Stack>
-  </React.Fragment>
-)
+  );
 }
 
-export { Activation };
+export { ActivationJobs };
