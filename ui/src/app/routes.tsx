@@ -6,6 +6,8 @@ import { Project } from '@app/Project/Project';
 import { NewProject } from '@app/NewProject/NewProject';
 import { Activations } from '@app/Activations/Activations';
 import { Activation } from '@app/Activation/Activation';
+import { ActivationDetails } from '@app/Activation/activation-details';
+import { ActivationJobs } from '@app/Activation/activation-jobs';
 import { NewActivation } from '@app/NewActivation/NewActivation';
 import { Jobs } from '@app/Jobs/Jobs';
 import { Job } from '@app/Job/Job';
@@ -75,6 +77,18 @@ const routes: AppRouteConfig[] = [
     component: Activation,
     exact: true,
     path: '/activation/:id',
+    title: 'Activation',
+  },
+  {
+    component: ActivationDetails,
+    exact: true,
+    path: '/activation/:id',
+    title: 'Activation',
+  },
+  {
+    component: ActivationJobs,
+    exact: true,
+    path: '/activation/:id/job-instances',
     title: 'Activation',
   },
   {

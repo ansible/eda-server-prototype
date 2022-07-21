@@ -1,4 +1,4 @@
-import {CardBody, PageSection, Title} from '@patternfly/react-core';
+import {CardBody, PageSection, SimpleList, Title} from '@patternfly/react-core';
 import { Link, useParams } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
 import Ansi from "ansi-to-react";

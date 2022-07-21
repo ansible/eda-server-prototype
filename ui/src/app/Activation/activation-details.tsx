@@ -1,4 +1,4 @@
-import { PageSection, Title } from '@patternfly/react-core';
+import {CardBody, PageSection, Title} from '@patternfly/react-core';
 import { Link, useParams } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
 import Ansi from "ansi-to-react";
@@ -10,6 +10,7 @@ import {
   StackItem,
 } from '@patternfly/react-core';
 import {getServer} from '@app/utils/utils';
+import {SimpleList} from "@patternfly/react-core/dist/js";
 
 const client = new WebSocket('ws://' + getServer() + '/api/ws');
 
@@ -64,15 +65,6 @@ const ActivationDetails: React.FunctionComponent = () => {
 
   const [jobs, setJobs] = useState([]);
   const [newJob, setNewJob] = useState([]);
-
-  useEffect(() => {
-     fetch(endpoint2 + id, {
-       headers: {
-         'Content-Type': 'application/json',
-       },
-     }).then(response => response.json())
-    .then(data => setJobs(data));
-  }, []);
 
   const [update_client, setUpdateClient] = useState([]);
   useEffect(() => {
