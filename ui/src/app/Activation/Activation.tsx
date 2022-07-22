@@ -1,20 +1,11 @@
-import { PageSection, Title } from '@patternfly/react-core';
+import {PageSection, Tab, Tabs, Title} from '@patternfly/react-core';
 import { Link, Route, Switch, useParams } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
-import Ansi from "ansi-to-react";
 import {
-  Card,
-  CardBody as PFCardBody,
-  CardTitle,
-  SimpleList as PFSimpleList,
-  SimpleListItem,
   Stack,
   StackItem,
 } from '@patternfly/react-core';
-import styled from 'styled-components';
 import {getServer} from '@app/utils/utils';
-import { Button } from '@patternfly/react-core';
-import { PlayIcon, PauseIcon } from '@patternfly/react-icons';
 import {TopToolbar} from "@app/shared/top-toolbar";
 import AppTabs from "@app/shared/app-tabs";
 import {ActivationDetails} from "@app/Activation/activation-details";
@@ -124,7 +115,18 @@ const Activation: React.FunctionComponent = () => {
     </TopToolbar>
 
     <Stack>
-      <AppTabs tabItems={activation_tabs}/>
+      <Tabs>
+        {activation_tabs.map((item) => (
+          <Tab
+            title={item.title}
+            key={item.eventKey}
+            eventKey={item.eventKey}
+            name={item.name}
+            disabled={item.disabled}
+          />
+        ))}
+      </Tabs>
+
       <StackItem className="pf-u-pl-lg pf-u-pr-lg pf-u-mb-lg pf-u-mt-0 pf-u-pt-0">
         <Switch>
           <Route
