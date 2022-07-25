@@ -1,5 +1,12 @@
+# Python: Byte code
+__pycache__/
+
+# Python: Packaging
+build/
+dist/
 *.egg-info
-*.pyc
+
+
 *.db
 .env
 /venv
