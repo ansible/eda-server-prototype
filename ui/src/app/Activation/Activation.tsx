@@ -1,4 +1,4 @@
-import {PageSection, Tab, Tabs, Title} from '@patternfly/react-core';
+import {Card, CardBody, PageSection, Tab, Tabs, Title} from '@patternfly/react-core';
 import { Link, Route, Switch, useParams } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
 import {
@@ -121,21 +121,23 @@ const Activation: React.FunctionComponent = () => {
   return (
   <React.Fragment>
     <TopToolbar>
-      <Title headingLevel={"h2"}>{`Activation ${activation.name}`}</Title>
+      <Title headingLevel={"h2"}>{`${activation.name}`}</Title>
     </TopToolbar>
-
-    <Stack>
-      { renderActivationTabs(id) }
-      <StackItem className="pf-u-pl-lg pf-u-pr-lg pf-u-mb-lg pf-u-mt-0 pf-u-pt-0">
-        <Switch>
-          <Route
-            path={`/activation/${id}/jobs`}
-            component={ActivationJobs}
-          />
-          <Route path={`/activation/${id}/details`} component={ActivationDetails} />
-        </Switch>
-      </StackItem>
-    </Stack>
+    <PageSection page-type={'activation-tabs'} id={'activation-tabs'}>
+      <Stack>
+        { renderActivationTabs(id) }
+        <StackItem className="pf-u-pl-lg pf-u-pr-lg pf-u-mb-lg pf-u-mt-0 pf-u-pt-0">
+          <Switch>
+            <Route
+              path={`/activation/${id}/jobs`}
+              component={ActivationJobs}
+            />
+            <Route exact path={`/activation/${id}/details`} component={ActivationDetails} />
+            <Route exact path={`/activation/${id}`} component={ActivationDetails} />
+          </Switch>
+        </StackItem>
+      </Stack>
+    </PageSection>
   </React.Fragment>
 )
 }

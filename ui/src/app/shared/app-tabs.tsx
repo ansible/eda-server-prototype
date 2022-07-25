@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 import React from 'react';
-import { Tabs, Tab } from '@patternfly/react-core';
+import {Tabs, Tab, PageSection} from '@patternfly/react-core';
 import {useHistory, useLocation} from 'react-router-dom';
 
 export interface AppTabsProps {
@@ -21,8 +21,11 @@ const AppTabs: React.ComponentType<AppTabsProps> = ({ tabItems }) => {
 
   return (
     <Tabs
-      activeKey={activeTab ? activeTab.eventKey : 0}
+      activeKey={activeTab ? activeTab.eventKey : 1}
       onSelect={handleTabClick}
+      style={{
+        backgroundColor: 'var(--pf-global--palette--white)'
+      }}
     >
       {tabItems.map((item) => (
         <Tab

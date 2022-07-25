@@ -79,7 +79,7 @@ const ActivationDetails: React.FunctionComponent = () => {
       <Title headingLevel={"h2"}>{`Activation ${activation.name}`}</Title>
     </TopToolbar>
 
-    <Stack>
+    <PageSection page-type={'activation-details'} id={'activation-details'}>
       { renderActivationTabs(id) }
       <Stack>
         <StackItem>
@@ -92,7 +92,7 @@ const ActivationDetails: React.FunctionComponent = () => {
           </Card>
         </StackItem>
       </Stack>
-    </Stack>
+    </PageSection>
   </React.Fragment>
 )
 }
