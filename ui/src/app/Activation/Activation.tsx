@@ -10,19 +10,7 @@ import {TopToolbar} from "@app/shared/top-toolbar";
 import AppTabs from "@app/shared/app-tabs";
 import {ActivationDetails} from "@app/Activation/activation-details";
 import {ActivationJobs} from "@app/Activation/activation-jobs";
-
-const activation_tabs = [
-  {
-    eventKey: 0,
-    title: 'Details',
-    name: '/activation/details'
-  },
-  {
-    eventKey: 1,
-    title: 'Jobs',
-    name: '/activation/jobs'
-  }
-];
+import {CaretLeftIcon} from "@patternfly/react-icons";
 
 const client = new WebSocket('ws://' + getServer() + '/api/ws');
 
@@ -33,13 +21,35 @@ client.onopen = () => {
 const endpoint1 = 'http://' + getServer() + '/api/activation_instance/';
 const endpoint2 = 'http://' + getServer() + '/api/activation_instance_job_instances/';
 
+export const renderActivationTabs = (activationId: string) => {
+  const activation_tabs = [
+    {
+      eventKey: 0,
+      title: (
+        <>
+          <CaretLeftIcon />
+          {'Back to Activations'}
+        </>
+      ),
+      name: `/activations`,
+    },
+    { eventKey: 1, title: 'Details', name: `/activation/${activationId}/details` },
+    {
+      eventKey: 2,
+      title: 'Jobs',
+      name: `/activation/${activationId}/jobs`,
+    }
+  ];
+
+  return <AppTabs tabItems={activation_tabs}/>
+};
+
 const Activation: React.FunctionComponent = () => {
 
   const [activation, setActivation] = useState([]);
 
   const { id } = useParams();
   console.log(id);
-
 
   useEffect(() => {
      fetch(endpoint1 + id, {
@@ -115,25 +125,14 @@ const Activation: React.FunctionComponent = () => {
     </TopToolbar>
 
     <Stack>
-      <Tabs>
-        {activation_tabs.map((item) => (
-          <Tab
-            title={item.title}
-            key={item.eventKey}
-            eventKey={item.eventKey}
-            name={item.name}
-            disabled={item.disabled}
-          />
-        ))}
-      </Tabs>
-
+      { renderActivationTabs(id) }
       <StackItem className="pf-u-pl-lg pf-u-pr-lg pf-u-mb-lg pf-u-mt-0 pf-u-pt-0">
         <Switch>
           <Route
-            path={`/activation/jobs`}
+            path={`/activation/${id}/jobs`}
             component={ActivationJobs}
           />
-          <Route path={'/activation'} component={ActivationDetails} />
+          <Route path={`/activation/${id}/details`} component={ActivationDetails} />
         </Switch>
       </StackItem>
     </Stack>

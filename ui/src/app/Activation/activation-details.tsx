@@ -1,16 +1,14 @@
 import {CardBody, PageSection, Title} from '@patternfly/react-core';
 import { Link, useParams } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
-import Ansi from "ansi-to-react";
 import {
   Card,
-  CardTitle,
-  SimpleListItem,
   Stack,
   StackItem,
 } from '@patternfly/react-core';
 import {getServer} from '@app/utils/utils';
-import {SimpleList} from "@patternfly/react-core/dist/js";
+import {TopToolbar} from "@app/shared/top-toolbar";
+import {renderActivationTabs} from "@app/Activation/Activation";
 
 const client = new WebSocket('ws://' + getServer() + '/api/ws');
 
@@ -77,24 +75,23 @@ const ActivationDetails: React.FunctionComponent = () => {
 
   return (
   <React.Fragment>
-    <Link to={"/rulesetfile/" + activation.ruleset_id}>{activation.ruleset_name}</Link>
-    <Link to={"/inventory/" + activation.inventory_id}>{activation.inventory_name}</Link>
-    <Link to={"/var/" + activation.extra_var_id}>{activation.extra_vars_name}</Link>
+    <TopToolbar>
+      <Title headingLevel={"h2"}>{`Activation ${activation.name}`}</Title>
+    </TopToolbar>
+
     <Stack>
-      <StackItem>
-        <Card>
-          <CardTitle>Standard Out</CardTitle>
-          <CardBody>
-            {stdout.length !== 0 && (
-              <SimpleList style={{ whiteSpace: 'pre-wrap' }}>
-                {stdout.map((item, i) => (
-                  <SimpleListItem key={i}><Ansi>{item}</Ansi></SimpleListItem>
-                ))}
-              </SimpleList>
-            )}
-          </CardBody>
-        </Card>
-      </StackItem>
+      { renderActivationTabs(id) }
+      <Stack>
+        <StackItem>
+          <Card>
+            <CardBody>
+              <Link to={"/rulesetfile/" + activation.ruleset_id}>{activation.ruleset_name}</Link>
+              <Link to={"/inventory/" + activation.inventory_id}>{activation.inventory_name}</Link>
+              <Link to={"/var/" + activation.extra_var_id}>{activation.extra_vars_name}</Link>
+            </CardBody>
+          </Card>
+        </StackItem>
+      </Stack>
     </Stack>
   </React.Fragment>
 )

@@ -10,8 +10,12 @@ import {
   StackItem,
 } from '@patternfly/react-core';
 import {getServer} from '@app/utils/utils';
+import {TopToolbar} from "@app/shared/top-toolbar";
+import AppTabs from "@app/shared/app-tabs";
+import {renderActivationTabs} from "@app/Activation/Activation";
 
 const client = new WebSocket('ws://' + getServer() + '/api/ws');
+const endpoint1 = 'http://' + getServer() + '/api/activation_instance/';
 const endpoint2 = 'http://' + getServer() + '/api/activation_instance_job_instances/';
 
 const ActivationJobs: React.FunctionComponent = () => {
@@ -83,22 +87,30 @@ const ActivationJobs: React.FunctionComponent = () => {
   }, [newJob]);
 
   return (
-    <Stack>
-      <StackItem>
-        <Card>
-          <CardTitle>Jobs</CardTitle>
-          <CardBody>
-            {jobs.length !== 0 && (
-              <SimpleList style={{whiteSpace: 'pre-wrap'}}>
-                {jobs.map((item, i) => (
-                  <SimpleListItem key={i}><Link to={"/job/" + item.id}>{item.id} </Link></SimpleListItem>
-                ))}
-              </SimpleList>
-            )}
-          </CardBody>
-        </Card>
-      </StackItem>
-    </Stack>
+    <React.Fragment>
+      <TopToolbar>
+        <Title headingLevel={"h2"}>{`Activation ${activation.name}`}</Title>
+      </TopToolbar>
+      <Stack>
+        <StackItem>
+          { renderActivationTabs(id) }
+        </StackItem>
+        <StackItem>
+          <Card>
+            <CardTitle>Jobs</CardTitle>
+            <CardBody>
+              {jobs.length !== 0 && (
+                <SimpleList style={{whiteSpace: 'pre-wrap'}}>
+                  {jobs.map((item, i) => (
+                    <SimpleListItem key={i}><Link to={"/job/" + item.id}>{item.id} </Link></SimpleListItem>
+                  ))}
+                </SimpleList>
+              )}
+            </CardBody>
+          </Card>
+        </StackItem>
+      </Stack>
+    </React.Fragment>
   );
 }
 

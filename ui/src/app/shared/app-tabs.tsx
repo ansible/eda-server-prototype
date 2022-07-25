@@ -7,8 +7,7 @@ export interface AppTabsProps {
   tabItems: {
     name: string;
     eventKey: number;
-    title: string;
-    disabled?: boolean;
+    title:  React.ReactNode;
   }[];
 }
 const AppTabs: React.ComponentType<AppTabsProps> = ({ tabItems }) => {
@@ -31,7 +30,6 @@ const AppTabs: React.ComponentType<AppTabsProps> = ({ tabItems }) => {
           key={item.eventKey}
           eventKey={item.eventKey}
           name={item.name}
-          disabled={item.disabled}
         />
       ))}
     </Tabs>
