@@ -6,7 +6,7 @@ import yaml
 from sqlalchemy import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from .models import (
+from .db.models import (
     extra_vars,
     inventories,
     playbooks,

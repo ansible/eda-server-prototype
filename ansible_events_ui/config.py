@@ -9,9 +9,9 @@ class Settings(BaseSettings):
     host: str = "127.0.0.1"
     port: int = 8080
 
-    # FIXME(cutwater): Use only asynchronous sqlalchemy connection
-    database_url: str = "sqlite:///./test.db"
-    async_database_url: str = "sqlite+aiosqlite:///./test.db"
+    database_url: str = (
+        "postgresql+asyncpg://postgres:secret@localhost:5432/ansible_events"
+    )
 
     class Config:
         env_prefix = "AE_"

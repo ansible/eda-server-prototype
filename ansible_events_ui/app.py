@@ -11,9 +11,7 @@ from fastapi.staticfiles import StaticFiles
 from sqlalchemy import insert, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from .database import async_session_maker, get_async_session
-from .manager import activate_rulesets, inactivate_rulesets
-from .models import (
+from .db.models import (
     User,
     activation_instance_job_instances,
     activation_instance_logs,
@@ -30,6 +28,8 @@ from .models import (
     projects,
     rule_set_files,
 )
+from .db.session import async_session_maker, get_db_session
+from .manager import activate_rulesets, inactivate_rulesets
 from .project import clone_project, sync_project
 from .schemas import (
     Activation,
@@ -139,7 +139,7 @@ async def websocket_endpoint(websocket: WebSocket):
 
 @app.websocket("/api/ws2")
 async def websocket_endpoint2(
-    websocket: WebSocket, db: AsyncSession = Depends(get_async_session)
+    websocket: WebSocket, db: AsyncSession = Depends(get_db_session)
 ):
     print("starting ws2")
     await websocket.accept()
@@ -201,7 +201,7 @@ def ping():
 
 @app.post("/api/rule_set_file/")
 async def create_rule_set_file(
-    rsf: RuleSetFile, db: AsyncSession = Depends(get_async_session)
+    rsf: RuleSetFile, db: AsyncSession = Depends(get_db_session)
 ):
     query = insert(rule_set_files).values(name=rsf.name, rulesets=rsf.rulesets)
     result = await db.execute(query)
@@ -212,7 +212,7 @@ async def create_rule_set_file(
 
 @app.post("/api/inventory/")
 async def create_inventory(
-    i: Inventory, db: AsyncSession = Depends(get_async_session)
+    i: Inventory, db: AsyncSession = Depends(get_db_session)
 ):
     query = insert(inventories).values(name=i.name, inventory=i.inventory)
     result = await db.execute(query)
@@ -223,7 +223,7 @@ async def create_inventory(
 
 @app.post("/api/extra_vars/")
 async def create_extra_vars(
-    e: Extravars, db: AsyncSession = Depends(get_async_session)
+    e: Extravars, db: AsyncSession = Depends(get_db_session)
 ):
     query = insert(extra_vars).values(name=e.name, extra_var=e.extra_var)
     result = await db.execute(query)
@@ -234,7 +234,7 @@ async def create_extra_vars(
 
 @app.post("/api/activation_instance/")
 async def create_activation_instance(
-    a: Activation, db: AsyncSession = Depends(get_async_session)
+    a: Activation, db: AsyncSession = Depends(get_db_session)
 ):
     query = select(rule_set_files).where(
         rule_set_files.c.id == a.rule_set_file_id
@@ -310,7 +310,7 @@ async def read_output(proc, activation_instance_id):
 
 @app.get("/api/activation_instance_logs/", response_model=List[ActivationLog])
 async def list_activation_instance_logs(
-    activation_instance_id: int, db: AsyncSession = Depends(get_async_session)
+    activation_instance_id: int, db: AsyncSession = Depends(get_db_session)
 ):
     query = select(activation_instance_logs).where(
         activation_instance_logs.c.activation_instance_id
@@ -333,7 +333,7 @@ async def list_tasks():
 
 @app.post("/api/project/")
 async def create_project(
-    p: Project, db: AsyncSession = Depends(get_async_session)
+    p: Project, db: AsyncSession = Depends(get_db_session)
 ):
     found_hash, tempdir = await clone_project(p.url, p.git_hash)
     p.git_hash = found_hash
@@ -347,7 +347,7 @@ async def create_project(
 
 @app.get("/api/project/{project_id}")
 async def read_project(
-    project_id: int, db: AsyncSession = Depends(get_async_session)
+    project_id: int, db: AsyncSession = Depends(get_db_session)
 ):
     # FIXME(cutwater): Return HTTP 404 if project doesn't exist
     query = select(projects).where(projects.c.id == project_id)
@@ -391,14 +391,14 @@ async def read_project(
 
 
 @app.get("/api/projects/")
-async def list_projects(db: AsyncSession = Depends(get_async_session)):
+async def list_projects(db: AsyncSession = Depends(get_db_session)):
     query = select(projects)
     result = await db.execute(query)
     return result.all()
 
 
 @app.get("/api/playbooks/")
-async def list_playbooks(db: AsyncSession = Depends(get_async_session)):
+async def list_playbooks(db: AsyncSession = Depends(get_db_session)):
     query = select(playbooks)
     result = await db.execute(query)
     return result.all()
@@ -406,7 +406,7 @@ async def list_playbooks(db: AsyncSession = Depends(get_async_session)):
 
 @app.get("/api/playbook/{playbook_id}")
 async def read_playbook(
-    playbook_id: int, db: AsyncSession = Depends(get_async_session)
+    playbook_id: int, db: AsyncSession = Depends(get_db_session)
 ):
     query = select(playbooks).where(playbooks.c.id == playbook_id)
     result = await db.execute(query)
@@ -414,7 +414,7 @@ async def read_playbook(
 
 
 @app.get("/api/inventories/")
-async def list_inventories(db: AsyncSession = Depends(get_async_session)):
+async def list_inventories(db: AsyncSession = Depends(get_db_session)):
     query = select(inventories)
     result = await db.execute(query)
     return result.all()
@@ -422,7 +422,7 @@ async def list_inventories(db: AsyncSession = Depends(get_async_session)):
 
 @app.get("/api/inventory/{inventory_id}")
 async def read_inventory(
-    inventory_id: int, db: AsyncSession = Depends(get_async_session)
+    inventory_id: int, db: AsyncSession = Depends(get_db_session)
 ):
     # FIXME(cutwater): Return HTTP 404 if inventory doesn't exist
     query = select(inventories).where(inventories.c.id == inventory_id)
@@ -431,7 +431,7 @@ async def read_inventory(
 
 
 @app.get("/api/rule_set_files/")
-async def list_rule_set_files(db: AsyncSession = Depends(get_async_session)):
+async def list_rule_set_files(db: AsyncSession = Depends(get_db_session)):
     query = select(rule_set_files)
     result = await db.execute(query)
     return result.all()
@@ -439,7 +439,7 @@ async def list_rule_set_files(db: AsyncSession = Depends(get_async_session)):
 
 @app.get("/api/rule_set_file/{rule_set_file_id}")
 async def read_rule_set_file(
-    rule_set_file_id: int, db: AsyncSession = Depends(get_async_session)
+    rule_set_file_id: int, db: AsyncSession = Depends(get_db_session)
 ):
     query = select(rule_set_files).where(
         rule_set_files.c.id == rule_set_file_id
@@ -450,7 +450,7 @@ async def read_rule_set_file(
 
 @app.get("/api/rule_set_file_json/{rule_set_file_id}")
 async def read_rule_set_file_json(
-    rule_set_file_id: int, db: AsyncSession = Depends(get_async_session)
+    rule_set_file_id: int, db: AsyncSession = Depends(get_db_session)
 ):
     query = select(rule_set_files).where(
         rule_set_files.c.id == rule_set_file_id
@@ -463,7 +463,7 @@ async def read_rule_set_file_json(
 
 
 @app.get("/api/extra_vars/")
-async def list_extra_vars(db: AsyncSession = Depends(get_async_session)):
+async def list_extra_vars(db: AsyncSession = Depends(get_db_session)):
     query = select(extra_vars)
     result = await db.execute(query)
     return result.all()
@@ -471,7 +471,7 @@ async def list_extra_vars(db: AsyncSession = Depends(get_async_session)):
 
 @app.get("/api/extra_var/{extra_var_id}")
 async def read_extravar(
-    extra_var_id: int, db: AsyncSession = Depends(get_async_session)
+    extra_var_id: int, db: AsyncSession = Depends(get_db_session)
 ):
     query = select(extra_vars).where(extra_vars.c.id == extra_var_id)
     result = await db.execute(query)
@@ -480,7 +480,7 @@ async def read_extravar(
 
 @app.get("/api/activation_instances/")
 async def list_activation_instances(
-    db: AsyncSession = Depends(get_async_session),
+    db: AsyncSession = Depends(get_db_session),
 ):
     query = select(activation_instances)
     result = await db.execute(query)
@@ -489,7 +489,7 @@ async def list_activation_instances(
 
 @app.get("/api/activation_instance/{activation_instance_id}")
 async def read_activation_instance(
-    activation_instance_id: int, db: AsyncSession = Depends(get_async_session)
+    activation_instance_id: int, db: AsyncSession = Depends(get_db_session)
 ):
     query = (
         select(
@@ -514,7 +514,7 @@ async def read_activation_instance(
 
 
 @app.get("/api/job_instances/")
-async def list_job_instances(db: AsyncSession = Depends(get_async_session)):
+async def list_job_instances(db: AsyncSession = Depends(get_db_session)):
     query = select(job_instances)
     result = await db.execute(query)
     return result.all()
@@ -522,7 +522,7 @@ async def list_job_instances(db: AsyncSession = Depends(get_async_session)):
 
 @app.get("/api/job_instance/{job_instance_id}")
 async def read_job_instance(
-    job_instance_id: int, db: AsyncSession = Depends(get_async_session)
+    job_instance_id: int, db: AsyncSession = Depends(get_db_session)
 ):
     query = select(job_instances).where(job_instances.c.id == job_instance_id)
     result = await db.execute(query)
@@ -531,7 +531,7 @@ async def read_job_instance(
 
 @app.get("/api/job_instance_events/{job_instance_id}")
 async def read_job_instance_events(
-    job_instance_id: int, db: AsyncSession = Depends(get_async_session)
+    job_instance_id: int, db: AsyncSession = Depends(get_db_session)
 ):
     query = select(job_instances).where(job_instances.c.id == job_instance_id)
     job = (await db.execute(query)).first()
@@ -544,7 +544,7 @@ async def read_job_instance_events(
 
 @app.get("/api/activation_instance_job_instances/{activation_instance_id}")
 async def read_activation_instance_job_instances(
-    activation_instance_id: int, db: AsyncSession = Depends(get_async_session)
+    activation_instance_id: int, db: AsyncSession = Depends(get_db_session)
 ):
     query = select(activation_instance_job_instances).where(
         activation_instance_job_instances.c.activation_instance_id

@@ -26,7 +26,7 @@ import tempfile
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from .models import playbooks
+from .db.models import playbooks
 
 activated_rulesets = {}
 ansible_events = shutil.which("ansible-events")
