@@ -33,7 +33,7 @@ export const createRows = (data) =>
       <Fragment key={`[activation-${id}`}>
         <Link
           to={{
-            pathname: `/activation/${id}`
+            pathname: `/activation/${id}/details`
           }}
         >
           {name}

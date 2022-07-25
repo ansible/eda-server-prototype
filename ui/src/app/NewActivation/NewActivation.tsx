@@ -78,7 +78,7 @@ const NewActivation: React.FunctionComponent = () => {
                            extra_var_id: extravar})
 				.then(data => {
 					console.log(data);
-          history.push("/activation/" + data.id);
+          history.push(`/activation/${data.id}/details`);
 			});
   };
 

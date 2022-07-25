@@ -3,6 +3,11 @@ import { Link, useParams } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
 import {
   Card,
+  Button,
+  DescriptionList,
+  DescriptionListTerm,
+  DescriptionListGroup,
+  DescriptionListDescription,
   Stack,
   StackItem,
 } from '@patternfly/react-core';
@@ -73,10 +78,89 @@ const ActivationDetails: React.FunctionComponent = () => {
     };
   }, []);
 
+  const renderActivationDetails: React.FunctionComponent = (activation) => (
+    <DescriptionList isFillColumns columnModifier={{ default: '3Col' }}>
+      <DescriptionListGroup>
+        <DescriptionListTerm>Name</DescriptionListTerm>
+        <DescriptionListDescription>
+          {activation?.name}
+        </DescriptionListDescription>
+      </DescriptionListGroup>
+      <DescriptionListGroup>
+        <DescriptionListTerm>Execution environment</DescriptionListTerm>
+        <DescriptionListDescription>
+          {activation?.execution_environment}
+        </DescriptionListDescription>
+      </DescriptionListGroup>
+      <DescriptionListGroup>
+        <DescriptionListTerm>Description</DescriptionListTerm>
+        <DescriptionListDescription>
+          {activation?.description}
+        </DescriptionListDescription>
+      </DescriptionListGroup>
+      <DescriptionListGroup>
+        <DescriptionListTerm>Rule set</DescriptionListTerm>
+        <DescriptionListDescription><Link to={"/rulesetfile/" + activation.ruleset_id}>{activation.ruleset_name}</Link></DescriptionListDescription>
+      </DescriptionListGroup>
+      <DescriptionListGroup>
+        <DescriptionListTerm>Inventory</DescriptionListTerm>
+        <DescriptionListDescription>
+          {<Link to={"/inventory/" + activation.inventory_id}>{activation.inventory_name}</Link>}
+        </DescriptionListDescription>
+      </DescriptionListGroup>
+      <DescriptionListGroup>
+        <DescriptionListTerm>Restart policy</DescriptionListTerm>
+        <DescriptionListDescription>{activation?.restart_policy}</DescriptionListDescription>
+      </DescriptionListGroup>
+      <DescriptionListGroup>
+      <DescriptionListTerm>Playbook</DescriptionListTerm>
+      <DescriptionListDescription>
+        {activation?.playbook}
+      </DescriptionListDescription>
+    </DescriptionListGroup>
+     <DescriptionListGroup>
+      <DescriptionListTerm>Activation status</DescriptionListTerm>
+      <DescriptionListDescription>
+        {activation?.status}
+      </DescriptionListDescription>
+    </DescriptionListGroup>
+      <DescriptionListGroup>
+        <DescriptionListTerm>Last restarted</DescriptionListTerm>
+        <DescriptionListDescription>
+          {activation?.last_restarted}
+        </DescriptionListDescription>
+      </DescriptionListGroup>
+      <DescriptionListGroup>
+        <DescriptionListTerm>Restarted count</DescriptionListTerm>
+        <DescriptionListDescription>
+          {activation?.restarted_count}
+        </DescriptionListDescription>
+      </DescriptionListGroup>
+      <DescriptionListGroup>
+        <DescriptionListTerm>Created</DescriptionListTerm>
+        <DescriptionListDescription>
+          {activation?.created_at}
+        </DescriptionListDescription>
+      </DescriptionListGroup>
+      <DescriptionListGroup>
+        <DescriptionListTerm>Last modified</DescriptionListTerm>
+        <DescriptionListDescription>
+          {activation?.modified_at}
+        </DescriptionListDescription>
+      </DescriptionListGroup>
+      <DescriptionListGroup>
+        <DescriptionListTerm>Variables</DescriptionListTerm>
+        <DescriptionListDescription>
+          {<Link to={"/var/" + activation.extra_var_id}>{activation.extra_vars_name}</Link>}
+        </DescriptionListDescription>
+      </DescriptionListGroup>
+    </DescriptionList>
+  );
+
   return (
   <React.Fragment>
     <TopToolbar>
-      <Title headingLevel={"h2"}>{`Activation ${activation.name}`}</Title>
+      <Title headingLevel={"h2"}>{`${activation.name}`}</Title>
     </TopToolbar>
 
     <PageSection page-type={'activation-details'} id={'activation-details'}>
@@ -85,9 +169,7 @@ const ActivationDetails: React.FunctionComponent = () => {
         <StackItem>
           <Card>
             <CardBody>
-              <Link to={"/rulesetfile/" + activation.ruleset_id}>{activation.ruleset_name}</Link>
-              <Link to={"/inventory/" + activation.inventory_id}>{activation.inventory_name}</Link>
-              <Link to={"/var/" + activation.extra_var_id}>{activation.extra_vars_name}</Link>
+              {renderActivationDetails(activation)}
             </CardBody>
           </Card>
         </StackItem>

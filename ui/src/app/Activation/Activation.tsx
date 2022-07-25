@@ -133,7 +133,6 @@ const Activation: React.FunctionComponent = () => {
               component={ActivationJobs}
             />
             <Route exact path={`/activation/${id}/details`} component={ActivationDetails} />
-            <Route exact path={`/activation/${id}`} component={ActivationDetails} />
           </Switch>
         </StackItem>
       </Stack>
