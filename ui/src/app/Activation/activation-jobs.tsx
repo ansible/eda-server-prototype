@@ -85,30 +85,25 @@ const ActivationJobs: React.FunctionComponent = () => {
   }, [newJob]);
 
   return (
-    <React.Fragment>
-      <TopToolbar>
-        <Title headingLevel={"h2"}>{`${activation.name}`}</Title>
-      </TopToolbar>
-      <PageSection page-type={'activation-details'} id={'activation-details'}>
-        { renderActivationTabs(id) }
-        <Stack>
-          <StackItem>
-            <Card>
-              <CardTitle>Jobs</CardTitle>
-              <CardBody>
-                {jobs.length !== 0 && (
-                  <SimpleList style={{whiteSpace: 'pre-wrap'}}>
-                    {jobs.map((item, i) => (
-                      <SimpleListItem key={i}><Link to={"/job/" + item.id}>{item.id} </Link></SimpleListItem>
-                    ))}
-                  </SimpleList>
-                )}
-              </CardBody>
-            </Card>
-        </StackItem>
-      </Stack>
-      </PageSection>
-    </React.Fragment>
+    <PageSection page-type={'activation-details'} id={'activation-details'}>
+      { renderActivationTabs(id) }
+      <Stack>
+        <StackItem>
+          <Card>
+            <CardTitle>Jobs</CardTitle>
+            <CardBody>
+              {jobs.length !== 0 && (
+                <SimpleList style={{whiteSpace: 'pre-wrap'}}>
+                  {jobs.map((item, i) => (
+                    <SimpleListItem key={i}><Link to={"/job/" + item.id}>{item.id} </Link></SimpleListItem>
+                  ))}
+                </SimpleList>
+              )}
+            </CardBody>
+          </Card>
+      </StackItem>
+    </Stack>
+    </PageSection>
   );
 }
 

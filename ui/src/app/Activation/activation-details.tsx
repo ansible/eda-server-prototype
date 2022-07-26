@@ -293,24 +293,18 @@ const ActivationDetails: React.FunctionComponent = () => {
   );
 
   return (
-  <React.Fragment>
-    <TopToolbar>
-      <Title headingLevel={"h2"}>{`${activation?.name}`}</Title>
-    </TopToolbar>
-
-    <PageSection page-type={'activation-details'} id={'activation-details'}>
-      { renderActivationTabs(id) }
-      <Stack>
-        <StackItem>
-          <Card>
-            <CardBody>
-              {renderFlexActivationDetails(activation)}
-            </CardBody>
-          </Card>
-        </StackItem>
-      </Stack>
-    </PageSection>
-  </React.Fragment>
+  <PageSection page-type={'activation-details'} id={'activation-details'}>
+    { renderActivationTabs(id) }
+    <Stack>
+      <StackItem>
+        <Card>
+          <CardBody>
+            {renderFlexActivationDetails(activation)}
+          </CardBody>
+        </Card>
+      </StackItem>
+    </Stack>
+  </PageSection>
 )
 }
 
