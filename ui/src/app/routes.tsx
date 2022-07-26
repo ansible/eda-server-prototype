@@ -70,9 +70,9 @@ const routes: AppRouteConfig[] = [
   {
     component: Activations,
     exact: true,
-    label: 'Activations',
+    label: 'Rulebook activations',
     path: '/activations',
-    title: 'Activations',
+    title: 'Rulebook activations',
   },
   {
     component: Activation,

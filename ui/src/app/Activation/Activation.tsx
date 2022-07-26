@@ -17,7 +17,7 @@ export const renderActivationTabs = (activationId: string) => {
       title: (
         <>
           <CaretLeftIcon />
-          {'Back to Activations'}
+          {'Back to Rulebook activations'}
         </>
       ),
       name: `/activations`,
@@ -114,7 +114,7 @@ const Activation: React.FunctionComponent = () => {
     <React.Fragment>
       <TopToolbar breadcrumbs={[
         {
-          title: 'Activations',
+          title: 'Rulebook activations',
           to: '/activations'
         }
       ]

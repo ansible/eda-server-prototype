@@ -91,7 +91,7 @@ const NewActivation: React.FunctionComponent = () => {
     <TopToolbar
       breadcrumbs={[
         {
-          title: 'Activations',
+          title: 'Rulebook activations',
           to: '/activations'
         }
       ]
