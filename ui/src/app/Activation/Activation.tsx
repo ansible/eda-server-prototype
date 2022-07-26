@@ -1,5 +1,5 @@
-import {Card, CardBody, PageSection, Tab, Tabs, Title} from '@patternfly/react-core';
-import { Link, Route, Switch, useParams } from 'react-router-dom';
+import { Title} from '@patternfly/react-core';
+import { Route, Switch, useParams } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
 import AppTabs from "@app/shared/app-tabs";
 
@@ -8,6 +8,7 @@ import {getServer} from "@app/utils/utils";
 import {TopToolbar} from "@app/shared/top-toolbar";
 import {ActivationJobs} from "@app/Activation/activation-jobs";
 import {ActivationDetails} from "@app/Activation/activation-details";
+import {ActivationStdout} from "@app/Activation/activation-stdout";
 
 export const renderActivationTabs = (activationId: string) => {
   const activation_tabs = [
@@ -26,6 +27,11 @@ export const renderActivationTabs = (activationId: string) => {
       eventKey: 2,
       title: 'Jobs',
       name: `/activation/${activationId}/jobs`,
+    },
+    {
+      eventKey: 3,
+      title: 'Standard out',
+      name: `/activation/${activationId}/stdout`,
     }
   ];
 
@@ -106,7 +112,13 @@ const Activation: React.FunctionComponent = () => {
 
   return (
     <React.Fragment>
-      <TopToolbar>
+      <TopToolbar breadcrumbs={[
+        {
+          title: 'Activations',
+          to: '/activations'
+        }
+      ]
+      }>
         <Title headingLevel={"h2"}>{`${activation.name}`}</Title>
       </TopToolbar>
       <Switch>
@@ -114,14 +126,17 @@ const Activation: React.FunctionComponent = () => {
           <ActivationJobs
             jobs={jobs}
             activation={activation}
-            update_client={update_client}
+          />
+        </Route>
+        <Route exact path="/activation/:id/stdout">
+          <ActivationStdout
+            activation={activation}
+            stdout={stdout}
           />
         </Route>
         <Route path="/activation/:id">
           <ActivationDetails
-            jobs={jobs}
             activation={activation}
-            update_client={update_client}
           />
         </Route>
       </Switch>

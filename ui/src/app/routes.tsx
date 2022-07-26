@@ -21,6 +21,7 @@ import { Playbooks } from '@app/Playbooks/Playbooks';
 import { Playbook } from '@app/Playbook/Playbook';
 import { NotFound } from '@app/NotFound/NotFound';
 import { useDocumentTitle } from '@app/utils/useDocumentTitle';
+import {ActivationStdout} from "@app/Activation/activation-stdout";
 
 export interface IAppRoute {
   label?: string; // Excluding the label will exclude the route from the nav sidebar in AppLayout
@@ -89,6 +90,12 @@ const routes: AppRouteConfig[] = [
     exact: true,
     path: '/activation/:id/details',
     title: 'Activation details',
+  },
+  {
+    component: ActivationStdout,
+    exact: true,
+    path: '/activation/:id/stdout',
+    title: 'Standard out',
   },
   {
     component: NewActivation,

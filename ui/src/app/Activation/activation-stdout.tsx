@@ -1,29 +1,28 @@
 import {CardBody, PageSection, SimpleList} from '@patternfly/react-core';
-import { Link } from 'react-router-dom';
 import React from 'react';
 import {
   Card,
   CardTitle,
   SimpleListItem,
   Stack,
-  StackItem
+  StackItem,
 } from '@patternfly/react-core';
 import {renderActivationTabs} from "@app/Activation/Activation";
+import Ansi from "ansi-to-react";
 
-const ActivationJobs: React.FunctionComponent = ({activation, jobs}) => {
-
+const ActivationStdout: React.FunctionComponent = ({activation, stdout}) => {
   return (
     <PageSection page-type={'activation-details'} id={'activation-details'}>
-      { renderActivationTabs(activation?.id) }
+      { renderActivationTabs(activation.id) }
       <Stack>
         <StackItem>
           <Card>
-            <CardTitle>Jobs</CardTitle>
+            <CardTitle>Standard Out</CardTitle>
             <CardBody>
-              {jobs.length !== 0 && (
-                <SimpleList style={{whiteSpace: 'pre-wrap'}}>
-                  {jobs.map((item, i) => (
-                    <SimpleListItem key={i}><Link to={"/job/" + item.id}>{item.id} </Link></SimpleListItem>
+              {stdout.length !== 0 && (
+                <SimpleList style={{ whiteSpace: 'pre-wrap' }}>
+                  {stdout.map((item, i) => (
+                    <SimpleListItem key={i}><Ansi>{item}</Ansi></SimpleListItem>
                   ))}
                 </SimpleList>
               )}
@@ -35,4 +34,4 @@ const ActivationJobs: React.FunctionComponent = ({activation, jobs}) => {
   );
 }
 
-export { ActivationJobs };
+export { ActivationStdout };

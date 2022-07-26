@@ -1,13 +1,8 @@
 import {CardBody, Flex, FlexItem, PageSection, Title} from '@patternfly/react-core';
-import { Link, useParams } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
 import {
   Card,
-  Button,
-  DescriptionList,
-  DescriptionListTerm,
-  DescriptionListGroup,
-  DescriptionListDescription,
   Stack,
   StackItem,
 } from '@patternfly/react-core';
@@ -24,7 +19,7 @@ client.onopen = () => {
 
 const endpointVar = 'http://' + getServer() + '/api/extra_var/';
 
-const ActivationDetails: React.FunctionComponent = ({ activation, jobs, update_client }) => {
+const ActivationDetails: React.FunctionComponent = ({ activation }) => {
 
   const [activationVars, setActivationVars] = useState(undefined);
   const id = activation?.id;
@@ -39,7 +34,7 @@ const ActivationDetails: React.FunctionComponent = ({ activation, jobs, update_c
   };
 
     useEffect(() => {
-    activation?.extra_vars_name ? fetchActivationVars(activation.extra_vars_name)
+    activation?.extra_var_id ? fetchActivationVars(activation.extra_var_id)
       .then(data => setActivationVars(data)) : setActivationVars(undefined);
   }, [activation]);
   console.log('Debug - extra vars: ', activationVars);
