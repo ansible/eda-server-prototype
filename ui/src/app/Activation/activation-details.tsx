@@ -1,4 +1,4 @@
-import {CardBody, PageSection, Title} from '@patternfly/react-core';
+import {CardBody, Flex, FlexItem, PageSection, Title} from '@patternfly/react-core';
 import { Link, useParams } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
 import {
@@ -14,6 +14,7 @@ import {
 import {getServer} from '@app/utils/utils';
 import {TopToolbar} from "@app/shared/top-toolbar";
 import {renderActivationTabs} from "@app/Activation/Activation";
+import ReactJsonView from 'react-json-view';
 
 const client = new WebSocket('ws://' + getServer() + '/api/ws');
 
@@ -22,23 +23,41 @@ client.onopen = () => {
 };
 
 const endpoint1 = 'http://' + getServer() + '/api/activation_instance/';
+const endpointVar = 'http://' + getServer() + '/api/extra_var/';
 
 const ActivationDetails: React.FunctionComponent = () => {
 
   const [activation, setActivation] = useState([]);
+  const [activationVars, setActivationVars] = useState(undefined);
 
   const { id } = useParams();
   console.log(id);
 
+  const fetchActivation = (id) => {
+  return fetch(endpoint1 + id, {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  }).then(response => response.json())
+  };
+
+  const fetchActivationVars = (varname) => {
+    return fetch(endpointVar + varname, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }).then(response => response.json())
+  };
 
   useEffect(() => {
-     fetch(endpoint1 + id, {
-       headers: {
-         'Content-Type': 'application/json',
-       },
-     }).then(response => response.json())
+     fetchActivation(id)
     .then(data => setActivation(data));
   }, []);
+
+  useEffect(() => {
+    activation?.extra_vars_name ? fetchActivationVars(activation.extra_vars_name)
+      .then(data => setActivationVars(data)) : setActivationVars(undefined);
+  }, [activation]);
 
   const [stdout, setStdout] = useState([]);
   const [newStdout, setNewStdout] = useState('');
@@ -78,6 +97,7 @@ const ActivationDetails: React.FunctionComponent = () => {
     };
   }, []);
 
+  console.log('Debug - extra vars: ', activationVars);
   const renderActivationDetails: React.FunctionComponent = (activation) => (
     <DescriptionList isFillColumns columnModifier={{ default: '3Col' }}>
       <DescriptionListGroup>
@@ -151,16 +171,131 @@ const ActivationDetails: React.FunctionComponent = () => {
       <DescriptionListGroup>
         <DescriptionListTerm>Variables</DescriptionListTerm>
         <DescriptionListDescription>
-          {<Link to={"/var/" + activation.extra_var_id}>{activation.extra_vars_name}</Link>}
+          {activationVars ? <ReactJsonView src={activationVars}/> : null}
         </DescriptionListDescription>
       </DescriptionListGroup>
     </DescriptionList>
   );
 
+  const renderFlexActivationDetails: React.FunctionComponent = (activation) => (
+    <Flex>
+      <Flex direction={{ default: 'column' }} flex={{ default: 'flex_1' }}>
+        <FlexItem>
+          <Stack>
+            <StackItem><Title headingLevel="h3">Name</Title></StackItem>
+            <StackItem>
+              {activation?.name}
+            </StackItem>
+          </Stack>
+        </FlexItem>
+        <FlexItem>
+          <Stack>
+            <StackItem><Title headingLevel="h3">Execution environment</Title></StackItem>
+            <StackItem>
+              {activation?.execution_environment}
+            </StackItem>
+          </Stack>
+        </FlexItem>
+        <FlexItem>
+          <Stack>
+            <StackItem><Title headingLevel="h3">Playbook</Title></StackItem>
+            <StackItem>
+              {activation?.playbook}
+            </StackItem>
+          </Stack>
+        </FlexItem>
+        <FlexItem>
+          <Stack>
+            <StackItem><Title headingLevel="h3">Restarted count</Title></StackItem>
+            <StackItem>
+              {activation?.restarted_count}
+            </StackItem>
+          </Stack>
+        </FlexItem>
+        <FlexItem>
+          <Stack>
+            <StackItem><Title headingLevel="h3">Variables</Title></StackItem>
+            <StackItem>
+              {activationVars ? <ReactJsonView src={activationVars}/> : null}
+            </StackItem>
+          </Stack>
+        </FlexItem>
+      </Flex>
+      <Flex direction={{ default: 'column' }} flex={{ default: 'flex_1' }}>
+        <FlexItem>
+          <Stack>
+            <StackItem><Title headingLevel="h3">Description</Title></StackItem>
+            <StackItem>
+              {activation?.description}
+            </StackItem>
+          </Stack>
+        </FlexItem>
+        <FlexItem>
+          <Stack>
+            <StackItem><Title headingLevel="h3">Rule set</Title></StackItem>
+            <StackItem>
+              <Link to={"/rulesetfile/" + activation.ruleset_id}>{activation.ruleset_name}</Link>
+            </StackItem>
+          </Stack>
+        </FlexItem>
+        <FlexItem>
+          <Stack>
+            <StackItem><Title headingLevel="h3">Activation status</Title></StackItem>
+            <StackItem>
+              {activation?.status}
+            </StackItem>
+          </Stack>
+        </FlexItem>
+        <FlexItem>
+          <Stack>
+            <StackItem><Title headingLevel="h3">Created</Title></StackItem>
+            <StackItem>
+              {activation?.created_at}
+            </StackItem>
+          </Stack>
+        </FlexItem>
+      </Flex>
+      <Flex direction={{ default: 'column' }} flex={{ default: 'flex_1' }}>
+        <FlexItem>
+          <Stack>
+            <StackItem><Title headingLevel="h3">Inventory</Title></StackItem>
+            <StackItem>
+              {<Link to={"/inventory/" + activation.inventory_id}>{activation.inventory_name}</Link>}
+            </StackItem>
+          </Stack>
+        </FlexItem>
+        <FlexItem>
+          <Stack>
+            <StackItem><Title headingLevel="h3">Restart policy</Title></StackItem>
+            <StackItem>
+              {activation?.restart_policy}
+            </StackItem>
+          </Stack>
+        </FlexItem>
+        <FlexItem>
+          <Stack>
+            <StackItem><Title headingLevel="h3">Last restarted</Title></StackItem>
+            <StackItem>
+              {activation?.last_restarted}
+            </StackItem>
+          </Stack>
+        </FlexItem>
+        <FlexItem>
+          <Stack>
+            <StackItem><Title headingLevel="h3">Last modified</Title></StackItem>
+            <StackItem>
+              {activation?.updated_at}
+            </StackItem>
+          </Stack>
+        </FlexItem>
+      </Flex>
+    </Flex>
+  );
+
   return (
   <React.Fragment>
     <TopToolbar>
-      <Title headingLevel={"h2"}>{`${activation.name}`}</Title>
+      <Title headingLevel={"h2"}>{`${activation?.name}`}</Title>
     </TopToolbar>
 
     <PageSection page-type={'activation-details'} id={'activation-details'}>
@@ -169,7 +304,7 @@ const ActivationDetails: React.FunctionComponent = () => {
         <StackItem>
           <Card>
             <CardBody>
-              {renderActivationDetails(activation)}
+              {renderFlexActivationDetails(activation)}
             </CardBody>
           </Card>
         </StackItem>

@@ -1,7 +1,6 @@
 import {CardBody, PageSection, SimpleList, Title} from '@patternfly/react-core';
 import { Link, useParams } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
-import Ansi from "ansi-to-react";
 import {
   Card,
   CardTitle,
@@ -11,7 +10,6 @@ import {
 } from '@patternfly/react-core';
 import {getServer} from '@app/utils/utils';
 import {TopToolbar} from "@app/shared/top-toolbar";
-import AppTabs from "@app/shared/app-tabs";
 import {renderActivationTabs} from "@app/Activation/Activation";
 
 const client = new WebSocket('ws://' + getServer() + '/api/ws');
@@ -94,7 +92,7 @@ const ActivationJobs: React.FunctionComponent = () => {
       <PageSection page-type={'activation-details'} id={'activation-details'}>
         { renderActivationTabs(id) }
         <Stack>
-          <StackItem>act
+          <StackItem>
             <Card>
               <CardTitle>Jobs</CardTitle>
               <CardBody>

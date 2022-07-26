@@ -74,12 +74,6 @@ const routes: AppRouteConfig[] = [
     title: 'Activations',
   },
   {
-    component: Activation,
-    exact: true,
-    path: '/activation/:id',
-    title: 'Activation',
-  },
-  {
     component: ActivationDetails,
     exact: true,
     path: '/activation/:id/details',
