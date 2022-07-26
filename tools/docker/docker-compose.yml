@@ -8,11 +8,20 @@ services:
       dockerfile: tools/docker/Dockerfile
     ports:
       - "8080:8080"
-    volumes:
-      - sqlite_db:/opt/app-root/src/sqlite
     environment:
       - AE_HOST=0.0.0.0
-      - AE_DATABASE_URL=sqlite:///./sqlite/test.db
-      - AE_ASYNC_DATABASE_URL=sqlite+aiosqlite:///./sqlite/test.db
+      - AE_DATABASE_URL=postgres+asyncpg://postgres:secret@postgres/ansible_events
+    depends_on:
+      - postgres
+
+  postgres:
+    image: "docker.io/library/postgres:13"
+    environment:
+      - "POSTGRES_PASSWORD=secret"
+      - "POSTGRES_DB=ansible_events"
+    ports:
+      - "5432:5432"
+    volumes:
+      - "postgres_data:/var/lib/postgresql/data"
 volumes:
-  sqlite_db: {}
+  postgres_data:

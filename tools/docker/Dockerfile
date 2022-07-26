@@ -16,10 +16,10 @@ RUN pip install ansible && \
     ansible-galaxy collection install benthomasson.eda
 COPY . $WORKDIR
 COPY --from=ui-builder /app/ui/dist/ ./ui/dist
-RUN mkdir sqlite && chown -R $USER_ID ./
+RUN chown -R $USER_ID ./
 
 USER $USER_ID
-RUN pip install '.[sqlite]'
+RUN pip install .
 
 RUN bash -c "if [ $DEVEL_AE_LIBRARY -ne 0 ]; then \
     pip uninstall ansible-events -y && \

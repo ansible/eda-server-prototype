@@ -2,34 +2,73 @@
 
 ## Setting up a development environment
 
-Run these commands:
+### 1. Clone the repository
 
-    git clone https://github.com/benthomasson/ansible-events-ui.git
-    cd ansible-events-ui
-    python3.9 -m venv .venv
-    source .venv/bin/activate
-    pip install -e '.[sqlite]'
-    pip install ansible
-    ansible-galaxy collection install benthomasson.eda
-    cd ui
-    npm install
-    npm run build
-    cd ..
-    ansible-events-ui
+First you need to clone the `ansible-events-ui` repository:
 
-Visit this url:
+```shell
+  $ git clone https://github.com/benthomasson/ansible-events-ui.git
+  $ cd ansible-events-ui
+```
 
-    http://localhost:8080/docs#/auth/register_register_api_auth_register_post
+### 2. Virtual environment
 
-Click "Try it out" on /api/auth/register
+Create virtual environment and install project
+
+```shell
+
+  $ python -m venv .venv
+  $ source .venv/bin/activate
+  (venv) $ pip install -e .
+```
+
+Install Ansible and `benthomasson.eda` collection:
+
+```shell
+  (venv) $ pip install ansible
+  (venv) $ ansible-galaxy collection install benthomasson.eda
+```
+
+### 3. Services
+
+You need to set up a PostgreSQL database sever. The easiest way is using the `docker-compose`:
+
+```shell
+  $ docker-compose -p ansible-events -f tools/docker/docker-compose.yml up -d postgres
+```
+
+Then run database migrations:
+
+```shell
+  $ alembic upgrade head
+```
+
+### 4. User interface
+
+Build UI files:
+
+```shell
+  $ cd ui
+  $ npm install
+  $ npm run build
+  $ cd ..
+```
+
+### 6. Start server
+
+```shell
+  $ ansible-events-ui
+```
+
+Visit this url: http://localhost:8080/docs#/auth/register_register_api_auth_register_post
+
+Click "Try it out" on `/api/auth/register`
 
 Change email and password
 
 Click execute
 
-Visit this url:
-
-    http://localhost:8080/eda
+Visit this url: http://localhost:8080/eda
 
 You have set up the development environment.
 
