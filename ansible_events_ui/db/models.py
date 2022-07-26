@@ -56,9 +56,6 @@ activation_instances = sqlalchemy.Table(
     ),
     sqlalchemy.Column("inventory_id", sqlalchemy.ForeignKey("inventory.id")),
     sqlalchemy.Column("extra_var_id", sqlalchemy.ForeignKey("extra_var.id")),
-    # sqlalchemy.Column(
-    #     "activation_id", sqlalchemy.ForeignKey("activation.id")
-    # ),
 )
 
 
@@ -123,7 +120,6 @@ job_instances = sqlalchemy.Table(
     metadata,
     sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True),
     sqlalchemy.Column("uuid", sqlalchemy.String),
-    # sqlalchemy.Column("job_id", sqlalchemy.ForeignKey("job.id")),
 )
 
 activation_instance_job_instances = sqlalchemy.Table(

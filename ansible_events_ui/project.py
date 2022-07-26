@@ -53,10 +53,8 @@ async def clone_project(url, git_hash=None):
         stdout, stderr = await proc.communicate()
 
         if stdout:
-            # print(stdout.decode())
             return stdout.decode().strip(), tempdir
         if stderr:
-            # print(stderr.decode())
             return stderr.decode().strip(), tempdir
 
     finally:
@@ -97,7 +95,7 @@ def is_rules_file(filename):
 
 def yield_files(project_dir):
 
-    for root, dirs, files in os.walk(project_dir):
+    for root, _dirs, files in os.walk(project_dir):
         if ".git" in root:
             continue
         for f in files:

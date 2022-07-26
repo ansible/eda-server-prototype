@@ -1,7 +1,4 @@
 -r requirements_test.txt
-
-flake8
-black
-isort
+-r requirements_lint.txt
 
 sqlalchemy[mypy] ~= 1.4
