@@ -107,9 +107,13 @@ const sharedMessages = defineMessages({
     id: 'rulesets.norulesets',
     defaultMessage: 'No rule sets'
   },
-  addRuleSet: {
-    id: 'rulesets.addRuleSet',
-    defaultMessage: 'Add rule set'
+  number_of_rules: {
+    id: 'rulesets.number_of_rules',
+    defaultMessage: 'Number of rules'
+  },
+  fire_count: {
+    id: 'rulesets.fire_count',
+    defaultMessage: 'Fire count'
   },
   deleteRuleSetTitle: {
     id: 'rulesets.deleteRuleSet',

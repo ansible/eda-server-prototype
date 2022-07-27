@@ -26,7 +26,13 @@ const endpoint = 'http://' + getServer() + '/api/rule_set_files/';
 const columns = (intl) => [
   {
     title: intl.formatMessage(sharedMessages.name),
-    transforms: [cellWidth(80)]
+    transforms: [cellWidth(50)]
+  },
+  {
+    title: intl.formatMessage(sharedMessages.number_of_rules)
+  },
+  {
+    title: intl.formatMessage(sharedMessages.fire_count)
   }
 ];
 
