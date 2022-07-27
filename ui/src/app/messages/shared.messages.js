@@ -85,7 +85,7 @@ const sharedMessages = defineMessages({
   },
   addActivation: {
     id: 'activation.addActivation',
-    defaultMessage: 'Add activation'
+    defaultMessage: 'Add rulebook activation'
   },
   deleteActivationTitle: {
     id: 'activation.deleteActivation',
