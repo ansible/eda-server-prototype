@@ -1,4 +1,5 @@
 import asyncio
+import logging
 import os
 import tempfile
 
@@ -17,13 +18,15 @@ from .db.models import (
     rule_set_files,
 )
 
+logger = logging.getLogger("ansible_events_ui")
+
 
 # FIXME(cutwater): Remove try: .. finally: pass
 async def clone_project(url, git_hash=None):
 
     try:
         tempdir = tempfile.mkdtemp(prefix="clone_project")
-        print(tempdir)
+        logger.debug(tempdir)
 
         cmd = f"git clone {url} ."
 
@@ -37,9 +40,9 @@ async def clone_project(url, git_hash=None):
         stdout, stderr = await proc.communicate()
 
         if stdout:
-            print(stdout.decode())
+            logger.debug(stdout.decode())
         if stderr:
-            print(stderr.decode())
+            logger.debug(stderr.decode())
 
         cmd = "git rev-parse HEAD"
 
@@ -86,8 +89,8 @@ def is_rules_file(filename):
             for entry in data:
                 if "rules" not in entry:
                     return False
-    except Exception as e:
-        print(f"{filename} {e}")
+    except Exception:
+        logger.exception(filename)
         return False
 
     return True
@@ -106,7 +109,8 @@ async def find_rules(project_id, project_dir, db: AsyncSession):
 
     for directory, filename in yield_files(project_dir):
         full_path = os.path.join(directory, filename)
-        print(filename)
+        # TODO(cutwater): Remove debugging print
+        logger.debug(filename)
         if is_rules_file(full_path):
             with open(full_path) as f:
                 rulesets = f.read()
@@ -115,13 +119,15 @@ async def find_rules(project_id, project_dir, db: AsyncSession):
                 name=filename, rulesets=rulesets
             )
             (record_id,) = (await db.execute(query)).inserted_primary_key
-            print(record_id)
+            # TODO(cutwater): Remove debugging print
+            logger.debug(record_id)
 
             query = insert(project_rules).values(
                 project_id=project_id, rule_set_file_id=record_id
             )
             (record_id,) = (await db.execute(query)).inserted_primary_key
-            print(record_id)
+            # TODO(cutwater): Remove debugging print
+            logger.debug(record_id)
 
 
 def is_inventory_file(filename):
@@ -134,8 +140,8 @@ def is_inventory_file(filename):
                 return False
             if "all" not in data:
                 return False
-    except Exception as e:
-        print(f"{filename} {e}")
+    except Exception:
+        logger.exception(filename)
         return False
 
     return True
@@ -145,7 +151,8 @@ async def find_inventory(project_id, project_dir, db: AsyncSession):
 
     for directory, filename in yield_files(project_dir):
         full_path = os.path.join(directory, filename)
-        print(filename)
+        # TODO(cutwater): Remove debugging print
+        logger.debug(filename)
         if is_inventory_file(full_path):
             with open(full_path) as f:
                 inventory = f.read()
@@ -154,13 +161,15 @@ async def find_inventory(project_id, project_dir, db: AsyncSession):
                 name=filename, inventory=inventory
             )
             (record_id,) = (await db.execute(query)).inserted_primary_key
-            print(record_id)
+            # TODO(cutwater): Remove debugging print
+            logger.debug(record_id)
 
             query = insert(project_inventories).values(
                 project_id=project_id, inventory_id=record_id
             )
             (record_id,) = (await db.execute(query)).inserted_primary_key
-            print(record_id)
+            # TODO(cutwater): Remove debugging print
+            logger.debug(record_id)
 
 
 def is_playbook_file(filename):
@@ -176,8 +185,8 @@ def is_playbook_file(filename):
                     return True
                 if "roles" in entry:
                     return True
-    except Exception as e:
-        print(f"{filename} {e}")
+    except Exception:
+        logger.exception(filename)
         return False
     return False
 
@@ -196,7 +205,8 @@ async def find_extra_vars(project_id, project_dir, db: AsyncSession):
 
     for directory, filename in yield_files(project_dir):
         full_path = os.path.join(directory, filename)
-        print(filename)
+        # TODO(cutwater): Remove debugging print
+        logger.debug(filename)
         if is_extra_vars_file(full_path):
             with open(full_path) as f:
                 extra_var = f.read()
@@ -205,30 +215,35 @@ async def find_extra_vars(project_id, project_dir, db: AsyncSession):
                 name=filename, extra_var=extra_var
             )
             (record_id,) = (await db.execute(query)).inserted_primary_key
-            print(record_id)
+            # TODO(cutwater): Remove debugging print
+            logger.debug(record_id)
 
             query = insert(project_vars).values(
                 project_id=project_id, vars_id=record_id
             )
             (record_id,) = (await db.execute(query)).inserted_primary_key
-            print(record_id)
+            # TODO(cutwater): Remove debugging print
+            logger.debug(record_id)
 
 
 async def find_playbook(project_id, project_dir, db: AsyncSession):
 
     for directory, filename in yield_files(project_dir):
         full_path = os.path.join(directory, filename)
-        print(filename)
+        # TODO(cutwater): Remove debugging print
+        logger.debug(filename)
         if is_playbook_file(full_path):
             with open(full_path) as f:
                 playbook = f.read()
 
             query = insert(playbooks).values(name=filename, playbook=playbook)
             (record_id,) = (await db.execute(query)).inserted_primary_key
-            print(record_id)
+            # TODO(cutwater): Remove debugging print
+            logger.debug(record_id)
 
             query = insert(project_playbooks).values(
                 project_id=project_id, playbook_id=record_id
             )
             (record_id,) = (await db.execute(query)).inserted_primary_key
-            print(record_id)
+            # TODO(cutwater): Remove debugging print
+            logger.debug(record_id)

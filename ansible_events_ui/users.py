@@ -1,3 +1,4 @@
+import logging
 import uuid
 from typing import Optional
 
@@ -14,6 +15,8 @@ from .config import settings
 from .db.models import User
 from .db.session import get_user_db
 
+logger = logging.getLogger("ansible_events_ui.auth")
+
 
 class UserManager(UUIDIDMixin, BaseUserManager[User, uuid.UUID]):
     reset_password_token_secret = settings.secret
@@ -22,21 +25,24 @@ class UserManager(UUIDIDMixin, BaseUserManager[User, uuid.UUID]):
     async def on_after_register(
         self, user: User, request: Optional[Request] = None
     ):
-        print(f"User {user.id} has registered.")
+        logger.info("User %s has registered.", user.id)
 
     async def on_after_forgot_password(
         self, user: User, token: str, request: Optional[Request] = None
     ):
-        print(
-            f"User {user.id} has forgot their password. Reset token: {token}"
+        logger.info(
+            "User %s has forgot their password. Reset token: %s",
+            user.id,
+            token,
         )
 
     async def on_after_request_verify(
         self, user: User, token: str, request: Optional[Request] = None
     ):
-        print(
-            f"Verification requested for user {user.id}."
-            f" Verification token: {token}"
+        logger.info(
+            "Verification requested for user %s. Verification token: %s",
+            user.id,
+            token,
         )
 
 

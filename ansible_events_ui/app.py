@@ -1,5 +1,6 @@
 import asyncio
 import json
+import logging
 from collections import defaultdict
 from typing import List
 
@@ -43,6 +44,8 @@ from .schemas import (
     UserUpdate,
 )
 from .users import auth_backend, current_active_user, fastapi_users
+
+logger = logging.getLogger("ansible_events_ui")
 
 app = FastAPI(title="Ansible Events API")
 
@@ -106,13 +109,18 @@ class UpdateManager:
     async def connect(self, page, websocket: WebSocket):
         await websocket.accept()
         self.active_connections[page].append(websocket)
-        print("connect", page, self.active_connections[page])
+        logger.debug("connect %s %s", page, self.active_connections[page])
 
     def disconnect(self, page, websocket: WebSocket):
         self.active_connections[page].remove(websocket)
 
     async def broadcast(self, page, message: str):
-        print("broadcast", page, message, "->", self.active_connections[page])
+        logger.debug(
+            "broadcast %s %s -> %s",
+            page,
+            message,
+            self.active_connections[page],
+        )
         for connection in self.active_connections[page]:
             await connection.send_text(message)
 
@@ -127,7 +135,7 @@ async def root():
 
 @app.websocket("/api/ws")
 async def websocket_endpoint(websocket: WebSocket):
-    print("starting ws")
+    logger.debug("starting ws")
     await connnectionmanager.connect(websocket)
     try:
         while True:
@@ -141,13 +149,12 @@ async def websocket_endpoint(websocket: WebSocket):
 async def websocket_endpoint2(
     websocket: WebSocket, db: AsyncSession = Depends(get_db_session)
 ):
-    print("starting ws2")
+    logger.debug("starting ws2")
     await websocket.accept()
     try:
         while True:
             data = await websocket.receive_text()
             data = json.loads(data)
-            print(data)
             # TODO(cutwater): Some data validation is needed
             data_type = data.get("type")
             if data_type == "Job":
@@ -175,7 +182,6 @@ async def websocket_endpoint2(
                 )
                 await db.execute(query)
                 await db.commit()
-            print(data)
     except WebSocketDisconnect:
         pass
 
@@ -189,7 +195,7 @@ async def websocket_activation_endpoint(
     try:
         while True:
             data = await websocket.receive_text()
-            print(data)
+            logger.debug(data)
     except WebSocketDisconnect:
         updatemanager.disconnect(page, websocket)
 
@@ -293,8 +299,7 @@ async def read_output(proc, activation_instance_id):
             if len(line) == 0:
                 break
             line = line.decode()
-            # FIXME(cutwater): F-string is not needed here
-            print(f"{line}", end="")
+            logger.debug(line)
             query = insert(activation_instance_logs).values(
                 line_number=line_number,
                 log=line,

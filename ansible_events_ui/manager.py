@@ -19,6 +19,7 @@ Functions:
 """
 
 import asyncio
+import logging
 import os
 import shutil
 import tempfile
@@ -27,6 +28,8 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from .db.models import playbooks
+
+logger = logging.getLogger("ansible_events_ui")
 
 activated_rulesets = {}
 ansible_events = shutil.which("ansible-events")
@@ -84,8 +87,8 @@ async def activate_rulesets(
         "--id",
         str(activation_id),
     ]
-    print(ansible_events)
-    print(cmd)
+    logger.debug(ansible_events)
+    logger.debug(cmd)
 
     proc = await asyncio.create_subprocess_exec(
         ansible_events,
