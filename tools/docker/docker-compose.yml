@@ -6,13 +6,16 @@ services:
     build:
       context: ../../
       dockerfile: tools/docker/Dockerfile
+    command: ["/bin/bash", "-c", "alembic upgrade head && ansible-events-ui"]
     ports:
       - "8080:8080"
     environment:
       - AE_HOST=0.0.0.0
-      - AE_DATABASE_URL=postgres+asyncpg://postgres:secret@postgres/ansible_events
+      - AE_DATABASE_URL=postgresql+asyncpg://postgres:secret@postgres/ansible_events
     depends_on:
       - postgres
+    # NOTE(cutwater): Temporary workaround for a container startup readiness problem
+    restart: on-failure
 
   postgres:
     image: "docker.io/library/postgres:13"
