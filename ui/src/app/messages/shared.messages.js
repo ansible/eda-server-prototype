@@ -18,6 +18,10 @@ const sharedMessages = defineMessages({
     id: 'shared.delete',
     defaultMessage: 'Delete'
   },
+  disable: {
+    id: 'shared.disable',
+    defaultMessage: 'Disable'
+  },
   search: {
     id: 'shared.search',
     defaultMessage: 'Search'

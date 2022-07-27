@@ -1,5 +1,5 @@
-import {Checkbox, Title, ToolbarGroup, ToolbarItem} from '@patternfly/react-core';
-import {Link, Route, useHistory} from 'react-router-dom';
+import {Title} from '@patternfly/react-core';
+import {Route, useHistory} from 'react-router-dom';
 import React, {useState, useEffect, useReducer, Fragment} from 'react';
 import { Button } from '@patternfly/react-core';
 import {getServer} from '@app/utils/utils';
@@ -7,7 +7,6 @@ import {TopToolbar} from '../shared/top-toolbar';
 import { PlusCircleIcon } from '@patternfly/react-icons';
 import sharedMessages from '../messages/shared.messages';
 import {cellWidth} from "@patternfly/react-table";
-import RuleSetsTableContext from './rule-sets-table-context';
 import {TableToolbarView} from "@app/shared/table-toolbar-view";
 import TableEmptyState from "@app/shared/table-empty-state";
 import isEmpty from 'lodash/isEmpty';
@@ -24,13 +23,7 @@ interface RuleSetType {
 
 const endpoint = 'http://' + getServer() + '/api/rule_set_files/';
 
-const columns = (intl, selectedAll, selectAll) => [
-  {
-    title: (
-      <Checkbox onChange={selectAll} isChecked={selectedAll} id="select-all" />
-    ),
-    transforms: [cellWidth(10)]
-  },
+const columns = (intl) => [
   {
     title: intl.formatMessage(sharedMessages.name),
     transforms: [cellWidth(80)]
@@ -78,37 +71,6 @@ export const RuleSetsListState = (state, action) => {
       };
     case 'setFilterValue':
       return { ...state, filterValue: action.payload };
-    case 'select':
-      return {
-        ...state,
-        selectedAll: false,
-        selectedRuleSets: state.selectedRuleSets.includes(action.payload)
-          ? state.selectedRuleSets.filter((id) => id !== action.payload)
-          : [...state.selectedRuleSets, action.payload]
-      };
-    case 'selectAll':
-      return {
-        ...state,
-        selectedRuleSets: [
-          ...state.selectedRuleSets,
-          ...action.payload
-        ].filter(unique),
-        selectedAll: true
-      };
-    case 'unselectAll':
-      return {
-        ...state,
-        selectedRuleSets: state.selectedRuleSets.filter(
-          (selected) => !action.payload.includes(selected)
-        ),
-        selectedAll: false
-      };
-    case 'resetSelected':
-      return {
-        ...state,
-        selectedRuleSets: [],
-        selectedAll: false
-      };
     case 'setFilteringFlag':
       return {
         ...state,
@@ -196,123 +158,61 @@ const RuleSets: React.FunctionComponent = () => {
 
   const actionResolver = () => [
     {
-      title: intl.formatMessage(sharedMessages.delete),
+      title: intl.formatMessage(sharedMessages.disable),
       component: 'button',
       onClick: (_event, _rowId, ruleset) =>
         history.push({
-          pathname: '/remove-rule-set',
+          pathname: '/disable-rule-set',
           search: `?rule-set=${ruleset.id}`
         })
     }
   ];
 
-  const selectAllFunction = () =>
-    selectedAll
-      ? stateDispatch({type: 'unselectAll', payload: data.map((wf) => wf.id)})
-      : stateDispatch({type: 'selectAll', payload: data.map((wf) => wf.id)});
-
   const anyRuleSetsSelected = selectedRuleSets.length > 0;
 
-  const toolbarButtons = () => (
-    <ToolbarGroup className={`pf-u-pl-lg top-toolbar`}>
-      <ToolbarItem>
-        <Link
-          id="add-rule-set-link"
-          to={{pathname: '/new-rule-set'}}
-        >
-          <Button
-            ouiaId={'add-rule-set-link'}
-            variant="primary"
-            aria-label={intl.formatMessage(sharedMessages.add)}
-          >
-            {intl.formatMessage(sharedMessages.add)}
-          </Button>
-        </Link>
-      </ToolbarItem>
-      <ToolbarItem>
-        <Link
-          id="remove-multiple-rule-sets"
-          className={anyRuleSetsSelected ? '' : 'disabled-link'}
-          to={{pathname: '/remove-rule-sets'}}
-        >
-          <Button
-            variant="secondary"
-            isDisabled={!anyRuleSetsSelected}
-            aria-label={intl.formatMessage(
-              sharedMessages.deleteRuleSetTitle
-            )}
-          >
-            {intl.formatMessage(sharedMessages.delete)}
-          </Button>
-        </Link>
-      </ToolbarItem>
-    </ToolbarGroup>
-  );
+  const toolbarButtons = () => null;
 
   return (
     <Fragment>
       <TopToolbar>
         <Title headingLevel={"h2"}>Rule Sets</Title>
       </TopToolbar>
-      <RuleSetsTableContext.Provider
-        value={{
-          selectedRuleSets,
-          setSelectedRuleSets
-        }}
-      >
-        <TableToolbarView
-          ouiaId={'RuleSets-table'}
-          rows={rows}
-          columns={columns(intl, selectedAll, selectAllFunction)}
-          fetchData={updateRuleSets}
-          routes={routes}
-          actionResolver={actionResolver}
-          titlePlural={intl.formatMessage(sharedMessages.rulesets)}
-          titleSingular={intl.formatMessage(sharedMessages.ruleset)}
-          toolbarButtons={toolbarButtons}
-          isLoading={isFetching || isFiltering}
-          renderEmptyState={() => (
-            <TableEmptyState
-              title={intl.formatMessage(sharedMessages.norulesets)}
-              Icon={PlusCircleIcon}
-              PrimaryAction={() =>
-                filterValue !== '' ? (
-                  <Button onClick={() => clearFilters()} variant="link">
-                    {intl.formatMessage(sharedMessages.clearAllFilters)}
-                  </Button>
-                ) : (
-                  <Link
-                    id="create-rule-set-link"
-                    to={{pathname: '/new-rule-set-file'}}
-                  >
-                    <Button
-                      ouiaId={'create-rule-set-link'}
-                      variant="primary"
-                      aria-label={intl.formatMessage(
-                        sharedMessages.addRuleSet
-                      )}
-                    >
-                      {intl.formatMessage(sharedMessages.addRuleSet)}
-                    </Button>
-                  </Link>
+      <TableToolbarView
+        ouiaId={'RuleSets-table'}
+        rows={rows}
+        columns={columns(intl)}
+        fetchData={updateRuleSets}
+        routes={routes}
+        actionResolver={actionResolver}
+        titlePlural={intl.formatMessage(sharedMessages.rulesets)}
+        titleSingular={intl.formatMessage(sharedMessages.ruleset)}
+        isLoading={isFetching || isFiltering}
+        renderEmptyState={() => (
+          <TableEmptyState
+            title={intl.formatMessage(sharedMessages.norulesets)}
+            Icon={PlusCircleIcon}
+            PrimaryAction={() =>
+              filterValue !== '' ? (
+                <Button onClick={() => clearFilters()} variant="link">
+                  {intl.formatMessage(sharedMessages.clearAllFilters)}
+                </Button>
+              ) : null
+            }
+            description={
+              filterValue === ''
+                ? intl.formatMessage(sharedMessages.norulesets)
+                : intl.formatMessage(
+                sharedMessages.clearAllFiltersDescription
                 )
-              }
-              description={
-                filterValue === ''
-                  ? intl.formatMessage(sharedMessages.norulesets)
-                  : intl.formatMessage(
-                  sharedMessages.clearAllFiltersDescription
-                  )
-              }
-              isSearch={!isEmpty(filterValue)}
-            />
-          )}
-          activeFiltersConfig={{
-            filters: prepareChips(filterValue, intl),
-            onDelete: () => handleFilterChange('')
-          }}
-        />
-      </RuleSetsTableContext.Provider>
+            }
+            isSearch={!isEmpty(filterValue)}
+          />
+        )}
+        activeFiltersConfig={{
+          filters: prepareChips(filterValue, intl),
+          onDelete: () => handleFilterChange('')
+        }}
+      />
     </Fragment>
   );
 }

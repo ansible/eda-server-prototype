@@ -98,9 +98,9 @@ const routes: AppRouteConfig[] = [
   {
     component: RuleSets,
     exact: true,
-    label: 'Rules Files',
-    path: '/rulesetfiles',
-    title: 'Rules Files',
+    label: 'Rule sets',
+    path: '/rulesets',
+    title: 'Rule Sets',
   },
   {
     component: RuleSetFile,
