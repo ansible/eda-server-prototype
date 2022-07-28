@@ -5,6 +5,7 @@ flake8-comprehensions
 flake8-debugger
 flake8-docstrings
 flake8-eradicate
+flake8-print
 flake8-string-format
 pep8-naming
 black
