@@ -42,7 +42,7 @@ const NewActivation: React.FunctionComponent = () => {
   const [rules, setRules] = useState([{"id": 0, "name": "Please select a rule set"}])
   const [inventories, setInventories] = useState([{"id": 0, "name": "Please select an inventory"}]);
   const [extravars, setExtraVars] = useState([{"id": 0, "name": "Please select vars"}]);
-  const [name, setName] = useState('');
+  const [name, setName] = useState();
   const [ruleset, setRuleSet] = useState('');
   const [inventory, setInventory] = useState('');
   const [extravar, setExtraVar] = useState('');
@@ -78,43 +78,54 @@ const NewActivation: React.FunctionComponent = () => {
     .then(data => setExtraVars([...extravars, ...data]));
   }, []);
 
-  const onNameChange = async (value) => {
-    setName(value);
+  const validateName = (value) => {
     (!value || value.length < 1 ) ?
       setValidatedName(ValidatedOptions.error) :
       setValidatedName(ValidatedOptions.default)
+  }
+
+  const onNameChange = (value) => {
+    setName(value);
+    validateName(value);
   };
 
-  const onRuleSetChange = async (value) => {
-    setRuleSet(value);
+  const validateRuleSet = (value) => {
     (!value || value.length < 1 ) ?
       setValidatedRuleSet(ValidatedOptions.error) :
       setValidatedRuleSet(ValidatedOptions.default)
   };
 
-  const onInventoryChange = async (value) => {
-    setInventory(value);
+  const onRuleSetChange = (value) => {
+    setRuleSet(value);
+    validateRuleSet(value);
+  };
+
+  const validateInventory = (value) => {
     (!value || value.length < 1 ) ?
       setValidatedInventory(ValidatedOptions.error) :
       setValidatedInventory(ValidatedOptions.default)
   };
 
-  const onExtraVarChange = async (value) => {
-    setExtraVar(value);
+  const onInventoryChange = (value) => {
+    setInventory(value);
+    validateInventory(value);
+  };
+
+  const validateExtraVar = (value) => {
     (!value || value.length < 1 ) ?
       setValidatedExtraVar(ValidatedOptions.error) :
       setValidatedExtraVar(ValidatedOptions.default)
+  }
+  const onExtraVarChange = (value) => {
+    setExtraVar(value);
+    validateExtraVar(value);
   };
 
   const validateFields = () => {
-    (!name || name.length < 1) ?
-      setValidatedName(ValidatedOptions.error) : setValidatedName(ValidatedOptions.default);
-    (!ruleset || ruleset.length < 1) ?
-      setValidatedRuleSet(ValidatedOptions.error) : setValidatedRuleSet(ValidatedOptions.default);
-    (!inventory || inventory.length < 1) ?
-      setValidatedInventory(ValidatedOptions.error) : setValidatedInventory(ValidatedOptions.default);
-    (!extravar || extravar.length < 1) ?
-      setValidatedExtraVar(ValidatedOptions.error) : setValidatedExtraVar(ValidatedOptions.default);
+    validateName(name);
+    validateRuleSet(ruleset);
+    validateInventory(inventory);
+    validateExtraVar(extravar);
   };
 
   const handleSubmit = (e) => {
@@ -167,6 +178,7 @@ const NewActivation: React.FunctionComponent = () => {
                 isRequired
                 validated={validatedName}
                 onChange={onNameChange}
+                onBlur={(event) => validateName(name)}
               />
             </FormGroup>
             <FormGroup label="Rule Set"
@@ -177,6 +189,7 @@ const NewActivation: React.FunctionComponent = () => {
               <FormSelect value={ruleset}
                           onChange={onRuleSetChange}
                           validated={validatedRuleSet}
+                          onBlur={(event) => validateRuleSet(ruleset)}
                           aria-label="FormSelect Input RuleSet">
                 {rules.map((option, index) => (
                   <FormSelectOption
@@ -193,6 +206,7 @@ const NewActivation: React.FunctionComponent = () => {
                        validated={validatedInventory}>
               <FormSelect value={inventory}
                           onChange={onInventoryChange}
+                          onBlur={() => validateInventory(inventory)}
                           validated={validatedInventory}
                           aria-label="FormSelect Input Inventory">
                 {inventories.map((option, index) => (
@@ -208,6 +222,7 @@ const NewActivation: React.FunctionComponent = () => {
                        validated={validatedExtraVar}>
               <FormSelect value={extravar}
                           onChange={onExtraVarChange}
+                          onBlur={() => validateExtraVar(extravar)}
                           validated={validatedExtraVar}
                           aria-label="FormSelect Input ExtraVar">
                 {extravars.map((option, index) => (
@@ -219,7 +234,7 @@ const NewActivation: React.FunctionComponent = () => {
             </FormGroup>
             <ActionGroup>
               <Button variant="primary" onClick={handleSubmit}>Save</Button>
-              <Button variant="link">Cancel</Button>
+              <Button variant="link" target={'/activations'}>Cancel</Button>
             </ActionGroup>
           </Form>
         </CardBody>
