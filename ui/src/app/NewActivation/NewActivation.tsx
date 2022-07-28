@@ -42,7 +42,15 @@ const NewActivation: React.FunctionComponent = () => {
   const [rules, setRules] = useState([{"id": 0, "name": "Please select a rule set"}])
   const [inventories, setInventories] = useState([{"id": 0, "name": "Please select an inventory"}]);
   const [extravars, setExtraVars] = useState([{"id": 0, "name": "Please select vars"}]);
+  const [name, setName] = useState('');
+  const [ruleset, setRuleSet] = useState('');
+  const [inventory, setInventory] = useState('');
+  const [extravar, setExtraVar] = useState('');
 
+  const [ validatedName, setValidatedName ] = useState<ValidatedOptions>(ValidatedOptions.default);
+  const [ validatedRuleSet, setValidatedRuleSet ] = useState<ValidatedOptions>(ValidatedOptions.default);
+  const [ validatedInventory, setValidatedInventory ] = useState<ValidatedOptions>(ValidatedOptions.default);
+  const [ validatedExtraVar, setValidatedExtraVar ] = useState<ValidatedOptions>(ValidatedOptions.default);
   useEffect(() => {
      fetch(endpoint1, {
        headers: {
@@ -70,28 +78,43 @@ const NewActivation: React.FunctionComponent = () => {
     .then(data => setExtraVars([...extravars, ...data]));
   }, []);
 
-  const [name, setName] = useState('');
-  const [ruleset, setRuleSet] = useState('');
-  const [inventory, setInventory] = useState('');
-  const [extravar, setExtraVar] = useState('');
-  const [showError, setShowError] = useState(false);
-
   const onNameChange = async (value) => {
     setName(value);
-    if (value === '') {
-      setValidatedName(ValidatedOptions.error);
-    }
+    (!value || value.length < 1 ) ?
+      setValidatedName(ValidatedOptions.error) :
+      setValidatedName(ValidatedOptions.default)
   };
 
   const onRuleSetChange = async (value) => {
     setRuleSet(value);
-    if (value === '') {
-      setValidatedName(ValidatedOptions.error);
-    }
+    (!value || value.length < 1 ) ?
+      setValidatedRuleSet(ValidatedOptions.error) :
+      setValidatedRuleSet(ValidatedOptions.default)
   };
+
+  const onInventoryChange = async (value) => {
+    setInventory(value);
+    (!value || value.length < 1 ) ?
+      setValidatedInventory(ValidatedOptions.error) :
+      setValidatedInventory(ValidatedOptions.default)
+  };
+
+  const onExtraVarChange = async (value) => {
+    setExtraVar(value);
+    (!value || value.length < 1 ) ?
+      setValidatedExtraVar(ValidatedOptions.error) :
+      setValidatedExtraVar(ValidatedOptions.default)
+  };
+
   const validateFields = () => {
     (!name || name.length < 1) ?
       setValidatedName(ValidatedOptions.error) : setValidatedName(ValidatedOptions.default);
+    (!ruleset || ruleset.length < 1) ?
+      setValidatedRuleSet(ValidatedOptions.error) : setValidatedRuleSet(ValidatedOptions.default);
+    (!inventory || inventory.length < 1) ?
+      setValidatedInventory(ValidatedOptions.error) : setValidatedInventory(ValidatedOptions.default);
+    (!extravar || extravar.length < 1) ?
+      setValidatedExtraVar(ValidatedOptions.error) : setValidatedExtraVar(ValidatedOptions.default);
   };
 
   const handleSubmit = (e) => {
@@ -111,7 +134,6 @@ const NewActivation: React.FunctionComponent = () => {
   console.log(rules);
   console.log(inventories);
   console.log(extravars);
-  const [ validatedName, setValidatedName ] = useState<ValidatedOptions>(ValidatedOptions.default);
   return (
   <React.Fragment>
     <TopToolbar
@@ -147,24 +169,51 @@ const NewActivation: React.FunctionComponent = () => {
                 onChange={onNameChange}
               />
             </FormGroup>
-            <FormGroup label="Rule Set"  fieldId={`rule-set-${ruleset}`}>
-              <FormSelect value={ruleset} onChange={setRuleSet} aria-label="FormSelect Input">
+            <FormGroup label="Rule Set"
+                       fieldId={`rule-set-${ruleset}`}
+                       helperTextInvalid={ intl.formatMessage(sharedMessages.selectRuleSet) }
+                       helperTextInvalidIcon={<ExclamationCircleIcon />}
+                       validated={validatedRuleSet}>
+              <FormSelect value={ruleset}
+                          onChange={onRuleSetChange}
+                          validated={validatedRuleSet}
+                          aria-label="FormSelect Input RuleSet">
                 {rules.map((option, index) => (
-                  <FormSelectOption key={index} value={option.id} label={"" + option.id + " "+ option.name} />
-                ))}
-          </FormSelect>
-            </FormGroup>
-            <FormGroup label="Inventory" fieldId={'activation-name'}>
-              <FormSelect value={inventory} onChange={setInventory} aria-label="FormSelect Input2">
-                {inventories.map((option, index) => (
-                  <FormSelectOption key={index} value={option.id} label={"" + option.id + " "+ option.name} />
+                  <FormSelectOption
+                    key={index}
+                    value={option.id}
+                    label={"" + option.id + " "+ option.name} />
                 ))}
               </FormSelect>
             </FormGroup>
-            <FormGroup label="Extra Vars" fieldId={'activation-vars'}>
-              <FormSelect value={extravar} onChange={setExtraVar} aria-label="FormSelect Input3">
+            <FormGroup label="Inventory"
+                       fieldId={'activation-name'}
+                       helperTextInvalid={ intl.formatMessage(sharedMessages.selectInventory) }
+                       helperTextInvalidIcon={<ExclamationCircleIcon />}
+                       validated={validatedInventory}>
+              <FormSelect value={inventory}
+                          onChange={onInventoryChange}
+                          validated={validatedInventory}
+                          aria-label="FormSelect Input Inventory">
+                {inventories.map((option, index) => (
+                  <FormSelectOption key={index} value={option.id}
+                                    label={"" + option.id + " "+ option.name} />
+                ))}
+              </FormSelect>
+            </FormGroup>
+            <FormGroup label="Extra Vars"
+                       fieldId={'activation-vars'}
+                       helperTextInvalid={ intl.formatMessage(sharedMessages.selectExtraVar) }
+                       helperTextInvalidIcon={<ExclamationCircleIcon />}
+                       validated={validatedExtraVar}>
+              <FormSelect value={extravar}
+                          onChange={onExtraVarChange}
+                          validated={validatedExtraVar}
+                          aria-label="FormSelect Input ExtraVar">
                 {extravars.map((option, index) => (
-                  <FormSelectOption key={index} value={option.id} label={"" + option.id + " "+ option.name} />
+                  <FormSelectOption key={index}
+                                    value={option.id}
+                                    label={"" + option.id + " "+ option.name} />
                 ))}
               </FormSelect>
             </FormGroup>

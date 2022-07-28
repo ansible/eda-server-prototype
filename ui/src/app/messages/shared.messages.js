@@ -103,6 +103,18 @@ const sharedMessages = defineMessages({
     id: 'activation.enterRulebookActivationName',
     defaultMessage: 'Enter a rulebook activation name'
   },
+  selectRuleSet: {
+    id: 'activation.selectRulebookActivationName',
+    defaultMessage: 'Select a rule set'
+  },
+  selectInventory: {
+    id: 'activation.selectInventory',
+    defaultMessage: 'Select an inventory'
+  },
+  selectExtraVar: {
+    id: 'activation.selectExtraVar',
+    defaultMessage: 'Select extra variables'
+  },
   ruleset: {
     id: 'rulesets.ruleset',
     defaultMessage: 'Rule set'
