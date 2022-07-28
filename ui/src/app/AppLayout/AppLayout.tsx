@@ -16,13 +16,13 @@ import {
 import { routes, IAppRoute, IAppRouteGroup } from '@app/routes';
 import {ExternalLinkAltIcon, QuestionCircleIcon } from '@patternfly/react-icons';
 import {useEffect, useState} from 'react';
-import { AboutModalWindow } from './about-modal';
 import Logo from '../../assets/images/logo-large.svg';
 import { SmallLogo } from './small-logo';
 import { APPLICATION_TITLE } from '../utils/constants';
 import { StatefulDropdown } from './stateful-dropdown';
 import {getUser, logoutUser} from '@app/shared/auth';
 import {User} from "@app/shared/types/common-types";
+import {AboutModalWindow} from "@app/AppLayout/about-modal";
 
 interface IAppLayout {
   children: React.ReactNode;

@@ -6,6 +6,8 @@ import { Project } from '@app/Project/Project';
 import { NewProject } from '@app/NewProject/NewProject';
 import { Activations } from '@app/Activations/Activations';
 import { Activation } from '@app/Activation/Activation';
+import { ActivationDetails } from '@app/Activation/activation-details';
+import { ActivationJobs } from '@app/Activation/activation-jobs';
 import { NewActivation } from '@app/NewActivation/NewActivation';
 import { Jobs } from '@app/Jobs/Jobs';
 import { Job } from '@app/Job/Job';
@@ -19,6 +21,7 @@ import { Playbooks } from '@app/Playbooks/Playbooks';
 import { Playbook } from '@app/Playbook/Playbook';
 import { NotFound } from '@app/NotFound/NotFound';
 import { useDocumentTitle } from '@app/utils/useDocumentTitle';
+import {ActivationStdout} from "@app/Activation/activation-stdout";
 
 export interface IAppRoute {
   label?: string; // Excluding the label will exclude the route from the nav sidebar in AppLayout
@@ -67,15 +70,32 @@ const routes: AppRouteConfig[] = [
   {
     component: Activations,
     exact: true,
-    label: 'Activations',
+    label: 'Rulebook activations',
     path: '/activations',
-    title: 'Activations',
+    title: 'Rulebook activations',
   },
   {
     component: Activation,
-    exact: true,
     path: '/activation/:id',
     title: 'Activation',
+  },
+  {
+    component: ActivationJobs,
+    exact: true,
+    path: '/activation/:id/jobs',
+    title: 'Activation jobs',
+  },
+  {
+    component: ActivationDetails,
+    exact: true,
+    path: '/activation/:id/details',
+    title: 'Activation details',
+  },
+  {
+    component: ActivationStdout,
+    exact: true,
+    path: '/activation/:id/stdout',
+    title: 'Standard out',
   },
   {
     component: NewActivation,

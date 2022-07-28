@@ -3,10 +3,12 @@
     "baseUrl": "./",
     "rootDir": ".",
     "outDir": "dist",
+    "sourceMap": true,
     "module": "esnext",
+    "moduleResolution": "node",
     "target": "es5",
     "lib": ["es6", "dom"],
-    "sourceMap": true,
+    "skipLibCheck": true,
     "jsx": "react",
     "moduleResolution": "node",
     "forceConsistentCasingInFileNames": true,
@@ -16,13 +18,16 @@
     "allowJs": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
-    "strict": true,
+    "noErrorTruncation": true,
+    "strict": true, // Never set this rule to false. Setting strict to false basically turns off any type check and we could not use TS at all.
     "paths": {
       "@app/*": ["src/app/*"],
       "@assets/*": ["node_modules/@patternfly/react-core/dist/styles/assets/*"]
     },
-    "importHelpers": true,
-    "skipLibCheck": true
+    "typeRoots": [
+      "./node_modules/@types",
+      "./src/types/"
+  ]
   },
   "include": [
     "**/*.ts",
@@ -30,5 +35,5 @@
     "**/*.jsx",
     "**/*.js"
   ],
-  "exclude": ["node_modules"]
+  "exclude": ["./dist", "node_modules"]
 }

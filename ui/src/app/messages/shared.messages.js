@@ -81,15 +81,15 @@ const sharedMessages = defineMessages({
   },
   activations: {
     id: 'activation.activations',
-    defaultMessage: 'Activations'
+    defaultMessage: 'Rulebook activations'
   },
   noactivations: {
     id: 'activation.noactivations',
-    defaultMessage: 'No activations'
+    defaultMessage: 'There are currently no rulebook activations added for your organization.'
   },
   addActivation: {
     id: 'activation.addActivation',
-    defaultMessage: 'Add activation'
+    defaultMessage: 'Add rulebook activation'
   },
   deleteActivationTitle: {
     id: 'activation.deleteActivation',

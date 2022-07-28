@@ -252,7 +252,7 @@ const Activations: React.FunctionComponent = () => {
   return (
     <Fragment>
       <TopToolbar>
-        <Title headingLevel={"h2"}>Activations</Title>
+        <Title headingLevel={"h2"}>Rulebook activations</Title>
       </TopToolbar>
       <ActivationsTableContext.Provider
         value={{
