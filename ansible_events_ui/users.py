@@ -46,7 +46,6 @@ async def get_user_manager(
     yield UserManager(user_db)
 
 
-# bearer_transport = BearerTransport(tokenUrl="auth/jwt/login")
 cookie_transport = CookieTransport(cookie_max_age=3600)
 
 

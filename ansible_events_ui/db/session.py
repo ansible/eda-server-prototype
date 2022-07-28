@@ -16,7 +16,7 @@ async_session_maker = sessionmaker(
     async_engine,
     class_=AsyncSession,
     expire_on_commit=False,
-    # future=True,
+    # future=True,  # noqa: E800
 )
 
 

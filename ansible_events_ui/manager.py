@@ -1,5 +1,5 @@
 """
-Ruleset manager
+Ruleset manager.
 
 Activates rulesets together with an inventory and extravars.
 
@@ -42,10 +42,11 @@ async def activate_rulesets(
     db: AsyncSession,
 ):
     """
-    Call ansible-events with ruleset, inventory, and extravars
-    added as volumes to a container.
-    """
+    Spawn ansible-events.
 
+    Call ansible-events with ruleset, inventory, and extravars added
+    as volumes to a container.
+    """
     tempdir = tempfile.mkdtemp(prefix="ruleset_manager")
     result = await db.execute(select(playbooks))
     for playbook in result.all():

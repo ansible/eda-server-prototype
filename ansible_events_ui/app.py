@@ -304,7 +304,7 @@ async def read_output(proc, activation_instance_id):
             await db.commit()
             line_number += 1
             await connnectionmanager.broadcast(
-                json.dumps(["Stdout", dict(stdout=line)])
+                json.dumps(["Stdout", {"stdout": line}])
             )
 
 
@@ -323,9 +323,11 @@ async def list_activation_instance_logs(
 @app.get("/api/tasks/")
 async def list_tasks():
     tasks = [
-        dict(
-            name=task.get_name(), done=task.done(), cancelled=task.cancelled()
-        )
+        {
+            "name": task.get_name(),
+            "done": task.done(),
+            "cancelled": task.cancelled(),
+        }
         for task in taskmanager.tasks
     ]
     return tasks
