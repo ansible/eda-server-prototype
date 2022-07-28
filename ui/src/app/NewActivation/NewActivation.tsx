@@ -1,25 +1,28 @@
-import {FormHelperText, PageSection, Text, TextVariants, Title} from '@patternfly/react-core';
-import { useHistory } from "react-router-dom";
-import React, { useState, useEffect } from 'react';
 import {
+  ActionGroup,
+  Button,
   Card,
   CardBody as PFCardBody,
-  CardTitle,
+  Form,
+  FormGroup,
+  FormSelect,
+  FormSelectOption,
+  PageSection,
   SimpleList as PFSimpleList,
-  SimpleListItem,
-  Stack,
-  StackItem,
+  Text,
+  TextInput,
+  TextVariants,
+  Title,
+  ValidatedOptions
 } from '@patternfly/react-core';
-import { ActionGroup, Button, Form, FormGroup, TextInput } from '@patternfly/react-core';
-import { FormSelect, FormSelectOption, FormSelectOptionGroup } from '@patternfly/react-core';
-import { postData } from '@app/utils/utils';
-import {getServer} from '@app/utils/utils';
+import {useHistory} from "react-router-dom";
+import React, {useEffect, useState} from 'react';
+import {getServer, postData} from '@app/utils/utils';
 import styled from 'styled-components';
 import {TopToolbar} from "@app/shared/top-toolbar";
 import {ExclamationCircleIcon} from "@patternfly/react-icons";
 import {useIntl} from "react-intl";
-import sharedMessages from "@app/messages/shared.messages";
-
+import sharedMessages from "../messages/shared.messages";
 
 const CardBody = styled(PFCardBody)`
   white-space: pre-wrap;
@@ -73,8 +76,21 @@ const NewActivation: React.FunctionComponent = () => {
   const [extravar, setExtraVar] = useState('');
   const [showError, setShowError] = useState(false);
 
+  const onNameChange = async (value) => {
+    setName(value);
+    if (value === '') {
+      setValidatedName(ValidatedOptions.error);
+    }
+  };
+
+  const validateFields = () => {
+    (!name || name.length < 1) ?
+      setValidatedName(ValidatedOptions.error) : setValidatedName(ValidatedOptions.default);
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
+    validateFields();
     postData(endpoint, { name: name,
                          rule_set_file_id: ruleset,
                          inventory_id: inventory,
@@ -89,7 +105,7 @@ const NewActivation: React.FunctionComponent = () => {
   console.log(rules);
   console.log(inventories);
   console.log(extravars);
-
+  const [ validatedName, setValidatedName ] = useState<ValidatedOptions>(ValidatedOptions.default);
   return (
   <React.Fragment>
     <TopToolbar
@@ -114,13 +130,15 @@ const NewActivation: React.FunctionComponent = () => {
                        isRequired
                        helperTextInvalid={ intl.formatMessage(sharedMessages.enterRulebookActivationName) }
                        helperTextInvalidIcon={<ExclamationCircleIcon />}
+                       validated={validatedName}
             >
               <TextInput
                 id="activation-name"
-                onChange={setName}
                 value={name}
                 label="Name"
                 isRequired
+                validated={validatedName}
+                onChange={onNameChange}
               />
             </FormGroup>
             <FormGroup label="Rule Set"  fieldId={`rule-set-${ruleset}`}>
