@@ -1,4 +1,4 @@
-import { PageSection, Title } from '@patternfly/react-core';
+import {FormHelperText, PageSection, Text, TextVariants, Title} from '@patternfly/react-core';
 import { useHistory } from "react-router-dom";
 import React, { useState, useEffect } from 'react';
 import {
@@ -14,9 +14,11 @@ import { ActionGroup, Button, Form, FormGroup, TextInput } from '@patternfly/rea
 import { FormSelect, FormSelectOption, FormSelectOptionGroup } from '@patternfly/react-core';
 import { postData } from '@app/utils/utils';
 import {getServer} from '@app/utils/utils';
-
 import styled from 'styled-components';
 import {TopToolbar} from "@app/shared/top-toolbar";
+import {ExclamationCircleIcon} from "@patternfly/react-icons";
+import {useIntl} from "react-intl";
+import sharedMessages from "@app/messages/shared.messages";
 
 
 const CardBody = styled(PFCardBody)`
@@ -32,9 +34,8 @@ const endpoint2 = 'http://' + getServer() + '/api/inventories/';
 const endpoint3 = 'http://' + getServer() + '/api/extra_vars/';
 
 const NewActivation: React.FunctionComponent = () => {
-
   const history = useHistory();
-
+  const intl = useIntl();
   const [rules, setRules] = useState([{"id": 0, "name": "Please select a rule set"}])
   const [inventories, setInventories] = useState([{"id": 0, "name": "Please select an inventory"}]);
   const [extravars, setExtraVars] = useState([{"id": 0, "name": "Please select vars"}]);
@@ -70,16 +71,19 @@ const NewActivation: React.FunctionComponent = () => {
   const [ruleset, setRuleSet] = useState('');
   const [inventory, setInventory] = useState('');
   const [extravar, setExtraVar] = useState('');
+  const [showError, setShowError] = useState(false);
 
-  const handleSubmit = () => {
-			postData(endpoint, { name: name,
-                           rule_set_file_id: ruleset,
-                           inventory_id: inventory,
-                           extra_var_id: extravar})
-				.then(data => {
-					console.log(data);
-          history.push(`/activation/${data.id}/details`);
-			});
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    postData(endpoint, { name: name,
+                         rule_set_file_id: ruleset,
+                         inventory_id: inventory,
+                         extra_var_id: extravar})
+      .then(data => {
+        console.log(data);
+        data?.id ? history.push("/activation/" + data.id) :
+          console.log('no activation was added')
+    });
   };
 
   console.log(rules);
@@ -102,33 +106,43 @@ const NewActivation: React.FunctionComponent = () => {
       <Card>
         <CardBody>
           <Form>
-            <FormGroup label="Name"  fieldId={`activation-name`}>
+            <Text component={TextVariants.small}>
+              { intl.formatMessage(sharedMessages.allFieldsRequired) }
+            </Text>
+            <FormGroup label={intl.formatMessage(sharedMessages.name)}
+                       fieldId={`activation-name`}
+                       isRequired
+                       helperTextInvalid={ intl.formatMessage(sharedMessages.enterRulebookActivationName) }
+                       helperTextInvalidIcon={<ExclamationCircleIcon />}
+            >
               <TextInput
                 id="activation-name"
                 onChange={setName}
                 value={name}
+                label="Name"
+                isRequired
               />
-          </FormGroup>
+            </FormGroup>
             <FormGroup label="Rule Set"  fieldId={`rule-set-${ruleset}`}>
               <FormSelect value={ruleset} onChange={setRuleSet} aria-label="FormSelect Input">
-            {rules.map((option, index) => (
-              <FormSelectOption key={index} value={option.id} label={"" + option.id + " "+ option.name} />
-            ))}
+                {rules.map((option, index) => (
+                  <FormSelectOption key={index} value={option.id} label={"" + option.id + " "+ option.name} />
+                ))}
           </FormSelect>
             </FormGroup>
             <FormGroup label="Inventory" fieldId={'activation-name'}>
               <FormSelect value={inventory} onChange={setInventory} aria-label="FormSelect Input2">
-            {inventories.map((option, index) => (
-              <FormSelectOption key={index} value={option.id} label={"" + option.id + " "+ option.name} />
-            ))}
-          </FormSelect>
+                {inventories.map((option, index) => (
+                  <FormSelectOption key={index} value={option.id} label={"" + option.id + " "+ option.name} />
+                ))}
+              </FormSelect>
             </FormGroup>
             <FormGroup label="Extra Vars" fieldId={'activation-vars'}>
               <FormSelect value={extravar} onChange={setExtraVar} aria-label="FormSelect Input3">
-            {extravars.map((option, index) => (
-              <FormSelectOption key={index} value={option.id} label={"" + option.id + " "+ option.name} />
-            ))}
-          </FormSelect>
+                {extravars.map((option, index) => (
+                  <FormSelectOption key={index} value={option.id} label={"" + option.id + " "+ option.name} />
+                ))}
+              </FormSelect>
             </FormGroup>
             <ActionGroup>
               <Button variant="primary" onClick={handleSubmit}>Save</Button>

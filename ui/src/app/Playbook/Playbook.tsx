@@ -26,7 +26,7 @@ const Playbook: React.FunctionComponent = () => {
   return (
   <React.Fragment>
     <TopToolbar>
-      <Title headingLevel={"h2"}>{`Playbook ${playbook.url}`}</Title>
+      <Title headingLevel={"h2"}>{`Playbook ${playbook.name}`}</Title>
     </TopToolbar>
     <CodeBlock>
       <CodeBlockCode id="code-content">{playbook.playbook}</CodeBlockCode>

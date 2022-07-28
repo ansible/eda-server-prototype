@@ -55,6 +55,10 @@ const sharedMessages = defineMessages({
     id: 'shared.updatedLabel',
     defaultMessage: 'Updated'
   },
+  allFieldsRequired: {
+    id: 'shared.allFieldsRequired',
+    defaultMessage: 'All fields are required'
+  },
   project: {
     id: 'project.project',
     defaultMessage: 'Project'
@@ -94,6 +98,10 @@ const sharedMessages = defineMessages({
   deleteActivationTitle: {
     id: 'activation.deleteActivation',
     defaultMessage: 'Delete activation'
+  },
+  enterRulebookActivationName: {
+    id: 'activation.enterRulebookActivationName',
+    defaultMessage: 'Enter a rulebook activation name'
   },
   ruleset: {
     id: 'rulesets.ruleset',
