@@ -15,7 +15,7 @@ import {
   Title,
   ValidatedOptions
 } from '@patternfly/react-core';
-import {useHistory} from "react-router-dom";
+import {Link, useHistory} from "react-router-dom";
 import React, {useEffect, useState} from 'react';
 import {getServer, postData} from '@app/utils/utils';
 import styled from 'styled-components';
@@ -234,7 +234,7 @@ const NewActivation: React.FunctionComponent = () => {
             </FormGroup>
             <ActionGroup>
               <Button variant="primary" onClick={handleSubmit}>Save</Button>
-              <Button variant="link" target={'/activations'}>Cancel</Button>
+              <Button variant="link" onClick={() => history.push('/activations')}> Cancel</Button>
             </ActionGroup>
           </Form>
         </CardBody>
