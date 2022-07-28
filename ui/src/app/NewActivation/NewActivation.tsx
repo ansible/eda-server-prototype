@@ -83,6 +83,12 @@ const NewActivation: React.FunctionComponent = () => {
     }
   };
 
+  const onRuleSetChange = async (value) => {
+    setRuleSet(value);
+    if (value === '') {
+      setValidatedName(ValidatedOptions.error);
+    }
+  };
   const validateFields = () => {
     (!name || name.length < 1) ?
       setValidatedName(ValidatedOptions.error) : setValidatedName(ValidatedOptions.default);
