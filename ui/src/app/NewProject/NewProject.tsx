@@ -53,7 +53,7 @@ const NewProject: React.FunctionComponent = () => {
     <PageSection>
       <Card>
         <CardBody>
-        <Form>
+        <Form isWidthLimited>
           <FormGroup
             label="Git URL"
             fieldId="url-1"
@@ -66,7 +66,7 @@ const NewProject: React.FunctionComponent = () => {
           </FormGroup>
           <ActionGroup>
             <Button variant="primary" onClick={handleSubmit}>Save</Button>
-            <Button variant="link">Cancel</Button>
+            <Button variant="link" onClick={() => history.push('/projects')}> Cancel</Button>
           </ActionGroup>
         </Form>
         </CardBody>
