@@ -18,6 +18,10 @@ const sharedMessages = defineMessages({
     id: 'shared.delete',
     defaultMessage: 'Delete'
   },
+  disable: {
+    id: 'shared.disable',
+    defaultMessage: 'Disable'
+  },
   search: {
     id: 'shared.search',
     defaultMessage: 'Search'
@@ -90,6 +94,30 @@ const sharedMessages = defineMessages({
   deleteActivationTitle: {
     id: 'activation.deleteActivation',
     defaultMessage: 'Delete activation'
+  },
+  ruleset: {
+    id: 'rulesets.ruleset',
+    defaultMessage: 'Rule set'
+  },
+  rulesets: {
+    id: 'rulesets.rulesets',
+    defaultMessage: 'Rule sets'
+  },
+  norulesets: {
+    id: 'rulesets.norulesets',
+    defaultMessage: 'No rule sets'
+  },
+  number_of_rules: {
+    id: 'rulesets.number_of_rules',
+    defaultMessage: 'Number of rules'
+  },
+  fire_count: {
+    id: 'rulesets.fire_count',
+    defaultMessage: 'Fire count'
+  },
+  deleteRuleSetTitle: {
+    id: 'rulesets.deleteRuleSet',
+    defaultMessage: 'Delete rule set'
   }
 });
 
