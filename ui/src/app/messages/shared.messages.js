@@ -38,6 +38,22 @@ const sharedMessages = defineMessages({
     id: 'shared.noResult',
     defaultMessage: 'No {results}'
   },
+  job: {
+    id: 'shared.job',
+    defaultMessage: 'Job'
+  },
+  jobs: {
+    id: 'shared.jobs',
+    defaultMessage: 'Jobs'
+  },
+  status: {
+    id: 'shared.status',
+    defaultMessage: 'Status'
+  },
+  rule: {
+    id: 'shared.rule',
+    defaultMessage: 'Rule'
+  },
   clearAllFilters: {
     id: 'shared.clearAllFilters',
     defaultMessage: 'Clear all filters'
@@ -138,7 +154,15 @@ const sharedMessages = defineMessages({
   deleteRuleSetTitle: {
     id: 'rulesets.deleteRuleSet',
     defaultMessage: 'Delete rule set'
-  }
+  },
+  nojobs: {
+    id: 'activation.nojobs',
+    defaultMessage: 'There are currently no jobs for this rulebook activation.'
+  },
+  lastFiredDate: {
+    id: 'activation.lastFiredDate',
+    defaultMessage: 'Last fired date'
+  },
 });
 
 export default sharedMessages;

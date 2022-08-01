@@ -1,4 +1,4 @@
-import {Title} from '@patternfly/react-core';
+import {PageSection, Title} from '@patternfly/react-core';
 import {Route, useHistory} from 'react-router-dom';
 import React, {useState, useEffect, useReducer, Fragment} from 'react';
 import { Button } from '@patternfly/react-core';
@@ -183,42 +183,44 @@ const RuleSets: React.FunctionComponent = () => {
       <TopToolbar>
         <Title headingLevel={"h2"}>Rule Sets</Title>
       </TopToolbar>
-      <TableToolbarView
-        ouiaId={'RuleSets-table'}
-        rows={rows}
-        columns={columns(intl)}
-        fetchData={updateRuleSets}
-        routes={routes}
-        actionResolver={actionResolver}
-        titlePlural={intl.formatMessage(sharedMessages.rulesets)}
-        titleSingular={intl.formatMessage(sharedMessages.ruleset)}
-        isLoading={isFetching || isFiltering}
-        renderEmptyState={() => (
-          <TableEmptyState
-            title={intl.formatMessage(sharedMessages.norulesets)}
-            Icon={PlusCircleIcon}
-            PrimaryAction={() =>
-              filterValue !== '' ? (
-                <Button onClick={() => clearFilters()} variant="link">
-                  {intl.formatMessage(sharedMessages.clearAllFilters)}
-                </Button>
-              ) : null
-            }
-            description={
-              filterValue === ''
-                ? intl.formatMessage(sharedMessages.norulesets)
-                : intl.formatMessage(
-                sharedMessages.clearAllFiltersDescription
-                )
-            }
-            isSearch={!isEmpty(filterValue)}
-          />
-        )}
-        activeFiltersConfig={{
-          filters: prepareChips(filterValue, intl),
-          onDelete: () => handleFilterChange('')
-        }}
-      />
+      <PageSection>
+        <TableToolbarView
+          ouiaId={'RuleSets-table'}
+          rows={rows}
+          columns={columns(intl)}
+          fetchData={updateRuleSets}
+          routes={routes}
+          actionResolver={actionResolver}
+          titlePlural={intl.formatMessage(sharedMessages.rulesets)}
+          titleSingular={intl.formatMessage(sharedMessages.ruleset)}
+          isLoading={isFetching || isFiltering}
+          renderEmptyState={() => (
+            <TableEmptyState
+              title={intl.formatMessage(sharedMessages.norulesets)}
+              Icon={PlusCircleIcon}
+              PrimaryAction={() =>
+                filterValue !== '' ? (
+                  <Button onClick={() => clearFilters()} variant="link">
+                    {intl.formatMessage(sharedMessages.clearAllFilters)}
+                  </Button>
+                ) : null
+              }
+              description={
+                filterValue === ''
+                  ? intl.formatMessage(sharedMessages.norulesets)
+                  : intl.formatMessage(
+                  sharedMessages.clearAllFiltersDescription
+                  )
+              }
+              isSearch={!isEmpty(filterValue)}
+            />
+          )}
+          activeFiltersConfig={{
+            filters: prepareChips(filterValue, intl),
+            onDelete: () => handleFilterChange('')
+          }}
+        />
+      </PageSection>
     </Fragment>
   );
 }

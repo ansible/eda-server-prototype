@@ -9,6 +9,7 @@ import {TopToolbar} from "@app/shared/top-toolbar";
 import {ActivationJobs} from "@app/Activation/activation-jobs";
 import {ActivationDetails} from "@app/Activation/activation-details";
 import {ActivationStdout} from "@app/Activation/activation-stdout";
+import {defaultSettings} from "@app/shared/pagination";
 
 export const renderActivationTabs = (activationId: string) => {
   const activation_tabs = [
@@ -42,6 +43,14 @@ const client = new WebSocket('ws://' + getServer() + '/api/ws');
 const endpoint1 = 'http://' + getServer() + '/api/activation_instance/';
 const endpoint2 = 'http://' + getServer() + '/api/activation_instance_job_instances/';
 
+export const fetchActivationJobs = (activationId, pagination=defaultSettings) =>
+{
+  return fetch(endpoint2 + activationId, {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  }).then(response => response.json());
+}
 const Activation: React.FunctionComponent = () => {
 
   const [activation, setActivation] = useState([]);
@@ -82,11 +91,7 @@ const Activation: React.FunctionComponent = () => {
   const [newJob, setNewJob] = useState([]);
 
   useEffect(() => {
-    fetch(endpoint2 + id, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    }).then(response => response.json())
+    fetchActivationJobs(id)
       .then(data => setJobs(data));
   }, []);
 
