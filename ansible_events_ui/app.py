@@ -5,10 +5,7 @@ from collections import defaultdict
 from typing import List
 
 import yaml
-from fastapi import Depends, FastAPI, WebSocket, WebSocketDisconnect
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import RedirectResponse
-from fastapi.staticfiles import StaticFiles
+from fastapi import APIRouter, Depends, WebSocket, WebSocketDisconnect
 from sqlalchemy import insert, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -29,7 +26,7 @@ from .db.models import (
     projects,
     rule_set_files,
 )
-from .db.session import async_session_maker, get_db_session
+from .db.session import SessionMaker, get_db_session, get_db_sessionmaker
 from .manager import activate_rulesets, inactivate_rulesets
 from .project import clone_project, sync_project
 from .schemas import (
@@ -47,26 +44,7 @@ from .users import auth_backend, current_active_user, fastapi_users
 
 logger = logging.getLogger("ansible_events_ui")
 
-app = FastAPI(title="Ansible Events API")
-
-app.mount("/eda", StaticFiles(directory="ui/dist", html=True), name="eda")
-
-origins = [
-    "http://localhost",
-    "http://localhost:8080",
-    "http://localhost:9000",
-    "http://127.0.0.1",
-    "http://127.0.0.1:8080",
-    "http://127.0.0.1:9000",
-]
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+router = APIRouter()
 
 
 # TODO(cutwater): A more reliable, scalable and robust tasking system
@@ -128,12 +106,7 @@ class UpdateManager:
 updatemanager = UpdateManager()
 
 
-@app.get("/")
-async def root():
-    return RedirectResponse("/eda")
-
-
-@app.websocket("/api/ws")
+@router.websocket("/api/ws")
 async def websocket_endpoint(websocket: WebSocket):
     logger.debug("starting ws")
     await connnectionmanager.connect(websocket)
@@ -145,7 +118,7 @@ async def websocket_endpoint(websocket: WebSocket):
         connnectionmanager.disconnect(websocket)
 
 
-@app.websocket("/api/ws2")
+@router.websocket("/api/ws2")
 async def websocket_endpoint2(
     websocket: WebSocket, db: AsyncSession = Depends(get_db_session)
 ):
@@ -186,7 +159,7 @@ async def websocket_endpoint2(
         pass
 
 
-@app.websocket("/api/ws-activation/{activation_instance_id}")
+@router.websocket("/api/ws-activation/{activation_instance_id}")
 async def websocket_activation_endpoint(
     websocket: WebSocket, activation_instance_id
 ):
@@ -200,12 +173,7 @@ async def websocket_activation_endpoint(
         updatemanager.disconnect(page, websocket)
 
 
-@app.get("/ping")
-def ping():
-    return {"ping": "pong!"}
-
-
-@app.post("/api/rule_set_file/")
+@router.post("/api/rule_set_file/")
 async def create_rule_set_file(
     rsf: RuleSetFile, db: AsyncSession = Depends(get_db_session)
 ):
@@ -216,7 +184,7 @@ async def create_rule_set_file(
     return {**rsf.dict(), "id": id_}
 
 
-@app.post("/api/inventory/")
+@router.post("/api/inventory/")
 async def create_inventory(
     i: Inventory, db: AsyncSession = Depends(get_db_session)
 ):
@@ -227,7 +195,7 @@ async def create_inventory(
     return {**i.dict(), "id": id_}
 
 
-@app.post("/api/extra_vars/")
+@router.post("/api/extra_vars/")
 async def create_extra_vars(
     e: Extravars, db: AsyncSession = Depends(get_db_session)
 ):
@@ -238,9 +206,11 @@ async def create_extra_vars(
     return {**e.dict(), "id": id_}
 
 
-@app.post("/api/activation_instance/")
+@router.post("/api/activation_instance/")
 async def create_activation_instance(
-    a: Activation, db: AsyncSession = Depends(get_db_session)
+    a: Activation,
+    db: AsyncSession = Depends(get_db_session),
+    db_sessionmaker: SessionMaker = Depends(get_db_sessionmaker),
 ):
     query = select(rule_set_files).where(
         rule_set_files.c.id == a.rule_set_file_id
@@ -274,23 +244,23 @@ async def create_activation_instance(
     )
 
     task = asyncio.create_task(
-        read_output(proc, id_), name=f"read_output {proc.pid}"
+        read_output(proc, id_, db_sessionmaker), name=f"read_output {proc.pid}"
     )
     taskmanager.tasks.append(task)
 
     return {**a.dict(), "id": id_}
 
 
-@app.post("/api/deactivate/")
+@router.post("/api/deactivate/")
 async def deactivate(activation_instance_id: int):
     await inactivate_rulesets(activation_instance_id)
     return
 
 
-async def read_output(proc, activation_instance_id):
+async def read_output(proc, activation_instance_id, db_sessionmaker):
     # TODO(cutwater): Replace with FastAPI dependency injections,
     #   that is available in BackgroundTasks
-    async with async_session_maker() as db:
+    async with db_sessionmaker() as db:
         line_number = 0
         # FIXME(cutwater): The `done` variable is never set to True.
         done = False
@@ -313,7 +283,9 @@ async def read_output(proc, activation_instance_id):
             )
 
 
-@app.get("/api/activation_instance_logs/", response_model=List[ActivationLog])
+@router.get(
+    "/api/activation_instance_logs/", response_model=List[ActivationLog]
+)
 async def list_activation_instance_logs(
     activation_instance_id: int, db: AsyncSession = Depends(get_db_session)
 ):
@@ -325,7 +297,7 @@ async def list_activation_instance_logs(
     return result.all()
 
 
-@app.get("/api/tasks/")
+@router.get("/api/tasks/")
 async def list_tasks():
     tasks = [
         {
@@ -338,7 +310,7 @@ async def list_tasks():
     return tasks
 
 
-@app.post("/api/project/")
+@router.post("/api/project/")
 async def create_project(
     p: Project, db: AsyncSession = Depends(get_db_session)
 ):
@@ -352,7 +324,7 @@ async def create_project(
     return {**p.dict(), "id": project_id}
 
 
-@app.get("/api/project/{project_id}")
+@router.get("/api/project/{project_id}")
 async def read_project(
     project_id: int, db: AsyncSession = Depends(get_db_session)
 ):
@@ -397,21 +369,21 @@ async def read_project(
     return response
 
 
-@app.get("/api/projects/")
+@router.get("/api/projects/")
 async def list_projects(db: AsyncSession = Depends(get_db_session)):
     query = select(projects)
     result = await db.execute(query)
     return result.all()
 
 
-@app.get("/api/playbooks/")
+@router.get("/api/playbooks/")
 async def list_playbooks(db: AsyncSession = Depends(get_db_session)):
     query = select(playbooks)
     result = await db.execute(query)
     return result.all()
 
 
-@app.get("/api/playbook/{playbook_id}")
+@router.get("/api/playbook/{playbook_id}")
 async def read_playbook(
     playbook_id: int, db: AsyncSession = Depends(get_db_session)
 ):
@@ -420,14 +392,14 @@ async def read_playbook(
     return result.first()
 
 
-@app.get("/api/inventories/")
+@router.get("/api/inventories/")
 async def list_inventories(db: AsyncSession = Depends(get_db_session)):
     query = select(inventories)
     result = await db.execute(query)
     return result.all()
 
 
-@app.get("/api/inventory/{inventory_id}")
+@router.get("/api/inventory/{inventory_id}")
 async def read_inventory(
     inventory_id: int, db: AsyncSession = Depends(get_db_session)
 ):
@@ -437,14 +409,14 @@ async def read_inventory(
     return result.first()
 
 
-@app.get("/api/rule_set_files/")
+@router.get("/api/rule_set_files/")
 async def list_rule_set_files(db: AsyncSession = Depends(get_db_session)):
     query = select(rule_set_files)
     result = await db.execute(query)
     return result.all()
 
 
-@app.get("/api/rule_set_file/{rule_set_file_id}")
+@router.get("/api/rule_set_file/{rule_set_file_id}")
 async def read_rule_set_file(
     rule_set_file_id: int, db: AsyncSession = Depends(get_db_session)
 ):
@@ -455,7 +427,7 @@ async def read_rule_set_file(
     return result.first()
 
 
-@app.get("/api/rule_set_file_json/{rule_set_file_id}")
+@router.get("/api/rule_set_file_json/{rule_set_file_id}")
 async def read_rule_set_file_json(
     rule_set_file_id: int, db: AsyncSession = Depends(get_db_session)
 ):
@@ -469,14 +441,14 @@ async def read_rule_set_file_json(
     return response
 
 
-@app.get("/api/extra_vars/")
+@router.get("/api/extra_vars/")
 async def list_extra_vars(db: AsyncSession = Depends(get_db_session)):
     query = select(extra_vars)
     result = await db.execute(query)
     return result.all()
 
 
-@app.get("/api/extra_var/{extra_var_id}")
+@router.get("/api/extra_var/{extra_var_id}")
 async def read_extravar(
     extra_var_id: int, db: AsyncSession = Depends(get_db_session)
 ):
@@ -485,7 +457,7 @@ async def read_extravar(
     return result.first()
 
 
-@app.get("/api/activation_instances/")
+@router.get("/api/activation_instances/")
 async def list_activation_instances(
     db: AsyncSession = Depends(get_db_session),
 ):
@@ -494,7 +466,7 @@ async def list_activation_instances(
     return result.all()
 
 
-@app.get("/api/activation_instance/{activation_instance_id}")
+@router.get("/api/activation_instance/{activation_instance_id}")
 async def read_activation_instance(
     activation_instance_id: int, db: AsyncSession = Depends(get_db_session)
 ):
@@ -520,14 +492,14 @@ async def read_activation_instance(
     return result.first()
 
 
-@app.get("/api/job_instances/")
+@router.get("/api/job_instances/")
 async def list_job_instances(db: AsyncSession = Depends(get_db_session)):
     query = select(job_instances)
     result = await db.execute(query)
     return result.all()
 
 
-@app.get("/api/job_instance/{job_instance_id}")
+@router.get("/api/job_instance/{job_instance_id}")
 async def read_job_instance(
     job_instance_id: int, db: AsyncSession = Depends(get_db_session)
 ):
@@ -536,7 +508,7 @@ async def read_job_instance(
     return result.first()
 
 
-@app.get("/api/job_instance_events/{job_instance_id}")
+@router.get("/api/job_instance_events/{job_instance_id}")
 async def read_job_instance_events(
     job_instance_id: int, db: AsyncSession = Depends(get_db_session)
 ):
@@ -549,7 +521,7 @@ async def read_job_instance_events(
     return (await db.execute(query)).all()
 
 
-@app.get("/api/activation_instance_job_instances/{activation_instance_id}")
+@router.get("/api/activation_instance_job_instances/{activation_instance_id}")
 async def read_activation_instance_job_instances(
     activation_instance_id: int, db: AsyncSession = Depends(get_db_session)
 ):
@@ -564,33 +536,33 @@ async def read_activation_instance_job_instances(
 # FastAPI Users
 
 
-app.include_router(
+router.include_router(
     fastapi_users.get_auth_router(auth_backend),
     prefix="/api/auth/jwt",
     tags=["auth"],
 )
-app.include_router(
+router.include_router(
     fastapi_users.get_register_router(UserRead, UserCreate),
     prefix="/api/auth",
     tags=["auth"],
 )
-app.include_router(
+router.include_router(
     fastapi_users.get_reset_password_router(),
     prefix="/api/auth",
     tags=["auth"],
 )
-app.include_router(
+router.include_router(
     fastapi_users.get_verify_router(UserRead),
     prefix="/api/auth",
     tags=["auth"],
 )
-app.include_router(
+router.include_router(
     fastapi_users.get_users_router(UserRead, UserUpdate),
     prefix="/api/users",
     tags=["users"],
 )
 
 
-@app.get("/api/authenticated-route")
+@router.get("/api/authenticated-route")
 async def authenticated_route(user: User = Depends(current_active_user)):
     return {"message": f"Hello {user.email}!"}

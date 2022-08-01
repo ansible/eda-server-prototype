@@ -6,7 +6,7 @@ from sqlalchemy import engine_from_config, pool
 from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import AsyncEngine
 
-from ansible_events_ui.config import settings
+from ansible_events_ui.config import load_settings
 from ansible_events_ui.db.models import metadata
 
 config = context.config
@@ -28,6 +28,7 @@ def run_migrations_offline() -> None:
     script output.
 
     """
+    settings = load_settings()
     context.configure(
         url=settings.database_url,
         target_metadata=target_metadata,
@@ -47,6 +48,7 @@ def do_run_migrations(connection: Connection) -> None:
 
 
 async def run_async_migrations() -> None:
+    settings = load_settings()
     connectable = AsyncEngine(
         engine_from_config(
             config.get_section(config.config_ini_section),

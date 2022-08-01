@@ -1,7 +1,10 @@
+from fastapi.requests import Request
 from pydantic import BaseSettings
 
 
 class Settings(BaseSettings):
+    """Application settings."""
+
     secret: str = "secret"
 
     log_level: str = "INFO"
@@ -18,5 +21,12 @@ class Settings(BaseSettings):
         env_nested_delimiter = "__"
 
 
-# TODO(cutwater): Eliminate global settings object
-settings = Settings()
+def load_settings() -> Settings:
+    """Load and validate application settings."""
+    return Settings()
+
+
+# TODO(cutwater): Move dependencies into standalone package
+def get_settings(request: Request) -> Settings:
+    """Application settings dependency."""
+    return request.app.state.settings
