@@ -7,8 +7,8 @@
 First you need to clone the `ansible-events-ui` repository:
 
 ```shell
-  $ git clone https://github.com/benthomasson/ansible-events-ui.git
-  $ cd ansible-events-ui
+  git clone https://github.com/benthomasson/ansible-events-ui.git
+  cd ansible-events-ui
 ```
 
 ### 2. Virtual environment
@@ -34,13 +34,13 @@ Install Ansible and `benthomasson.eda` collection:
 You need to set up a PostgreSQL database sever. The easiest way is using the `docker-compose`:
 
 ```shell
-  $ docker-compose -p ansible-events -f tools/docker/docker-compose.yml up -d postgres
+  docker-compose -p ansible-events -f tools/docker/docker-compose.yml up -d postgres
 ```
 
 Then run database migrations:
 
 ```shell
-  $ alembic upgrade head
+  alembic upgrade head
 ```
 
 ### 4. User interface
@@ -48,19 +48,19 @@ Then run database migrations:
 Build UI files:
 
 ```shell
-  $ cd ui
-  $ npm install
-  $ npm run build
-  $ cd ..
+  cd ui
+  npm install
+  npm run build
+  cd ..
 ```
 
 ### 6. Start server
 
 ```shell
-  $ ansible-events-ui
+  ansible-events-ui
 ```
 
-Visit this url: http://localhost:8080/docs#/auth/register_register_api_auth_register_post
+Visit this url: <http://localhost:8080/docs#/auth/register_register_api_auth_register_post>
 
 Click "Try it out" on `/api/auth/register`
 
@@ -68,7 +68,7 @@ Change email and password
 
 Click execute
 
-Visit this url: http://localhost:8080/eda
+Visit this url: <http://localhost:8080/eda>
 
 You have set up the development environment.
 
@@ -80,3 +80,8 @@ Requires docker-compose installed. [See the documentation](https://docs.docker.c
 cd tools/docker
 docker-compose up --build
 ```
+
+The application is available on <http://localhost:8080/eda>
+You can log in with the default credentials:
+user: admin@example.com
+password: password

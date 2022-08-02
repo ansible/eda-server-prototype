@@ -6,7 +6,12 @@ services:
     build:
       context: ../../
       dockerfile: tools/docker/Dockerfile
-    command: ["/bin/bash", "-c", "alembic upgrade head && ansible-events-ui"]
+    command:
+      [
+        "/bin/bash",
+        "-c",
+        "alembic -x create_default_user=True upgrade head && ansible-events-ui"
+      ]
     ports:
       - "8080:8080"
     environment:
