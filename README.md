@@ -74,7 +74,7 @@ You have set up the development environment.
 
 ## Run the application with docker-compose
 
-Requires docker-compose installed. [See the documentation](https://docs.docker.com/compose/install/) for instructions.
+Requires docker-compose installed. [See the documentation](https://docs.docker.com/compose/install/) for instructions. (latest stable version is recommended)
 
 ```sh
 cd tools/docker
