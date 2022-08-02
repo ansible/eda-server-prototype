@@ -1,4 +1,4 @@
-"""Add optional data seed
+"""Add optional data seed.
 
 Revision ID: 663ac86a4c54
 Revises: 42461b4ec88d
@@ -51,7 +51,7 @@ def data_upgrades():
         [
             {
                 "email": "admin@example.com",
-                # password: "password"
+                # password: "password" # noqa: E800
                 "hashed_password": "$2b$12$kI9N82wfnBtawYrD4K.rvuXme"
                 "/8H0Y57i9ZcVNgLgNOnSXyR5J/iu",
                 "is_active": True,
