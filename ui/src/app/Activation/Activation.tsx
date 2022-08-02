@@ -45,7 +45,7 @@ const endpoint2 = 'http://' + getServer() + '/api/activation_instance_job_instan
 
 export const fetchActivationJobs = (activationId, pagination=defaultSettings) =>
 {
-  return fetch(endpoint2 + activationId, {
+  return fetch(`${endpoint2}${activationId}`, {
     headers: {
       'Content-Type': 'application/json',
     },

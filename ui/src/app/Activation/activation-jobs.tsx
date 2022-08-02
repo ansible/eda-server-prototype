@@ -4,18 +4,18 @@ import React, {useEffect, useReducer, useState} from 'react';
 import {fetchActivationJobs, renderActivationTabs} from "@app/Activation/Activation";
 import {TableToolbarView} from "@app/shared/table-toolbar-view";
 import sharedMessages from "../messages/shared.messages";
-import {PlusCircleIcon} from "@patternfly/react-icons";
 import {cellWidth} from "@patternfly/react-table";
 import TableEmptyState from "@app/shared/table-empty-state";
 import isEmpty from 'lodash/isEmpty';
 import {useIntl} from "react-intl";
 import {defaultSettings} from "@app/shared/pagination";
 import {createRows} from "./jobs-table-helpers";
+import {CubesIcon} from "@patternfly/react-icons";
 
 const columns = (intl) => [
   {
     title: (intl.formatMessage(sharedMessages.jobs)),
-    transforms: [cellWidth(80 )]
+    transforms: [cellWidth(40 )]
   },
   {
     title: (intl.formatMessage(sharedMessages.status))
@@ -41,7 +41,7 @@ const prepareChips = (filterValue, intl) =>
 
 const initialState = (filterValue = '') => ({
   filterValue,
-  isFetching: true,
+  isFetching: false,
   isFiltering: false,
   rows: []
 });
@@ -127,7 +127,7 @@ const ActivationJobs: React.FunctionComponent = ({activation, jobs}) => {
         renderEmptyState={() => (
           <TableEmptyState
             title={intl.formatMessage(sharedMessages.nojobs)}
-            Icon={PlusCircleIcon}
+            Icon={CubesIcon}
             PrimaryAction={() =>
               filterValue !== '' ? (
                 <Button onClick={() => clearFilters()} variant="link">

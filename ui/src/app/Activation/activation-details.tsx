@@ -37,7 +37,6 @@ const ActivationDetails: React.FunctionComponent = ({ activation }) => {
     activation?.extra_var_id ? fetchActivationVars(activation.extra_var_id)
       .then(data => setActivationVars(data)) : setActivationVars(undefined);
   }, [activation]);
-  console.log('Debug - extra vars: ', activationVars);
 
   const renderFlexActivationDetails: React.FunctionComponent = (activation) => (
     <Flex>
