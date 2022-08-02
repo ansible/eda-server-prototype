@@ -155,7 +155,7 @@ const NewActivation: React.FunctionComponent = () => {
         }
       ]
       }>
-      <Title headingLevel={"h2"}>New activation</Title>
+      <Title headingLevel={"h2"}>Add new rulebook activation</Title>
     </TopToolbar>
     <PageSection>
       <Card>
