@@ -9,18 +9,28 @@ from fastapi_users.authentication import (
     CookieTransport,
     JWTStrategy,
 )
-from fastapi_users.db import SQLAlchemyUserDatabase
+from fastapi_users.db import BaseUserDatabase, SQLAlchemyUserDatabase
+from fastapi_users.password import PasswordHelperProtocol
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from .config import settings
+from .config import Settings, get_settings
 from .db.models import User
-from .db.session import get_user_db
+from .db.session import get_db_session
 
 logger = logging.getLogger("ansible_events_ui.auth")
 
 
 class UserManager(UUIDIDMixin, BaseUserManager[User, uuid.UUID]):
-    reset_password_token_secret = settings.secret
-    verification_token_secret = settings.secret
+    def __init__(
+        self,
+        secret: str,
+        user_db: BaseUserDatabase[User, uuid.UUID],
+        password_helper: Optional[PasswordHelperProtocol] = None,
+    ):
+        super().__init__(user_db, password_helper)
+
+        self.reset_password_token_secret = secret
+        self.verification_token_secret = secret
 
     async def on_after_register(
         self, user: User, request: Optional[Request] = None
@@ -46,18 +56,24 @@ class UserManager(UUIDIDMixin, BaseUserManager[User, uuid.UUID]):
         )
 
 
+async def get_user_db(session: AsyncSession = Depends(get_db_session)):
+    yield SQLAlchemyUserDatabase(session, User)
+
+
 async def get_user_manager(
+    settings: Settings = Depends(get_settings),
     user_db: SQLAlchemyUserDatabase = Depends(get_user_db),
 ):
-    yield UserManager(user_db)
+    yield UserManager(settings.secret, user_db)
+
+
+def get_jwt_strategy(
+    settings: Settings = Depends(get_settings),
+) -> JWTStrategy:
+    return JWTStrategy(secret=settings.secret, lifetime_seconds=3600)
 
 
 cookie_transport = CookieTransport(cookie_max_age=3600)
-
-
-def get_jwt_strategy() -> JWTStrategy:
-    return JWTStrategy(secret=settings.secret, lifetime_seconds=3600)
-
 
 auth_backend = AuthenticationBackend(
     name="jwt",
