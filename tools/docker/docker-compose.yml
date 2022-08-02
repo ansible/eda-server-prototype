@@ -13,7 +13,8 @@ services:
       - AE_HOST=0.0.0.0
       - AE_DATABASE_URL=postgresql+asyncpg://postgres:secret@postgres/ansible_events
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
 
   postgres:
     image: "docker.io/library/postgres:13"
