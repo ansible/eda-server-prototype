@@ -110,7 +110,7 @@ export const TableToolbarView: React.ComponentType<TableToolbarViewProps> = ({
   );
 
   return (
-    <PageSection page-type={`tab-${plural}`} id={`tab-${plural}`}>
+    <Fragment>
       {routes()}
       {renderToolbar()}
       {!isLoading && rows.length === 0 ? (
@@ -145,6 +145,6 @@ export const TableToolbarView: React.ComponentType<TableToolbarViewProps> = ({
           )}
         </Fragment>
       )}
-    </PageSection>
+    </Fragment>
   );
 };
