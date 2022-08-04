@@ -10,8 +10,9 @@ import {ProjectDetails} from "@app/Project/project-details";
 import {ProjectLinks} from "@app/Project/project-links";
 import sharedMessages from "../messages/shared.messages";
 import {useIntl} from "react-intl";
+import {IProject} from "@app/shared/types/common-types";
 
-export const renderProjectTabs = (intl, projectId: string) => {
+export const renderProjectTabs = (intl, projectId: string | undefined) => {
   const project_tabs = [
     {
       eventKey: 0,
@@ -34,7 +35,7 @@ export const renderProjectTabs = (intl, projectId: string) => {
   return <AppTabs tabItems={project_tabs}/>
 };
 const endpoint1 = 'http://' + getServer() + '/api/project/';
-export const extractProjectNameFromUrl = (url: string) => {
+export const extractProjectNameFromUrl = (url: string | undefined) => {
   if( !url )
     return '';
   return (url.split("/").pop())?.split('.')[0];
@@ -42,8 +43,8 @@ export const extractProjectNameFromUrl = (url: string) => {
 
 const Project: React.FunctionComponent = () => {
 
-  const [project, setProject] = useState([]);
-  const { id } = useParams();
+  const [project, setProject] = useState<IProject>();
+  const { id } = useParams<{id:string}>();
   const intl = useIntl();
 
   useEffect(() => {
@@ -63,18 +64,18 @@ const Project: React.FunctionComponent = () => {
           to: '/projects'
         },
         {
-          title:`${project?.name || extractProjectNameFromUrl(project.url)}`
+          title:`${project?.name || extractProjectNameFromUrl(project?.url)}`
         },
       ]
       }>
-        <Title headingLevel={"h2"}>{`${project?.name || extractProjectNameFromUrl(project.url) }`}</Title>
+        <Title headingLevel={"h2"}>{`${project?.name || extractProjectNameFromUrl(project?.url) }`}</Title>
       </TopToolbar>
       <Switch>
-        <Route exact path="/project/:id/links">
+        { project && <Route exact path="/project/:id/links">
           <ProjectLinks
             project={project}
           />
-        </Route>
+        </Route> }
         <Route path="/project/:id">
           <ProjectDetails
             project={project}

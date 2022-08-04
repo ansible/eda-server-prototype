@@ -8,17 +8,18 @@ import {
 import {extractProjectNameFromUrl, renderProjectTabs} from "@app/Project/Project";
 import {useIntl} from "react-intl";
 import sharedMessages from "../messages/shared.messages";
+import {IProject} from "@app/shared/types/common-types";
 
-const ProjectDetails: React.FunctionComponent = ({ project }) => {
+const ProjectDetails: React.FunctionComponent<{project:IProject | undefined}> = ({ project } : { project: IProject | undefined}) => {
   const intl = useIntl();
-  const renderFlexProjectDetails: React.FunctionComponent = (project) => (
+  const renderFlexProjectDetails: React.FunctionComponent<IProject | undefined> = (project : IProject | undefined) => (
     <Flex>
       <Flex direction={{ default: 'column' }} flex={{ default: 'flex_1' }}>
         <FlexItem>
           <Stack>
             <StackItem><Title headingLevel="h3">{intl.formatMessage(sharedMessages.name)}</Title></StackItem>
             <StackItem>
-              {project?.name || extractProjectNameFromUrl(project.url)}
+              {project?.name || extractProjectNameFromUrl(project?.url)}
             </StackItem>
           </Stack>
         </FlexItem>

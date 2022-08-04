@@ -17,7 +17,7 @@ export interface ApiMetadata extends AnyObject {
 }
 
 export interface ApiCollectionResponse<
-  T /** he type of collection item.*/
+  T /** the type of collection item.*/
   > {
   data: T[];
   meta: ApiMetadata;
@@ -44,11 +44,6 @@ export type NotificationPayload =
   payload: any;
 };
 
-export type FormatMessage = (
-  message: MessageDescriptor,
-  values?: AnyObject
-) => ReactNode;
-
 export interface SortBy {
   index: number;
   property: string;
@@ -61,3 +56,13 @@ export type User = {
   email: string
 };
 
+export interface IProject {
+  id: string,
+  name?: string,
+  description?: string,
+  scm_type?: string,
+  scm_credentials?: string,
+  created_at?: string,
+  modified_at?: string,
+  url?: string
+}
