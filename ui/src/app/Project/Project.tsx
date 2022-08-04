@@ -31,14 +31,21 @@ export const renderProjectTabs = (projectId: string) => {
 
   return <AppTabs tabItems={project_tabs}/>
 };
-const endpoint1 = 'http://' + getServer() + '/api/projects/';
+const endpoint1 = 'http://' + getServer() + '/api/project/';
+export const extractProjectNameFromUrl = (url: string) => {
+  if( !url )
+    return '';
+
+  console.log( 'Debug url, url split, url pop: ', url,  url.split("/").pop(),  url.split("/").pop());
+  return (url.split("/").pop())?.split('.')[0];
+};
 
 const Project: React.FunctionComponent = () => {
 
   const [project, setProject] = useState([]);
 
   const { id } = useParams();
-  console.log(id);
+  console.log('Debug project id: ', id);
 
 
   useEffect(() => {
@@ -54,12 +61,15 @@ const Project: React.FunctionComponent = () => {
     <React.Fragment>
       <TopToolbar breadcrumbs={[
         {
-          title: 'Rulebook projects',
+          title: 'Projects',
           to: '/projects'
-        }
+        },
+        {
+          title:`${project?.name || extractProjectNameFromUrl(project.url)}`
+        },
       ]
       }>
-        <Title headingLevel={"h2"}>{`${project.name}`}</Title>
+        <Title headingLevel={"h2"}>{`${project?.name || extractProjectNameFromUrl(project.url) }`}</Title>
       </TopToolbar>
       <Switch>
         <Route exact path="/project/:id/links">

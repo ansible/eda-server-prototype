@@ -5,7 +5,7 @@ import {
   Stack,
   StackItem,
 } from '@patternfly/react-core';
-import {renderProjectTabs} from "@app/Project/Project";
+import {extractProjectNameFromUrl, renderProjectTabs} from "@app/Project/Project";
 
 const ProjectDetails: React.FunctionComponent = ({ project }) => {
   const renderFlexProjectDetails: React.FunctionComponent = (project) => (
@@ -15,7 +15,7 @@ const ProjectDetails: React.FunctionComponent = ({ project }) => {
           <Stack>
             <StackItem><Title headingLevel="h3">Name</Title></StackItem>
             <StackItem>
-              {project?.name}
+              {project?.name || extractProjectNameFromUrl(project.url)}
             </StackItem>
           </Stack>
         </FlexItem>
@@ -23,15 +23,15 @@ const ProjectDetails: React.FunctionComponent = ({ project }) => {
           <Stack>
             <StackItem><Title headingLevel="h3">SCM URL</Title></StackItem>
             <StackItem>
-              {project?.url}
+              {project?.url || ' '}
             </StackItem>
           </Stack>
         </FlexItem>
         <FlexItem>
           <Stack>
-            <StackItem><Title headingLevel="h3">LAst modified</Title></StackItem>
+            <StackItem><Title headingLevel="h3">Last modified</Title></StackItem>
             <StackItem>
-              {project?.modified_at}
+              {project?.modified_at || ' '}
             </StackItem>
           </Stack>
         </FlexItem>
@@ -41,7 +41,7 @@ const ProjectDetails: React.FunctionComponent = ({ project }) => {
           <Stack>
             <StackItem><Title headingLevel="h3">Description</Title></StackItem>
             <StackItem>
-              {project?.description}
+              {project?.description || ' '}
             </StackItem>
           </Stack>
         </FlexItem>
@@ -49,7 +49,7 @@ const ProjectDetails: React.FunctionComponent = ({ project }) => {
           <Stack>
             <StackItem><Title headingLevel="h3">SCM credentials</Title></StackItem>
             <StackItem>
-              {project?.scm_credentials}
+              {project?.scm_credentials || ' '}
             </StackItem>
           </Stack>
         </FlexItem>
@@ -58,7 +58,7 @@ const ProjectDetails: React.FunctionComponent = ({ project }) => {
         <FlexItem>
           <Stack>
             <StackItem><Title headingLevel="h3">SCM type</Title>
-              {project?.scm_type}
+              {project?.scm_type || ''}
             </StackItem>
           </Stack>
         </FlexItem>
@@ -66,15 +66,7 @@ const ProjectDetails: React.FunctionComponent = ({ project }) => {
           <Stack>
             <StackItem><Title headingLevel="h3">Created</Title></StackItem>
             <StackItem>
-              {project?.created_at}
-            </StackItem>
-          </Stack>
-        </FlexItem>
-        <FlexItem>
-          <Stack>
-            <StackItem><Title headingLevel="h3">Last modified</Title></StackItem>
-            <StackItem>
-              {project?.updated_at}
+              {project?.created_at || ''}
             </StackItem>
           </Stack>
         </FlexItem>
@@ -84,7 +76,7 @@ const ProjectDetails: React.FunctionComponent = ({ project }) => {
 
   return (
   <PageSection page-type={'project-details'} id={'project-details'}>
-    { renderProjectTabs(id) }
+    { renderProjectTabs(project?.id) }
     <Stack>
       <StackItem>
         <Card>
