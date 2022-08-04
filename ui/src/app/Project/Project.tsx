@@ -37,8 +37,6 @@ const endpoint1 = 'http://' + getServer() + '/api/project/';
 export const extractProjectNameFromUrl = (url: string) => {
   if( !url )
     return '';
-
-  console.log( 'Debug url, url split, url pop: ', url,  url.split("/").pop(),  url.split("/").pop());
   return (url.split("/").pop())?.split('.')[0];
 };
 
