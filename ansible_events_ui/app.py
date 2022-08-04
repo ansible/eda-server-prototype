@@ -5,10 +5,8 @@ from fastapi.staticfiles import StaticFiles
 
 from ansible_events_ui.api import router as api_router
 from ansible_events_ui.config import load_settings
-from ansible_events_ui.db.session import (
-    create_sessionmaker,
-    engine_from_settings,
-)
+from ansible_events_ui.db.dependency import get_db_session_factory
+from ansible_events_ui.db.provider import DatabaseProvider
 
 ALLOWED_ORIGINS = [
     "http://localhost",
@@ -52,9 +50,12 @@ def setup_routes(app: FastAPI) -> None:
 
 
 def setup_database(app: FastAPI) -> None:
-    app.state.db_engine = db_engine = engine_from_settings(app.state.settings)
-    app.state.db_sessionmaker = create_sessionmaker(db_engine)
-    app.add_event_handler("shutdown", db_engine.dispose)
+    settings = app.state.settings
+    provider = DatabaseProvider(settings.database_url)
+    app.add_event_handler("shutdown", provider.close)
+    app.dependency_overrides[
+        get_db_session_factory
+    ] = lambda: provider.session_factory
 
 
 # TODO(cutwater): Use dependency overrides.

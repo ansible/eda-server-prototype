@@ -1,12 +1,7 @@
 import asyncio
-import pathlib
-from typing import Callable
 
-import alembic.command
-import alembic.config
 import pytest
 import pytest_asyncio
-import sqlalchemy as sa
 import sqlalchemy.event
 import sqlalchemy.future
 import sqlalchemy.pool
@@ -15,40 +10,13 @@ from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 
-from ansible_events_ui.app import setup_cors, setup_routes
 from ansible_events_ui.config import load_settings
-from ansible_events_ui.db.session import get_db_session, get_db_sessionmaker
-
-BASE_DIR = pathlib.Path(__file__).parents[2]
-ALEMBIC_INI = BASE_DIR / "alembic.ini"
-
-
-def alembic_command_wrapper(
-    connection: sqlalchemy.future.Engine,
-    command: Callable[[alembic.config.Config, ...], None],
-    config: alembic.config.Config,
-    *args,
-    **kwargs,
-):
-    config.attributes["connection"] = connection
-    command(config, *args, **kwargs)
-
-
-def create_test_app(settings, session):
-    app = FastAPI(title="Ansible Events API")
-    app.state.settings = settings
-
-    setup_cors(app)
-    setup_routes(app)
-
-    app.dependency_overrides.update(
-        {
-            get_db_session: lambda: session,
-            get_db_sessionmaker: lambda: lambda: session,
-        }
-    )
-
-    return app
+from tests.integration.utils.app import create_test_app
+from tests.integration.utils.db import (
+    create_database,
+    drop_database,
+    upgrade_database,
+)
 
 
 @pytest.fixture(scope="session")
@@ -84,10 +52,7 @@ def db_url(default_settings):
 @pytest_asyncio.fixture(scope="session")
 async def db_engine(default_engine, db_url):
     async with default_engine.connect() as connection:
-        query = f'DROP DATABASE IF EXISTS "{db_url.database}"'
-        await connection.execute(sa.text(query))
-        query = f'CREATE DATABASE "{db_url.database}"'
-        await connection.execute(sa.text(query))
+        await create_database(connection, db_url.database)
 
     engine = create_async_engine(
         db_url,
@@ -96,20 +61,14 @@ async def db_engine(default_engine, db_url):
     )
 
     async with engine.connect() as connection:
-        await connection.run_sync(
-            alembic_command_wrapper,
-            alembic.command.upgrade,
-            alembic.config.Config(str(ALEMBIC_INI)),
-            "head",
-        )
+        await upgrade_database(connection)
 
     yield engine
 
     await engine.dispose()
 
     async with default_engine.connect() as connection:
-        query = f'DROP DATABASE IF EXISTS "{db_url.database}"'
-        await connection.execute(sa.text(query))
+        await drop_database(connection, db_url.database)
 
 
 @pytest_asyncio.fixture
