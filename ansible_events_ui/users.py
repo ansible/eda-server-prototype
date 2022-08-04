@@ -14,8 +14,8 @@ from fastapi_users.password import PasswordHelperProtocol
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from .config import Settings, get_settings
+from .db.dependency import get_db_session
 from .db.models import User
-from .db.session import get_db_session
 
 logger = logging.getLogger("ansible_events_ui.auth")
 

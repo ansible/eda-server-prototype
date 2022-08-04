@@ -4,11 +4,13 @@ import logging
 from collections import defaultdict
 from typing import List
 
+import sqlalchemy.orm
 import yaml
 from fastapi import APIRouter, Depends, WebSocket, WebSocketDisconnect
 from sqlalchemy import insert, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from .db.dependency import get_db_session, get_db_session_factory
 from .db.models import (
     User,
     activation_instance_job_instances,
@@ -26,7 +28,6 @@ from .db.models import (
     projects,
     rule_set_files,
 )
-from .db.session import SessionMaker, get_db_session, get_db_sessionmaker
 from .manager import activate_rulesets, inactivate_rulesets
 from .project import clone_project, sync_project
 from .schemas import (
@@ -210,7 +211,9 @@ async def create_extra_vars(
 async def create_activation_instance(
     a: Activation,
     db: AsyncSession = Depends(get_db_session),
-    db_sessionmaker: SessionMaker = Depends(get_db_sessionmaker),
+    db_session_factory: sqlalchemy.orm.sessionmaker = Depends(
+        get_db_session_factory
+    ),
 ):
     query = select(rule_set_files).where(
         rule_set_files.c.id == a.rule_set_file_id
@@ -244,7 +247,8 @@ async def create_activation_instance(
     )
 
     task = asyncio.create_task(
-        read_output(proc, id_, db_sessionmaker), name=f"read_output {proc.pid}"
+        read_output(proc, id_, db_session_factory),
+        name=f"read_output {proc.pid}",
     )
     taskmanager.tasks.append(task)
 
@@ -257,10 +261,10 @@ async def deactivate(activation_instance_id: int):
     return
 
 
-async def read_output(proc, activation_instance_id, db_sessionmaker):
+async def read_output(proc, activation_instance_id, db_session_factory):
     # TODO(cutwater): Replace with FastAPI dependency injections,
     #   that is available in BackgroundTasks
-    async with db_sessionmaker() as db:
+    async with db_session_factory() as db:
         line_number = 0
         # FIXME(cutwater): The `done` variable is never set to True.
         done = False

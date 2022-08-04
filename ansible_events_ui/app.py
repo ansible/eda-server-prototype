@@ -1,16 +1,12 @@
-from typing import Optional
-
 from fastapi import APIRouter, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 
 from ansible_events_ui.api import router as api_router
-from ansible_events_ui.config import Settings, load_settings
-from ansible_events_ui.db.session import (
-    create_sessionmaker,
-    engine_from_settings,
-)
+from ansible_events_ui.config import load_settings
+from ansible_events_ui.db.dependency import get_db_session_factory
+from ansible_events_ui.db.provider import DatabaseProvider
 
 ALLOWED_ORIGINS = [
     "http://localhost",
@@ -34,16 +30,7 @@ def ping():
     return {"ping": "pong!"}
 
 
-# TODO(cutwater): Use dependency overrides
-def create_app(settings: Optional[Settings] = None) -> FastAPI:
-    """Initialize FastAPI application."""
-    if settings is None:
-        settings = load_settings()
-
-    app = FastAPI(title="Ansible Events API")
-    app.state.settings = settings
-
-    # Setup CORS
+def setup_cors(app: FastAPI) -> None:
     app.add_middleware(
         CORSMiddleware,
         allow_origins=ALLOWED_ORIGINS,
@@ -52,16 +39,38 @@ def create_app(settings: Optional[Settings] = None) -> FastAPI:
         allow_headers=["*"],
     )
 
-    # Setup static files
+
+def setup_staticfiles(app: FastAPI) -> None:
     app.mount("/eda", StaticFiles(directory="ui/dist", html=True), name="eda")
 
-    # Setup routes
+
+def setup_routes(app: FastAPI) -> None:
     app.include_router(root_router)
     app.include_router(api_router)
 
-    # Setup database
-    app.state.db_engine = db_engine = engine_from_settings(settings)
-    app.state.db_sessionmaker = create_sessionmaker(db_engine)
-    app.add_event_handler("shutdown", db_engine.dispose)
+
+def setup_database(app: FastAPI) -> None:
+    settings = app.state.settings
+    provider = DatabaseProvider(settings.database_url)
+    app.add_event_handler("shutdown", provider.close)
+    app.dependency_overrides[
+        get_db_session_factory
+    ] = lambda: provider.session_factory
+
+
+# TODO(cutwater): Use dependency overrides.
+# TODO(cutwater): Implement customizable ApplicationBuilder for testing.
+def create_app() -> FastAPI:
+    """Initialize FastAPI application."""
+    settings = load_settings()
+
+    app = FastAPI(title="Ansible Events API")
+    app.state.settings = settings
+
+    setup_cors(app)
+    setup_staticfiles(app)
+    setup_routes(app)
+
+    setup_database(app)
 
     return app
