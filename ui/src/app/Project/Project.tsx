@@ -8,20 +8,22 @@ import {getServer} from "@app/utils/utils";
 import {TopToolbar} from "@app/shared/top-toolbar";
 import {ProjectDetails} from "@app/Project/project-details";
 import {ProjectLinks} from "@app/Project/project-links";
+import sharedMessages from "../messages/shared.messages";
+import {useIntl} from "react-intl";
 
-export const renderProjectTabs = (projectId: string) => {
+export const renderProjectTabs = (intl, projectId: string) => {
   const project_tabs = [
     {
       eventKey: 0,
       title: (
         <>
           <CaretLeftIcon />
-          {'Back to Projects'}
+          {intl.formatMessage(sharedMessages.backToProjects)}
         </>
       ),
       name: `/projects`,
     },
-    { eventKey: 1, title: 'Details', name: `/project/${projectId}/details` },
+    { eventKey: 1, title: intl.formatMessage(sharedMessages.details), name: `/project/${projectId}/details` },
     {
       eventKey: 2,
       title: 'Links',
@@ -43,10 +45,8 @@ export const extractProjectNameFromUrl = (url: string) => {
 const Project: React.FunctionComponent = () => {
 
   const [project, setProject] = useState([]);
-
   const { id } = useParams();
-  console.log('Debug project id: ', id);
-
+  const intl = useIntl();
 
   useEffect(() => {
     fetch(endpoint1 + id, {
@@ -61,7 +61,7 @@ const Project: React.FunctionComponent = () => {
     <React.Fragment>
       <TopToolbar breadcrumbs={[
         {
-          title: 'Projects',
+          title: intl.formatMessage(sharedMessages.projects),
           to: '/projects'
         },
         {

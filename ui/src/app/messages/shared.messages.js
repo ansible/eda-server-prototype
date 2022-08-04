@@ -26,6 +26,22 @@ const sharedMessages = defineMessages({
     id: 'shared.search',
     defaultMessage: 'Search'
   },
+  lastModified: {
+    id: 'shared.lastModified',
+    defaultMessage: 'Last modified'
+  },
+  description: {
+    id: 'shared.description',
+    defaultMessage: 'Description'
+  },
+  details: {
+    id: 'shared.details',
+    defaultMessage: 'Details'
+  },
+  created: {
+    id: 'shared.created',
+    defaultMessage: 'Created'
+  },
   filterByName: {
     id: 'shared.filterByName',
     defaultMessage: 'Filter by {name}'
@@ -94,6 +110,22 @@ const sharedMessages = defineMessages({
   deleteProjectTitle: {
     id: 'project.deleteProject',
     defaultMessage: 'Delete project'
+  },
+  backToProjects: {
+    id: 'project.backToProjects',
+    defaultMessage: 'Back to projects'
+  },
+  scmUrl: {
+    id: 'project.scmUrl',
+    defaultMessage: 'SCM URL'
+  },
+  scmType: {
+    id: 'project.scmType',
+    defaultMessage: 'SCM Type'
+  },
+  scmCredentials: {
+    id: 'project.scmCredentials',
+    defaultMessage: 'SCM Credentials'
   },
   activation: {
     id: 'activation.activation',

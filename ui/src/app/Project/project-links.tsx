@@ -11,6 +11,7 @@ import {
 } from '@patternfly/react-core';
 import styled from 'styled-components';
 import {renderProjectTabs} from "@app/Project/Project";
+import {useIntl} from "react-intl";
 
 
 const CardBody = styled(PFCardBody)`
@@ -20,10 +21,10 @@ const SimpleList = styled(PFSimpleList)`
   white-space: pre-wrap;
 `
 const ProjectLinks: React.FunctionComponent = ({project}) => {
-  console.log( 'Debug - Project links - project: ', project);
+  const intl = useIntl();
   return (
   <PageSection page-type={'project-links'} id={'project-links'}>
-    { renderProjectTabs(project?.id) }
+    { renderProjectTabs(intl, project?.id) }
     <Stack>
       <StackItem>
         <Card>

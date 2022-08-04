@@ -6,14 +6,17 @@ import {
   StackItem,
 } from '@patternfly/react-core';
 import {extractProjectNameFromUrl, renderProjectTabs} from "@app/Project/Project";
+import {useIntl} from "react-intl";
+import sharedMessages from "../messages/shared.messages";
 
 const ProjectDetails: React.FunctionComponent = ({ project }) => {
+  const intl = useIntl();
   const renderFlexProjectDetails: React.FunctionComponent = (project) => (
     <Flex>
       <Flex direction={{ default: 'column' }} flex={{ default: 'flex_1' }}>
         <FlexItem>
           <Stack>
-            <StackItem><Title headingLevel="h3">Name</Title></StackItem>
+            <StackItem><Title headingLevel="h3">{intl.formatMessage(sharedMessages.name)}</Title></StackItem>
             <StackItem>
               {project?.name || extractProjectNameFromUrl(project.url)}
             </StackItem>
@@ -21,7 +24,7 @@ const ProjectDetails: React.FunctionComponent = ({ project }) => {
         </FlexItem>
         <FlexItem>
           <Stack>
-            <StackItem><Title headingLevel="h3">SCM URL</Title></StackItem>
+            <StackItem><Title headingLevel="h3">{intl.formatMessage(sharedMessages.scmUrl)}</Title></StackItem>
             <StackItem>
               {project?.url || ' '}
             </StackItem>
@@ -29,7 +32,7 @@ const ProjectDetails: React.FunctionComponent = ({ project }) => {
         </FlexItem>
         <FlexItem>
           <Stack>
-            <StackItem><Title headingLevel="h3">Last modified</Title></StackItem>
+            <StackItem><Title headingLevel="h3">{intl.formatMessage(sharedMessages.lastModified)}</Title></StackItem>
             <StackItem>
               {project?.modified_at || ' '}
             </StackItem>
@@ -39,7 +42,7 @@ const ProjectDetails: React.FunctionComponent = ({ project }) => {
       <Flex direction={{ default: 'column' }} flex={{ default: 'flex_1' }}>
         <FlexItem>
           <Stack>
-            <StackItem><Title headingLevel="h3">Description</Title></StackItem>
+            <StackItem><Title headingLevel="h3">{intl.formatMessage(sharedMessages.description)}</Title></StackItem>
             <StackItem>
               {project?.description || ' '}
             </StackItem>
@@ -47,7 +50,7 @@ const ProjectDetails: React.FunctionComponent = ({ project }) => {
         </FlexItem>
         <FlexItem>
           <Stack>
-            <StackItem><Title headingLevel="h3">SCM credentials</Title></StackItem>
+            <StackItem><Title headingLevel="h3">{intl.formatMessage(sharedMessages.scmCredentials)}</Title></StackItem>
             <StackItem>
               {project?.scm_credentials || ' '}
             </StackItem>
@@ -57,14 +60,14 @@ const ProjectDetails: React.FunctionComponent = ({ project }) => {
       <Flex direction={{ default: 'column' }} flex={{ default: 'flex_1' }}>
         <FlexItem>
           <Stack>
-            <StackItem><Title headingLevel="h3">SCM type</Title>
+            <StackItem><Title headingLevel="h3">{intl.formatMessage(sharedMessages.scmType)}</Title>
               {project?.scm_type || ''}
             </StackItem>
           </Stack>
         </FlexItem>
         <FlexItem>
           <Stack>
-            <StackItem><Title headingLevel="h3">Created</Title></StackItem>
+            <StackItem><Title headingLevel="h3">{intl.formatMessage(sharedMessages.created)}</Title></StackItem>
             <StackItem>
               {project?.created_at || ''}
             </StackItem>
@@ -76,7 +79,7 @@ const ProjectDetails: React.FunctionComponent = ({ project }) => {
 
   return (
   <PageSection page-type={'project-details'} id={'project-details'}>
-    { renderProjectTabs(project?.id) }
+    { renderProjectTabs(intl, project?.id) }
     <Stack>
       <StackItem>
         <Card>
