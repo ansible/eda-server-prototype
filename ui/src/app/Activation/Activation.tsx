@@ -42,6 +42,7 @@ export const renderActivationTabs = (activationId: string) => {
 const client = new WebSocket('ws://' + getServer() + '/api/ws');
 const endpoint1 = 'http://' + getServer() + '/api/activation_instance/';
 const endpoint2 = 'http://' + getServer() + '/api/activation_instance_job_instances/';
+const endpoint3 = 'http://' + getServer() + '/api/activation_instance_logs/?activation_instance_id=';
 
 export const fetchActivationJobs = (activationId, pagination=defaultSettings) =>
 {
@@ -58,6 +59,10 @@ const Activation: React.FunctionComponent = () => {
   const { id } = useParams();
   console.log(id);
 
+  const [stdout, setStdout] = useState([]);
+  const [newStdout, setNewStdout] = useState('');
+  const [websocket_client, setWebsocketClient] = useState([]);
+
 
   useEffect(() => {
     fetch(endpoint1 + id, {
@@ -66,12 +71,16 @@ const Activation: React.FunctionComponent = () => {
       },
     }).then(response => response.json())
       .then(data => setActivation(data));
+    fetch(endpoint3 + id, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }).then(response => response.json())
+      .then(data => {
+                setStdout(data.map((item) => item.log));
+            });
   }, []);
 
-  const [stdout, setStdout] = useState([]);
-  const [newStdout, setNewStdout] = useState('');
-
-  const [websocket_client, setWebsocketClient] = useState([]);
   useEffect(() => {
     const wc = new WebSocket('ws://' + getServer() + '/api/ws');
     setWebsocketClient(wc);
@@ -110,6 +119,12 @@ const Activation: React.FunctionComponent = () => {
       }
     }
   }, []);
+
+  useEffect(() => {
+    console.log(["newStdout: ",  newStdout]);
+    console.log(["stdout: ",  stdout]);
+    setStdout([...stdout, newStdout]);
+  }, [newStdout]);
 
   useEffect(() => {
     setJobs([...jobs, newJob]);
