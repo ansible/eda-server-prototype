@@ -266,12 +266,12 @@ async def read_output(proc, activation_instance_id, db_session_factory):
     #   that is available in BackgroundTasks
     async with db_session_factory() as db:
         line_number = 0
-        # FIXME(cutwater): The `done` variable is never set to True.
         done = False
         while not done:
             line = await proc.stdout.readline()
             if len(line) == 0:
-                break
+                done = True
+                continue
             line = line.decode()
             logger.debug(line)
             query = insert(activation_instance_logs).values(
@@ -293,9 +293,13 @@ async def read_output(proc, activation_instance_id, db_session_factory):
 async def list_activation_instance_logs(
     activation_instance_id: int, db: AsyncSession = Depends(get_db_session)
 ):
-    query = select(activation_instance_logs).where(
-        activation_instance_logs.c.activation_instance_id
-        == activation_instance_id
+    query = (
+        select(activation_instance_logs)
+        .where(
+            activation_instance_logs.c.activation_instance_id
+            == activation_instance_id
+        )
+        .order_by(activation_instance_logs.c.id)
     )
     result = await db.execute(query)
     return result.all()
@@ -519,8 +523,10 @@ async def read_job_instance_events(
     query = select(job_instances).where(job_instances.c.id == job_instance_id)
     job = (await db.execute(query)).first()
 
-    query = select(job_instance_events).where(
-        job_instance_events.c.job_uuid == job.uuid
+    query = (
+        select(job_instance_events)
+        .where(job_instance_events.c.job_uuid == job.uuid)
+        .order_by(job_instance_events.c.counter)
     )
     return (await db.execute(query)).all()
 
