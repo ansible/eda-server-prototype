@@ -15,6 +15,7 @@ import {useIntl} from "react-intl";
 import {defaultSettings} from "@app/shared/pagination";
 import {NewProject} from "@app/NewProject/NewProject";
 import {createRows} from "@app/Projects/projects-table-helpers";
+import {AnyObject} from "@app/shared/types/common-types";
 
 interface ProjectType {
   id: string;
@@ -29,7 +30,7 @@ const columns = (intl, selectedAll, selectAll) => [
     title: (
       <Checkbox onChange={selectAll} isChecked={selectedAll} id="select-all" />
     ),
-    transforms: [cellWidth(1)]
+    transforms: [cellWidth(10)]
   },
   {
     title: intl.formatMessage(sharedMessages.url)
@@ -56,7 +57,7 @@ const initialState = (filterValue = '') => ({
   rows: []
 });
 
-const areSelectedAll = (rows = [], selected) =>
+const areSelectedAll = (rows: AnyObject[] = [], selected) =>
   rows.every((row) => selected.includes(row.id));
 
 const unique = (value, index, self) => self.indexOf(value) === index;
@@ -147,7 +148,7 @@ const Projects: React.FunctionComponent = () => {
     stateDispatch
   ] = useReducer(projectsListState, initialState());
 
-  const setSelectedProjects = (id) =>
+  const setSelectedProjects = (id: string) =>
     stateDispatch({type: 'select', payload: id});
 
   const updateProjects = (pagination) => {
@@ -186,7 +187,7 @@ const Projects: React.FunctionComponent = () => {
       <Route
         exact
         path={'/new-project'}
-        render={(props) => (
+        render={(props: AnyObject) => (
           <NewProject {...props} />
         )}
       />
@@ -259,60 +260,58 @@ const Projects: React.FunctionComponent = () => {
           setSelectedProjects
         }}
       >
-        <PageSection>
-          <TableToolbarView
-            ouiaId={'projects-table'}
-            rows={rows}
-            columns={columns(intl, selectedAll, selectAllFunction)}
-            fetchData={updateProjects}
-            routes={routes}
-            actionResolver={actionResolver}
-            titlePlural={intl.formatMessage(sharedMessages.projects)}
-            titleSingular={intl.formatMessage(sharedMessages.project)}
-            toolbarButtons={toolbarButtons}
-            isLoading={isFetching || isFiltering}
-            renderEmptyState={() => (
-              <TableEmptyState
-                title={intl.formatMessage(sharedMessages.noprojects)}
-                Icon={PlusCircleIcon}
-                PrimaryAction={() =>
-                  filterValue !== '' ? (
-                    <Button onClick={() => clearFilters()} variant="link">
-                      {intl.formatMessage(sharedMessages.clearAllFilters)}
-                    </Button>
-                  ) : (
-                    <Link
-                      id="create-project-link"
-                      to={{pathname: '/new-project'}}
+        <TableToolbarView
+          ouiaId={'projects-table'}
+          rows={rows}
+          columns={columns(intl, selectedAll, selectAllFunction)}
+          fetchData={updateProjects}
+          routes={routes}
+          actionResolver={actionResolver}
+          plural={intl.formatMessage(sharedMessages.projects)}
+          singular={intl.formatMessage(sharedMessages.project)}
+          toolbarButtons={toolbarButtons}
+          isLoading={isFetching || isFiltering}
+          renderEmptyState={() => (
+            <TableEmptyState
+              title={intl.formatMessage(sharedMessages.noprojects)}
+              Icon={PlusCircleIcon}
+              PrimaryAction={() =>
+                filterValue !== '' ? (
+                  <Button onClick={() => clearFilters()} variant="link">
+                    {intl.formatMessage(sharedMessages.clearAllFilters)}
+                  </Button>
+                ) : (
+                  <Link
+                    id="create-project-link"
+                    to={{pathname: '/new-project'}}
+                  >
+                    <Button
+                      ouiaId={'create-project-link'}
+                      variant="primary"
+                      aria-label={intl.formatMessage(
+                        sharedMessages.addProject
+                      )}
                     >
-                      <Button
-                        ouiaId={'create-project-link'}
-                        variant="primary"
-                        aria-label={intl.formatMessage(
-                          sharedMessages.addProject
-                        )}
-                      >
-                        {intl.formatMessage(sharedMessages.addProject)}
-                      </Button>
-                    </Link>
+                      {intl.formatMessage(sharedMessages.addProject)}
+                    </Button>
+                  </Link>
+                )
+              }
+              description={
+                filterValue === ''
+                  ? intl.formatMessage(sharedMessages.noprojects)
+                  : intl.formatMessage(
+                  sharedMessages.clearAllFiltersDescription
                   )
-                }
-                description={
-                  filterValue === ''
-                    ? intl.formatMessage(sharedMessages.noprojects)
-                    : intl.formatMessage(
-                    sharedMessages.clearAllFiltersDescription
-                    )
-                }
-                isSearch={!isEmpty(filterValue)}
-              />
-            )}
-            activeFiltersConfig={{
-              filters: prepareChips(filterValue, intl),
-              onDelete: () => handleFilterChange('')
-            }}
-          />
-        </PageSection>
+              }
+              isSearch={!isEmpty(filterValue)}
+            />
+          )}
+          activeFiltersConfig={{
+            filters: prepareChips(filterValue, intl),
+            onDelete: () => handleFilterChange('')
+          }}
+        />
       </ProjectsTableContext.Provider>
     </Fragment>
   );
