@@ -1,13 +1,24 @@
-import {CardBody, Flex, FlexItem, PageSection, Title} from '@patternfly/react-core';
-import { Link } from 'react-router-dom';
-import React, { useState, useEffect } from 'react';
 import {
   Card,
+  CardBody,
+  CodeBlock,
+  CodeBlockCode,
+  Flex,
+  FlexItem,
+  Grid,
+  GridItem,
+  Level,
+  LevelItem,
+  PageSection,
   Stack,
   StackItem,
+  Title,
+  ToggleGroup,
+  ToggleGroupItem
 } from '@patternfly/react-core';
+import { Link } from 'react-router-dom';
+import React, {useState, useEffect, Fragment} from 'react';
 import {getServer} from '@app/utils/utils';
-import {TopToolbar} from "@app/shared/top-toolbar";
 import {renderActivationTabs} from "@app/Activation/Activation";
 import ReactJsonView from 'react-json-view';
 
@@ -22,6 +33,7 @@ const endpointVar = 'http://' + getServer() + '/api/extra_var/';
 const ActivationDetails: React.FunctionComponent = ({ activation }) => {
 
   const [activationVars, setActivationVars] = useState(undefined);
+  const [varFormat, setVarFormat] = useState('yaml');
   const id = activation?.id;
   console.log(id);
 
@@ -39,122 +51,155 @@ const ActivationDetails: React.FunctionComponent = ({ activation }) => {
   }, [activation]);
   console.log('Debug - extra vars: ', activationVars);
 
+  const handleToggleVarFormat = (_, event) => {
+    const id = event.currentTarget.id;
+    console.log( 'Debug - toggle event: ', event);
+    console.log( 'Debug - toggle event id: ', id);
+    setVarFormat(id );
+  }
+
   const renderFlexActivationDetails: React.FunctionComponent = (activation) => (
-    <Flex>
-      <Flex direction={{ default: 'column' }} flex={{ default: 'flex_1' }}>
-        <FlexItem>
-          <Stack>
-            <StackItem><Title headingLevel="h3">Name</Title></StackItem>
-            <StackItem>
-              {activation?.name}
-            </StackItem>
-          </Stack>
-        </FlexItem>
-        <FlexItem>
-          <Stack>
-            <StackItem><Title headingLevel="h3">Execution environment</Title></StackItem>
-            <StackItem>
-              {activation?.execution_environment}
-            </StackItem>
-          </Stack>
-        </FlexItem>
-        <FlexItem>
-          <Stack>
-            <StackItem><Title headingLevel="h3">Playbook</Title></StackItem>
-            <StackItem>
-              {activation?.playbook}
-            </StackItem>
-          </Stack>
-        </FlexItem>
-        <FlexItem>
-          <Stack>
-            <StackItem><Title headingLevel="h3">Restarted count</Title></StackItem>
-            <StackItem>
-              {activation?.restarted_count}
-            </StackItem>
-          </Stack>
-        </FlexItem>
-        <FlexItem>
-          <Stack>
-            <StackItem><Title headingLevel="h3">Variables</Title></StackItem>
-            <StackItem>
-              {activationVars ? <ReactJsonView displayObjectSize={false}
-                                               displayDataTypes={false}
-                                               quotesOnKeys={false}
-                                               src={activationVars}/> : null}
-            </StackItem>
-          </Stack>
-        </FlexItem>
-      </Flex>
-      <Flex direction={{ default: 'column' }} flex={{ default: 'flex_1' }}>
-        <FlexItem>
-          <Stack>
-            <StackItem><Title headingLevel="h3">Description</Title></StackItem>
-            <StackItem>
-              {activation?.description}
-            </StackItem>
-          </Stack>
-        </FlexItem>
-        <FlexItem>
-          <Stack>
-            <StackItem><Title headingLevel="h3">Rule set</Title></StackItem>
-            <StackItem>
-              <Link to={"/rulesetfile/" + activation.ruleset_id}>{activation.ruleset_name}</Link>
-            </StackItem>
-          </Stack>
-        </FlexItem>
-        <FlexItem>
-          <Stack>
-            <StackItem><Title headingLevel="h3">Activation status</Title></StackItem>
-            <StackItem>
-              {activation?.status}
-            </StackItem>
-          </Stack>
-        </FlexItem>
-        <FlexItem>
-          <Stack>
-            <StackItem><Title headingLevel="h3">Created</Title></StackItem>
-            <StackItem>
-              {activation?.created_at}
-            </StackItem>
-          </Stack>
-        </FlexItem>
-      </Flex>
-      <Flex direction={{ default: 'column' }} flex={{ default: 'flex_1' }}>
-        <FlexItem>
-          <Stack>
-            <StackItem><Title headingLevel="h3">Inventory</Title></StackItem>
-            <StackItem>
-              {<Link to={"/inventory/" + activation.inventory_id}>{activation.inventory_name}</Link>}
-            </StackItem>
-          </Stack>
-        </FlexItem>
-        <FlexItem>
-          <Stack>
-            <StackItem><Title headingLevel="h3">Restart policy</Title></StackItem>
-            <StackItem>
-              {activation?.restart_policy}
-            </StackItem>
-          </Stack>
-        </FlexItem>
-        <FlexItem>
-          <Stack>
-            <StackItem><Title headingLevel="h3">Last restarted</Title></StackItem>
-            <StackItem>
-              {activation?.last_restarted}
-            </StackItem>
-          </Stack>
-        </FlexItem>
-        <FlexItem>
-          <Stack>
-            <StackItem><Title headingLevel="h3">Last modified</Title></StackItem>
-            <StackItem>
-              {activation?.updated_at}
-            </StackItem>
-          </Stack>
-        </FlexItem>
-      </Flex>
-    </Flex>
+    <Stack hasGutter={true}>
+      <StackItem>
+        <Flex>
+          <Flex direction={{ default: 'column' }} flex={{ default: 'flex_1' }}>
+            <FlexItem>
+              <Stack>
+                <StackItem><Title headingLevel="h3">Name</Title></StackItem>
+                <StackItem>
+                  {activation?.name}
+                </StackItem>
+              </Stack>
+            </FlexItem>
+            <FlexItem>
+              <Stack>
+                <StackItem><Title headingLevel="h3">Execution environment</Title></StackItem>
+                <StackItem>
+                  {activation?.execution_environment}
+                </StackItem>
+              </Stack>
+            </FlexItem>
+            <FlexItem>
+              <Stack>
+                <StackItem><Title headingLevel="h3">Playbook</Title></StackItem>
+                <StackItem>
+                  {activation?.playbook}
+                </StackItem>
+              </Stack>
+            </FlexItem>
+            <FlexItem>
+              <Stack>
+                <StackItem><Title headingLevel="h3">Restarted count</Title></StackItem>
+                <StackItem>
+                  {activation?.restarted_count}
+                </StackItem>
+              </Stack>
+            </FlexItem>
+          </Flex>
+          <Flex direction={{ default: 'column' }} flex={{ default: 'flex_1' }}>
+            <FlexItem>
+              <Stack>
+                <StackItem><Title headingLevel="h3">Description</Title></StackItem>
+                <StackItem>
+                  {activation?.description}
+                </StackItem>
+              </Stack>
+            </FlexItem>
+            <FlexItem>
+              <Stack>
+                <StackItem><Title headingLevel="h3">Rule set</Title></StackItem>
+                <StackItem>
+                  <Link to={"/rulesetfile/" + activation.ruleset_id}>{activation.ruleset_name}</Link>
+                </StackItem>
+              </Stack>
+            </FlexItem>
+            <FlexItem>
+              <Stack>
+                <StackItem><Title headingLevel="h3">Activation status</Title></StackItem>
+                <StackItem>
+                  {activation?.status}
+                </StackItem>
+              </Stack>
+            </FlexItem>
+            <FlexItem>
+              <Stack>
+                <StackItem><Title headingLevel="h3">Created</Title></StackItem>
+                <StackItem>
+                  {activation?.created_at}
+                </StackItem>
+              </Stack>
+            </FlexItem>
+          </Flex>
+          <Flex direction={{ default: 'column' }} flex={{ default: 'flex_1' }}>
+            <FlexItem>
+              <Stack>
+                <StackItem><Title headingLevel="h3">Inventory</Title></StackItem>
+                <StackItem>
+                  {<Link to={"/inventory/" + activation.inventory_id}>{activation.inventory_name}</Link>}
+                </StackItem>
+              </Stack>
+            </FlexItem>
+            <FlexItem>
+              <Stack>
+                <StackItem><Title headingLevel="h3">Restart policy</Title></StackItem>
+                <StackItem>
+                  {activation?.restart_policy}
+                </StackItem>
+              </Stack>
+            </FlexItem>
+            <FlexItem>
+              <Stack>
+                <StackItem><Title headingLevel="h3">Last restarted</Title></StackItem>
+                <StackItem>
+                  {activation?.last_restarted}
+                </StackItem>
+              </Stack>
+            </FlexItem>
+            <FlexItem>
+              <Stack>
+                <StackItem><Title headingLevel="h3">Last modified</Title></StackItem>
+                <StackItem>
+                  {activation?.updated_at}
+                </StackItem>
+              </Stack>
+            </FlexItem>
+          </Flex>
+        </Flex>
+      </StackItem>
+      <StackItem>
+        <Stack hasGutter={true}>
+          <StackItem>
+            <Grid hasGutter>
+              <GridItem>
+                <Title headingLevel="h3">Variables</Title>
+              </GridItem>
+              <GridItem>
+                <ToggleGroup isCompact aria-label="JsonYaml">
+                  <ToggleGroupItem text="YAML" buttonId="yaml" isSelected={varFormat === 'yaml' } onChange={handleToggleVarFormat} />
+                  <ToggleGroupItem text="JSON" buttonId="json" isSelected={varFormat === 'json'} onChange={handleToggleVarFormat} />
+                </ToggleGroup>
+              </GridItem>
+            </Grid>
+          </StackItem>
+          <StackItem>
+            {activationVars ? ( varFormat === 'json' ?
+                <ReactJsonView displayObjectSize={false}
+                               displayDataTypes={false}
+                               quotesOnKeys={false}
+                               src={activationVars}/> :
+                <Card>
+                  <CodeBlock className="global-primary-background">
+                    <CodeBlockCode id={'vars-yaml'}>
+                      {activationVars.extra_var}
+                    </CodeBlockCode>
+                  </CodeBlock>
+                </Card>
+            ) : null
+            }
+          </StackItem>
+        </Stack>
+      </StackItem>
+    </Stack>
   );
 
   return (

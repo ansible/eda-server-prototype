@@ -94,6 +94,7 @@
     "sass": "^1.53.0",
     "sass-loader": "^13.0.2",
     "sirv-cli": "^1.0.12",
-    "styled-components": "^5.3.5"
+    "styled-components": "^5.3.5",
+    "yaml": "^2.1.1"
   }
 }
