@@ -77,7 +77,10 @@ const ActivationDetails: React.FunctionComponent = ({ activation }) => {
           <Stack>
             <StackItem><Title headingLevel="h3">Variables</Title></StackItem>
             <StackItem>
-              {activationVars ? <ReactJsonView src={activationVars}/> : null}
+              {activationVars ? <ReactJsonView displayObjectSize={false}
+                                               displayDataTypes={false}
+                                               quotesOnKeys={false}
+                                               src={activationVars}/> : null}
             </StackItem>
           </Stack>
         </FlexItem>
