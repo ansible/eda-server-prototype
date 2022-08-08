@@ -14,11 +14,13 @@ operations.
    update since most of the cost of database writes are updating indicies.
 
 2. Know what SQL statement that you want to send to the database first.  Use
-   tools to generate that SQL second. ORMs generate really slow SQL unless you
-   are very careful and know what you are doing.
+   tools to generate that SQL second. Think about the number and the complexity
+   of queries you're writing. Avoid making queries in for loops.  Instead combine
+   those queries into one or two queries and process the data in a batch.
 
-3. Don't override the save function.  This prevents #1.  Don't use most of ORM
-   features since they conflict with #1.
+3. Create a diagram of the schema in Lucid charts, Miro, or Omnigraffle
+   something similar.  Database schemas that look organized in a diagram are
+   easier to understand when writing queries for them.
 
 4. Get the data into the database as fast as possible without processing it.
    Don't leave the user waiting for processing before responding that you
@@ -30,11 +32,14 @@ operations.
 5. Process the data in the database.  The database manipulates data many times
    faster and scales better than Python applications.  Create and temporary
    tables if needed and drop them when you are done with the operations.
+   That said, getting SQL to do the manipulation that you want can be quite
+   tricky.  Exporting batches of data to tools like Pandas can be useful
+   and scale horiztonally in background tasks.
 
-6. Create reporting tables. If you need to generate reports, create another set
-   of paritioned tables for those reports and ONLY do read, bulk inserts, and
-   drop table partition operations on them.  Don't report out of the relational
-   tables since it will be way too slow.
+6. Create reporting tables or databases. If you need to generate reports,
+   create another set of paritioned tables for those reports and ONLY do read,
+   bulk inserts, and drop table partition operations on them.  Don't report out of
+   the relational tables since it will be way too slow.
 
 7. Write correct queries first and optimize them second if needed.  Some queries
    will be slow due to the structure of the relational data.  This can be fixed
