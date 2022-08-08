@@ -22,6 +22,10 @@ import React, {useState, useEffect, Fragment} from 'react';
 import {getServer} from '@app/utils/utils';
 import {renderActivationTabs} from "@app/Activation/Activation";
 import ReactJsonView from 'react-json-view';
+import AceEditor from "react-ace";
+import "ace-builds/src-noconflict/mode-yaml";
+import "ace-builds/src-noconflict/theme-xcode";
+import styled from 'styled-components';
 
 const client = new WebSocket('ws://' + getServer() + '/api/ws');
 
@@ -30,6 +34,19 @@ client.onopen = () => {
 };
 
 const endpointVar = 'http://' + getServer() + '/api/extra_var/';
+
+const FocusWrapper = styled.div`
+  && + .keyboard-help-text {
+    opacity: 0;
+    transition: opacity 0.1s linear;
+  }
+  &:focus-within + .keyboard-help-text {
+    opacity: 1;
+  }
+  & .ace_hidden-cursors .ace_cursor {
+    opacity: 0;
+  }
+`;
 
 const ActivationDetails: React.FunctionComponent = ({ activation }) => {
 
@@ -187,12 +204,27 @@ const ActivationDetails: React.FunctionComponent = ({ activation }) => {
                                quotesOnKeys={false}
                                src={activationVars}/> :
                 <Card>
-                  <CodeEditor
-                    isLineNumbersVisible={true}
-                    className="global-primary-background"
-                    height="100"
-                    options={{theme:"vs-dark"}}
-                    code={activationVars.extra_var}/>
+                  <FocusWrapper>
+                    <AceEditor
+                      mode="javascript"
+                      theme="xcode"
+                      name="activation_extravars"
+                      fontSize={14}
+                      value={activationVars.extra_var}
+                      height={'100px'}
+                      setOptions={{
+                        enableBasicAutocompletion: false,
+                        enableLiveAutocompletion: false,
+                        enableSnippets: false,
+                        showLineNumbers: true,
+                        tabSize: 2,
+                        readOnly: true,
+                        focus: false,
+                        highlightActiveLine: false,
+                        cursorStart: 0,
+                        cursorStyle: undefined
+                      }}/>
+                  </FocusWrapper>
                 </Card>
             ) : null
             }

@@ -79,7 +79,6 @@
     "webpack-merge": "^5.8.0"
   },
   "dependencies": {
-    "@patternfly/react-code-editor": "^4.65.1",
     "@patternfly/react-core": "^4.225.9",
     "@patternfly/react-icons": "^4.75.1",
     "@patternfly/react-styles": "^4.74.1",
@@ -90,12 +89,12 @@
     "ansi-to-react": "^6.1.6",
     "css-loader": "^6.7.1",
     "react": "^17.0.2",
+    "react-ace": "^10.1.0",
     "react-dom": "^17.0.2",
     "react-intl": "^6.0.5",
     "sass": "^1.53.0",
     "sass-loader": "^13.0.2",
     "sirv-cli": "^1.0.12",
-    "styled-components": "^5.3.5",
-    "yaml": "^2.1.1"
+    "styled-components": "^5.3.5"
   }
 }
