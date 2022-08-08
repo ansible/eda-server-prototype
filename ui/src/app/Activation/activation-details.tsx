@@ -16,6 +16,7 @@ import {
   ToggleGroup,
   ToggleGroupItem
 } from '@patternfly/react-core';
+import { CodeEditor, Language } from '@patternfly/react-code-editor';
 import { Link } from 'react-router-dom';
 import React, {useState, useEffect, Fragment} from 'react';
 import {getServer} from '@app/utils/utils';
@@ -53,8 +54,6 @@ const ActivationDetails: React.FunctionComponent = ({ activation }) => {
 
   const handleToggleVarFormat = (_, event) => {
     const id = event.currentTarget.id;
-    console.log( 'Debug - toggle event: ', event);
-    console.log( 'Debug - toggle event id: ', id);
     setVarFormat(id );
   }
 
@@ -169,11 +168,11 @@ const ActivationDetails: React.FunctionComponent = ({ activation }) => {
       <StackItem>
         <Stack hasGutter={true}>
           <StackItem>
-            <Grid hasGutter>
-              <GridItem>
+            <Grid>
+              <GridItem span={1}>
                 <Title headingLevel="h3">Variables</Title>
               </GridItem>
-              <GridItem>
+              <GridItem span={2}>
                 <ToggleGroup isCompact aria-label="JsonYaml">
                   <ToggleGroupItem text="YAML" buttonId="yaml" isSelected={varFormat === 'yaml' } onChange={handleToggleVarFormat} />
                   <ToggleGroupItem text="JSON" buttonId="json" isSelected={varFormat === 'json'} onChange={handleToggleVarFormat} />
@@ -188,11 +187,12 @@ const ActivationDetails: React.FunctionComponent = ({ activation }) => {
                                quotesOnKeys={false}
                                src={activationVars}/> :
                 <Card>
-                  <CodeBlock className="global-primary-background">
-                    <CodeBlockCode id={'vars-yaml'}>
-                      {activationVars.extra_var}
-                    </CodeBlockCode>
-                  </CodeBlock>
+                  <CodeEditor
+                    isLineNumbersVisible={true}
+                    className="global-primary-background"
+                    height="100"
+                    options={{theme:"vs-dark"}}
+                    code={activationVars.extra_var}/>
                 </Card>
             ) : null
             }
