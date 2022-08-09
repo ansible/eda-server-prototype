@@ -18,20 +18,19 @@ Functions:
     Returns None
 """
 
-from functools import partial
-import concurrent.futures
-import ansible_runner
-
 import asyncio
+import concurrent.futures
 import logging
 import os
 import shutil
 import tempfile
+from functools import partial
 
-from sqlalchemy import select, insert
+import ansible_runner
+from sqlalchemy import insert, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from .db.models import playbooks, job_instance_events
+from .db.models import job_instance_events, playbooks
 from .messages import JobEnd
 
 logger = logging.getLogger("ansible_events_ui")
@@ -116,7 +115,9 @@ async def inactivate_rulesets(activation_id):
         pass
 
 
-async def run_job(job_uuid, event_log, playbook, inventory, extravars, db: AsyncSession):
+async def run_job(
+    job_uuid, event_log, playbook, inventory, extravars, db: AsyncSession
+):
     loop = asyncio.get_running_loop()
     task_pool = concurrent.futures.ThreadPoolExecutor()
 

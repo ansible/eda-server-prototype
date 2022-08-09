@@ -29,19 +29,24 @@ from .db.models import (
     projects,
     rule_set_files,
 )
-from .manager import activate_rulesets, inactivate_rulesets, run_job, write_job_events
+from .manager import (
+    activate_rulesets,
+    inactivate_rulesets,
+    run_job,
+    write_job_events,
+)
 from .project import clone_project, sync_project
 from .schemas import (
     Activation,
     ActivationLog,
     Extravars,
     Inventory,
+    JobInstance,
     Project,
     RuleSetFile,
     UserCreate,
     UserRead,
     UserUpdate,
-    JobInstance,
 )
 from .users import auth_backend, current_active_user, fastapi_users
 
@@ -552,7 +557,7 @@ async def create_job_instance(
         name=f"write_job_events {job_instance_id}",
     )
     taskmanager.tasks.append(task)
-    return {**j.dict(), 'id': job_instance_id, 'uuid': job_uuid}
+    return {**j.dict(), "id": job_instance_id, "uuid": job_uuid}
 
 
 @router.get("/api/job_instance/{job_instance_id}")
