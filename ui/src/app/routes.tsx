@@ -9,7 +9,7 @@ import { Activation } from '@app/Activation/Activation';
 import { ActivationDetails } from '@app/Activation/activation-details';
 import { ActivationJobs } from '@app/Activation/activation-jobs';
 import { NewActivation } from '@app/NewActivation/NewActivation';
-import { Jobs } from '@app/Jobs/Jobs2';
+import { Jobs } from '@app/Jobs/Jobs';
 import { Job } from '@app/Job/Job';
 import { NewJob } from '@app/NewJob/NewJob';
 import { RuleSets } from '@app/RuleSetFiles/RuleSetFiles';
