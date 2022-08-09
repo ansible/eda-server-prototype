@@ -9,8 +9,10 @@ import {
 } from '@patternfly/react-core';
 import {renderActivationTabs} from "@app/Activation/Activation";
 import Ansi from "ansi-to-react";
+import {ActivationType} from "@app/Activations/Activations";
+import {StdoutType} from "@app/Job/Job";
 
-const ActivationStdout: React.FunctionComponent = ({activation, stdout}) => {
+const ActivationStdout: React.FunctionComponent<{activation: ActivationType, stdout: StdoutType[]}> = ({activation, stdout}) => {
   return (
     <PageSection page-type={'activation-details'} id={'activation-details'}>
       { renderActivationTabs(activation.id) }
@@ -19,10 +21,10 @@ const ActivationStdout: React.FunctionComponent = ({activation, stdout}) => {
           <Card>
             <CardTitle>Standard Out</CardTitle>
             <CardBody>
-              {stdout.length !== 0 && (
+              {stdout && stdout.length > 0 && (
                 <SimpleList style={{ whiteSpace: 'pre-wrap' }}>
                   {stdout.map((item, i) => (
-                    <SimpleListItem key={i}><Ansi>{item}</Ansi></SimpleListItem>
+                    <SimpleListItem key={i}><Ansi>{item?.stdout}</Ansi></SimpleListItem>
                   ))}
                 </SimpleList>
               )}

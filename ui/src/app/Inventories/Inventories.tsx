@@ -25,9 +25,7 @@ const SimpleList = styled(PFSimpleList)`
 const endpoint = 'http://' + getServer() + '/api/inventories/';
 
 const Inventories: React.FunctionComponent = () => {
-
-
-  const [inventories, setInventories] = useState([]);
+  const [inventories, setInventories] = useState<{id: string, name: string}[]>([]);
 
   useEffect(() => {
      fetch(endpoint, {

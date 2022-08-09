@@ -38,13 +38,13 @@ function Login(props) {
 					'password': passwordValue,
 				};
 
-				let formBody = [];
+				const formBodyItems: string[] = [];
 				for (const property in details) {
 					const encodedKey = encodeURIComponent(property);
 					const encodedValue = encodeURIComponent(details[property]);
-					formBody.push(encodedKey + "=" + encodedValue);
+					formBodyItems.push(encodedKey + "=" + encodedValue);
 				}
-				formBody = formBody.join("&");
+				const formBody = formBodyItems.join("&");
 				fetch('http://' + getServer() + '/api/auth/jwt/login',
 						{
 							method: 'POST',

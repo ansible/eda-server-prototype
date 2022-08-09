@@ -9,7 +9,8 @@ import {TopToolbar} from "@app/shared/top-toolbar";
 import {ActivationJobs} from "@app/Activation/activation-jobs";
 import {ActivationDetails} from "@app/Activation/activation-details";
 import {ActivationStdout} from "@app/Activation/activation-stdout";
-import {defaultSettings} from "@app/shared/pagination";
+import {ActivationType} from "@app/Activations/Activations";
+import {JobType, StdoutType} from "@app/Job/Job";
 
 export const renderActivationTabs = (activationId: string) => {
   const activation_tabs = [
@@ -42,26 +43,13 @@ export const renderActivationTabs = (activationId: string) => {
 const client = new WebSocket('ws://' + getServer() + '/api/ws');
 const endpoint1 = 'http://' + getServer() + '/api/activation_instance/';
 const endpoint2 = 'http://' + getServer() + '/api/activation_instance_job_instances/';
-const endpoint3 = 'http://' + getServer() + '/api/activation_instance_logs/?activation_instance_id=';
 
-export const fetchActivationJobs = (activationId, pagination=defaultSettings) =>
-{
-  return fetch(`${endpoint2}${activationId}`, {
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  }).then(response => response.json());
-}
 const Activation: React.FunctionComponent = () => {
 
-  const [activation, setActivation] = useState([]);
+  const [activation, setActivation] = useState<ActivationType|undefined>(undefined);
 
   const { id } = useParams<{id: string}>();
   console.log(id);
-
-  const [stdout, setStdout] = useState([]);
-  const [newStdout, setNewStdout] = useState('');
-  const [websocket_client, setWebsocketClient] = useState([]);
 
 
   useEffect(() => {
@@ -71,16 +59,12 @@ const Activation: React.FunctionComponent = () => {
       },
     }).then(response => response.json())
       .then(data => setActivation(data));
-    fetch(endpoint3 + id, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    }).then(response => response.json())
-      .then(data => {
-                setStdout(data.map((item) => item.log));
-            });
   }, []);
 
+  const [stdout, setStdout] = useState<StdoutType[]>([]);
+  const [newStdout, setNewStdout] = useState<StdoutType>({stdout:''});
+
+  const [websocket_client, setWebsocketClient] = useState<WebSocket | unknown>({});
   useEffect(() => {
     const wc = new WebSocket('ws://' + getServer() + '/api/ws');
     setWebsocketClient(wc);
@@ -96,15 +80,19 @@ const Activation: React.FunctionComponent = () => {
       }
     }
   }, []);
-  const [jobs, setJobs] = useState([]);
-  const [newJob, setNewJob] = useState([]);
+  const [jobs, setJobs] = useState<JobType[]>([]);
+  const [newJob, setNewJob] = useState<JobType|undefined>( undefined);
 
   useEffect(() => {
-    fetchActivationJobs(id)
+    fetch(endpoint2 + id, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }).then(response => response.json())
       .then(data => setJobs(data));
   }, []);
 
-  const [update_client, setUpdateClient] = useState([]);
+  const [update_client, setUpdateClient] = useState<WebSocket|unknown>({});
   useEffect(() => {
     const uc = new WebSocket('ws://' + getServer() + '/api/ws-activation/' + id);
     setUpdateClient(uc);
@@ -121,13 +109,9 @@ const Activation: React.FunctionComponent = () => {
   }, []);
 
   useEffect(() => {
-    console.log(["newStdout: ",  newStdout]);
-    console.log(["stdout: ",  stdout]);
-    setStdout([...stdout, newStdout]);
-  }, [newStdout]);
-
-  useEffect(() => {
-    setJobs([...jobs, newJob]);
+    if(newJob) {
+      setJobs([...jobs, newJob]);
+    }
   }, [newJob]);
 
   return (
@@ -139,27 +123,29 @@ const Activation: React.FunctionComponent = () => {
         }
       ]
       }>
-        <Title headingLevel={"h2"}>{`${activation.name}`}</Title>
+        <Title headingLevel={"h2"}>{`${activation?.name}`}</Title>
       </TopToolbar>
-      <Switch>
-        <Route exact path="/activation/:id/jobs">
-          <ActivationJobs
-            jobs={jobs}
-            activation={activation}
-          />
-        </Route>
-        <Route exact path="/activation/:id/stdout">
-          <ActivationStdout
-            activation={activation}
-            stdout={stdout}
-          />
-        </Route>
-        <Route path="/activation/:id">
-          <ActivationDetails
-            activation={activation}
-          />
-        </Route>
-      </Switch>
+      { activation &&
+        <Switch>
+          <Route exact path="/activation/:id/jobs">
+            <ActivationJobs
+              jobs={jobs}
+              activation={activation}
+            />
+          </Route>
+          <Route exact path="/activation/:id/stdout">
+            <ActivationStdout
+              activation={activation}
+              stdout={stdout}
+            />
+          </Route>
+          <Route path="/activation/:id">
+            <ActivationDetails
+              activation={activation}
+            />
+          </Route>
+        </Switch>
+      }
     </React.Fragment>
   );
 }

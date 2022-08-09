@@ -10,7 +10,6 @@ import {cellWidth} from "@patternfly/react-table";
 import ProjectsTableContext from './projects-table-context';
 import {TableToolbarView} from "@app/shared/table-toolbar-view";
 import TableEmptyState from "@app/shared/table-empty-state";
-import isEmpty from 'lodash/isEmpty';
 import {useIntl} from "react-intl";
 import {defaultSettings} from "@app/shared/pagination";
 import {NewProject} from "@app/NewProject/NewProject";
@@ -25,13 +24,7 @@ interface ProjectType {
 
 const endpoint = 'http://' + getServer() + '/api/projects/';
 
-const columns = (intl, selectedAll, selectAll) => [
-  {
-    title: (
-      <Checkbox onChange={selectAll} isChecked={selectedAll} id="select-all" />
-    ),
-    transforms: [cellWidth(10)]
-  },
+const columns = (intl) => [
   {
     title: intl.formatMessage(sharedMessages.url)
   }
@@ -229,23 +222,6 @@ const Projects: React.FunctionComponent = () => {
           </Button>
         </Link>
       </ToolbarItem>
-      <ToolbarItem>
-        <Link
-          id="remove-multiple-projects"
-          className={anyProjectsSelected ? '' : 'disabled-link'}
-          to={{pathname: '/remove-projects'}}
-        >
-          <Button
-            variant="secondary"
-            isDisabled={!anyProjectsSelected}
-            aria-label={intl.formatMessage(
-              sharedMessages.deleteProjectTitle
-            )}
-          >
-            {intl.formatMessage(sharedMessages.delete)}
-          </Button>
-        </Link>
-      </ToolbarItem>
     </ToolbarGroup>
   );
 
@@ -263,7 +239,7 @@ const Projects: React.FunctionComponent = () => {
         <TableToolbarView
           ouiaId={'projects-table'}
           rows={rows}
-          columns={columns(intl, selectedAll, selectAllFunction)}
+          columns={columns(intl)}
           fetchData={updateProjects}
           routes={routes}
           actionResolver={actionResolver}
