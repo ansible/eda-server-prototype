@@ -1,4 +1,4 @@
-import {Title} from '@patternfly/react-core';
+import {PageSection, Title} from '@patternfly/react-core';
 import {Route, useHistory} from 'react-router-dom';
 import React, {useState, useEffect, useReducer, Fragment} from 'react';
 import { Button } from '@patternfly/react-core';
@@ -177,38 +177,40 @@ const RuleSets: React.FunctionComponent = () => {
       <TopToolbar>
         <Title headingLevel={"h2"}>Rule Sets</Title>
       </TopToolbar>
-      <TableToolbarView
-        ouiaId={'RuleSets-table'}
-        rows={rows}
-        columns={columns(intl)}
-        fetchData={updateRuleSets}
-        routes={routes}
-        actionResolver={actionResolver}
-        plural={intl.formatMessage(sharedMessages.rulesets)}
-        singular={intl.formatMessage(sharedMessages.ruleset)}
-        isLoading={isFetching || isFiltering}
-        onFilterChange={handleFilterChange}
-        renderEmptyState={() => (
-          <TableEmptyState
-            title={intl.formatMessage(sharedMessages.norulesets)}
-            Icon={PlusCircleIcon}
-            PrimaryAction={() =>
-              filterValue !== '' ? (
-                <Button onClick={() => clearFilters()} variant="link">
-                  {intl.formatMessage(sharedMessages.clearAllFilters)}
-                </Button>
-              ) : null
-            }
-            description={
-              filterValue === ''
-                ? intl.formatMessage(sharedMessages.norulesets)
-                : intl.formatMessage(
-                sharedMessages.clearAllFiltersDescription
-                )
-            }
-          />
-        )}
-      />
+      <PageSection page-type={'ruleset-list'} id={'ruleset_list'}>
+        <TableToolbarView
+          ouiaId={'RuleSets-table'}
+          rows={rows}
+          columns={columns(intl)}
+          fetchData={updateRuleSets}
+          routes={routes}
+          actionResolver={actionResolver}
+          plural={intl.formatMessage(sharedMessages.rulesets)}
+          singular={intl.formatMessage(sharedMessages.ruleset)}
+          isLoading={isFetching || isFiltering}
+          onFilterChange={handleFilterChange}
+          renderEmptyState={() => (
+            <TableEmptyState
+              title={intl.formatMessage(sharedMessages.norulesets)}
+              Icon={PlusCircleIcon}
+              PrimaryAction={() =>
+                filterValue !== '' ? (
+                  <Button onClick={() => clearFilters()} variant="link">
+                    {intl.formatMessage(sharedMessages.clearAllFilters)}
+                  </Button>
+                ) : null
+              }
+              description={
+                filterValue === ''
+                  ? intl.formatMessage(sharedMessages.norulesets)
+                  : intl.formatMessage(
+                  sharedMessages.clearAllFiltersDescription
+                  )
+              }
+            />
+          )}
+        />
+      </PageSection>
     </Fragment>
   );
 }

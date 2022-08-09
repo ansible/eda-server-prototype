@@ -6,7 +6,6 @@ import {getServer} from '@app/utils/utils';
 import {TopToolbar} from '../shared/top-toolbar';
 import { PlusCircleIcon } from '@patternfly/react-icons';
 import sharedMessages from '../messages/shared.messages';
-import {cellWidth} from "@patternfly/react-table";
 import ProjectsTableContext from './projects-table-context';
 import {TableToolbarView} from "@app/shared/table-toolbar-view";
 import TableEmptyState from "@app/shared/table-empty-state";
@@ -236,54 +235,56 @@ const Projects: React.FunctionComponent = () => {
           setSelectedProjects
         }}
       >
-        <TableToolbarView
-          ouiaId={'projects-table'}
-          rows={rows}
-          columns={columns(intl)}
-          fetchData={updateProjects}
-          routes={routes}
-          actionResolver={actionResolver}
-          plural={intl.formatMessage(sharedMessages.projects)}
-          singular={intl.formatMessage(sharedMessages.project)}
-          toolbarButtons={toolbarButtons}
-          isLoading={isFetching || isFiltering}
-          onFilterChange={handleFilterChange}
-          renderEmptyState={() => (
-            <TableEmptyState
-              title={intl.formatMessage(sharedMessages.noprojects)}
-              Icon={PlusCircleIcon}
-              PrimaryAction={() =>
-                filterValue !== '' ? (
-                  <Button onClick={() => clearFilters()} variant="link">
-                    {intl.formatMessage(sharedMessages.clearAllFilters)}
-                  </Button>
-                ) : (
-                  <Link
-                    id="create-project-link"
-                    to={{pathname: '/new-project'}}
-                  >
-                    <Button
-                      ouiaId={'create-project-link'}
-                      variant="primary"
-                      aria-label={intl.formatMessage(
-                        sharedMessages.addProject
-                      )}
-                    >
-                      {intl.formatMessage(sharedMessages.addProject)}
+        <PageSection page-type={'projects-list'} id={'projects_list'}>
+          <TableToolbarView
+            ouiaId={'projects-table'}
+            rows={rows}
+            columns={columns(intl)}
+            fetchData={updateProjects}
+            routes={routes}
+            actionResolver={actionResolver}
+            plural={intl.formatMessage(sharedMessages.projects)}
+            singular={intl.formatMessage(sharedMessages.project)}
+            toolbarButtons={toolbarButtons}
+            isLoading={isFetching || isFiltering}
+            onFilterChange={handleFilterChange}
+            renderEmptyState={() => (
+              <TableEmptyState
+                title={intl.formatMessage(sharedMessages.noprojects)}
+                Icon={PlusCircleIcon}
+                PrimaryAction={() =>
+                  filterValue !== '' ? (
+                    <Button onClick={() => clearFilters()} variant="link">
+                      {intl.formatMessage(sharedMessages.clearAllFilters)}
                     </Button>
-                  </Link>
-                )
-              }
-              description={
-                filterValue === ''
-                  ? intl.formatMessage(sharedMessages.noprojects)
-                  : intl.formatMessage(
-                  sharedMessages.clearAllFiltersDescription
+                  ) : (
+                    <Link
+                      id="create-project-link"
+                      to={{pathname: '/new-project'}}
+                    >
+                      <Button
+                        ouiaId={'create-project-link'}
+                        variant="primary"
+                        aria-label={intl.formatMessage(
+                          sharedMessages.addProject
+                        )}
+                      >
+                        {intl.formatMessage(sharedMessages.addProject)}
+                      </Button>
+                    </Link>
                   )
-              }
-            />
-          )}
-        />
+                }
+                description={
+                  filterValue === ''
+                    ? intl.formatMessage(sharedMessages.noprojects)
+                    : intl.formatMessage(
+                    sharedMessages.clearAllFiltersDescription
+                    )
+                }
+              />
+            )}
+          />
+        </PageSection>
       </ProjectsTableContext.Provider>
     </Fragment>
   );

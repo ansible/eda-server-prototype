@@ -245,54 +245,56 @@ const Activations: React.FunctionComponent = () => {
           setSelectedActivations
         }}
       >
-        <TableToolbarView
-          ouiaId={'activations-table'}
-          rows={rows}
-          columns={columns(intl)}
-          fetchData={updateActivations}
-          routes={routes}
-          actionResolver={actionResolver}
-          plural={intl.formatMessage(sharedMessages.activations)}
-          singular={intl.formatMessage(sharedMessages.activation)}
-          toolbarButtons={toolbarButtons}
-          isLoading={isFetching || isFiltering}
-          onFilterChange={handleFilterChange}
-          renderEmptyState={() => (
-            <TableEmptyState
-              title={intl.formatMessage(sharedMessages.noactivations)}
-              Icon={PlusCircleIcon}
-              PrimaryAction={() =>
-                filterValue !== '' ? (
-                  <Button onClick={() => clearFilters()} variant="link">
-                    {intl.formatMessage(sharedMessages.clearAllFilters)}
-                  </Button>
-                ) : (
-                  <Link
-                    id="create-activation-link"
-                    to={{pathname: '/new-activation'}}
-                  >
-                    <Button
-                      ouiaId={'create-activation-link'}
-                      variant="primary"
-                      aria-label={intl.formatMessage(
-                        sharedMessages.addActivation
-                      )}
-                    >
-                      {intl.formatMessage(sharedMessages.addActivation)}
+        <PageSection page-type={'activations-list'} id={'activations_list'}>
+          <TableToolbarView
+            ouiaId={'activations-table'}
+            rows={rows}
+            columns={columns(intl)}
+            fetchData={updateActivations}
+            routes={routes}
+            actionResolver={actionResolver}
+            plural={intl.formatMessage(sharedMessages.activations)}
+            singular={intl.formatMessage(sharedMessages.activation)}
+            toolbarButtons={toolbarButtons}
+            isLoading={isFetching || isFiltering}
+            onFilterChange={handleFilterChange}
+            renderEmptyState={() => (
+              <TableEmptyState
+                title={intl.formatMessage(sharedMessages.noactivations)}
+                Icon={PlusCircleIcon}
+                PrimaryAction={() =>
+                  filterValue !== '' ? (
+                    <Button onClick={() => clearFilters()} variant="link">
+                      {intl.formatMessage(sharedMessages.clearAllFilters)}
                     </Button>
-                  </Link>
-                )
-              }
-              description={
-                filterValue === ''
-                  ? intl.formatMessage(sharedMessages.noactivations)
-                  : intl.formatMessage(
-                  sharedMessages.clearAllFiltersDescription
+                  ) : (
+                    <Link
+                      id="create-activation-link"
+                      to={{pathname: '/new-activation'}}
+                    >
+                      <Button
+                        ouiaId={'create-activation-link'}
+                        variant="primary"
+                        aria-label={intl.formatMessage(
+                          sharedMessages.addActivation
+                        )}
+                      >
+                        {intl.formatMessage(sharedMessages.addActivation)}
+                      </Button>
+                    </Link>
                   )
-              }
-            />
-          )}
-        />
+                }
+                description={
+                  filterValue === ''
+                    ? intl.formatMessage(sharedMessages.noactivations)
+                    : intl.formatMessage(
+                    sharedMessages.clearAllFiltersDescription
+                    )
+                }
+              />
+            )}
+          />
+        </PageSection>
       </ActivationsTableContext.Provider>
     </Fragment>
   );
