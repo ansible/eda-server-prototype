@@ -62,6 +62,14 @@ const sharedMessages = defineMessages({
     id: 'shared.jobs',
     defaultMessage: 'Jobs'
   },
+  addJob: {
+    id: 'activation.addJob',
+    defaultMessage: 'Add job'
+  },
+  deleteJobTitle: {
+    id: 'activation.deleteJob',
+    defaultMessage: 'Delete job'
+  },
   status: {
     id: 'shared.status',
     defaultMessage: 'Status'
@@ -154,6 +162,10 @@ const sharedMessages = defineMessages({
   selectRuleSet: {
     id: 'activation.selectRulebookActivationName',
     defaultMessage: 'Select a rule set'
+  },
+  selectPlaybook: {
+    id: 'job.selectPlaybookName',
+    defaultMessage: 'Select a playbook'
   },
   selectInventory: {
     id: 'activation.selectInventory',
