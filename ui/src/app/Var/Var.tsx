@@ -16,22 +16,15 @@ import { CodeBlock, CodeBlockCode  } from '@patternfly/react-core';
 import styled from 'styled-components';
 import {getServer} from '@app/utils/utils';
 import {TopToolbar} from "@app/shared/top-toolbar";
-
-
-const CardBody = styled(PFCardBody)`
-  white-space: pre-wrap;
-  `
-const SimpleList = styled(PFSimpleList)`
-  white-space: pre-wrap;
-`
+import {ExtraVarType} from "@app/Vars/Vars";
 
 const endpoint = 'http://' + getServer() + '/api/extra_var/';
 
 const Var: React.FunctionComponent = () => {
 
-  const [extraVar, setVar] = useState([]);
+  const [extraVar, setVar] = useState<ExtraVarType|undefined>(undefined);
 
-  const { id } = useParams();
+  const { id } = useParams<ExtraVarType>();
   console.log(id);
 
   useEffect(() => {
@@ -46,10 +39,10 @@ const Var: React.FunctionComponent = () => {
   return (
   <React.Fragment>
     <TopToolbar>
-      <Title headingLevel={"h2"}>{`Var ${extraVar.name}`}</Title>
+      <Title headingLevel={"h2"}>{`Var ${extraVar?.name}`}</Title>
     </TopToolbar>
     <CodeBlock>
-      <CodeBlockCode id="code-content">{extraVar.extra_var}</CodeBlockCode>
+      <CodeBlockCode id="code-content">{extraVar?.extra_var}</CodeBlockCode>
     </CodeBlock>
   </React.Fragment>
 )

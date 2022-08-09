@@ -21,7 +21,6 @@ import {
   PrimaryToolbar
 } from '@redhat-cloud-services/frontend-components/PrimaryToolbar';
 import sharedMessages from '../messages/shared.messages';
-import { PageSection } from '@patternfly/react-core';
 
 export interface TableToolbarViewProps {
   columns: ICell[];
