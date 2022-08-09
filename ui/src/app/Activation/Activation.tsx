@@ -56,7 +56,7 @@ const Activation: React.FunctionComponent = () => {
 
   const [activation, setActivation] = useState([]);
 
-  const { id } = useParams();
+  const { id } = useParams<{id: string}>();
   console.log(id);
 
   const [stdout, setStdout] = useState([]);

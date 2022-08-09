@@ -10,7 +10,6 @@ import {cellWidth} from "@patternfly/react-table";
 import ActivationsTableContext from './activations-table-context';
 import {TableToolbarView} from "@app/shared/table-toolbar-view";
 import TableEmptyState from "@app/shared/table-empty-state";
-import isEmpty from 'lodash/isEmpty';
 import {useIntl} from "react-intl";
 import {defaultSettings} from "@app/shared/pagination";
 import {NewActivation} from "@app/NewActivation/NewActivation";
@@ -57,7 +56,7 @@ const initialState = (filterValue = '') => ({
   rows: []
 });
 
-const areSelectedAll = (rows = [], selected) =>
+const areSelectedAll = (rows:ActivationType[] = [], selected) =>
   rows.every((row) => selected.includes(row.id));
 
 const unique = (value, index, self) => self.indexOf(value) === index;
@@ -184,13 +183,9 @@ const Activations: React.FunctionComponent = () => {
 
   const routes = () => (
     <Fragment>
-      <Route
-        exact
-        path={'/new-activation'}
-        render={(props) => (
-          <NewActivation {...props} />
-        )}
-      />
+      <Route exact path={'/new-activation'}>
+          <NewActivation/>
+      </Route>
     </Fragment>
   );
 
@@ -260,60 +255,54 @@ const Activations: React.FunctionComponent = () => {
           setSelectedActivations
         }}
       >
-        <PageSection>
-          <TableToolbarView
-            ouiaId={'activations-table'}
-            rows={rows}
-            columns={columns(intl, selectedAll, selectAllFunction)}
-            fetchData={updateActivations}
-            routes={routes}
-            actionResolver={actionResolver}
-            titlePlural={intl.formatMessage(sharedMessages.activations)}
-            titleSingular={intl.formatMessage(sharedMessages.activation)}
-            toolbarButtons={toolbarButtons}
-            isLoading={isFetching || isFiltering}
-            renderEmptyState={() => (
-              <TableEmptyState
-                title={intl.formatMessage(sharedMessages.noactivations)}
-                Icon={PlusCircleIcon}
-                PrimaryAction={() =>
-                  filterValue !== '' ? (
-                    <Button onClick={() => clearFilters()} variant="link">
-                      {intl.formatMessage(sharedMessages.clearAllFilters)}
-                    </Button>
-                  ) : (
-                    <Link
-                      id="create-activation-link"
-                      to={{pathname: '/new-activation'}}
+        <TableToolbarView
+          ouiaId={'activations-table'}
+          rows={rows}
+          columns={columns(intl, selectedAll, selectAllFunction)}
+          fetchData={updateActivations}
+          routes={routes}
+          actionResolver={actionResolver}
+          plural={intl.formatMessage(sharedMessages.activations)}
+          singular={intl.formatMessage(sharedMessages.activation)}
+          toolbarButtons={toolbarButtons}
+          isLoading={isFetching || isFiltering}
+          onFilterChange={handleFilterChange}
+          renderEmptyState={() => (
+            <TableEmptyState
+              title={intl.formatMessage(sharedMessages.noactivations)}
+              Icon={PlusCircleIcon}
+              PrimaryAction={() =>
+                filterValue !== '' ? (
+                  <Button onClick={() => clearFilters()} variant="link">
+                    {intl.formatMessage(sharedMessages.clearAllFilters)}
+                  </Button>
+                ) : (
+                  <Link
+                    id="create-activation-link"
+                    to={{pathname: '/new-activation'}}
+                  >
+                    <Button
+                      ouiaId={'create-activation-link'}
+                      variant="primary"
+                      aria-label={intl.formatMessage(
+                        sharedMessages.addActivation
+                      )}
                     >
-                      <Button
-                        ouiaId={'create-activation-link'}
-                        variant="primary"
-                        aria-label={intl.formatMessage(
-                          sharedMessages.addActivation
-                        )}
-                      >
-                        {intl.formatMessage(sharedMessages.addActivation)}
-                      </Button>
-                    </Link>
+                      {intl.formatMessage(sharedMessages.addActivation)}
+                    </Button>
+                  </Link>
+                )
+              }
+              description={
+                filterValue === ''
+                  ? intl.formatMessage(sharedMessages.noactivations)
+                  : intl.formatMessage(
+                  sharedMessages.clearAllFiltersDescription
                   )
-                }
-                description={
-                  filterValue === ''
-                    ? intl.formatMessage(sharedMessages.noactivations)
-                    : intl.formatMessage(
-                    sharedMessages.clearAllFiltersDescription
-                    )
-                }
-                isSearch={!isEmpty(filterValue)}
-              />
-            )}
-            activeFiltersConfig={{
-              filters: prepareChips(filterValue, intl),
-              onDelete: () => handleFilterChange('')
-            }}
-          />
-        </PageSection>
+              }
+            />
+          )}
+        />
       </ActivationsTableContext.Provider>
     </Fragment>
   );

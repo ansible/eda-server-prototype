@@ -1,7 +1,9 @@
-import { ApiMetadata } from './types/common-types';
 import { SortByDirection } from '@patternfly/react-table';
+import {PaginationProps} from "@patternfly/react-core";
 
-export interface PaginationConfiguration extends ApiMetadata {
+export interface PaginationConfiguration extends PaginationProps {
+  limit: number;
+  count: number;
   filter?: string;
   sortDirection?: SortByDirection;
 }

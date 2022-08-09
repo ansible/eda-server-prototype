@@ -18,6 +18,7 @@ export interface TableEmptyState {
   PrimaryAction?: React.ElementType;
   renderDescription?: () => ReactNode;
 }
+
 const TableEmptyState: React.ComponentType<TableEmptyState> = ({
   title,
   Icon,

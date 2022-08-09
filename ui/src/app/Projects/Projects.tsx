@@ -148,8 +148,8 @@ const Projects: React.FunctionComponent = () => {
     stateDispatch
   ] = useReducer(projectsListState, initialState());
 
-  const setSelectedProjects = (id: string) =>
-    stateDispatch({type: 'select', payload: id});
+  const setSelectedProjects = (ids: string[]) =>
+    stateDispatch({type: 'select', payload: ids});
 
   const updateProjects = (pagination) => {
     stateDispatch({type: 'setFetching', payload: true});
@@ -271,6 +271,7 @@ const Projects: React.FunctionComponent = () => {
           singular={intl.formatMessage(sharedMessages.project)}
           toolbarButtons={toolbarButtons}
           isLoading={isFetching || isFiltering}
+          onFilterChange={handleFilterChange}
           renderEmptyState={() => (
             <TableEmptyState
               title={intl.formatMessage(sharedMessages.noprojects)}
@@ -304,13 +305,8 @@ const Projects: React.FunctionComponent = () => {
                   sharedMessages.clearAllFiltersDescription
                   )
               }
-              isSearch={!isEmpty(filterValue)}
             />
           )}
-          activeFiltersConfig={{
-            filters: prepareChips(filterValue, intl),
-            onDelete: () => handleFilterChange('')
-          }}
         />
       </ProjectsTableContext.Provider>
     </Fragment>
