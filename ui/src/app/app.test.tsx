@@ -12,6 +12,18 @@ const ComponentWrapper = ({ children }) => (
 );
 
 describe('App tests', () => {
+  // @ts-ignore
+  global.fetch = jest.fn(() =>
+    Promise.resolve({
+      json: () => Promise.resolve({})
+    })
+  );
+
+  beforeEach(() => {
+    // @ts-ignore
+    fetch.resetMocks();
+  });
+
   test('should render default App component', () => {
     const view = shallow(<App />);
     expect(view).toMatchSnapshot();

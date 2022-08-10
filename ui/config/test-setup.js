@@ -19,7 +19,7 @@ import 'whatwg-fetch';
  */
 // eslint-disable-next-line no-undef
 jest.mock('react-intl', () => {
-  const reactIntl = jest.genMockFromModule('react-intl');
+  const reactIntl = jest.createMockFromModule('react-intl');
   const intl = reactIntl.createIntl({
     locale: 'en'
   });
@@ -53,4 +53,3 @@ const root = document.createElement('div');
 root.id = 'root';
 document.body.appendChild(root);
 Element.prototype.scrollTo = () => {};
-
