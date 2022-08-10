@@ -2,7 +2,19 @@ import sqlalchemy
 from fastapi_users.db import SQLAlchemyBaseUserTableUUID
 from sqlalchemy.ext.declarative import declarative_base
 
-metadata = sqlalchemy.MetaData()
+NAMING_CONVENTION = {
+    # Index
+    "ix": "ix_%(table_name)s_%(column_0_N_name)s",
+    # Unqiue constraint
+    "uq": "uq_%(table_name)s_%(column_0_N_name)s",
+    # Check
+    "ck": "ck_%(table_name)s_%(constraint_name)s",
+    # Foreign key
+    "fk": "fk_%(table_name)s_%(column_0_N_name)s",
+    # Primary key
+    "pk": "pk_%(table_name)s",
+}
+metadata = sqlalchemy.MetaData(naming_convention=NAMING_CONVENTION)
 Base = declarative_base(metadata=metadata)
 
 
