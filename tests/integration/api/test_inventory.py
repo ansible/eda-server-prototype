@@ -81,5 +81,6 @@ async def test_list_inventories(client: AsyncClient, db: AsyncSession):
             "id": result.inserted_primary_key[0],
             "name": "test-list-inventories-01",
             "inventory": "{}",  # noqa: P103
+            "project_id": None,
         }
     ]
