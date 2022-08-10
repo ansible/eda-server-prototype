@@ -1,4 +1,4 @@
-import {Checkbox, PageSection, Title, ToolbarGroup, ToolbarItem} from '@patternfly/react-core';
+import {PageSection, Title, ToolbarGroup, ToolbarItem} from '@patternfly/react-core';
 import {Link, Route, useHistory} from 'react-router-dom';
 import React, {useState, useEffect, useReducer, Fragment} from 'react';
 import { Button } from '@patternfly/react-core';
