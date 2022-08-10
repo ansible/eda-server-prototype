@@ -13,6 +13,7 @@ import {
 import styled from 'styled-components';
 import {getServer} from '@app/utils/utils';
 import {TopToolbar} from "@app/shared/top-toolbar";
+import {JobType} from "@app/Job/Job";
 
 
 const CardBody = styled(PFCardBody)`
@@ -26,7 +27,7 @@ const endpoint = 'http://' + getServer() + '/api/job_instances/';
 
 const Jobs: React.FunctionComponent = () => {
 
-  const [jobs, setJobs] = useState([]);
+  const [jobs, setJobs] = useState<JobType[]>([]);
 
   useEffect(() => {
      fetch(endpoint, {

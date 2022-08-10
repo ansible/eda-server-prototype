@@ -1,9 +1,36 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`App tests should render default App component 1`] = `
-<BrowserRouter>
-  <AppLayout>
-    <AppRoutes />
-  </AppLayout>
-</BrowserRouter>
+<Fragment>
+  <Memo(l) />
+  <IntlProvider
+    defaultFormats={Object {}}
+    defaultLocale="en"
+    fallbackOnEmptyString={true}
+    formats={Object {}}
+    locale="en"
+    messages={Object {}}
+    onError={[Function]}
+    onWarn={[Function]}
+    textComponent={Symbol(react.fragment)}
+  >
+    <BrowserRouter
+      basename="/eda"
+    >
+      <Switch>
+        <Route
+          exact={true}
+          path="/"
+        >
+          <Login />
+        </Route>
+        <Route>
+          <AppLayout>
+            <AppRoutes />
+          </AppLayout>
+        </Route>
+      </Switch>
+    </BrowserRouter>
+  </IntlProvider>
+</Fragment>
 `;

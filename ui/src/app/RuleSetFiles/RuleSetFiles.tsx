@@ -13,10 +13,36 @@ import {useIntl} from "react-intl";
 import {defaultSettings} from "@app/shared/pagination";
 import {NewRuleSet} from "@app/NewRuleSet/NewRuleSet";
 import {createRows} from "@app/RuleSetFiles/rule-sets-table-helpers";
+import {AnyObject} from "@app/shared/types/common-types";
 
-interface RuleSetType {
+export interface SourceType {
   id: string;
-  name: string;
+  name?: string;
+}
+
+export interface InventoryType {
+  id: string;
+  name?: string;
+  inventory?: string
+}
+export interface PlaybookType {
+  id: string;
+  name?: string;
+  playbook?: string;
+}
+
+export interface RuleType {
+  id: string;
+  name?: string;
+  action: AnyObject;
+}
+
+export interface RuleSetType {
+  id: string;
+  name?: string;
+  sources?: SourceType[];
+  rules?: RuleType[];
+  rulesets: string;
 }
 
 const endpoint = 'http://' + getServer() + '/api/rule_set_files/';

@@ -3,7 +3,7 @@ import {
   LoginForm,
   LoginPage,
 } from '@patternfly/react-core';
-import ExclamationCircleIcon from '@patternfly/react-icons/dist/esm/icons/exclamation-circle-icon';
+import { ExclamationCircleIcon } from '@patternfly/react-icons';
 import { useHistory } from 'react-router-dom';
 import { getServer } from '@app/utils/utils';
 import Logo from '../../assets/images/logo-masthead.svg';
