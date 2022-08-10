@@ -10,8 +10,8 @@ exports[`App tests should render default App component 1`] = `
     formats={Object {}}
     locale="en"
     messages={Object {}}
-    onError={[Function]}
-    onWarn={[Function]}
+    onError={[MockFunction]}
+    onWarn={[MockFunction]}
     textComponent={Symbol(react.fragment)}
   >
     <BrowserRouter

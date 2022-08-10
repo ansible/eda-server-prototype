@@ -1,7 +1,15 @@
 import * as React from 'react';
+import { act } from 'react-dom/test-utils';
 import App from '@app/index';
 import { mount, shallow } from 'enzyme';
 import { Button } from '@patternfly/react-core';
+import {MemoryRouter} from "react-router";
+import {AppLayout} from "@app/AppLayout/AppLayout";
+import {AppRoutes} from "@app/routes";
+
+const ComponentWrapper = ({ children }) => (
+    <MemoryRouter>{children}</MemoryRouter>
+);
 
 describe('App tests', () => {
   test('should render default App component', () => {
@@ -15,11 +23,23 @@ describe('App tests', () => {
     expect(button.exists()).toBe(true);
   });
 
-  it('should hide the sidebar on smaller viewports', () => {
-    Object.defineProperty(window, 'innerWidth', { writable: true, configurable: true, value: 600 });
-    const wrapper = mount(<App />);
+  it('should hide the sidebar on smaller viewports', async () => {
+    Object.defineProperty(window, 'innerWidth', { writable: true, configurable: true, value: 200 });
+    let wrapper;
+    await act(async () => {
+        wrapper = mount(
+        <ComponentWrapper>
+          <AppLayout>
+            <AppRoutes />
+          </AppLayout>
+        </ComponentWrapper>
+      );
+    });
     window.dispatchEvent(new Event('resize'));
-    expect(wrapper.find('#page-sidebar').hasClass('pf-m-collapsed')).toBeTruthy();
+    await act(async () => {
+      wrapper.update();
+    });
+    expect(wrapper.find('sidebar').hasClass('pf-m-collapsed')).toBeTruthy();
   });
 
   it('should expand the sidebar on larger viewports', () => {

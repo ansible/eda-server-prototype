@@ -29,10 +29,8 @@ interface IAppLayout {
 }
 
 const AppLayout: React.FunctionComponent<IAppLayout> = ({ children }) => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isNavOpen, setIsNavOpen] = useState(true);
   const [isMobileView, setIsMobileView] = useState(true);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isNavOpenMobile, setIsNavOpenMobile] = useState(false);
   const [aboutModalVisible, setAboutModalVisible] = useState(false);
   const [user, setUser] = useState<User | undefined>(undefined);
@@ -173,6 +171,7 @@ const AppLayout: React.FunctionComponent<IAppLayout> = ({ children }) => {
 
   const Sidebar = (
     <PageSidebar
+      id={'#page-sidebar'}
       theme="dark"
       nav={Navigation}
       isNavOpen={isMobileView ? isNavOpenMobile : isNavOpen} />
