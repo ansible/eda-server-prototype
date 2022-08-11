@@ -10,9 +10,8 @@ import {
 import {renderActivationTabs} from "@app/Activation/Activation";
 import Ansi from "ansi-to-react";
 import {ActivationType} from "@app/Activations/Activations";
-import {StdoutType} from "@app/Job/Job";
 
-const ActivationStdout: React.FunctionComponent<{activation: ActivationType, stdout: StdoutType[]}> = ({activation, stdout}) => {
+const ActivationStdout: React.FunctionComponent<{activation: ActivationType, stdout: string[]}> = ({activation, stdout}) => {
   return (
     <PageSection page-type={'activation-details'} id={'activation-details'}>
       { renderActivationTabs(activation.id) }
@@ -24,7 +23,7 @@ const ActivationStdout: React.FunctionComponent<{activation: ActivationType, std
               {stdout && stdout.length > 0 && (
                 <SimpleList style={{ whiteSpace: 'pre-wrap' }}>
                   {stdout.map((item, i) => (
-                    <SimpleListItem key={i}><Ansi>{item?.stdout}</Ansi></SimpleListItem>
+                    <SimpleListItem key={i}><Ansi>{item}</Ansi></SimpleListItem>
                   ))}
                 </SimpleList>
               )}

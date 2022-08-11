@@ -19,10 +19,6 @@ export interface JobType {
   id: string
 }
 
-export interface StdoutType {
-  stdout: string
-}
-
 const CardBody = styled(PFCardBody)`
   white-space: pre-wrap;
   `
@@ -36,7 +32,7 @@ const event_endpoint = 'http://' + getServer() + '/api/job_instance_events/';
 const Job: React.FunctionComponent = () => {
 
   const [job, setJob] = useState<JobType|undefined>(undefined);
-  const [stdout, setStdout] = useState<StdoutType[]>([]);
+  const [stdout, setStdout] = useState<string[]>([]);
 
   const { id } = useParams<JobType>();
   console.log(id);
