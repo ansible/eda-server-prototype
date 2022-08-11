@@ -6,29 +6,18 @@ import { configure, mount, render, shallow } from 'enzyme';
 import Adapter from '@wojtekmaj/enzyme-adapter-react-17';
 import fetchMock from "jest-fetch-mock";
 
-fetchMock.enableMocks();
-
-
 /**
  * mock fetch
  */
 import 'whatwg-fetch';
 
+import reactIntl from "react-intl";
+
 /**
  * mock react-intl in tests
+ *
  */
-// eslint-disable-next-line no-undef
-jest.mock('react-intl', () => {
-  const reactIntl = jest.createMockFromModule('react-intl');
-  const intl = reactIntl.createIntl({
-    locale: 'en'
-  });
-
-  return {
-    ...reactIntl,
-    useIntl: () => intl
-  };
-});
+fetchMock.enableMocks();
 
 configure({ adapter: new Adapter() });
 
@@ -36,6 +25,7 @@ global.shallow = shallow;
 global.render = render;
 global.mount = mount;
 global.React = React;
+global.fetchMock = fetchMock;
 
 /**
  * Setup JSDOM

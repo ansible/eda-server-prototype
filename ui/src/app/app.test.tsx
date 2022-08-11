@@ -6,24 +6,13 @@ import { Button } from '@patternfly/react-core';
 import {MemoryRouter} from "react-router";
 import {AppLayout} from "@app/AppLayout/AppLayout";
 import {AppRoutes} from "@app/routes";
+import fetchMock from "jest-fetch-mock";
 
 const ComponentWrapper = ({ children }) => (
     <MemoryRouter>{children}</MemoryRouter>
 );
 
 describe('App tests', () => {
-  // @ts-ignore
-  global.fetch = jest.fn(() =>
-    Promise.resolve({
-      json: () => Promise.resolve({})
-    })
-  );
-
-  beforeEach(() => {
-    // @ts-ignore
-    fetch.resetMocks();
-  });
-
   test('should render default App component', () => {
     const view = shallow(<App />);
     expect(view).toMatchSnapshot();
@@ -36,6 +25,7 @@ describe('App tests', () => {
   });
 
   it('should hide the sidebar on smaller viewports', async () => {
+    fetchMock.mockResponse(JSON.stringify({}))
     Object.defineProperty(window, 'innerWidth', { writable: true, configurable: true, value: 200 });
     let wrapper;
     await act(async () => {
