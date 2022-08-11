@@ -2,3 +2,4 @@
 -r requirements_lint.txt
 
 sqlalchemy[mypy] ~= 1.4
+python-dateutil
