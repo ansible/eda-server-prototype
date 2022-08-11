@@ -1,14 +1,10 @@
 import {
   Card,
   CardBody,
-  CodeBlock,
-  CodeBlockCode,
   Flex,
   FlexItem,
   Grid,
   GridItem,
-  Level,
-  LevelItem,
   PageSection,
   Stack,
   StackItem,
@@ -16,7 +12,6 @@ import {
   ToggleGroup,
   ToggleGroupItem
 } from '@patternfly/react-core';
-import { CodeEditor, Language } from '@patternfly/react-code-editor';
 import { Link } from 'react-router-dom';
 import React, {useState, useEffect, Fragment} from 'react';
 import {getServer} from '@app/utils/utils';
@@ -26,6 +21,8 @@ import AceEditor from "react-ace";
 import "ace-builds/src-noconflict/mode-yaml";
 import "ace-builds/src-noconflict/theme-xcode";
 import styled from 'styled-components';
+import {ActivationType} from "@app/Activations/Activations";
+import {ExtraVarType} from "@app/Vars/Vars";
 
 const client = new WebSocket('ws://' + getServer() + '/api/ws');
 
@@ -48,9 +45,9 @@ const FocusWrapper = styled.div`
   }
 `;
 
-const ActivationDetails: React.FunctionComponent = ({ activation }) => {
+const ActivationDetails: React.FunctionComponent<{activation: ActivationType}> = ({ activation }) => {
 
-  const [activationVars, setActivationVars] = useState(undefined);
+  const [activationVars, setActivationVars] = useState<ExtraVarType|undefined>(undefined);
   const [varFormat, setVarFormat] = useState('yaml');
   const id = activation?.id;
   console.log(id);
@@ -73,7 +70,7 @@ const ActivationDetails: React.FunctionComponent = ({ activation }) => {
     setVarFormat(id );
   }
 
-  const renderFlexActivationDetails: React.FunctionComponent = (activation) => (
+  const renderFlexActivationDetails: React.FunctionComponent<ActivationType> = (activation) => (
     <Stack hasGutter={true}>
       <StackItem>
         <Flex>
@@ -209,7 +206,7 @@ const ActivationDetails: React.FunctionComponent = ({ activation }) => {
                       theme="xcode"
                       name="activation_extravars"
                       fontSize={14}
-                      value={activationVars.extra_var}
+                      value={activationVars?.extra_var}
                       height={'100px'}
                       setOptions={{
                         enableBasicAutocompletion: false,
