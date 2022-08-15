@@ -11,6 +11,7 @@ import { ActivationJobs } from '@app/Activation/activation-jobs';
 import { NewActivation } from '@app/NewActivation/NewActivation';
 import { Jobs } from '@app/Jobs/Jobs';
 import { Job } from '@app/Job/Job';
+import { NewJob } from '@app/NewJob/NewJob';
 import { RuleSets } from '@app/RuleSetFiles/RuleSetFiles';
 import { RuleSetFile } from '@app/RuleSetFile/RuleSetFile';
 import { Inventories } from '@app/Inventories/Inventories';
@@ -114,6 +115,11 @@ const routes: AppRouteConfig[] = [
     exact: true,
     path: '/job/:id',
     title: 'Job',
+  },
+  {
+    component: NewJob,
+    path: '/new-job/',
+    title: 'NewJob',
   },
   {
     component: RuleSets,

@@ -82,6 +82,13 @@ class Project(BaseModel):
     url: StrictStr
 
 
+class JobInstance(BaseModel):
+    id: Optional[int]
+    playbook_id: int
+    inventory_id: int
+    extra_var_id: int
+
+
 # Fast API Users
 
 

@@ -1,6 +1,7 @@
 import asyncio
 import json
 import logging
+import uuid
 from collections import defaultdict
 from typing import List
 
@@ -28,13 +29,19 @@ from .db.models import (
     projects,
     rule_set_files,
 )
-from .manager import activate_rulesets, inactivate_rulesets
+from .manager import (
+    activate_rulesets,
+    inactivate_rulesets,
+    run_job,
+    write_job_events,
+)
 from .project import clone_project, sync_project
 from .schemas import (
     Activation,
     ActivationLog,
     Extravars,
     Inventory,
+    JobInstance,
     Project,
     RuleSetFile,
     UserCreate,
@@ -505,6 +512,52 @@ async def list_job_instances(db: AsyncSession = Depends(get_db_session)):
     query = select(job_instances)
     result = await db.execute(query)
     return result.all()
+
+
+@router.post("/api/job_instance/")
+async def create_job_instance(
+    j: JobInstance, db: AsyncSession = Depends(get_db_session)
+):
+
+    query = select(playbooks).where(playbooks.c.id == j.playbook_id)
+    playbook_row = (await db.execute(query)).first()
+
+    query = select(inventories).where(inventories.c.id == j.inventory_id)
+    inventory_row = (await db.execute(query)).first()
+
+    query = select(extra_vars).where(extra_vars.c.id == j.extra_var_id)
+    extra_var_row = (await db.execute(query)).first()
+
+    job_uuid = str(uuid.uuid4())
+
+    query = insert(job_instances).values(uuid=job_uuid)
+    result = await db.execute(query)
+    await db.commit()
+    (job_instance_id,) = result.inserted_primary_key
+
+    event_log = asyncio.Queue()
+
+    task = asyncio.create_task(
+        run_job(
+            job_uuid,
+            event_log,
+            playbook_row.playbook,
+            inventory_row.inventory,
+            extra_var_row.extra_var,
+            db,
+        ),
+        name=f"run_job {job_instance_id}",
+    )
+    taskmanager.tasks.append(task)
+    task = asyncio.create_task(
+        write_job_events(
+            event_log,
+            db,
+        ),
+        name=f"write_job_events {job_instance_id}",
+    )
+    taskmanager.tasks.append(task)
+    return {**j.dict(), "id": job_instance_id, "uuid": job_uuid}
 
 
 @router.get("/api/job_instance/{job_instance_id}")

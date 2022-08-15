@@ -19,15 +19,19 @@ Functions:
 """
 
 import asyncio
+import concurrent.futures
 import logging
 import os
 import shutil
 import tempfile
+from functools import partial
 
-from sqlalchemy import select
+import ansible_runner
+from sqlalchemy import insert, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from .db.models import playbooks
+from .db.models import job_instance_events, playbooks
+from .messages import JobEnd
 
 logger = logging.getLogger("ansible_events_ui")
 
@@ -109,3 +113,63 @@ async def inactivate_rulesets(activation_id):
         activated_rulesets[activation_id].kill()
     except ProcessLookupError:
         pass
+
+
+async def run_job(
+    job_uuid, event_log, playbook, inventory, extravars, db: AsyncSession
+):
+    loop = asyncio.get_running_loop()
+    task_pool = concurrent.futures.ThreadPoolExecutor()
+
+    host_limit = "localhost"
+    verbosity = 0
+    json_mode = False
+
+    def event_callback(event, *args, **kwargs):
+        event["job_id"] = job_uuid
+        event_log.put_nowait(event)
+
+    temp = tempfile.mkdtemp(prefix="run_playbook")
+
+    os.mkdir(os.path.join(temp, "env"))
+    with open(os.path.join(temp, "env", "extravars"), "w") as f:
+        f.write(extravars)
+    os.mkdir(os.path.join(temp, "inventory"))
+    with open(os.path.join(temp, "inventory", "hosts"), "w") as f:
+        f.write(inventory)
+    os.mkdir(os.path.join(temp, "project"))
+    with open(os.path.join(temp, "project", "playbook.yml"), "w") as f:
+        f.write(playbook)
+
+    await loop.run_in_executor(
+        task_pool,
+        partial(
+            ansible_runner.run,
+            playbook="playbook.yml",
+            private_data_dir=temp,
+            limit=host_limit,
+            verbosity=verbosity,
+            event_handler=event_callback,
+            json_mode=json_mode,
+        ),
+    )
+
+    await event_log.put(JobEnd(job_uuid))
+
+
+async def write_job_events(event_log, db: AsyncSession):
+
+    while True:
+
+        event = await event_log.get()
+
+        if isinstance(event, JobEnd):
+            break
+
+        query = insert(job_instance_events).values(
+            job_uuid=event.get("job_id"),
+            counter=event.get("counter"),
+            stdout=event.get("stdout"),
+        )
+        await db.execute(query)
+        await db.commit()
