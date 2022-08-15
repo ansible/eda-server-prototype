@@ -15,9 +15,6 @@ import styled from 'styled-components';
 import {getServer} from '@app/utils/utils';
 import {TopToolbar} from "@app/shared/top-toolbar";
 
-export interface JobType {
-  id: string
-}
 
 const CardBody = styled(PFCardBody)`
   white-space: pre-wrap;
@@ -31,10 +28,10 @@ const event_endpoint = 'http://' + getServer() + '/api/job_instance_events/';
 
 const Job: React.FunctionComponent = () => {
 
-  const [job, setJob] = useState<JobType|undefined>(undefined);
-  const [stdout, setStdout] = useState<string[]>([]);
+  const [job, setJob] = useState([]);
+  const [stdout, setStdout] = useState([]);
 
-  const { id } = useParams<JobType>();
+  const { id } = useParams();
   console.log(id);
 
   useEffect(() => {
@@ -55,7 +52,7 @@ const Job: React.FunctionComponent = () => {
   return (
   <React.Fragment>
     <TopToolbar>
-      <Title headingLevel={"h2"}>{`Job ${job?.id}`}</Title>
+      <Title headingLevel={"h2"}>{`Job ${job.id}`}</Title>
     </TopToolbar>
     <Stack>
       <StackItem>
@@ -65,7 +62,7 @@ const Job: React.FunctionComponent = () => {
             {stdout.length !== 0 && (
               <SimpleList style={{ whiteSpace: 'pre-wrap' }}>
                 {stdout.map((item, i) => (
-                  <SimpleListItem key={i}><Ansi>{item.toString()}</Ansi></SimpleListItem>
+                  <SimpleListItem key={i}><Ansi>{item.stdout}</Ansi></SimpleListItem>
                 ))}
               </SimpleList>
             )}
