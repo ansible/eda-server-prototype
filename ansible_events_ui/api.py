@@ -11,6 +11,7 @@ from fastapi import APIRouter, Depends, WebSocket, WebSocketDisconnect
 from sqlalchemy import insert, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from .rbac import check_action
 from .db.dependency import get_db_session, get_db_session_factory
 from .db.models import (
     User,
@@ -627,5 +628,17 @@ router.include_router(
 
 
 @router.get("/api/authenticated-route")
-async def authenticated_route(user: User = Depends(current_active_user)):
+async def authenticated_route(
+    user: User = Depends(current_active_user),
+    db: AsyncSession = Depends(get_db_session),
+):
+    return {"message": f"Hello {user.email}!"}
+
+
+@router.get("/api/authorized-route")
+async def authorized_route(
+    user: User = Depends(current_active_user),
+    db: AsyncSession = Depends(get_db_session),
+):
+    await check_action(db, user, "test")
     return {"message": f"Hello {user.email}!"}

@@ -1,6 +1,7 @@
 import sqlalchemy
 from fastapi_users.db import SQLAlchemyBaseUserTableUUID
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.dialects.postgresql import UUID
 
 NAMING_CONVENTION = {
     # Index
@@ -255,9 +256,50 @@ project_playbooks = sqlalchemy.Table(
     sqlalchemy.Column("playbook_id", sqlalchemy.ForeignKey("playbook.id")),
 )
 
+# RBAC
+
+roles = sqlalchemy.Table(
+    "role",
+    metadata,
+    sqlalchemy.Column(
+        "id",
+        UUID,
+        sqlalchemy.Identity(always=True),
+        primary_key=True,
+    ),
+    sqlalchemy.Column("name", sqlalchemy.String),
+)
+
+actions = sqlalchemy.Table(
+    "action",
+    metadata,
+    sqlalchemy.Column(
+        "id",
+        UUID,
+        sqlalchemy.Identity(always=True),
+        primary_key=True,
+    ),
+    sqlalchemy.Column("name", sqlalchemy.String),
+)
+
+
+role_actions = sqlalchemy.Table(
+    "role_action",
+    metadata,
+    sqlalchemy.Column("role_id", sqlalchemy.ForeignKey("role.id")),
+    sqlalchemy.Column("action_id", sqlalchemy.ForeignKey("action.id")),
+)
 
 # FastAPI Users
 
 
 class User(SQLAlchemyBaseUserTableUUID, Base):
     pass
+
+
+user_roles = sqlalchemy.Table(
+    "user_role",
+    metadata,
+    sqlalchemy.Column("role_id", sqlalchemy.ForeignKey("role.id")),
+    sqlalchemy.Column("user_id", sqlalchemy.ForeignKey("user.id")),
+)
