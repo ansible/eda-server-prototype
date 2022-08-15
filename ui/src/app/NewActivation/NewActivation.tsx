@@ -27,10 +27,6 @@ import sharedMessages from "../messages/shared.messages";
 const CardBody = styled(PFCardBody)`
   white-space: pre-wrap;
   `
-const SimpleList = styled(PFSimpleList)`
-  white-space: pre-wrap;
-`
-
 const endpoint = 'http://' + getServer() + '/api/activation_instance/';
 const endpoint1 = 'http://' + getServer() + '/api/rule_set_files/';
 const endpoint2 = 'http://' + getServer() + '/api/inventories/';

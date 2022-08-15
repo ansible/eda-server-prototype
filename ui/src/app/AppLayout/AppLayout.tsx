@@ -13,7 +13,7 @@ import {
   DropdownItem,
   NavGroup
 } from '@patternfly/react-core';
-import { routes, IAppRoute, IAppRouteGroup } from '@app/routes';
+import { routes, IAppRoute, IAppRouteGroup } from '../routes';
 import {ExternalLinkAltIcon, QuestionCircleIcon } from '@patternfly/react-icons';
 import {useEffect, useState} from 'react';
 import Logo from '../../assets/images/logo-large.svg';
@@ -29,15 +29,12 @@ interface IAppLayout {
 }
 
 const AppLayout: React.FunctionComponent<IAppLayout> = ({ children }) => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isNavOpen, setIsNavOpen] = useState(true);
   const [isMobileView, setIsMobileView] = useState(true);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isNavOpenMobile, setIsNavOpenMobile] = useState(false);
   const [aboutModalVisible, setAboutModalVisible] = useState(false);
   const [user, setUser] = useState<User | undefined>(undefined);
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const onPageResize = (props: { mobileView: boolean; windowSize: number }) => {
     setIsMobileView(props.mobileView);
   };
@@ -115,6 +112,8 @@ const AppLayout: React.FunctionComponent<IAppLayout> = ({ children }) => {
     </DropdownItem>
   ];
 
+  const onNavToggle = () => setIsNavOpen(!isNavOpen);
+
   const headerNav = () => (
     <PageHeader
       logo={<SmallLogo alt={APPLICATION_TITLE} />}
@@ -138,6 +137,7 @@ const AppLayout: React.FunctionComponent<IAppLayout> = ({ children }) => {
         </PageHeaderTools>
       }
       showNavToggle
+      onNavToggle={onNavToggle}
     />
   );
 
@@ -164,7 +164,7 @@ const AppLayout: React.FunctionComponent<IAppLayout> = ({ children }) => {
     <Nav id="nav-primary-simple" theme="dark">
       <NavGroup title={APPLICATION_TITLE}/>
       <NavList id="nav-list-simple">
-        {routes.map(
+        {routes && routes.map(
           (route, idx) => route.label && (!route.routes ? renderNavItem(route, idx) : renderNavGroup(route, idx))
         )}
       </NavList>

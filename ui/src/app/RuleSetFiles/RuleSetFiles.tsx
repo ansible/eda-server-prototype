@@ -9,16 +9,40 @@ import sharedMessages from '../messages/shared.messages';
 import {cellWidth} from "@patternfly/react-table";
 import {TableToolbarView} from "@app/shared/table-toolbar-view";
 import TableEmptyState from "@app/shared/table-empty-state";
-import isEmpty from 'lodash/isEmpty';
 import {useIntl} from "react-intl";
 import {defaultSettings} from "@app/shared/pagination";
 import {NewRuleSet} from "@app/NewRuleSet/NewRuleSet";
 import {createRows} from "@app/RuleSetFiles/rule-sets-table-helpers";
+import {AnyObject} from "@app/shared/types/common-types";
 
-interface RuleSetType {
+export interface SourceType {
   id: string;
-  git_hash?: string;
-  url: string;
+  name?: string;
+}
+
+export interface InventoryType {
+  id: string;
+  name?: string;
+  inventory?: string
+}
+export interface PlaybookType {
+  id: string;
+  name?: string;
+  playbook?: string;
+}
+
+export interface RuleType {
+  id: string;
+  name?: string;
+  action: AnyObject;
+}
+
+export interface RuleSetType {
+  id: string;
+  name?: string;
+  sources?: SourceType[];
+  rules?: RuleType[];
+  rulesets: string;
 }
 
 const endpoint = 'http://' + getServer() + '/api/rule_set_files/';
@@ -56,7 +80,7 @@ const initialState = (filterValue = '') => ({
   rows: []
 });
 
-const areSelectedAll = (rows = [], selected) =>
+const areSelectedAll = (rows:RuleSetType[] = [], selected) =>
   rows.every((row) => selected.includes(row.id));
 
 const unique = (value, index, self) => self.indexOf(value) === index;
@@ -152,14 +176,10 @@ const RuleSets: React.FunctionComponent = () => {
 
   const routes = () => (
     <Fragment>
-      <Route
-        exact
-        path={'/new-rule-set'}
-        render={(props) => (
-          <NewRuleSet {...props} />
-        )}
-      />
-    </Fragment>
+      <Route exact path={'/new-rule-set'}>
+        <NewRuleSet/>
+      </Route>
+      </Fragment>
   );
 
   const actionResolver = () => [
@@ -183,7 +203,7 @@ const RuleSets: React.FunctionComponent = () => {
       <TopToolbar>
         <Title headingLevel={"h2"}>Rule Sets</Title>
       </TopToolbar>
-      <PageSection>
+      <PageSection page-type={'ruleset-list'} id={'ruleset_list'}>
         <TableToolbarView
           ouiaId={'RuleSets-table'}
           rows={rows}
@@ -191,9 +211,10 @@ const RuleSets: React.FunctionComponent = () => {
           fetchData={updateRuleSets}
           routes={routes}
           actionResolver={actionResolver}
-          titlePlural={intl.formatMessage(sharedMessages.rulesets)}
-          titleSingular={intl.formatMessage(sharedMessages.ruleset)}
+          plural={intl.formatMessage(sharedMessages.rulesets)}
+          singular={intl.formatMessage(sharedMessages.ruleset)}
           isLoading={isFetching || isFiltering}
+          onFilterChange={handleFilterChange}
           renderEmptyState={() => (
             <TableEmptyState
               title={intl.formatMessage(sharedMessages.norulesets)}
@@ -212,13 +233,8 @@ const RuleSets: React.FunctionComponent = () => {
                   sharedMessages.clearAllFiltersDescription
                   )
               }
-              isSearch={!isEmpty(filterValue)}
             />
           )}
-          activeFiltersConfig={{
-            filters: prepareChips(filterValue, intl),
-            onDelete: () => handleFilterChange('')
-          }}
         />
       </PageSection>
     </Fragment>

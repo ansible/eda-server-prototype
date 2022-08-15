@@ -15,16 +15,16 @@ const App: React.FunctionComponent = () => (
     <IntlProvider locale="en">
     <Router basename="/eda">
       <Switch>
-      <Route path="/" exact={true}>
-         <Login />
-      </Route>
-      <Route>
-      <AppLayout>
-        <AppRoutes />
-      </AppLayout>
-      </Route>
-      </Switch>
-    </Router>
+        <Route path="/" exact={true}>
+           <Login />
+        </Route>
+        <Route>
+          <AppLayout>
+            <AppRoutes />
+          </AppLayout>
+        </Route>
+        </Switch>
+      </Router>
     </IntlProvider>
   </React.Fragment>
 );

@@ -10,27 +10,33 @@ import {cellWidth} from "@patternfly/react-table";
 import ActivationsTableContext from './activations-table-context';
 import {TableToolbarView} from "@app/shared/table-toolbar-view";
 import TableEmptyState from "@app/shared/table-empty-state";
-import isEmpty from 'lodash/isEmpty';
 import {useIntl} from "react-intl";
 import {defaultSettings} from "@app/shared/pagination";
 import {NewActivation} from "@app/NewActivation/NewActivation";
 import {createRows} from "@app/Activations/activations-table-helpers";
 
-interface ActivationType {
+export interface ActivationType {
   id: string;
-  git_hash?: string;
   name: string;
+  description: string,
+  extra_var_id?: string,
+  execution_environment?: string,
+  playbook?: string,
+  restarted_count?: string,
+  restart_policy?: string,
+  last_restarted?: string,
+  status?: string,
+  ruleset_id?: string,
+  ruleset_name?: string,
+  inventory_id?: string,
+  inventory_name?: string,
+  created_at?: string,
+  updated_at?: string
 }
 
 const endpoint = 'http://' + getServer() + '/api/activation_instances/';
 
-const columns = (intl, selectedAll, selectAll) => [
-  {
-    title: (
-      <Checkbox onChange={selectAll} isChecked={selectedAll} id="select-all" />
-    ),
-    transforms: [cellWidth(10 )]
-  },
+const columns = (intl) => [
   {
   title: (intl.formatMessage(sharedMessages.name)),
     transforms: [cellWidth(80 )]
@@ -57,7 +63,7 @@ const initialState = (filterValue = '') => ({
   rows: []
 });
 
-const areSelectedAll = (rows = [], selected) =>
+const areSelectedAll = (rows:ActivationType[] = [], selected) =>
   rows.every((row) => selected.includes(row.id));
 
 const unique = (value, index, self) => self.indexOf(value) === index;
@@ -184,13 +190,9 @@ const Activations: React.FunctionComponent = () => {
 
   const routes = () => (
     <Fragment>
-      <Route
-        exact
-        path={'/new-activation'}
-        render={(props) => (
-          <NewActivation {...props} />
-        )}
-      />
+      <Route exact path={'/new-activation'}>
+          <NewActivation/>
+      </Route>
     </Fragment>
   );
 
@@ -229,23 +231,6 @@ const Activations: React.FunctionComponent = () => {
           </Button>
         </Link>
       </ToolbarItem>
-      <ToolbarItem>
-        <Link
-          id="remove-multiple-activations"
-          className={anyActivationsSelected ? '' : 'disabled-link'}
-          to={{pathname: '/remove-activations'}}
-        >
-          <Button
-            variant="secondary"
-            isDisabled={!anyActivationsSelected}
-            aria-label={intl.formatMessage(
-              sharedMessages.deleteActivationTitle
-            )}
-          >
-            {intl.formatMessage(sharedMessages.delete)}
-          </Button>
-        </Link>
-      </ToolbarItem>
     </ToolbarGroup>
   );
 
@@ -260,18 +245,19 @@ const Activations: React.FunctionComponent = () => {
           setSelectedActivations
         }}
       >
-        <PageSection>
+        <PageSection page-type={'activations-list'} id={'activations_list'}>
           <TableToolbarView
             ouiaId={'activations-table'}
             rows={rows}
-            columns={columns(intl, selectedAll, selectAllFunction)}
+            columns={columns(intl)}
             fetchData={updateActivations}
             routes={routes}
             actionResolver={actionResolver}
-            titlePlural={intl.formatMessage(sharedMessages.activations)}
-            titleSingular={intl.formatMessage(sharedMessages.activation)}
+            plural={intl.formatMessage(sharedMessages.activations)}
+            singular={intl.formatMessage(sharedMessages.activation)}
             toolbarButtons={toolbarButtons}
             isLoading={isFetching || isFiltering}
+            onFilterChange={handleFilterChange}
             renderEmptyState={() => (
               <TableEmptyState
                 title={intl.formatMessage(sharedMessages.noactivations)}
@@ -305,13 +291,8 @@ const Activations: React.FunctionComponent = () => {
                     sharedMessages.clearAllFiltersDescription
                     )
                 }
-                isSearch={!isEmpty(filterValue)}
               />
             )}
-            activeFiltersConfig={{
-              filters: prepareChips(filterValue, intl),
-              onDelete: () => handleFilterChange('')
-            }}
           />
         </PageSection>
       </ActivationsTableContext.Provider>

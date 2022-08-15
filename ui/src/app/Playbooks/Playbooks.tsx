@@ -15,7 +15,7 @@ import {
 import styled from 'styled-components';
 import {getServer} from '@app/utils/utils';
 import {TopToolbar} from "@app/shared/top-toolbar";
-
+import {PlaybookType} from "@app/RuleSetFiles/RuleSetFiles";
 
 const CardBody = styled(PFCardBody)`
   white-space: pre-wrap;
@@ -27,10 +27,7 @@ const SimpleList = styled(PFSimpleList)`
 const endpoint = 'http://' + getServer() + '/api/playbooks/';
 
 const Playbooks: React.FunctionComponent = () => {
-
-
-
-  const [playbooks, setPlaybooks] = useState([]);
+  const [playbooks, setPlaybooks] = useState<PlaybookType[]>([]);
 
   useEffect(() => {
      fetch(endpoint, {
@@ -54,7 +51,7 @@ const Playbooks: React.FunctionComponent = () => {
                   {playbooks.length !== 0 && (
                     <SimpleList style={{ whiteSpace: 'pre-wrap' }}>
                       {playbooks.map((item, i) => (
-                        <SimpleListItem key={i}><Link to={"/playbook/" + item.id}>{item.name} </Link></SimpleListItem>
+                        <SimpleListItem key={i}><Link to={"/playbook/" + item.id}>{item?.name} </Link></SimpleListItem>
                       ))}
                     </SimpleList>
                   )}

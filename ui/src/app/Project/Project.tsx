@@ -1,112 +1,89 @@
-import { Link, useParams } from 'react-router-dom';
+import { Title} from '@patternfly/react-core';
+import { Route, Switch, useParams } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
-import {
-  Card,
-  CardBody as PFCardBody,
-  CardTitle,
-  SimpleList as PFSimpleList,
-  SimpleListItem,
-  Stack,
-  StackItem, Title,
-} from '@patternfly/react-core';
-import styled from 'styled-components';
-import {getServer} from '@app/utils/utils';
+import AppTabs from "@app/shared/app-tabs";
+
+import {CaretLeftIcon} from "@patternfly/react-icons";
+import {getServer} from "@app/utils/utils";
 import {TopToolbar} from "@app/shared/top-toolbar";
+import {ProjectDetails} from "@app/Project/project-details";
+import {ProjectLinks} from "@app/Project/project-links";
+import sharedMessages from "../messages/shared.messages";
+import {useIntl} from "react-intl";
+import {IProject} from "@app/shared/types/common-types";
 
+export const renderProjectTabs = (intl, projectId: string | undefined) => {
+  const project_tabs = [
+    {
+      eventKey: 0,
+      title: (
+        <>
+          <CaretLeftIcon />
+          {intl.formatMessage(sharedMessages.backToProjects)}
+        </>
+      ),
+      name: `/projects`,
+    },
+    { eventKey: 1, title: intl.formatMessage(sharedMessages.details), name: `/project/${projectId}/details` },
+    {
+      eventKey: 2,
+      title: 'Links',
+      name: `/project/${projectId}/links`,
+    }
+  ];
 
-const CardBody = styled(PFCardBody)`
-  white-space: pre-wrap;
-  `
-const SimpleList = styled(PFSimpleList)`
-  white-space: pre-wrap;
-`
-
-const endpoint = 'http://' + getServer() + '/api/project/';
+  return <AppTabs tabItems={project_tabs}/>
+};
+const endpoint1 = 'http://' + getServer() + '/api/project/';
+export const extractProjectNameFromUrl = (url: string | undefined) => {
+  if( !url )
+    return '';
+  return (url.split("/").pop())?.split('.')[0];
+};
 
 const Project: React.FunctionComponent = () => {
 
-  const [project, setProject] = useState({'rulesets': [],
-                                          'inventories': [],
-                                          'vars': [],
-                                          'playbooks': []});
-
-  const { id } = useParams();
-  console.log(id);
+  const [project, setProject] = useState<IProject>();
+  const { id } = useParams<{id:string}>();
+  const intl = useIntl();
 
   useEffect(() => {
-     fetch(endpoint + id, {
-       headers: {
-         'Content-Type': 'application/json',
-       },
-     }).then(response => response.json())
-    .then(data => setProject(data));
+    fetch(endpoint1 + id, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }).then(response => response.json())
+      .then(data => setProject(data));
   }, []);
 
   return (
-  <React.Fragment>
-    <TopToolbar>
-      <Title headingLevel={"h2"}>{`Project ${project.url}`}</Title>
-    </TopToolbar>
-    <Stack>
-      <StackItem>
-        <Card>
-          <CardTitle>Rule Sets</CardTitle>
-          <CardBody>
-            {project.rulesets.length !== 0 && (
-              <SimpleList style={{ whiteSpace: 'pre-wrap' }}>
-                {project.rulesets.map((item, i) => (
-                  <SimpleListItem key={i}><Link to={"/rulesetfile/" + item.id}>{item.name} </Link></SimpleListItem>
-                ))}
-              </SimpleList>
-            )}
-          </CardBody>
-        </Card>
-      </StackItem>
-      <StackItem>
-        <Card>
-          <CardTitle>Inventories</CardTitle>
-          <CardBody>
-            {project.inventories.length !== 0 && (
-              <SimpleList style={{ whiteSpace: 'pre-wrap' }}>
-                {project.inventories.map((item, i) => (
-                  <SimpleListItem key={i}><Link to={"/inventory/" + item.id}>{item.name} </Link></SimpleListItem>
-                ))}
-              </SimpleList>
-            )}
-          </CardBody>
-        </Card>
-      </StackItem>
-      <StackItem>
-        <Card>
-          <CardTitle>Vars</CardTitle>
-          <CardBody>
-            {project.vars.length !== 0 && (
-              <SimpleList style={{ whiteSpace: 'pre-wrap' }}>
-                {project.vars.map((item, i) => (
-                  <SimpleListItem key={i}><Link to={"/var/" + item.id}>{item.name} </Link></SimpleListItem>
-                ))}
-              </SimpleList>
-            )}
-          </CardBody>
-        </Card>
-      </StackItem>
-      <StackItem>
-        <Card>
-          <CardTitle>Playbooks</CardTitle>
-          <CardBody>
-            {project.playbooks.length !== 0 && (
-              <SimpleList style={{ whiteSpace: 'pre-wrap' }}>
-                {project.playbooks.map((item, i) => (
-                  <SimpleListItem key={i}><Link to={"/playbook/" + item.id}>{item.name} </Link></SimpleListItem>
-                ))}
-              </SimpleList>
-            )}
-          </CardBody>
-        </Card>
-      </StackItem>
-    </Stack>
-  </React.Fragment>
-)
+    <React.Fragment>
+      <TopToolbar breadcrumbs={[
+        {
+          title: intl.formatMessage(sharedMessages.projects),
+          to: '/projects'
+        },
+        {
+          title:`${project?.name || extractProjectNameFromUrl(project?.url)}`
+        },
+      ]
+      }>
+        <Title headingLevel={"h2"}>{`${project?.name || extractProjectNameFromUrl(project?.url) }`}</Title>
+      </TopToolbar>
+      <Switch>
+        { project && <Route exact path="/project/:id/links">
+          <ProjectLinks
+            project={project}
+          />
+        </Route> }
+        <Route path="/project/:id">
+          <ProjectDetails
+            project={project}
+          />
+        </Route>
+      </Switch>
+    </React.Fragment>
+  );
 }
 
 export { Project };

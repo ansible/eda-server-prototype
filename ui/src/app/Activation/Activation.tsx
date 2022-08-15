@@ -10,6 +10,8 @@ import {ActivationJobs} from "@app/Activation/activation-jobs";
 import {ActivationDetails} from "@app/Activation/activation-details";
 import {ActivationStdout} from "@app/Activation/activation-stdout";
 import {defaultSettings} from "@app/shared/pagination";
+import {ActivationType} from "@app/Activations/Activations";
+import {JobType} from "@app/Job/Job";
 
 export const renderActivationTabs = (activationId: string) => {
   const activation_tabs = [
@@ -54,14 +56,16 @@ export const fetchActivationJobs = (activationId, pagination=defaultSettings) =>
 }
 const Activation: React.FunctionComponent = () => {
 
-  const [activation, setActivation] = useState([]);
+  const [activation, setActivation] = useState<ActivationType|undefined>(undefined);
 
-  const { id } = useParams();
+  const { id } = useParams<{id: string}>();
   console.log(id);
 
-  const [stdout, setStdout] = useState([]);
-  const [newStdout, setNewStdout] = useState('');
-  const [websocket_client, setWebsocketClient] = useState([]);
+  const [stdout, setStdout] = useState<string[]>([]);
+  const [newStdout, setNewStdout] = useState<string>('');
+  const [websocket_client, setWebsocketClient] = useState<WebSocket|undefined>(undefined);
+  const [jobs, setJobs] = useState<JobType[]>([]);
+  const [newJob, setNewJob] = useState<JobType>({id:''});
 
 
   useEffect(() => {
@@ -96,15 +100,13 @@ const Activation: React.FunctionComponent = () => {
       }
     }
   }, []);
-  const [jobs, setJobs] = useState([]);
-  const [newJob, setNewJob] = useState([]);
 
   useEffect(() => {
     fetchActivationJobs(id)
       .then(data => setJobs(data));
   }, []);
 
-  const [update_client, setUpdateClient] = useState([]);
+  const [update_client, setUpdateClient] = useState<WebSocket|unknown>({});
   useEffect(() => {
     const uc = new WebSocket('ws://' + getServer() + '/api/ws-activation/' + id);
     setUpdateClient(uc);
@@ -121,8 +123,6 @@ const Activation: React.FunctionComponent = () => {
   }, []);
 
   useEffect(() => {
-    console.log(["newStdout: ",  newStdout]);
-    console.log(["stdout: ",  stdout]);
     setStdout([...stdout, newStdout]);
   }, [newStdout]);
 
@@ -139,27 +139,29 @@ const Activation: React.FunctionComponent = () => {
         }
       ]
       }>
-        <Title headingLevel={"h2"}>{`${activation.name}`}</Title>
+        <Title headingLevel={"h2"}>{`${activation?.name}`}</Title>
       </TopToolbar>
-      <Switch>
-        <Route exact path="/activation/:id/jobs">
-          <ActivationJobs
-            jobs={jobs}
-            activation={activation}
-          />
-        </Route>
-        <Route exact path="/activation/:id/stdout">
-          <ActivationStdout
-            activation={activation}
-            stdout={stdout}
-          />
-        </Route>
-        <Route path="/activation/:id">
-          <ActivationDetails
-            activation={activation}
-          />
-        </Route>
-      </Switch>
+      { activation &&
+        <Switch>
+          <Route exact path="/activation/:id/jobs">
+            <ActivationJobs
+              jobs={jobs}
+              activation={activation}
+            />
+          </Route>
+          <Route exact path="/activation/:id/stdout">
+            <ActivationStdout
+              activation={activation}
+              stdout={stdout}
+            />
+          </Route>
+          <Route path="/activation/:id">
+            <ActivationDetails
+              activation={activation}
+            />
+          </Route>
+        </Switch>
+      }
     </React.Fragment>
   );
 }

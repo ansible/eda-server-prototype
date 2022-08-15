@@ -1,4 +1,4 @@
-import {Checkbox, PageSection, Title, ToolbarGroup, ToolbarItem} from '@patternfly/react-core';
+import {PageSection, Title, ToolbarGroup, ToolbarItem} from '@patternfly/react-core';
 import {Link, Route, useHistory} from 'react-router-dom';
 import React, {useState, useEffect, useReducer, Fragment} from 'react';
 import { Button } from '@patternfly/react-core';
@@ -6,15 +6,14 @@ import {getServer} from '@app/utils/utils';
 import {TopToolbar} from '../shared/top-toolbar';
 import { PlusCircleIcon } from '@patternfly/react-icons';
 import sharedMessages from '../messages/shared.messages';
-import {cellWidth} from "@patternfly/react-table";
 import ProjectsTableContext from './projects-table-context';
 import {TableToolbarView} from "@app/shared/table-toolbar-view";
 import TableEmptyState from "@app/shared/table-empty-state";
-import isEmpty from 'lodash/isEmpty';
 import {useIntl} from "react-intl";
 import {defaultSettings} from "@app/shared/pagination";
 import {NewProject} from "@app/NewProject/NewProject";
 import {createRows} from "@app/Projects/projects-table-helpers";
+import {AnyObject} from "@app/shared/types/common-types";
 
 interface ProjectType {
   id: string;
@@ -24,13 +23,7 @@ interface ProjectType {
 
 const endpoint = 'http://' + getServer() + '/api/projects/';
 
-const columns = (intl, selectedAll, selectAll) => [
-  {
-    title: (
-      <Checkbox onChange={selectAll} isChecked={selectedAll} id="select-all" />
-    ),
-    transforms: [cellWidth(1)]
-  },
+const columns = (intl) => [
   {
     title: intl.formatMessage(sharedMessages.url)
   }
@@ -56,7 +49,7 @@ const initialState = (filterValue = '') => ({
   rows: []
 });
 
-const areSelectedAll = (rows = [], selected) =>
+const areSelectedAll = (rows: AnyObject[] = [], selected) =>
   rows.every((row) => selected.includes(row.id));
 
 const unique = (value, index, self) => self.indexOf(value) === index;
@@ -147,8 +140,8 @@ const Projects: React.FunctionComponent = () => {
     stateDispatch
   ] = useReducer(projectsListState, initialState());
 
-  const setSelectedProjects = (id) =>
-    stateDispatch({type: 'select', payload: id});
+  const setSelectedProjects = (ids: string[]) =>
+    stateDispatch({type: 'select', payload: ids});
 
   const updateProjects = (pagination) => {
     stateDispatch({type: 'setFetching', payload: true});
@@ -186,7 +179,7 @@ const Projects: React.FunctionComponent = () => {
       <Route
         exact
         path={'/new-project'}
-        render={(props) => (
+        render={(props: AnyObject) => (
           <NewProject {...props} />
         )}
       />
@@ -228,23 +221,6 @@ const Projects: React.FunctionComponent = () => {
           </Button>
         </Link>
       </ToolbarItem>
-      <ToolbarItem>
-        <Link
-          id="remove-multiple-projects"
-          className={anyProjectsSelected ? '' : 'disabled-link'}
-          to={{pathname: '/remove-projects'}}
-        >
-          <Button
-            variant="secondary"
-            isDisabled={!anyProjectsSelected}
-            aria-label={intl.formatMessage(
-              sharedMessages.deleteProjectTitle
-            )}
-          >
-            {intl.formatMessage(sharedMessages.delete)}
-          </Button>
-        </Link>
-      </ToolbarItem>
     </ToolbarGroup>
   );
 
@@ -259,18 +235,19 @@ const Projects: React.FunctionComponent = () => {
           setSelectedProjects
         }}
       >
-        <PageSection>
+        <PageSection page-type={'projects-list'} id={'projects_list'}>
           <TableToolbarView
             ouiaId={'projects-table'}
             rows={rows}
-            columns={columns(intl, selectedAll, selectAllFunction)}
+            columns={columns(intl)}
             fetchData={updateProjects}
             routes={routes}
             actionResolver={actionResolver}
-            titlePlural={intl.formatMessage(sharedMessages.projects)}
-            titleSingular={intl.formatMessage(sharedMessages.project)}
+            plural={intl.formatMessage(sharedMessages.projects)}
+            singular={intl.formatMessage(sharedMessages.project)}
             toolbarButtons={toolbarButtons}
             isLoading={isFetching || isFiltering}
+            onFilterChange={handleFilterChange}
             renderEmptyState={() => (
               <TableEmptyState
                 title={intl.formatMessage(sharedMessages.noprojects)}
@@ -304,13 +281,8 @@ const Projects: React.FunctionComponent = () => {
                     sharedMessages.clearAllFiltersDescription
                     )
                 }
-                isSearch={!isEmpty(filterValue)}
               />
             )}
-            activeFiltersConfig={{
-              filters: prepareChips(filterValue, intl),
-              onDelete: () => handleFilterChange('')
-            }}
           />
         </PageSection>
       </ProjectsTableContext.Provider>

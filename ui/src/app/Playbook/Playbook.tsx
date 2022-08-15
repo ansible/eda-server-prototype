@@ -4,14 +4,15 @@ import React, { useState, useEffect } from 'react';
 import { CodeBlock, CodeBlockCode  } from '@patternfly/react-core';
 import {getServer} from '@app/utils/utils';
 import {TopToolbar} from "@app/shared/top-toolbar";
+import {PlaybookType} from "@app/RuleSetFiles/RuleSetFiles";
 
 const endpoint = 'http://' + getServer() + '/api/playbook/';
 
 const Playbook: React.FunctionComponent = () => {
 
-  const [playbook, setPlaybook] = useState([]);
+  const [playbook, setPlaybook] = useState<PlaybookType|undefined>(undefined);
 
-  const { id } = useParams();
+  const { id } = useParams<{id:string}>();
   console.log(id);
 
   useEffect(() => {
@@ -26,10 +27,10 @@ const Playbook: React.FunctionComponent = () => {
   return (
   <React.Fragment>
     <TopToolbar>
-      <Title headingLevel={"h2"}>{`Playbook ${playbook.name}`}</Title>
+      <Title headingLevel={"h2"}>{`Playbook ${playbook?.name}`}</Title>
     </TopToolbar>
     <CodeBlock>
-      <CodeBlockCode id="code-content">{playbook.playbook}</CodeBlockCode>
+      <CodeBlockCode id="code-content">{playbook?.playbook}</CodeBlockCode>
     </CodeBlock>
   </React.Fragment>
 )

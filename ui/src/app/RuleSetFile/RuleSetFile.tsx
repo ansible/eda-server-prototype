@@ -1,11 +1,8 @@
-import * as React from 'react';
-import { PageSection, Title } from '@patternfly/react-core';
-import { useDispatch } from 'react-redux';
-import { Link, useParams } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
+import { Title } from '@patternfly/react-core';
+import { useParams } from 'react-router-dom';
 import { CodeBlock, CodeBlockCode  } from '@patternfly/react-core';
 
-import Ansi from "ansi-to-react";
 import {
   Card,
   CardBody as PFCardBody,
@@ -18,6 +15,7 @@ import {
 import styled from 'styled-components';
 import {getServer} from '@app/utils/utils';
 import {TopToolbar} from "@app/shared/top-toolbar";
+import {RuleSetType} from "@app/RuleSetFiles/RuleSetFiles";
 
 
 const CardBody = styled(PFCardBody)`
@@ -32,10 +30,10 @@ const endpoint2 = 'http://' + getServer() + '/api/rule_set_file_json/';
 
 const RuleSetFile: React.FunctionComponent = () => {
 
-  const [ruleSetFile, setRuleSetFile] = useState([]);
-  const [rulesets, setRuleSets] = useState([]);
+  const [ruleSetFile, setRuleSetFile] = useState<RuleSetType|undefined>(undefined);
+  const [rulesets, setRuleSets] = useState<RuleSetType[]>([]);
 
-  const { id } = useParams();
+  const { id } = useParams<{id:string}>();
   console.log(id);
 
   useEffect(() => {
@@ -56,23 +54,23 @@ const RuleSetFile: React.FunctionComponent = () => {
   return (
   <React.Fragment>
     <TopToolbar>
-      <Title headingLevel={"h2"}>{`Rule set ${ruleSetFile.name}`}</Title>
+      <Title headingLevel={"h2"}>{`Rule set ${ruleSetFile?.name}`}</Title>
     </TopToolbar>
     <Stack>
       <StackItem>
           <Card>
             <CardTitle>Rule Sets</CardTitle>
             <CardBody>
-              {rulesets.length !== 0 && (
+              {rulesets && rulesets.length !== 0 && (
                 <SimpleList style={{ whiteSpace: 'pre-wrap' }}>
                   {rulesets.map((item, i) => (
-                    <SimpleListItem>{item.name}
-                    <div>
-                    { item.sources.map((source, j) => (
-                    <div> {source.name} </div>))}
-                    { item.rules.map((rule, j) => (
-                    <div> {rule.name} {Object.keys(rule.action)} </div>))}
-                    </div>
+                    <SimpleListItem key={`ruleset-${item?.name}`}>{item?.name}
+                      <div>
+                        { item?.sources && item.sources.length > 0 && item.sources.map((source, j) => (
+                          <div key={`source-${source?.id}`}> {source.name} </div>))}
+                        { item?.rules && item.rules.length > 0 && item.rules.map((rule, j) => (
+                          <div key={`rule-${rule?.id}`}> {rule?.name} {Object.keys(rule?.action)} </div>))}
+                      </div>
                     </SimpleListItem>
                   )) }
                 </SimpleList>
@@ -83,7 +81,7 @@ const RuleSetFile: React.FunctionComponent = () => {
         <StackItem>
           <Card>
     <CodeBlock>
-      <CodeBlockCode id="code-content">{ruleSetFile.rulesets}</CodeBlockCode>
+      <CodeBlockCode id="code-content">{ruleSetFile?.rulesets}</CodeBlockCode>
     </CodeBlock>
               </Card>
             </StackItem>

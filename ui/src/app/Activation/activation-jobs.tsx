@@ -6,11 +6,12 @@ import {TableToolbarView} from "@app/shared/table-toolbar-view";
 import sharedMessages from "../messages/shared.messages";
 import {cellWidth} from "@patternfly/react-table";
 import TableEmptyState from "@app/shared/table-empty-state";
-import isEmpty from 'lodash/isEmpty';
 import {useIntl} from "react-intl";
 import {defaultSettings} from "@app/shared/pagination";
 import {createRows} from "./jobs-table-helpers";
 import {CubesIcon} from "@patternfly/react-icons";
+import {ActivationType} from "@app/Activations/Activations";
+import {JobType} from "@app/Job/Job";
 
 const columns = (intl) => [
   {
@@ -73,7 +74,7 @@ export const jobsListState = (state, action) => {
   }
 };
 
-const ActivationJobs: React.FunctionComponent = ({activation, jobs}) => {
+const ActivationJobs: React.FunctionComponent<{activation: ActivationType, jobs: JobType[]}> = ({activation, jobs}) => {
   const intl = useIntl();
   const history = useHistory();
   const [limit, setLimit] = useState(defaultSettings.limit);
@@ -121,9 +122,10 @@ const ActivationJobs: React.FunctionComponent = ({activation, jobs}) => {
         rows={rows}
         columns={columns(intl)}
         fetchData={updateJobs}
-        titlePlural={intl.formatMessage(sharedMessages.jobs)}
-        titleSingular={intl.formatMessage(sharedMessages.job)}
+        plural={intl.formatMessage(sharedMessages.jobs)}
+        singular={intl.formatMessage(sharedMessages.job)}
         isLoading={isFetching || isFiltering}
+        onFilterChange={handleFilterChange}
         renderEmptyState={() => (
           <TableEmptyState
             title={intl.formatMessage(sharedMessages.nojobs)}
@@ -142,13 +144,8 @@ const ActivationJobs: React.FunctionComponent = ({activation, jobs}) => {
                   sharedMessages.clearAllFiltersDescription
                 )
             }
-            isSearch={!isEmpty(filterValue)}
           />
         )}
-        activeFiltersConfig={{
-          filters: prepareChips(filterValue, intl),
-          onDelete: () => handleFilterChange('')
-        }}
       />
     </PageSection>
   );
