@@ -50,7 +50,6 @@ const ActivationDetails: React.FunctionComponent<{activation: ActivationType}> =
   const [activationVars, setActivationVars] = useState<ExtraVarType|undefined>(undefined);
   const [varFormat, setVarFormat] = useState('yaml');
   const id = activation?.id;
-  console.log(id);
 
   const fetchActivationVars = (varname) => {
     return fetch(endpointVar + varname, {

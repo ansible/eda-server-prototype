@@ -35,7 +35,6 @@ const Job: React.FunctionComponent = () => {
   const [stdout, setStdout] = useState<{stdout: string}[]>([]);
 
   const { id } = useParams<JobType>();
-  console.log(id);
 
   useEffect(() => {
      fetch(endpoint + id, {
@@ -50,7 +49,7 @@ const Job: React.FunctionComponent = () => {
        },
      }).then(response => response.json())
     .then(data => setStdout(data));
-  }, []);
+  }, [id]);
 
   return (
   <React.Fragment>

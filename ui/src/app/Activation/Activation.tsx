@@ -59,7 +59,6 @@ const Activation: React.FunctionComponent = () => {
   const [activation, setActivation] = useState<ActivationType|undefined>(undefined);
 
   const { id } = useParams<{id: string}>();
-  console.log(id);
 
   const [stdout, setStdout] = useState<string[]>([]);
   const [newStdout, setNewStdout] = useState<string>('');
@@ -92,7 +91,6 @@ const Activation: React.FunctionComponent = () => {
       console.log('Websocket client connected');
     };
     wc.onmessage = (message) => {
-      console.log('update: ' + message.data);
       const [messageType, data] = JSON.parse(message.data);
       if (messageType === 'Stdout') {
         const { stdout: dataStdout } = data;

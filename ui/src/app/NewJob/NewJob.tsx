@@ -136,15 +136,11 @@ const NewJob: React.FunctionComponent = () => {
                          inventory_id: inventory,
                          extra_var_id: extravar})
       .then(data => {
-        console.log(data);
-        data?.id ? history.push("/job/" + data.id) :
+        data?.id ? history.push(`/job/${data.id}`) :
           console.log('no job was added')
     });
   };
 
-  console.log(playbooks);
-  console.log(inventories);
-  console.log(extravars);
   return (
   <React.Fragment>
     <TopToolbar
