@@ -66,11 +66,13 @@ from ansible_events_ui.users import (
 )
 
 from .activation import router as activation_router
+from .rule import router as rule_router
 
 logger = logging.getLogger("ansible_events_ui")
 
 router = APIRouter()
 router.include_router(activation_router)
+router.include_router(rule_router)
 
 
 @router.websocket("/api/ws")

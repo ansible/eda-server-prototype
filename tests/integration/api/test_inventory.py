@@ -6,14 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from ansible_events_ui.db import models
 
-
-@pytest.mark.asyncio
-async def test_create_rule_set_file(client: AsyncClient, db: AsyncSession):
-    response = await client.post(
-        "/api/rule_set_file/",
-        json={
-            "name": "test-ruleset-1.yml",
-            "rulesets": """
+TEST_RULESET_SIMPLE = """
 ---
 - name: Test simple
   hosts: all
@@ -26,7 +19,16 @@ async def test_create_rule_set_file(client: AsyncClient, db: AsyncSession):
       condition: event.i == 1
       action:
         debug:
-            """,
+"""
+
+
+@pytest.mark.asyncio
+async def test_create_rule_set_file(client: AsyncClient, db: AsyncSession):
+    response = await client.post(
+        "/api/rule_set_file/",
+        json={
+            "name": "test-ruleset-1.yml",
+            "rulesets": TEST_RULESET_SIMPLE,
         },
     )
     assert response.status_code == status_codes.HTTP_200_OK
