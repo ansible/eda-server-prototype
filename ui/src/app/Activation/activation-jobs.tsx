@@ -128,7 +128,7 @@ const ActivationJobs: React.FunctionComponent<{activation: ActivationType, jobs:
         onFilterChange={handleFilterChange}
         renderEmptyState={() => (
           <TableEmptyState
-            title={intl.formatMessage(sharedMessages.nojobs)}
+            title={intl.formatMessage(sharedMessages.noactivationjobs)}
             Icon={CubesIcon}
             PrimaryAction={() =>
               filterValue !== '' ? (
@@ -139,7 +139,7 @@ const ActivationJobs: React.FunctionComponent<{activation: ActivationType, jobs:
             }
             description={
               filterValue === ''
-                ? intl.formatMessage(sharedMessages.nojobs)
+                ? intl.formatMessage(sharedMessages.noactivationjobs)
                 : intl.formatMessage(
                   sharedMessages.clearAllFiltersDescription
                 )

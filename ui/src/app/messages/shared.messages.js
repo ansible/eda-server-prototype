@@ -199,9 +199,13 @@ const sharedMessages = defineMessages({
     id: 'rulesets.deleteRuleSet',
     defaultMessage: 'Delete rule set'
   },
-  nojobs: {
+  noactivationjobs: {
     id: 'activation.nojobs',
     defaultMessage: 'There are currently no jobs for this rulebook activation.'
+  },
+  nojobs: {
+    id: 'common.nojobs',
+    defaultMessage: 'There are currently no jobs for your organization.'
   },
   lastFiredDate: {
     id: 'activation.lastFiredDate',
