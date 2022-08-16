@@ -14,7 +14,7 @@ export const SelectBox = ({ id }) => {
     <Checkbox
       id={`select-${id}`}
       isChecked={selectedJobs.includes(id)}
-      onChange={() => setSelectedJobs(id)}
+      onChange={() => setSelectedJobs ? setSelectedJobs(id) : ''}
     />
   );
 };
