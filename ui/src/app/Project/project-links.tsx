@@ -13,7 +13,7 @@ import styled from 'styled-components';
 import {renderProjectTabs} from "@app/Project/Project";
 import {useIntl} from "react-intl";
 
-interface IProject {
+interface ProjectType {
   id: string,
   name?: string,
   vars?: [{id: string, name: string}]
@@ -28,7 +28,7 @@ const CardBody = styled(PFCardBody)`
 const SimpleList = styled(PFSimpleList)`
   white-space: pre-wrap;
 `
-const ProjectLinks: React.FunctionComponent<{project:IProject | undefined}> = ({ project } : { project: IProject | undefined}) => {
+const ProjectLinks: React.FunctionComponent<{project:ProjectType | undefined}> = ({ project } : { project: ProjectType | undefined}) => {
   const intl = useIntl();
   return (
   <PageSection page-type={'project-links'} id={'project-links'}>

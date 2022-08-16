@@ -56,7 +56,7 @@ export type User = {
   email: string
 };
 
-export interface IProject {
+export interface ProjectType {
   id: string,
   name?: string,
   description?: string,
@@ -64,5 +64,8 @@ export interface IProject {
   scm_credentials?: string,
   created_at?: string,
   modified_at?: string,
-  url?: string
+  url?: string,
+  status?: string,
+  type?: string,
+  revision?: string
 }

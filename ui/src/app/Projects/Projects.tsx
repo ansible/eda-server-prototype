@@ -26,6 +26,15 @@ const endpoint = 'http://' + getServer() + '/api/projects/';
 const columns = (intl) => [
   {
     title: intl.formatMessage(sharedMessages.url)
+  },
+  {
+    title: intl.formatMessage(sharedMessages.status)
+  },
+  {
+    title: intl.formatMessage(sharedMessages.type)
+  },
+  {
+    title: intl.formatMessage(sharedMessages.revision)
   }
 ];
 

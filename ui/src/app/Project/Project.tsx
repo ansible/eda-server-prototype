@@ -10,7 +10,7 @@ import {ProjectDetails} from "@app/Project/project-details";
 import {ProjectLinks} from "@app/Project/project-links";
 import sharedMessages from "../messages/shared.messages";
 import {useIntl} from "react-intl";
-import {IProject} from "@app/shared/types/common-types";
+import {ProjectType} from "@app/shared/types/common-types";
 
 export const renderProjectTabs = (intl, projectId: string | undefined) => {
   const project_tabs = [
@@ -43,7 +43,7 @@ export const extractProjectNameFromUrl = (url: string | undefined) => {
 
 const Project: React.FunctionComponent = () => {
 
-  const [project, setProject] = useState<IProject>();
+  const [project, setProject] = useState<ProjectType>();
   const { id } = useParams<{id:string}>();
   const intl = useIntl();
 

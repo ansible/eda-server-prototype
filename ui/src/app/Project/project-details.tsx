@@ -8,11 +8,11 @@ import {
 import {extractProjectNameFromUrl, renderProjectTabs} from "@app/Project/Project";
 import {useIntl} from "react-intl";
 import sharedMessages from "../messages/shared.messages";
-import {IProject} from "@app/shared/types/common-types";
+import {ProjectType} from "@app/shared/types/common-types";
 
-const ProjectDetails: React.FunctionComponent<{project:IProject | undefined}> = ({ project } : { project: IProject | undefined}) => {
+const ProjectDetails: React.FunctionComponent<{project:ProjectType | undefined}> = ({ project } : { project: ProjectType | undefined}) => {
   const intl = useIntl();
-  const renderFlexProjectDetails: React.FunctionComponent<IProject | undefined> = (project : IProject | undefined) => (
+  const renderFlexProjectDetails: React.FunctionComponent<ProjectType | undefined> = (project : ProjectType | undefined) => (
     <Flex>
       <Flex direction={{ default: 'column' }} flex={{ default: 'flex_1' }}>
         <FlexItem>
