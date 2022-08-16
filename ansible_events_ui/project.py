@@ -7,6 +7,7 @@ import yaml
 from sqlalchemy import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from .db import models
 from .db.models import (
     extra_vars,
     inventories,
@@ -105,29 +106,66 @@ def yield_files(project_dir):
             yield root, f
 
 
+async def insert_rulebook_related_data(
+    rule_set_file_id: int, rulebook_data: dict, db: AsyncSession
+):
+    ruleset_values = []
+    for ruleset_data in rulebook_data:
+        ruleset_values.append(
+            {
+                "name": ruleset_data["name"],
+                "rule_set_file_id": rule_set_file_id,
+            }
+        )
+
+    query = (
+        insert(models.rulesets)
+        .returning(models.rulesets.c.id)
+        .values(ruleset_values)
+    )
+    ruleset_ids = (await db.scalars(query)).all()
+
+    rule_values = []
+    for ruleset_id, ruleset_data in zip(ruleset_ids, rulebook_data):
+        for rule_data in ruleset_data["rules"]:
+            rule_values.append(
+                {
+                    "name": rule_data["name"],
+                    "action": rule_data["action"],
+                    "ruleset_id": ruleset_id,
+                }
+            )
+
+    query = insert(models.rules).values(rule_values)
+    await db.execute(query)
+
+
 async def find_rules(project_id, project_dir, db: AsyncSession):
 
     for directory, filename in yield_files(project_dir):
         full_path = os.path.join(directory, filename)
         # TODO(cutwater): Remove debugging print
         logger.debug(filename)
-        if is_rules_file(full_path):
-            with open(full_path) as f:
-                rulesets = f.read()
+        if not is_rules_file(full_path):
+            continue
 
-            query = insert(rule_set_files).values(
-                name=filename, rulesets=rulesets
-            )
-            (record_id,) = (await db.execute(query)).inserted_primary_key
-            # TODO(cutwater): Remove debugging print
-            logger.debug(record_id)
+        with open(full_path) as f:
+            rulesets = f.read()
 
-            query = insert(project_rules).values(
-                project_id=project_id, rule_set_file_id=record_id
-            )
-            (record_id,) = (await db.execute(query)).inserted_primary_key
-            # TODO(cutwater): Remove debugging print
-            logger.debug(record_id)
+        query = insert(rule_set_files).values(name=filename, rulesets=rulesets)
+        (rule_set_file_id,) = (await db.execute(query)).inserted_primary_key
+        # TODO(cutwater): Remove debugging print
+        logger.debug(rule_set_file_id)
+
+        query = insert(project_rules).values(
+            project_id=project_id, rule_set_file_id=rule_set_file_id
+        )
+        (record_id,) = (await db.execute(query)).inserted_primary_key
+        # TODO(cutwater): Remove debugging print
+        logger.debug(record_id)
+
+        rulebook_data = yaml.safe_load(rulesets)
+        await insert_rulebook_related_data(rule_set_file_id, rulebook_data, db)
 
 
 def is_inventory_file(filename):

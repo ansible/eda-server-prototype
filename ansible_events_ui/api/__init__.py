@@ -36,7 +36,11 @@ from ansible_events_ui.managers import (
     taskmanager,
     updatemanager,
 )
-from ansible_events_ui.project import clone_project, sync_project
+from ansible_events_ui.project import (
+    clone_project,
+    insert_rulebook_related_data,
+    sync_project,
+)
 from ansible_events_ui.ruleset import (
     activate_rulesets,
     inactivate_rulesets,
@@ -142,8 +146,12 @@ async def create_rule_set_file(
 ):
     query = insert(rule_set_files).values(name=rsf.name, rulesets=rsf.rulesets)
     result = await db.execute(query)
-    await db.commit()
     (id_,) = result.inserted_primary_key
+
+    rulebook_data = yaml.safe_load(rsf.rulesets)
+    await insert_rulebook_related_data(id_, rulebook_data, db)
+    await db.commit()
+
     return {**rsf.dict(), "id": id_}
 
 
