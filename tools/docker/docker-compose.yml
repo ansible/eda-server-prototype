@@ -6,7 +6,12 @@ services:
     build:
       context: ../../
       dockerfile: tools/docker/Dockerfile
-    command: ["/bin/bash", "-c", "alembic upgrade head && ansible-events-ui"]
+    command:
+      [
+        "/bin/bash",
+        "-c",
+        "alembic upgrade head && ansible-events-ui"
+      ]
     ports:
       - "8080:8080"
     environment:
@@ -14,6 +19,18 @@ services:
       - AE_DATABASE_URL=postgresql+asyncpg://postgres:secret@postgres/ansible_events
     depends_on:
       postgres:
+        condition: service_healthy
+    healthcheck:
+      test: curl -q http://localhost:8080/ping
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  wait_for_app:
+    image: ansible-events-ui
+    command: echo app running!
+    depends_on:
+      app:
         condition: service_healthy
 
   postgres:
