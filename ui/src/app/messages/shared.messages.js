@@ -115,6 +115,10 @@ const sharedMessages = defineMessages({
     id: 'project.addNewProject',
     defaultMessage: 'Add new project'
   },
+  addProject: {
+    id: 'project.addProject',
+    defaultMessage: 'Add project'
+  },
   deleteProjectTitle: {
     id: 'project.deleteProject',
     defaultMessage: 'Delete project'
