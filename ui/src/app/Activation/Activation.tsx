@@ -64,7 +64,7 @@ const Activation: React.FunctionComponent = () => {
   const [newStdout, setNewStdout] = useState<string>('');
   const [websocket_client, setWebsocketClient] = useState<WebSocket|undefined>(undefined);
   const [jobs, setJobs] = useState<JobType[]>([]);
-  const [newJob, setNewJob] = useState<JobType>({id:''});
+  const [newJob, setNewJob] = useState<JobType|undefined>(undefined);
 
 
   useEffect(() => {
@@ -125,7 +125,9 @@ const Activation: React.FunctionComponent = () => {
   }, [newStdout]);
 
   useEffect(() => {
-    setJobs([...jobs, newJob]);
+    if (newJob) {
+      setJobs([...jobs, newJob]);
+    }
   }, [newJob]);
 
   return (

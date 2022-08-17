@@ -16,7 +16,8 @@ import {getServer} from '@app/utils/utils';
 import {TopToolbar} from "@app/shared/top-toolbar";
 
 export interface JobType {
-  id: string
+  id: string;
+  name: string;
 }
 
 const CardBody = styled(PFCardBody)`
@@ -49,7 +50,7 @@ const Job: React.FunctionComponent = () => {
        },
      }).then(response => response.json())
     .then(data => setStdout(data));
-  }, [id]);
+  }, []);
 
   return (
   <React.Fragment>
