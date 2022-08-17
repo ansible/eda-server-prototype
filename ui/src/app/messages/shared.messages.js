@@ -115,7 +115,14 @@ const sharedMessages = defineMessages({
     id: 'shared.descriptionPlaceholder',
     defaultMessage: 'Insert description here'
   },
-
+  output: {
+    id: 'shared.output',
+    defaultMessage: 'Output'
+  },
+  rulebookActivations: {
+    id: 'shared.rulebookActivations',
+    defaultMessage: 'Rulebook Activations'
+  },
   project: {
     id: 'project.project',
     defaultMessage: 'Project'
@@ -283,6 +290,10 @@ const sharedMessages = defineMessages({
   ruleSetPlaceholder: {
     id: 'activation.ruleSetPlaceholder',
     defaultMessage: 'Select a rule set'
+  },
+  backToRulebookActivations: {
+    id: 'activation.backToRulebookActivations',
+    defaultMessage: 'Back to rulebook activations'
   },
   extraVarPlaceholder: {
     id: 'project.extraVarPlaceholder',

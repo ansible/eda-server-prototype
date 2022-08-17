@@ -23,6 +23,7 @@ import "ace-builds/src-noconflict/theme-xcode";
 import styled from 'styled-components';
 import {ActivationType} from "@app/Activations/Activations";
 import {ExtraVarType} from "@app/Vars/Vars";
+import {useIntl} from "react-intl";
 
 const client = new WebSocket('ws://' + getServer() + '/api/ws');
 
@@ -50,6 +51,7 @@ const ActivationDetails: React.FunctionComponent<{activation: ActivationType}> =
   const [activationVars, setActivationVars] = useState<ExtraVarType|undefined>(undefined);
   const [varFormat, setVarFormat] = useState('yaml');
   const id = activation?.id;
+  const intl = useIntl();
 
   const fetchActivationVars = (varname) => {
     return fetch(endpointVar + varname, {
@@ -231,7 +233,7 @@ const ActivationDetails: React.FunctionComponent<{activation: ActivationType}> =
 
   return (
   <PageSection page-type={'activation-details'} id={'activation-details'}>
-    { renderActivationTabs(id) }
+    { renderActivationTabs(id, intl) }
     <Stack>
       <StackItem>
         <Card>
