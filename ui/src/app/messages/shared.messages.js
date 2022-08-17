@@ -111,9 +111,9 @@ const sharedMessages = defineMessages({
     id: 'project.noprojects',
     defaultMessage: 'No projects'
   },
-  addProject: {
-    id: 'project.addProject',
-    defaultMessage: 'Add project'
+  add_new_project: {
+    id: 'project.addNewProject',
+    defaultMessage: 'Add new project'
   },
   deleteProjectTitle: {
     id: 'project.deleteProject',
@@ -134,6 +134,26 @@ const sharedMessages = defineMessages({
   scmCredentials: {
     id: 'project.scmCredentials',
     defaultMessage: 'SCM Credentials'
+  },
+  namePlaceholder: {
+    id: 'project.namePlaceholder',
+    defaultMessage: 'Insert name here'
+  },
+  descriptionPlaceholder: {
+    id: 'project.descriptionPlaceholder',
+    defaultMessage: 'Insert description here'
+  },
+  scmUrlPlaceholder: {
+    id: 'project.scmUrlPlaceholder',
+    defaultMessage: 'Insert SCM URL here'
+  },
+  scmTypePlaceholder: {
+    id: 'project.scmTypePlaceholder',
+    defaultMessage: 'SCM Credentials'
+  },
+  scmCredentialPlaceholder: {
+    id: 'project.scmCredentialsPlaceholder',
+    defaultMessage: 'Select an SCM Credential'
   },
   activation: {
     id: 'activation.activation',
