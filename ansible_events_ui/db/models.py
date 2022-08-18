@@ -1,5 +1,6 @@
 import sqlalchemy
 from fastapi_users.db import SQLAlchemyBaseUserTableUUID
+from sqlalchemy.dialects import postgresql
 from sqlalchemy.ext.declarative import declarative_base
 
 NAMING_CONVENTION = {
@@ -18,6 +19,7 @@ metadata = sqlalchemy.MetaData(naming_convention=NAMING_CONVENTION)
 Base = declarative_base(metadata=metadata)
 
 
+# TODO(cutwater): Rename into rulebooks
 rule_set_files = sqlalchemy.Table(
     "rule_set_file",
     metadata,
@@ -29,6 +31,44 @@ rule_set_files = sqlalchemy.Table(
     ),
     sqlalchemy.Column("name", sqlalchemy.String),
     sqlalchemy.Column("rulesets", sqlalchemy.String),
+)
+
+
+rulesets = sqlalchemy.Table(
+    "ruleset",
+    metadata,
+    sqlalchemy.Column(
+        "id",
+        sqlalchemy.Integer,
+        sqlalchemy.Identity(always=True),
+        primary_key=True,
+    ),
+    sqlalchemy.Column(
+        "rule_set_file_id",
+        sqlalchemy.ForeignKey("rule_set_file.id"),
+        nullable=False,
+    ),
+    sqlalchemy.Column("name", sqlalchemy.String),
+)
+
+rules = sqlalchemy.Table(
+    "rule",
+    metadata,
+    sqlalchemy.Column(
+        "id",
+        sqlalchemy.Integer,
+        sqlalchemy.Identity(always=True),
+        primary_key=True,
+    ),
+    sqlalchemy.Column(
+        "ruleset_id",
+        sqlalchemy.ForeignKey("ruleset.id"),
+        nullable=False,
+    ),
+    sqlalchemy.Column("name", sqlalchemy.String),
+    sqlalchemy.Column(
+        "action", postgresql.JSONB(none_as_null=True), nullable=False
+    ),
 )
 
 

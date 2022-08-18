@@ -8,6 +8,46 @@ from ansible_events_ui.db import models
 
 
 @pytest.mark.asyncio
+async def test_create_rule_set_file(client: AsyncClient, db: AsyncSession):
+    response = await client.post(
+        "/api/rule_set_file/",
+        json={
+            "name": "test-ruleset-1.yml",
+            "rulesets": """
+---
+- name: Test simple
+  hosts: all
+  sources:
+    - name: range
+      range:
+        limit: 5
+  rules:
+    - name:
+      condition: event.i == 1
+      action:
+        debug:
+            """,
+        },
+    )
+    assert response.status_code == status_codes.HTTP_200_OK
+    data = response.json()
+    assert "id" in data
+    assert data["name"] == "test-ruleset-1.yml"
+
+    rulesets = (await db.execute(sa.select(models.rulesets))).all()
+    assert len(rulesets) == 1
+    ruleset = rulesets[0]
+    assert ruleset["rule_set_file_id"] == data["id"]
+    assert ruleset["name"] == "Test simple"
+
+    rules = (await db.execute(sa.select(models.rules))).all()
+    assert len(rules) == 1
+    rule = rules[0]
+    assert rule["ruleset_id"] == ruleset["id"]
+    assert rule["action"] == {"debug": None}
+
+
+@pytest.mark.asyncio
 async def test_create_inventory(client: AsyncClient):
     response = await client.post(
         "/api/inventory/",
