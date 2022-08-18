@@ -33,9 +33,6 @@ const NewRuleSet: React.FunctionComponent = () => {
 
   const [value, setValue] = useState('');
 
-  const handleSubmit = () => {
-  };
-
   return (
     <React.Fragment>
       <TopToolbar>

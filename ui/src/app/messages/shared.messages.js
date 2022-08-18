@@ -42,6 +42,14 @@ const sharedMessages = defineMessages({
     id: 'shared.created',
     defaultMessage: 'Created'
   },
+  type: {
+    id: 'shared.type',
+    defaultMessage: 'Type'
+  },
+  revision: {
+    id: 'shared.revision',
+    defaultMessage: 'Revision'
+  },
   filterByName: {
     id: 'shared.filterByName',
     defaultMessage: 'Filter by {name}'
