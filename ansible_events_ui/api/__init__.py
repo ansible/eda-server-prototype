@@ -2,7 +2,6 @@ import asyncio
 import json
 import logging
 import uuid
-from collections import defaultdict
 from typing import List
 
 import sqlalchemy.orm
@@ -11,8 +10,11 @@ from fastapi import APIRouter, Depends, WebSocket, WebSocketDisconnect
 from sqlalchemy import insert, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from .db.dependency import get_db_session, get_db_session_factory
-from .db.models import (
+from ansible_events_ui.db.dependency import (
+    get_db_session,
+    get_db_session_factory,
+)
+from ansible_events_ui.db.models import (
     User,
     activation_instance_job_instances,
     activation_instance_logs,
@@ -29,14 +31,19 @@ from .db.models import (
     projects,
     rule_set_files,
 )
-from .manager import (
+from ansible_events_ui.managers import (
+    connnectionmanager,
+    taskmanager,
+    updatemanager,
+)
+from ansible_events_ui.project import clone_project, sync_project
+from ansible_events_ui.ruleset import (
     activate_rulesets,
     inactivate_rulesets,
     run_job,
     write_job_events,
 )
-from .project import clone_project, sync_project
-from .schemas import (
+from ansible_events_ui.schemas import (
     Activation,
     ActivationLog,
     Extravars,
@@ -48,70 +55,18 @@ from .schemas import (
     UserRead,
     UserUpdate,
 )
-from .users import auth_backend, current_active_user, fastapi_users
+from ansible_events_ui.users import (
+    auth_backend,
+    current_active_user,
+    fastapi_users,
+)
+
+from .activation import router as activation_router
 
 logger = logging.getLogger("ansible_events_ui")
 
 router = APIRouter()
-
-
-# TODO(cutwater): A more reliable, scalable and robust tasking system
-#   is probably needed.
-class TaskManager:
-    def __init__(self):
-
-        self.tasks = []
-
-
-taskmanager = TaskManager()
-
-
-class ConnectionManager:
-    def __init__(self):
-        self.active_connections: List[WebSocket] = []
-
-    async def connect(self, websocket: WebSocket):
-        await websocket.accept()
-        self.active_connections.append(websocket)
-
-    def disconnect(self, websocket: WebSocket):
-        self.active_connections.remove(websocket)
-
-    async def send_personal_message(self, message: str, websocket: WebSocket):
-        await websocket.send_text(message)
-
-    async def broadcast(self, message: str):
-        for connection in self.active_connections:
-            await connection.send_text(message)
-
-
-connnectionmanager = ConnectionManager()
-
-
-class UpdateManager:
-    def __init__(self):
-        self.active_connections = defaultdict(list)
-
-    async def connect(self, page, websocket: WebSocket):
-        await websocket.accept()
-        self.active_connections[page].append(websocket)
-        logger.debug("connect %s %s", page, self.active_connections[page])
-
-    def disconnect(self, page, websocket: WebSocket):
-        self.active_connections[page].remove(websocket)
-
-    async def broadcast(self, page, message: str):
-        logger.debug(
-            "broadcast %s %s -> %s",
-            page,
-            message,
-            self.active_connections[page],
-        )
-        for connection in self.active_connections[page]:
-            await connection.send_text(message)
-
-
-updatemanager = UpdateManager()
+router.include_router(activation_router)
 
 
 @router.websocket("/api/ws")
