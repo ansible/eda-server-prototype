@@ -2,7 +2,14 @@
 
 ## Setting up a development environment
 
-### 1. Clone the repository
+### 1. Install taskfile
+
+[Taskfile](https://taskfile.dev/) is a task runner that aims to be simpler and easier 
+replacement for a GNU Make.
+
+Install taskfile following the [installation guide](https://taskfile.dev/installation/).
+
+### 2. Clone the repository
 
 First you need to clone the `ansible-events-ui` repository:
 
@@ -11,7 +18,7 @@ First you need to clone the `ansible-events-ui` repository:
   $ cd ansible-events-ui
 ```
 
-### 2. Virtual environment
+### 3. Virtual environment
 
 Create virtual environment and install project
 
@@ -29,7 +36,7 @@ Install Ansible and `benthomasson.eda` collection:
   (venv) $ ansible-galaxy collection install benthomasson.eda
 ```
 
-### 3. Services
+### 4. Services
 
 You need to set up a PostgreSQL database sever. The easiest way is using the `docker-compose`:
 
@@ -43,7 +50,7 @@ Then run database migrations:
   $ alembic upgrade head
 ```
 
-### 4. User interface
+### 5. User interface
 
 Build UI files:
 
@@ -79,4 +86,24 @@ Requires docker-compose installed. [See the documentation](https://docs.docker.c
 ```sh
 cd tools/docker
 docker-compose up --build
+```
+
+## Running tests
+
+If not started, start the PostgreSQL service, which is required for running integration tests.
+
+```shell
+$ docker-compose -f tools/docker/docker-compose.yml up postgres
+```
+
+Run all tests:
+
+```shell
+$ task test
+```
+
+Or call `pytest` directly:
+
+```shell
+(venv) $ python -m pytest 
 ```

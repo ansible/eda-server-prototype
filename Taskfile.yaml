@@ -1,0 +1,47 @@
+# https://taskfile.dev
+
+version: '3'
+
+tasks:
+  lint:
+    desc: "Run all linters."
+    cmds:
+      - task: lint:black
+      - task: lint:isort
+      - task: lint:flake8
+
+  test:
+    desc: "Run project tests."
+    cmds:
+      - python -m pytest
+
+  lint:black:
+    desc: "Check code with `black`."
+    cmds:
+      - black --check .
+
+  lint:isort:
+    desc: "Check code with `isort`."
+    cmds:
+      - isort --check .
+
+  lint:flake8:
+    desc: "Check code with `flake8`."
+    cmds:
+      - flake8
+
+  format:
+    desc: "Run all code formatters."
+    cmds:
+      - task: format:isort
+      - task: format:black
+
+  format:isort:
+    desc: "Format code with `isort`."
+    cmds:
+      - isort .
+
+  format:black:
+    desc: "Format code with `black`."
+    cmds:
+      - black .
