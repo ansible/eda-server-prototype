@@ -1,5 +1,14 @@
 import { createContext } from 'react';
 
-const JobsTableContext = createContext({ selectedJobs: [] });
+interface IJobsTableContext {
+  selectedJobs: string[];
+  setSelectedJobs?: (string) => void;
+}
+
+const defaultState = {
+  selectedJobs: []
+};
+
+const JobsTableContext = createContext<IJobsTableContext>({ selectedJobs: [] });
 
 export default JobsTableContext;

@@ -4,8 +4,6 @@ import React, {useState, useEffect, useReducer, Fragment} from 'react';
 import { Button } from '@patternfly/react-core';
 import {getServer} from '@app/utils/utils';
 import {TopToolbar} from "@app/shared/top-toolbar";
-import {JobType} from "@app/Job/Job";
-import {TopToolbar} from '../shared/top-toolbar';
 import { PlusCircleIcon } from '@patternfly/react-icons';
 import sharedMessages from '../messages/shared.messages';
 import {cellWidth} from "@patternfly/react-table";
@@ -20,8 +18,13 @@ import {createRows} from "@app/Jobs/jobs-table-helpers";
 
 interface JobType {
   id: string;
-  git_hash?: string;
-  name: string;
+  name?: string;
+}
+
+interface JobRowType {
+  id: string;
+  name?: string;
+  isChecked: boolean
 }
 
 const endpoint = 'http://' + getServer() + '/api/job_instances/';
@@ -59,7 +62,7 @@ const initialState = (filterValue = '') => ({
   rows: []
 });
 
-const areSelectedAll = (rows = [], selected) =>
+const areSelectedAll = (rows:JobRowType[] = [], selected) =>
   rows.every((row) => selected.includes(row.id));
 
 const unique = (value, index, self) => self.indexOf(value) === index;
@@ -150,8 +153,7 @@ const Jobs: React.FunctionComponent = () => {
     stateDispatch
   ] = useReducer(jobsListState, initialState());
 
-  const [jobs, setJobs] = useState<JobType[]>([]);
-  const setSelectedJobs = (id) =>
+  const setSelectedJobs = (id: string) =>
     stateDispatch({type: 'select', payload: id});
 
   const updateJobs = (pagination) => {
@@ -189,11 +191,9 @@ const Jobs: React.FunctionComponent = () => {
     <Fragment>
       <Route
         exact
-        path={'/new-job'}
-        render={(props) => (
-          <NewJob {...props} />
-        )}
-      />
+        path={'/new-job'}>
+        <NewJob/>
+      </Route>
     </Fragment>
   );
 
@@ -271,10 +271,11 @@ const Jobs: React.FunctionComponent = () => {
             fetchData={updateJobs}
             routes={routes}
             actionResolver={actionResolver}
-            titlePlural={intl.formatMessage(sharedMessages.jobs)}
-            titleSingular={intl.formatMessage(sharedMessages.job)}
+            plural={intl.formatMessage(sharedMessages.jobs)}
+            singular={intl.formatMessage(sharedMessages.job)}
             toolbarButtons={toolbarButtons}
             isLoading={isFetching || isFiltering}
+            onFilterChange={handleFilterChange}
             renderEmptyState={() => (
               <TableEmptyState
                 title={intl.formatMessage(sharedMessages.nojobs)}
@@ -308,13 +309,8 @@ const Jobs: React.FunctionComponent = () => {
                     sharedMessages.clearAllFiltersDescription
                     )
                 }
-                isSearch={!isEmpty(filterValue)}
               />
             )}
-            activeFiltersConfig={{
-              filters: prepareChips(filterValue, intl),
-              onDelete: () => handleFilterChange('')
-            }}
           />
         </PageSection>
       </JobsTableContext.Provider>

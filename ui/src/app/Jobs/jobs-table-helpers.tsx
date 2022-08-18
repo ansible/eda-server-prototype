@@ -14,7 +14,7 @@ export const SelectBox = ({ id }) => {
     <Checkbox
       id={`select-${id}`}
       isChecked={selectedJobs.includes(id)}
-      onChange={() => setSelectedJobs(id)}
+      onChange={() => setSelectedJobs ? setSelectedJobs(id) : ''}
     />
   );
 };
@@ -28,7 +28,7 @@ export const createRows = (data) =>
     id,
     cells: [
       <React.Fragment key={`${id}-checkbox`}>
-        <SelectBox id={id} />
+        <SelectBox id={`${id}`} />
       </React.Fragment>,
       <Fragment key={`[job-${id}`}>
         <Link
