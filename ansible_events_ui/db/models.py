@@ -219,7 +219,7 @@ jobs = sqlalchemy.Table(
         sqlalchemy.Identity(always=True),
         primary_key=True,
     ),
-    sqlalchemy.Column("uuid", sqlalchemy.String),
+    sqlalchemy.Column("uuid", postgresql.UUID),
 )
 
 job_instances = sqlalchemy.Table(
@@ -232,6 +232,7 @@ job_instances = sqlalchemy.Table(
         primary_key=True,
     ),
     sqlalchemy.Column("uuid", sqlalchemy.String),
+    sqlalchemy.Column("uuid", postgresql.UUID),
 )
 
 activation_instance_job_instances = sqlalchemy.Table(
@@ -262,7 +263,7 @@ job_instance_events = sqlalchemy.Table(
         sqlalchemy.Identity(always=True),
         primary_key=True,
     ),
-    sqlalchemy.Column("job_uuid", sqlalchemy.String),
+    sqlalchemy.Column("job_uuid", postgresql.UUID),
     sqlalchemy.Column("counter", sqlalchemy.Integer),
     sqlalchemy.Column("stdout", sqlalchemy.String),
 )
