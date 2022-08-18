@@ -107,14 +107,6 @@ const sharedMessages = defineMessages({
     id: 'shared.allFieldsRequired',
     defaultMessage: 'All fields are required'
   },
-  namePlaceholder: {
-    id: 'shared.namePlaceholder',
-    defaultMessage: 'Insert name here'
-  },
-  descriptionPlaceholder: {
-    id: 'shared.descriptionPlaceholder',
-    defaultMessage: 'Insert description here'
-  },
   output: {
     id: 'shared.output',
     defaultMessage: 'Output'
@@ -122,6 +114,14 @@ const sharedMessages = defineMessages({
   rulebookActivations: {
     id: 'shared.rulebookActivations',
     defaultMessage: 'Rulebook Activations'
+  },
+  namePlaceholder: {
+    id: 'shared.namePlaceholder',
+    defaultMessage: 'Insert name here'
+  },
+  descriptionPlaceholder: {
+    id: 'shared.descriptionPlaceholder',
+    defaultMessage: 'Insert description here'
   },
   project: {
     id: 'project.project',
@@ -162,14 +162,6 @@ const sharedMessages = defineMessages({
   scmCredentials: {
     id: 'project.scmCredentials',
     defaultMessage: 'SCM Credentials'
-  },
-  namePlaceholder: {
-    id: 'project.namePlaceholder',
-    defaultMessage: 'Insert name here'
-  },
-  descriptionPlaceholder: {
-    id: 'project.descriptionPlaceholder',
-    defaultMessage: 'Insert description here'
   },
   scmUrlPlaceholder: {
     id: 'project.scmUrlPlaceholder',
