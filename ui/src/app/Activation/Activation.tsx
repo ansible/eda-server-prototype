@@ -1,5 +1,5 @@
 import { Title} from '@patternfly/react-core';
-import { Route, Switch, useParams } from 'react-router-dom';
+import {Route, Switch, useLocation, useParams} from 'react-router-dom';
 import React, { useState, useEffect, Fragment } from 'react';
 import {useIntl} from "react-intl";
 import AppTabs from "@app/shared/app-tabs";
@@ -55,6 +55,15 @@ export const fetchActivationJobs = (activationId, pagination=defaultSettings) =>
     },
   }).then(response => response.json());
 }
+export const getTabFromPath = (path:string):string | undefined => {
+  const index = window.location.href.indexOf(window.location.pathname);
+  const baseUrl = window.location.href.substr(0, index);
+  console.log('Debug - path: ', path);
+  console.log('Debug - baseUrl: ', baseUrl);
+  console.log('Debug - window.location.pathname', window.location.pathname);
+  return undefined;
+};
+
 const Activation: React.FunctionComponent = () => {
 
   const [activation, setActivation] = useState<ActivationType|undefined>(undefined);
@@ -129,7 +138,9 @@ const Activation: React.FunctionComponent = () => {
       setJobs([...jobs, newJob]);
     }
   }, [newJob]);
-
+  const location = useLocation();
+  console.log('Debug - location: ', location);
+  const currentTab = getTabFromPath(location.pathname);
   return (
     <React.Fragment>
       <TopToolbar breadcrumbs={[
@@ -138,7 +149,11 @@ const Activation: React.FunctionComponent = () => {
           to: '/activations'
         },
         {
-          title: activation?.name
+          title: activation?.name,
+          to: `/activations/${activation?.id}/details`
+        },
+        {
+          title: currentTab || intl.formatMessage(sharedMessages.details)
         }
       ]
       }>
