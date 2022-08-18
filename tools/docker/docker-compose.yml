@@ -24,7 +24,14 @@ services:
     ports:
       - "5432:5432"
     volumes:
+      - "./postgres/initdb.d:/docker-entrypoint-initdb.d"
+      - "./postgres/postgresql.conf:/etc/postgresql/postgresql.conf"
+      - "./postgres/conf.d:/etc/postgresql/conf.d"
       - "postgres_data:/var/lib/postgresql/data"
+    command: >
+      postgres
+      -c config_file=/etc/postgresql/postgresql.conf
+      -c log_statement=${PG_LOG_STATEMENT:-mod}
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U postgres" ]
       interval: 5s
