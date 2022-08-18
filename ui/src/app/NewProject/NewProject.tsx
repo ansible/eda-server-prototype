@@ -1,4 +1,4 @@
-import { PageSection, Title } from '@patternfly/react-core';
+import {Grid, GridItem, PageSection, Title} from '@patternfly/react-core';
 import { useHistory } from "react-router-dom";
 import React, { useState, useEffect } from 'react';
 import {
@@ -6,12 +6,13 @@ import {
   CardBody as PFCardBody,
   SimpleList as PFSimpleList,
 } from '@patternfly/react-core';
+import {useIntl} from "react-intl";
 import { ActionGroup, Button, Form, FormGroup, TextInput } from '@patternfly/react-core';
 import { postData } from '@app/utils/utils';
 import {getServer} from '@app/utils/utils';
-
 import styled from 'styled-components';
 import {TopToolbar} from "@app/shared/top-toolbar";
+import sharedMessages from "../messages/shared.messages";
 
 
 const CardBody = styled(PFCardBody)`
@@ -27,14 +28,17 @@ const NewProject: React.FunctionComponent = () => {
 
   const history = useHistory();
 
-  const [value, setValue] = useState('');
+  const [scmUrl, setScmUrl] = useState('');
+  const [name, setName] = useState('');
+  const [description, setDescription] = useState('');
+  const [scmType, setScmType] = useState('');
+  const [scmCredential, setScmCredential] = useState('');
+  const intl = useIntl();
 
   const handleSubmit = () => {
-      console.log('submit ' + value);
-			postData(endpoint, { url: value })
+			postData(endpoint, { url: scmUrl })
 				.then(data => {
-					console.log(data);
-          history.push("/project/" + data.id);
+          history.push(`/project/${data.id}`);
 			});
   };
 
@@ -43,30 +47,90 @@ const NewProject: React.FunctionComponent = () => {
     <TopToolbar
       breadcrumbs={[
         {
-          title: 'Projects',
+          title: intl.formatMessage(sharedMessages.projects),
           to: '/projects'
+        },
+        {
+          title: 'Add'
         }
         ]
       }>
-      <Title headingLevel={"h2"}>New project</Title>
+      <Title headingLevel={"h2"}>{ intl.formatMessage(sharedMessages.add_new_project)}</Title>
     </TopToolbar>
     <PageSection>
       <Card>
         <CardBody>
-        <Form isWidthLimited>
-          <FormGroup
-            label="Git URL"
-            fieldId="url-1"
-          >
-            <TextInput
-              onChange={setValue}
-              value={value}
-              id="url-1"
-            />
-          </FormGroup>
+        <Form>
+          <Grid hasGutter>
+            <GridItem span={4}>
+              <FormGroup style={{paddingLeft: '15px', paddingRight: '15px'}}
+                label="Name"
+                fieldId="name"
+              >
+                <TextInput
+                  onChange={setName}
+                  value={name}
+                  id="name"
+                  placeholder={ intl.formatMessage(sharedMessages.namePlaceholder) }
+                />
+              </FormGroup>
+            </GridItem>
+            <GridItem span={4}>
+              <FormGroup style={{paddingLeft: '15px', paddingRight: '15px'}}
+                label="Description"
+                fieldId="description"
+              >
+                <TextInput
+                  onChange={setDescription}
+                  value={description}
+                  id="description"
+                  placeholder={intl.formatMessage(sharedMessages.descriptionPlaceholder)}
+                />
+              </FormGroup>
+            </GridItem>
+            <GridItem span={4}>
+              <FormGroup style={{paddingLeft: '15px', paddingRight: '15px'}}
+                label="SCM type"
+                fieldId="type"
+              >
+                <TextInput
+                  onChange={setScmType}
+                  value={scmType}
+                  id="scmType"
+                  placeholder={intl.formatMessage(sharedMessages.scmTypePlaceholder)}
+                />
+              </FormGroup>
+            </GridItem>
+            <GridItem span={4}>
+              <FormGroup style={{paddingLeft: '15px', paddingRight: '15px'}}
+                label="SCM URL"
+                fieldId="url-1"
+              >
+                <TextInput
+                  onChange={setScmUrl}
+                  value={scmUrl}
+                  id="url-1"
+                  placeholder={intl.formatMessage(sharedMessages.scmUrlPlaceholder)}
+                />
+              </FormGroup>
+            </GridItem>
+            <GridItem span={4}>
+              <FormGroup style={{paddingLeft: '15px', paddingRight: '15px'}}
+                label="SCM credential"
+                fieldId="scmCredential"
+              >
+                <TextInput
+                  onChange={setScmCredential}
+                  value={scmCredential}
+                  id="scmCredential"
+                  placeholder={intl.formatMessage(sharedMessages.scmCredentialPlaceholder)}
+                />
+              </FormGroup>
+            </GridItem>
+          </Grid>
           <ActionGroup>
             <Button variant="primary" onClick={handleSubmit}>Save</Button>
-            <Button variant="link" onClick={() => history.push('/projects')}> Cancel</Button>
+            <Button variant="link" onClick={() => history.push('/projects')}>Cancel</Button>
           </ActionGroup>
         </Form>
         </CardBody>
