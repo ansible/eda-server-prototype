@@ -10,6 +10,7 @@ dist/
 *.db
 .env
 /venv
+/.venv
 
 # IDE's
 .idea
