@@ -136,6 +136,7 @@ const Jobs: React.FunctionComponent = () => {
   const intl = useIntl();
   const history = useHistory();
   const [jobs, setJobs] = useState<JobType[]>([]);
+  const [newJob, setNewJob] = useState<JobType>({id:''});
   const [limit, setLimit] = useState(defaultSettings.limit);
   const [offset, setOffset] = useState(1);
 
@@ -162,6 +163,27 @@ const Jobs: React.FunctionComponent = () => {
       .then(() => stateDispatch({type: 'setFetching', payload: false}))
       .catch(() => stateDispatch({type: 'setFetching', payload: false}));
   };
+
+  const [update_client, setUpdateClient] = useState<WebSocket|unknown>({});
+  useEffect(() => {
+    const uc = new WebSocket('ws://' + getServer() + '/api/ws-jobs/');
+    setUpdateClient(uc);
+    uc.onopen = () => {
+      console.log('Update client connected');
+    };
+    uc.onmessage = (message) => {
+      console.log('update: ' + message.data);
+      const [messageType, data] = JSON.parse(message.data);
+      if (messageType === 'Job') {
+        setNewJob(data);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    setJobs([...jobs, newJob]);
+  }, [newJob]);
+
 
   useEffect(() => {
     fetchJobs().then(response => response.json())

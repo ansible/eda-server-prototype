@@ -231,7 +231,6 @@ job_instances = sqlalchemy.Table(
         sqlalchemy.Identity(always=True),
         primary_key=True,
     ),
-    sqlalchemy.Column("uuid", sqlalchemy.String),
     sqlalchemy.Column("uuid", postgresql.UUID),
 )
 

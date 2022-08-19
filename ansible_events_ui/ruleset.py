@@ -20,6 +20,7 @@ Functions:
 
 import asyncio
 import concurrent.futures
+import json
 import logging
 import os
 import shutil
@@ -31,6 +32,7 @@ from sqlalchemy import insert, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from .db.models import job_instance_events, playbooks
+from .managers import updatemanager
 from .messages import JobEnd
 
 logger = logging.getLogger("ansible_events_ui")
@@ -157,7 +159,7 @@ async def run_job(
     await event_log.put(JobEnd(job_uuid))
 
 
-async def write_job_events(event_log, db: AsyncSession):
+async def write_job_events(event_log, db: AsyncSession, job_instance_id):
 
     while True:
 
@@ -165,6 +167,12 @@ async def write_job_events(event_log, db: AsyncSession):
 
         if isinstance(event, JobEnd):
             break
+
+        if event.get("stdout"):
+            await updatemanager.broadcast(
+                f"/job_instance/{job_instance_id}",
+                json.dumps(["Stdout", {"stdout": event.get("stdout")}]),
+            )
 
         query = insert(job_instance_events).values(
             job_uuid=event.get("job_id"),

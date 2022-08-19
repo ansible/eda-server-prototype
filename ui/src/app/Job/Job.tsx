@@ -33,8 +33,29 @@ const Job: React.FunctionComponent = () => {
 
   const [job, setJob] = useState<JobType|undefined>(undefined);
   const [stdout, setStdout] = useState<{stdout: string}[]>([]);
+  const [newStdout, setNewStdout] = useState<string>('');
 
   const { id } = useParams<JobType>();
+
+  const [update_client, setUpdateClient] = useState<WebSocket|unknown>({});
+  useEffect(() => {
+    const uc = new WebSocket('ws://' + getServer() + '/api/ws-job/' + id);
+    setUpdateClient(uc);
+    uc.onopen = () => {
+      console.log('Update client connected');
+    };
+    uc.onmessage = (message) => {
+      console.log('update: ' + message.data);
+      const [messageType, data] = JSON.parse(message.data);
+      if (messageType === 'Stdout') {
+        setNewStdout(data);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    setStdout([...stdout, newStdout]);
+  }, [newStdout]);
 
   useEffect(() => {
      fetch(endpoint + id, {
