@@ -37,7 +37,7 @@ class ConnectionManager:
             await connection.send_text(message)
 
 
-connnectionmanager = ConnectionManager()
+connectionmanager = ConnectionManager()
 
 
 class UpdateManager:

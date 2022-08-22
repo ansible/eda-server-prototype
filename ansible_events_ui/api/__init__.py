@@ -32,7 +32,7 @@ from ansible_events_ui.db.models import (
     rule_set_files,
 )
 from ansible_events_ui.managers import (
-    connnectionmanager,
+    connectionmanager,
     taskmanager,
     updatemanager,
 )
@@ -78,13 +78,13 @@ router.include_router(rule_router)
 @router.websocket("/api/ws")
 async def websocket_endpoint(websocket: WebSocket):
     logger.debug("starting ws")
-    await connnectionmanager.connect(websocket)
+    await connectionmanager.connect(websocket)
     try:
         while True:
             data = await websocket.receive_text()
             await websocket.send_text(f"Message text was: {data}")
     except WebSocketDisconnect:
-        connnectionmanager.disconnect(websocket)
+        connectionmanager.disconnect(websocket)
 
 
 @router.websocket("/api/ws2")
@@ -115,8 +115,26 @@ async def websocket_endpoint2(
                     f"/activation_instance/{activation_instance_id}",
                     json.dumps(["Job", {"id": job_instance_id}]),
                 )
+                await updatemanager.broadcast(
+                    "/jobs",
+                    json.dumps(["Job", {"id": job_instance_id}]),
+                )
             elif data_type == "AnsibleEvent":
                 event_data = data.get("event", {})
+                if event_data.get("stdout"):
+                    query = select(job_instances).where(
+                        job_instances.c.uuid == event_data.get("job_id")
+                    )
+                    result = await db.execute(query)
+                    job_instance_id = result.first().job_instance_id
+
+                    await updatemanager.broadcast(
+                        f"/job_instance/{job_instance_id}",
+                        json.dumps(
+                            ["Stdout", {"stdout": event_data.get("stdout")}]
+                        ),
+                    )
+
                 query = insert(job_instance_events).values(
                     job_uuid=event_data.get("job_id"),
                     counter=event_data.get("counter"),
@@ -133,6 +151,30 @@ async def websocket_activation_endpoint(
     websocket: WebSocket, activation_instance_id
 ):
     page = f"/activation_instance/{activation_instance_id}"
+    await updatemanager.connect(page, websocket)
+    try:
+        while True:
+            data = await websocket.receive_text()
+            logger.debug(data)
+    except WebSocketDisconnect:
+        updatemanager.disconnect(page, websocket)
+
+
+@router.websocket("/api/ws-jobs/")
+async def websocket_jobs_endpoint(websocket: WebSocket):
+    page = "/jobs"
+    await updatemanager.connect(page, websocket)
+    try:
+        while True:
+            data = await websocket.receive_text()
+            logger.debug(data)
+    except WebSocketDisconnect:
+        updatemanager.disconnect(page, websocket)
+
+
+@router.websocket("/api/ws-job/{job_instance_id}")
+async def websocket_job_endpoint(websocket: WebSocket, job_instance_id):
+    page = f"/job_instance/{job_instance_id}"
     await updatemanager.connect(page, websocket)
     try:
         while True:
@@ -254,7 +296,7 @@ async def read_output(proc, activation_instance_id, db_session_factory):
             await db.execute(query)
             await db.commit()
             line_number += 1
-            await connnectionmanager.broadcast(
+            await connectionmanager.broadcast(
                 json.dumps(["Stdout", {"stdout": line}])
             )
 
@@ -515,10 +557,7 @@ async def create_job_instance(
     )
     taskmanager.tasks.append(task)
     task = asyncio.create_task(
-        write_job_events(
-            event_log,
-            db,
-        ),
+        write_job_events(event_log, db, job_instance_id),
         name=f"write_job_events {job_instance_id}",
     )
     taskmanager.tasks.append(task)
