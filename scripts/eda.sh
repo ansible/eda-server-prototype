@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+set -o errexit
+set -o pipefail
+set -o nounset
 
 #
 #
@@ -12,7 +15,7 @@
 #
 
 usage() {
-    log-info "Usage: `basename $0` <command>"
+    log-info "Usage: $(basename "$0") <command>"
     log-info ""
     log-info "services-start      start service containers"
     log-info "services-stop       stop service containers"
@@ -29,7 +32,7 @@ usage() {
 help() {
     usage
 }
-
+CMD=${1:-help}
 DEBUG=${DEBUG:-false}
 
 DEV_SCRIPTS_PATH=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
@@ -157,7 +160,7 @@ stop-events-all() {
 }
 
 # ---execute---
-ARG=$(echo "${1}" |tr [a-z] [A-Z])
+ARG=$(echo "${CMD}" |tr [a-z] [A-Z])
 
 case ${ARG} in
   "SERVICES-START")
