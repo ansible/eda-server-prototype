@@ -31,6 +31,9 @@ rule_set_files = sqlalchemy.Table(
     ),
     sqlalchemy.Column("name", sqlalchemy.String),
     sqlalchemy.Column("rulesets", sqlalchemy.String),
+    sqlalchemy.Column(
+        "project_id", sqlalchemy.ForeignKey("project.id"), nullable=True
+    ),
 )
 
 
@@ -83,6 +86,9 @@ inventories = sqlalchemy.Table(
     ),
     sqlalchemy.Column("name", sqlalchemy.String),
     sqlalchemy.Column("inventory", sqlalchemy.String),
+    sqlalchemy.Column(
+        "project_id", sqlalchemy.ForeignKey("project.id"), nullable=True
+    ),
 )
 
 
@@ -97,6 +103,9 @@ extra_vars = sqlalchemy.Table(
     ),
     sqlalchemy.Column("name", sqlalchemy.String),
     sqlalchemy.Column("extra_var", sqlalchemy.String),
+    sqlalchemy.Column(
+        "project_id", sqlalchemy.ForeignKey("project.id"), nullable=True
+    ),
 )
 
 
@@ -165,48 +174,6 @@ projects = sqlalchemy.Table(
     ),
     sqlalchemy.Column("git_hash", sqlalchemy.String),
     sqlalchemy.Column("url", sqlalchemy.String),
-)
-
-
-project_inventories = sqlalchemy.Table(
-    "project_inventory",
-    metadata,
-    sqlalchemy.Column(
-        "id",
-        sqlalchemy.Integer,
-        sqlalchemy.Identity(always=True),
-        primary_key=True,
-    ),
-    sqlalchemy.Column("project_id", sqlalchemy.ForeignKey("project.id")),
-    sqlalchemy.Column("inventory_id", sqlalchemy.ForeignKey("inventory.id")),
-)
-
-project_vars = sqlalchemy.Table(
-    "project_var",
-    metadata,
-    sqlalchemy.Column(
-        "id",
-        sqlalchemy.Integer,
-        sqlalchemy.Identity(always=True),
-        primary_key=True,
-    ),
-    sqlalchemy.Column("project_id", sqlalchemy.ForeignKey("project.id")),
-    sqlalchemy.Column("vars_id", sqlalchemy.ForeignKey("extra_var.id")),
-)
-
-project_rules = sqlalchemy.Table(
-    "project_rule",
-    metadata,
-    sqlalchemy.Column(
-        "id",
-        sqlalchemy.Integer,
-        sqlalchemy.Identity(always=True),
-        primary_key=True,
-    ),
-    sqlalchemy.Column("project_id", sqlalchemy.ForeignKey("project.id")),
-    sqlalchemy.Column(
-        "rule_set_file_id", sqlalchemy.ForeignKey("rule_set_file.id")
-    ),
 )
 
 
@@ -279,25 +246,12 @@ playbooks = sqlalchemy.Table(
     ),
     sqlalchemy.Column("name", sqlalchemy.String),
     sqlalchemy.Column("playbook", sqlalchemy.String),
-)
-
-
-project_playbooks = sqlalchemy.Table(
-    "project_playbook",
-    metadata,
     sqlalchemy.Column(
-        "id",
-        sqlalchemy.Integer,
-        sqlalchemy.Identity(always=True),
-        primary_key=True,
+        "project_id", sqlalchemy.ForeignKey("project.id"), nullable=True
     ),
-    sqlalchemy.Column("project_id", sqlalchemy.ForeignKey("project.id")),
-    sqlalchemy.Column("playbook_id", sqlalchemy.ForeignKey("playbook.id")),
 )
 
 
 # FastAPI Users
-
-
 class User(SQLAlchemyBaseUserTableUUID, Base):
     pass

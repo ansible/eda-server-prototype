@@ -8,16 +8,7 @@ from sqlalchemy import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from .db import models
-from .db.models import (
-    extra_vars,
-    inventories,
-    playbooks,
-    project_inventories,
-    project_playbooks,
-    project_rules,
-    project_vars,
-    rule_set_files,
-)
+from .db.models import extra_vars, inventories, playbooks, rule_set_files
 
 logger = logging.getLogger("ansible_events_ui")
 
@@ -152,17 +143,12 @@ async def find_rules(project_id, project_dir, db: AsyncSession):
         with open(full_path) as f:
             rulesets = f.read()
 
-        query = insert(rule_set_files).values(name=filename, rulesets=rulesets)
+        query = insert(rule_set_files).values(
+            name=filename, rulesets=rulesets, project_id=project_id
+        )
         (rule_set_file_id,) = (await db.execute(query)).inserted_primary_key
         # TODO(cutwater): Remove debugging print
         logger.debug(rule_set_file_id)
-
-        query = insert(project_rules).values(
-            project_id=project_id, rule_set_file_id=rule_set_file_id
-        )
-        (record_id,) = (await db.execute(query)).inserted_primary_key
-        # TODO(cutwater): Remove debugging print
-        logger.debug(record_id)
 
         rulebook_data = yaml.safe_load(rulesets)
         await insert_rulebook_related_data(rule_set_file_id, rulebook_data, db)
@@ -196,14 +182,7 @@ async def find_inventory(project_id, project_dir, db: AsyncSession):
                 inventory = f.read()
 
             query = insert(inventories).values(
-                name=filename, inventory=inventory
-            )
-            (record_id,) = (await db.execute(query)).inserted_primary_key
-            # TODO(cutwater): Remove debugging print
-            logger.debug(record_id)
-
-            query = insert(project_inventories).values(
-                project_id=project_id, inventory_id=record_id
+                name=filename, inventory=inventory, project_id=project_id
             )
             (record_id,) = (await db.execute(query)).inserted_primary_key
             # TODO(cutwater): Remove debugging print
@@ -250,14 +229,7 @@ async def find_extra_vars(project_id, project_dir, db: AsyncSession):
                 extra_var = f.read()
 
             query = insert(extra_vars).values(
-                name=filename, extra_var=extra_var
-            )
-            (record_id,) = (await db.execute(query)).inserted_primary_key
-            # TODO(cutwater): Remove debugging print
-            logger.debug(record_id)
-
-            query = insert(project_vars).values(
-                project_id=project_id, vars_id=record_id
+                name=filename, extra_var=extra_var, project_id=project_id
             )
             (record_id,) = (await db.execute(query)).inserted_primary_key
             # TODO(cutwater): Remove debugging print
@@ -274,13 +246,8 @@ async def find_playbook(project_id, project_dir, db: AsyncSession):
             with open(full_path) as f:
                 playbook = f.read()
 
-            query = insert(playbooks).values(name=filename, playbook=playbook)
-            (record_id,) = (await db.execute(query)).inserted_primary_key
-            # TODO(cutwater): Remove debugging print
-            logger.debug(record_id)
-
-            query = insert(project_playbooks).values(
-                project_id=project_id, playbook_id=record_id
+            query = insert(playbooks).values(
+                name=filename, playbook=playbook, project_id=project_id
             )
             (record_id,) = (await db.execute(query)).inserted_primary_key
             # TODO(cutwater): Remove debugging print

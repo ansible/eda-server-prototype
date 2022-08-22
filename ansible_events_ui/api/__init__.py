@@ -24,10 +24,6 @@ from ansible_events_ui.db.models import (
     job_instance_events,
     job_instances,
     playbooks,
-    project_inventories,
-    project_playbooks,
-    project_rules,
-    project_vars,
     projects,
     rule_set_files,
 )
@@ -359,7 +355,8 @@ async def read_project(
     response["rulesets"] = (
         await db.execute(
             select(rule_set_files.c.id, rule_set_files.c.name)
-            .select_from(projects.join(project_rules).join(rule_set_files))
+            .select_from(rule_set_files)
+            .join(projects)
             .where(projects.c.id == project_id)
         )
     ).all()
@@ -367,7 +364,8 @@ async def read_project(
     response["inventories"] = (
         await db.execute(
             select(inventories.c.id, inventories.c.name)
-            .select_from(projects.join(project_inventories).join(inventories))
+            .select_from(inventories)
+            .join(projects)
             .where(projects.c.id == project_id)
         )
     ).all()
@@ -375,7 +373,8 @@ async def read_project(
     response["vars"] = (
         await db.execute(
             select(extra_vars.c.id, extra_vars.c.name)
-            .select_from(projects.join(project_vars).join(extra_vars))
+            .select_from(extra_vars)
+            .join(projects)
             .where(projects.c.id == project_id)
         )
     ).all()
@@ -383,7 +382,8 @@ async def read_project(
     response["playbooks"] = (
         await db.execute(
             select(playbooks.c.id, playbooks.c.name)
-            .select_from(projects.join(project_playbooks).join(playbooks))
+            .select_from(playbooks)
+            .join(projects)
             .where(projects.c.id == project_id)
         )
     ).all()
