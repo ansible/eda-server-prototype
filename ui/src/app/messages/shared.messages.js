@@ -107,6 +107,15 @@ const sharedMessages = defineMessages({
     id: 'shared.allFieldsRequired',
     defaultMessage: 'All fields are required'
   },
+  namePlaceholder: {
+    id: 'shared.namePlaceholder',
+    defaultMessage: 'Insert name here'
+  },
+  descriptionPlaceholder: {
+    id: 'shared.descriptionPlaceholder',
+    defaultMessage: 'Insert description here'
+  },
+
   project: {
     id: 'project.project',
     defaultMessage: 'Project'
@@ -191,9 +200,21 @@ const sharedMessages = defineMessages({
     id: 'activation.enterRulebookActivationName',
     defaultMessage: 'Enter a rulebook activation name'
   },
+  enterRulebookActivationDescription: {
+    id: 'activation.enterRulebookActivationDescription',
+    defaultMessage: 'Enter a rulebook activation description'
+  },
   selectRuleSet: {
     id: 'activation.selectRulebookActivationName',
     defaultMessage: 'Select a rule set'
+  },
+  selectExecutionEnvironment: {
+    id: 'activation.selectExecutionEnvironment',
+    defaultMessage: 'Select a execution environment'
+  },
+  selectRestartPolicy: {
+    id: 'activation.selectRestartPolicy',
+    defaultMessage: 'Select a restart policy'
   },
   selectPlaybook: {
     id: 'job.selectPlaybookName',
@@ -243,6 +264,31 @@ const sharedMessages = defineMessages({
     id: 'activation.lastFiredDate',
     defaultMessage: 'Last fired date'
   },
+  executionEnvironmentPlaceholder: {
+    id: 'activation.executionEnvironmentPlaceholder',
+    defaultMessage: 'Select an execution environments'
+  },
+  restartPolicyPlaceholder: {
+    id: 'activation.restartPolicyPlaceholder',
+    defaultMessage: 'Select a restart policy'
+  },
+  inventoryPlaceholder: {
+    id: 'activation.inventoryPlaceholder',
+    defaultMessage: 'Select an inventory'
+  },
+  playbookPlaceholder: {
+    id: 'activation.playbookPlaceholder',
+    defaultMessage: 'Select a playbook'
+  },
+  ruleSetPlaceholder: {
+    id: 'activation.ruleSetPlaceholder',
+    defaultMessage: 'Select a rule set'
+  },
+  extraVarPlaceholder: {
+    id: 'project.extraVarPlaceholder',
+    defaultMessage: 'Select extra variables'
+  },
+
 });
 
 export default sharedMessages;
