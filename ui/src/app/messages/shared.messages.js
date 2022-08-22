@@ -196,6 +196,10 @@ const sharedMessages = defineMessages({
     id: 'activation.deleteActivation',
     defaultMessage: 'Delete activation'
   },
+  activation_status: {
+    id: 'activations.activation_status',
+    defaultMessage: 'Activation status'
+  },
   enterRulebookActivationName: {
     id: 'activation.enterRulebookActivationName',
     defaultMessage: 'Enter a rulebook activation name'

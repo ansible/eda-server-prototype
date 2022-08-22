@@ -38,8 +38,16 @@ const endpoint = 'http://' + getServer() + '/api/activation_instances/';
 
 const columns = (intl) => [
   {
-  title: (intl.formatMessage(sharedMessages.name)),
-    transforms: [cellWidth(80 )]
+  title: (intl.formatMessage(sharedMessages.name))
+  },
+  {
+    title: (intl.formatMessage(sharedMessages.activation_status))
+  },
+  {
+    title: (intl.formatMessage(sharedMessages.number_of_rules))
+  },
+  {
+    title: (intl.formatMessage(sharedMessages.fire_count))
   }
 ];
 
