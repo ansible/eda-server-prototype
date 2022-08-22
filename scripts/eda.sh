@@ -139,8 +139,8 @@ start-events-ui() {
 # shellcheck disable=SC2120
 stop-events-ui() {
   log-info "Stopping Event UI..."
-  log-debug "ps -ef | grep ansible-events-ui | grep -v grep | awk '{print $2}' | xargs kill"
-  pgrep ansible-events-ui | grep -v grep | awk '{print $2}' | xargs kill
+  log-debug "pgrep ansible-events-ui | xargs kill"
+  kill -9 $(pgrep -f 'ansible-events-ui')
 
   if lsof -i:8080 >/dev/null 2>&1; then
     log-debug "killing port tcp:8080"
