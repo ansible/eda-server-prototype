@@ -140,7 +140,7 @@ start-events-ui() {
 stop-events-ui() {
   log-info "Stopping Event UI..."
   log-debug "pgrep ansible-events-ui | xargs kill"
-  kill -9 $(pgrep -f 'ansible-events-ui')
+  kill -9 $(pgrep -f 'ansible-events-ui') >/dev/null 2>&1
 
   if lsof -i:8080 >/dev/null 2>&1; then
     log-debug "killing port tcp:8080"
