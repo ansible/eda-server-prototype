@@ -27,7 +27,7 @@ const CardBody = styled(PFCardBody)`
   white-space: pre-wrap;
   `
 const endpoint = 'http://' + getServer() + '/api/activation_instance/';
-const endpoint1 = 'http://' + getServer() + '/api/rule_set_files/';
+const endpoint1 = 'http://' + getServer() + '/api/rulebooks/';
 const endpoint2 = 'http://' + getServer() + '/api/inventories/';
 const endpoint3 = 'http://' + getServer() + '/api/extra_vars/';
 
@@ -155,7 +155,7 @@ const NewActivation: React.FunctionComponent = () => {
     e.preventDefault();
     validateFields();
     postData(endpoint, { name: name,
-                         rule_set_file_id: ruleset,
+                         rulebook_id: ruleset,
                          inventory_id: inventory,
                          extra_var_id: extravar})
       .then(data => {

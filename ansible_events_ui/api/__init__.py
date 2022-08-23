@@ -25,7 +25,7 @@ from ansible_events_ui.db.models import (
     job_instances,
     playbooks,
     projects,
-    rule_set_files,
+    rulebooks,
 )
 from ansible_events_ui.managers import (
     connectionmanager,
@@ -50,7 +50,7 @@ from ansible_events_ui.schemas import (
     Inventory,
     JobInstance,
     Project,
-    RuleSetFile,
+    Rulebook,
     UserCreate,
     UserRead,
     UserUpdate,
@@ -180,19 +180,21 @@ async def websocket_job_endpoint(websocket: WebSocket, job_instance_id):
         updatemanager.disconnect(page, websocket)
 
 
-@router.post("/api/rule_set_file/")
-async def create_rule_set_file(
-    rsf: RuleSetFile, db: AsyncSession = Depends(get_db_session)
+@router.post("/api/rulebooks/")
+async def create_rulebook(
+    rulebook: Rulebook, db: AsyncSession = Depends(get_db_session)
 ):
-    query = insert(rule_set_files).values(name=rsf.name, rulesets=rsf.rulesets)
+    query = insert(rulebooks).values(
+        name=rulebook.name, rulesets=rulebook.rulesets
+    )
     result = await db.execute(query)
     (id_,) = result.inserted_primary_key
 
-    rulebook_data = yaml.safe_load(rsf.rulesets)
+    rulebook_data = yaml.safe_load(rulebook.rulesets)
     await insert_rulebook_related_data(id_, rulebook_data, db)
     await db.commit()
 
-    return {**rsf.dict(), "id": id_}
+    return {**rulebook.dict(), "id": id_}
 
 
 @router.post("/api/inventory/")
@@ -225,10 +227,8 @@ async def create_activation_instance(
         get_db_session_factory
     ),
 ):
-    query = select(rule_set_files).where(
-        rule_set_files.c.id == a.rule_set_file_id
-    )
-    rule_set_file_row = (await db.execute(query)).first()
+    query = select(rulebooks).where(rulebooks.c.id == a.rulebook_id)
+    rulebook_row = (await db.execute(query)).first()
 
     query = select(inventories).where(inventories.c.id == a.inventory_id)
     inventory_row = (await db.execute(query)).first()
@@ -238,7 +238,7 @@ async def create_activation_instance(
 
     query = insert(activation_instances).values(
         name=a.name,
-        rule_set_file_id=a.rule_set_file_id,
+        rulebook_id=a.rulebook_id,
         inventory_id=a.inventory_id,
         extra_var_id=a.extra_var_id,
     )
@@ -250,7 +250,7 @@ async def create_activation_instance(
         id_,
         # TODO(cutwater): Hardcoded container image link
         "quay.io/bthomass/ansible-events:latest",
-        rule_set_file_row.rulesets,
+        rulebook_row.rulesets,
         inventory_row.inventory,
         extra_var_row.extra_var,
         db,
@@ -354,8 +354,8 @@ async def read_project(
 
     response["rulesets"] = (
         await db.execute(
-            select(rule_set_files.c.id, rule_set_files.c.name)
-            .select_from(rule_set_files)
+            select(rulebooks.c.id, rulebooks.c.name)
+            .select_from(rulebooks)
             .join(projects)
             .where(projects.c.id == project_id)
         )
@@ -431,31 +431,27 @@ async def read_inventory(
     return result.first()
 
 
-@router.get("/api/rule_set_files/")
-async def list_rule_set_files(db: AsyncSession = Depends(get_db_session)):
-    query = select(rule_set_files)
+@router.get("/api/rulebooks/")
+async def list_rulebooks(db: AsyncSession = Depends(get_db_session)):
+    query = select(rulebooks)
     result = await db.execute(query)
     return result.all()
 
 
-@router.get("/api/rule_set_file/{rule_set_file_id}")
-async def read_rule_set_file(
-    rule_set_file_id: int, db: AsyncSession = Depends(get_db_session)
+@router.get("/api/rulebooks/{rulebook_id}")
+async def read_rulebook(
+    rulebook_id: int, db: AsyncSession = Depends(get_db_session)
 ):
-    query = select(rule_set_files).where(
-        rule_set_files.c.id == rule_set_file_id
-    )
+    query = select(rulebooks).where(rulebooks.c.id == rulebook_id)
     result = await db.execute(query)
     return result.first()
 
 
-@router.get("/api/rule_set_file_json/{rule_set_file_id}")
-async def read_rule_set_file_json(
-    rule_set_file_id: int, db: AsyncSession = Depends(get_db_session)
+@router.get("/api/rulebook_json/{rulebook_id}")
+async def read_rulebook_json(
+    rulebook_id: int, db: AsyncSession = Depends(get_db_session)
 ):
-    query = select(rule_set_files).where(
-        rule_set_files.c.id == rule_set_file_id
-    )
+    query = select(rulebooks).where(rulebooks.c.id == rulebook_id)
     result = await db.execute(query)
 
     response = dict(result.first())
@@ -496,15 +492,15 @@ async def read_activation_instance(
         select(
             activation_instances.c.id,
             activation_instances.c.name,
-            rule_set_files.c.id.label("ruleset_id"),
-            rule_set_files.c.name.label("ruleset_name"),
+            rulebooks.c.id.label("ruleset_id"),
+            rulebooks.c.name.label("ruleset_name"),
             inventories.c.id.label("inventory_id"),
             inventories.c.name.label("inventory_name"),
             extra_vars.c.id.label("extra_var_id"),
             extra_vars.c.name.label("extra_vars_name"),
         )
         .select_from(
-            activation_instances.join(rule_set_files)
+            activation_instances.join(rulebooks)
             .join(inventories)
             .join(extra_vars)
         )

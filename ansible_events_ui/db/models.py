@@ -20,8 +20,8 @@ Base = declarative_base(metadata=metadata)
 
 
 # TODO(cutwater): Rename into rulebooks
-rule_set_files = sqlalchemy.Table(
-    "rule_set_file",
+rulebooks = sqlalchemy.Table(
+    "rulebook",
     metadata,
     sqlalchemy.Column(
         "id",
@@ -47,8 +47,8 @@ rulesets = sqlalchemy.Table(
         primary_key=True,
     ),
     sqlalchemy.Column(
-        "rule_set_file_id",
-        sqlalchemy.ForeignKey("rule_set_file.id"),
+        "rulebook_id",
+        sqlalchemy.ForeignKey("rulebook.id"),
         nullable=False,
     ),
     sqlalchemy.Column("name", sqlalchemy.String),
@@ -119,9 +119,7 @@ activations = sqlalchemy.Table(
         primary_key=True,
     ),
     sqlalchemy.Column("name", sqlalchemy.String),
-    sqlalchemy.Column(
-        "rule_set_file_id", sqlalchemy.ForeignKey("rule_set_file.id")
-    ),
+    sqlalchemy.Column("rulebook_id", sqlalchemy.ForeignKey("rulebook.id")),
     sqlalchemy.Column("inventory_id", sqlalchemy.ForeignKey("inventory.id")),
     sqlalchemy.Column("extra_var_id", sqlalchemy.ForeignKey("extra_var.id")),
 )
@@ -137,9 +135,7 @@ activation_instances = sqlalchemy.Table(
         primary_key=True,
     ),
     sqlalchemy.Column("name", sqlalchemy.String),
-    sqlalchemy.Column(
-        "rule_set_file_id", sqlalchemy.ForeignKey("rule_set_file.id")
-    ),
+    sqlalchemy.Column("rulebook_id", sqlalchemy.ForeignKey("rulebook.id")),
     sqlalchemy.Column("inventory_id", sqlalchemy.ForeignKey("inventory.id")),
     sqlalchemy.Column("extra_var_id", sqlalchemy.ForeignKey("extra_var.id")),
 )
