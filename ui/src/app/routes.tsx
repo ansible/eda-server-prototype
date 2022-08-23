@@ -23,6 +23,7 @@ import { Playbook } from '@app/Playbook/Playbook';
 import { NotFound } from '@app/NotFound/NotFound';
 import { useDocumentTitle } from '@app/utils/useDocumentTitle';
 import {ActivationStdout} from "@app/Activation/activation-stdout";
+import {useIntl} from "react-intl";
 
 export interface IAppRoute {
   label?: string; // Excluding the label will exclude the route from the nav sidebar in AppLayout
@@ -42,7 +43,6 @@ export interface IAppRouteGroup {
 }
 
 export type AppRouteConfig = IAppRoute | IAppRouteGroup;
-
 const routes: AppRouteConfig[] = [
   {
     component: Dashboard,
@@ -195,20 +195,20 @@ const flattenedRoutes: IAppRoute[] = routes.reduce(
   [] as IAppRoute[]
 );
 
-const AppRoutes = (): React.ReactElement => (
-    <Switch>
-      {flattenedRoutes.map(({ path, exact, component, title, isAsync }, idx) => (
-        <RouteWithTitleUpdates
-          path={path}
-          exact={exact}
-          component={component}
-          key={idx}
-          title={title}
-          isAsync={isAsync}
-        />
-      ))}
-      <PageNotFound title="404 Page Not Found" />
-    </Switch>
-);
+const AppRoutes = (): React.ReactElement => {
+  return (<Switch>
+    {flattenedRoutes.map(({path, exact, component, title, isAsync}, idx) => (
+      <RouteWithTitleUpdates
+        path={path}
+        exact={exact}
+        component={component}
+        key={idx}
+        title={title}
+        isAsync={isAsync}
+      />
+    ))}
+    <PageNotFound title="404 Page Not Found"/>
+  </Switch>);
+}
 
 export { AppRoutes, routes };

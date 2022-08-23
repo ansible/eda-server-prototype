@@ -7,14 +7,16 @@ import {
   Stack,
   StackItem,
 } from '@patternfly/react-core';
+import {useIntl} from "react-intl";
 import {renderActivationTabs} from "@app/Activation/Activation";
 import Ansi from "ansi-to-react";
 import {ActivationType} from "@app/Activations/Activations";
 
 const ActivationStdout: React.FunctionComponent<{activation: ActivationType, stdout: string[]}> = ({activation, stdout}) => {
+  const intl = useIntl();
   return (
     <PageSection page-type={'activation-details'} id={'activation-details'}>
-      { renderActivationTabs(activation.id) }
+      { renderActivationTabs(activation.id, intl) }
       <Stack>
         <StackItem>
           <Card>

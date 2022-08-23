@@ -75,7 +75,6 @@ export const jobsListState = (state, action) => {
 };
 
 const ActivationJobs: React.FunctionComponent<{activation: ActivationType, jobs: JobType[]}> = ({activation, jobs}) => {
-  const intl = useIntl();
   const history = useHistory();
   const [limit, setLimit] = useState(defaultSettings.limit);
   const [offset, setOffset] = useState(1);
@@ -92,6 +91,7 @@ const ActivationJobs: React.FunctionComponent<{activation: ActivationType, jobs:
     stateDispatch
   ] = useReducer(jobsListState, initialState());
 
+  const intl = useIntl();
   const updateJobs = (pagination) => {
     stateDispatch({type: 'setFetching', payload: true});
     return fetchActivationJobs(activation?.id, pagination)
@@ -116,7 +116,7 @@ const ActivationJobs: React.FunctionComponent<{activation: ActivationType, jobs:
 
   return (
     <PageSection page-type={'activation-details'} id={'activation-details'}>
-      { renderActivationTabs(activation?.id) }
+      { renderActivationTabs(activation?.id, intl) }
       <TableToolbarView
         ouiaId={'activations-table'}
         rows={rows}

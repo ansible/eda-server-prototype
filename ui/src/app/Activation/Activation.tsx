@@ -1,8 +1,8 @@
-import { Title} from '@patternfly/react-core';
-import { Route, Switch, useParams } from 'react-router-dom';
-import React, { useState, useEffect } from 'react';
+import {Title} from '@patternfly/react-core';
+import {Route, Switch, useLocation, useParams} from 'react-router-dom';
+import React, { useState, useEffect, Fragment } from 'react';
+import {useIntl} from "react-intl";
 import AppTabs from "@app/shared/app-tabs";
-
 import {CaretLeftIcon} from "@patternfly/react-icons";
 import {getServer} from "@app/utils/utils";
 import {TopToolbar} from "@app/shared/top-toolbar";
@@ -12,32 +12,42 @@ import {ActivationStdout} from "@app/Activation/activation-stdout";
 import {defaultSettings} from "@app/shared/pagination";
 import {ActivationType} from "@app/Activations/Activations";
 import {JobType} from "@app/Job/Job";
+import sharedMessages from "../messages/shared.messages";
+import {AnyObject} from "@app/shared/types/common-types";
 
-export const renderActivationTabs = (activationId: string) => {
-  const activation_tabs = [
+interface TabItemType {
+  eventKey: number;
+  title: string;
+  name: string;
+}
+const buildActivationTabs = (activationId: string, intl: AnyObject) : TabItemType[] => ( [
     {
       eventKey: 0,
       title: (
-        <>
+        <Fragment>
           <CaretLeftIcon />
-          {'Back to Rulebook activations'}
-        </>
+          {intl.formatMessage(sharedMessages.backToRulebookActivations)}
+        </Fragment>
       ),
-      name: `/activations`,
+      name: `/activations`
     },
-    { eventKey: 1, title: 'Details', name: `/activation/${activationId}/details` },
+    { eventKey: 1,
+      title: 'Details',
+      name: `/activation/${activationId}/details` },
     {
       eventKey: 2,
-      title: 'Jobs',
-      name: `/activation/${activationId}/jobs`,
+      title: intl.formatMessage(sharedMessages.jobs),
+      name: `/activation/${activationId}/jobs`
     },
     {
       eventKey: 3,
-      title: 'Standard out',
-      name: `/activation/${activationId}/stdout`,
+      title: intl.formatMessage(sharedMessages.output),
+      name: `/activation/${activationId}/stdout`
     }
-  ];
+  ]);
 
+export const renderActivationTabs = (activationId: string, intl) => {
+  const activation_tabs = buildActivationTabs(activationId, intl);
   return <AppTabs tabItems={activation_tabs}/>
 };
 
@@ -54,18 +64,24 @@ export const fetchActivationJobs = (activationId, pagination=defaultSettings) =>
     },
   }).then(response => response.json());
 }
+export const getTabFromPath = (tabs:TabItemType[], path:string):string | undefined => {
+  console.log('Debug - path: ', path);
+  console.log('Debug - window.location.pathname', window.location.pathname);
+  const currentTab=tabs.find((tabItem) => tabItem.name.split('/').pop() === path.split('/').pop());
+  return currentTab?.title;
+};
+
 const Activation: React.FunctionComponent = () => {
 
   const [activation, setActivation] = useState<ActivationType|undefined>(undefined);
-
-  const { id } = useParams<{id: string}>();
-
   const [stdout, setStdout] = useState<string[]>([]);
   const [newStdout, setNewStdout] = useState<string>('');
   const [websocket_client, setWebsocketClient] = useState<WebSocket|undefined>(undefined);
   const [jobs, setJobs] = useState<JobType[]>([]);
   const [newJob, setNewJob] = useState<JobType|undefined>(undefined);
 
+  const { id } = useParams<{id: string}>();
+  const intl = useIntl();
 
   useEffect(() => {
     fetch(endpoint1 + id, {
@@ -129,13 +145,27 @@ const Activation: React.FunctionComponent = () => {
       setJobs([...jobs, newJob]);
     }
   }, [newJob]);
-
+  const location = useLocation();
+  console.log('Debug - location: ', location);
+  const currentTab = activation?.id ?
+    getTabFromPath(buildActivationTabs(activation.id,intl), location.pathname) :
+    intl.formatMessage(sharedMessages.details);
   return (
     <React.Fragment>
       <TopToolbar breadcrumbs={[
         {
-          title: 'Rulebook activations',
+          title: intl.formatMessage(sharedMessages.rulebookActivations),
+          key: 'back-to-activations',
           to: '/activations'
+        },
+        {
+          title: activation?.name,
+          key: 'details',
+          to: `/activation/${activation?.id}/details`
+        },
+        {
+          title: currentTab || intl.formatMessage(sharedMessages.details),
+          key: 'current_tab'
         }
       ]
       }>
