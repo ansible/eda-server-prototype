@@ -2,19 +2,18 @@ import React, { Fragment } from 'react';
 import {Link} from "react-router-dom";
 
 export const createRows = (data) =>
-  data.map(({ id, name, rules_count, fire_count }) => ({
+  data.map(({ id, name, type }) => ({
     id,
     cells: [
-      <Fragment key={`[rule-set-${id}`}>
+      <Fragment key={`[sources-${id}`}>
         <Link
           to={{
-            pathname: `/ruleset/${id}`
+            pathname: `/sources/${id}`
           }}
         >
-          {name}
+          {name || id}
         </Link>
       </Fragment>,
-      rules_count,
-      fire_count
+      type
     ]
   }));

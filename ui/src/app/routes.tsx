@@ -13,7 +13,7 @@ import { Jobs } from '@app/Jobs/Jobs';
 import { Job } from '@app/Job/Job';
 import { NewJob } from '@app/NewJob/NewJob';
 import { RuleSets } from '@app/RuleSetFiles/RuleSetFiles';
-import { RuleSetFile } from '@app/RuleSetFile/RuleSetFile';
+import { RuleSet } from '@app/RuleSetFile/ruleset';
 import { Inventories } from '@app/Inventories/Inventories';
 import { Inventory } from '@app/Inventory/Inventory';
 import { Vars } from '@app/Vars/Vars';
@@ -24,6 +24,9 @@ import { NotFound } from '@app/NotFound/NotFound';
 import { useDocumentTitle } from '@app/utils/useDocumentTitle';
 import {ActivationStdout} from "@app/Activation/activation-stdout";
 import {useIntl} from "react-intl";
+import {RulesetSources} from "@app/RuleSetFile/ruleset-sources";
+import {RulesetDetails} from "@app/RuleSetFile/ruleset-details";
+import {RulesetRules} from "@app/RuleSetFile/ruleset-rules";
 
 export interface IAppRoute {
   label?: string; // Excluding the label will exclude the route from the nav sidebar in AppLayout
@@ -129,11 +132,29 @@ const routes: AppRouteConfig[] = [
     title: 'Rule Sets',
   },
   {
-    component: RuleSetFile,
-    exact: true,
-    path: '/rulesetfile/:id',
-    title: 'RuleSetFile',
+    component: RuleSet,
+    path: '/ruleset/:id',
+    title: 'RuleSet',
   },
+  {
+    component: RulesetRules,
+    exact: true,
+    path: '/ruleset/:id/rules',
+    title: 'Rules',
+  },
+  {
+    component: RulesetDetails,
+    exact: true,
+    path: '/ruleset/:id/details',
+    title: 'Details',
+  },
+  {
+    component: RulesetSources,
+    exact: true,
+    path: '/ruleset/:id/sources',
+    title: 'Sources',
+  },
+
   {
     component: Inventories,
     exact: true,
