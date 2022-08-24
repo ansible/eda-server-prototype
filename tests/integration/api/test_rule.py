@@ -23,9 +23,9 @@ TEST_RULESET_SIMPLE = """
 
 
 async def _create_rules(db: AsyncSession):
-    (rule_set_file_id,) = (
+    (rulebook_id,) = (
         await db.execute(
-            sa.insert(models.rule_set_files).values(
+            sa.insert(models.rulebooks).values(
                 name="test-ruleset-1.yml", rulesets=TEST_RULESET_SIMPLE
             )
         )
@@ -35,7 +35,7 @@ async def _create_rules(db: AsyncSession):
         await db.execute(
             sa.insert(models.rulesets).values(
                 name="Test simple",
-                rule_set_file_id=rule_set_file_id,
+                rulebook_id=rulebook_id,
             )
         )
     ).inserted_primary_key
@@ -49,12 +49,12 @@ async def _create_rules(db: AsyncSession):
     ).inserted_primary_key
     await db.commit()
 
-    return rule_set_file_id, ruleset_id, rule_id
+    return rulebook_id, ruleset_id, rule_id
 
 
 @pytest.mark.asyncio
 async def test_list_rules(client: AsyncClient, db: AsyncSession):
-    rule_set_file_id, ruleset_id, rule_id = await _create_rules(db)
+    rulebook_id, ruleset_id, rule_id = await _create_rules(db)
 
     response = await client.get("/api/rules/")
     assert response.status_code == status_codes.HTTP_200_OK
@@ -73,7 +73,7 @@ async def test_list_rules(client: AsyncClient, db: AsyncSession):
 
 @pytest.mark.asyncio
 async def test_show_rule(client: AsyncClient, db: AsyncSession):
-    rule_set_file_id, ruleset_id, rule_id = await _create_rules(db)
+    rulebook_id, ruleset_id, rule_id = await _create_rules(db)
 
     response = await client.get(f"/api/rules/{rule_id}/")
     assert response.status_code == status_codes.HTTP_200_OK

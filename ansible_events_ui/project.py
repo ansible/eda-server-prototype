@@ -8,7 +8,7 @@ from sqlalchemy import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from .db import models
-from .db.models import extra_vars, inventories, playbooks, rule_set_files
+from .db.models import extra_vars, inventories, playbooks, rulebooks
 
 logger = logging.getLogger("ansible_events_ui")
 
@@ -98,14 +98,14 @@ def yield_files(project_dir):
 
 
 async def insert_rulebook_related_data(
-    rule_set_file_id: int, rulebook_data: dict, db: AsyncSession
+    rulebook_id: int, rulebook_data: dict, db: AsyncSession
 ):
     ruleset_values = []
     for ruleset_data in rulebook_data:
         ruleset_values.append(
             {
                 "name": ruleset_data["name"],
-                "rule_set_file_id": rule_set_file_id,
+                "rulebook_id": rulebook_id,
             }
         )
 
@@ -143,15 +143,15 @@ async def find_rules(project_id, project_dir, db: AsyncSession):
         with open(full_path) as f:
             rulesets = f.read()
 
-        query = insert(rule_set_files).values(
+        query = insert(rulebooks).values(
             name=filename, rulesets=rulesets, project_id=project_id
         )
-        (rule_set_file_id,) = (await db.execute(query)).inserted_primary_key
+        (rulebook_id,) = (await db.execute(query)).inserted_primary_key
         # TODO(cutwater): Remove debugging print
-        logger.debug(rule_set_file_id)
+        logger.debug(rulebook_id)
 
         rulebook_data = yaml.safe_load(rulesets)
-        await insert_rulebook_related_data(rule_set_file_id, rulebook_data, db)
+        await insert_rulebook_related_data(rulebook_id, rulebook_data, db)
 
 
 def is_inventory_file(filename):

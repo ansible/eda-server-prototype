@@ -25,8 +25,8 @@ const SimpleList = styled(PFSimpleList)`
   white-space: pre-wrap;
 `
 
-const endpoint = 'http://' + getServer() + '/api/rule_set_file/';
-const endpoint2 = 'http://' + getServer() + '/api/rule_set_file_json/';
+const endpoint = 'http://' + getServer() + '/api/rulebooks/';
+const endpoint2 = 'http://' + getServer() + '/api/rulebook_json/';
 
 const RuleSetFile: React.FunctionComponent = () => {
 

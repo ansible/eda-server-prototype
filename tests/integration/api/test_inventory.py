@@ -23,9 +23,9 @@ TEST_RULESET_SIMPLE = """
 
 
 @pytest.mark.asyncio
-async def test_create_rule_set_file(client: AsyncClient, db: AsyncSession):
+async def test_create_rulebook(client: AsyncClient, db: AsyncSession):
     response = await client.post(
-        "/api/rule_set_file/",
+        "/api/rulebooks/",
         json={
             "name": "test-ruleset-1.yml",
             "rulesets": TEST_RULESET_SIMPLE,
@@ -39,7 +39,7 @@ async def test_create_rule_set_file(client: AsyncClient, db: AsyncSession):
     rulesets = (await db.execute(sa.select(models.rulesets))).all()
     assert len(rulesets) == 1
     ruleset = rulesets[0]
-    assert ruleset["rule_set_file_id"] == data["id"]
+    assert ruleset["rulebook_id"] == data["id"]
     assert ruleset["name"] == "Test simple"
 
     rules = (await db.execute(sa.select(models.rules))).all()
