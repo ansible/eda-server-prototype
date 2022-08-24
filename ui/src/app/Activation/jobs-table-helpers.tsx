@@ -2,16 +2,16 @@ import React, { Fragment, useContext } from 'react';
 import {Link} from "react-router-dom";
 
 export const createRows = (data) =>
-  data.map(({ id, name, status, rule, last_fired_at }) => ({
-    id,
+  data.map(({ job_instance_id, name, status, rule, last_fired_at }) => ({
+    job_instance_id,
     cells: [
-      <Fragment key={`[job-${id}`}>
+      <Fragment key={`[job-${job_instance_id}`}>
         <Link
           to={{
-            pathname: `/job/${id}`
+            pathname: `/job/${job_instance_id}`
           }}
         >
-          {name || id}
+          {name || job_instance_id}
         </Link>
       </Fragment>,
       status,
