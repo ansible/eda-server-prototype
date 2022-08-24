@@ -8,7 +8,7 @@ RUN cd ui && npm install && npm run build
 # Build app
 FROM registry.access.redhat.com/ubi8/python-39
 ARG USER_ID=${USER_ID:-1001}
-ARG DEVEL_AE_LIBRARY=0
+ARG DEVEL_AE_LIBRARY=1
 WORKDIR $HOME
 
 USER 0

@@ -75,6 +75,8 @@ class Activation(BaseModel):
     playbook_id: int
     activation_enabled: bool
     extra_var_id: int
+    working_directory: StrictStr
+    execution_environment: StrictStr
 
 
 class ActivationInstance(BaseModel):
@@ -83,6 +85,8 @@ class ActivationInstance(BaseModel):
     rulebook_id: int
     inventory_id: int
     extra_var_id: int
+    working_directory: StrictStr
+    execution_environment: StrictStr
 
 
 class ActivationLog(BaseModel):
