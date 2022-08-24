@@ -27,11 +27,7 @@ from ansible_events_ui.db.models import (
     projects,
     rule_set_files,
 )
-from ansible_events_ui.managers import (
-    connectionmanager,
-    taskmanager,
-    updatemanager,
-)
+from ansible_events_ui.managers import taskmanager, updatemanager
 from ansible_events_ui.project import (
     clone_project,
     insert_rulebook_related_data,
@@ -69,18 +65,6 @@ logger = logging.getLogger("ansible_events_ui")
 router = APIRouter()
 router.include_router(activation_router)
 router.include_router(rule_router)
-
-
-@router.websocket("/api/ws")
-async def websocket_endpoint(websocket: WebSocket):
-    logger.debug("starting ws")
-    await connectionmanager.connect(websocket)
-    try:
-        while True:
-            data = await websocket.receive_text()
-            await websocket.send_text(f"Message text was: {data}")
-    except WebSocketDisconnect:
-        connectionmanager.disconnect(websocket)
 
 
 @router.websocket("/api/ws2")
@@ -283,7 +267,10 @@ async def read_output(proc, activation_instance_id, db_session_factory):
                 done = True
                 continue
             line = line.decode()
-            logger.debug(line)
+            await updatemanager.broadcast(
+                f"/activation_instance/{activation_instance_id}",
+                json.dumps(["Stdout", {"stdout": line}]),
+            )
             query = insert(activation_instance_logs).values(
                 line_number=line_number,
                 log=line,
@@ -292,9 +279,6 @@ async def read_output(proc, activation_instance_id, db_session_factory):
             await db.execute(query)
             await db.commit()
             line_number += 1
-            await connectionmanager.broadcast(
-                json.dumps(["Stdout", {"stdout": line}])
-            )
 
 
 @router.get(
