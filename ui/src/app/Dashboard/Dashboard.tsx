@@ -22,31 +22,8 @@ const SimpleList = styled(PFSimpleList)`
 `
 
 
-const client = new WebSocket('ws://' + getServer() + '/api/ws');
-
-client.onopen = () => {
-    console.log('Websocket client connected');
-};
-
-
 const Dashboard: React.FunctionComponent = () => {
 
-
-  const [stdout, setStdout] = useState<never[]>([]);
-
-
-  client.onmessage = (message) => {
-        console.log(message.data);
-        const [messageType, data] = JSON.parse(message.data);
-
-        if (messageType === 'Stdout') {
-            const { stdout: dataStdout } = data;
-            console.log(data);
-            console.log(dataStdout);
-            // @ts-ignore
-          setStdout([...stdout, dataStdout])
-        }
-  }
 
   return (
   <React.Fragment>
@@ -54,23 +31,6 @@ const Dashboard: React.FunctionComponent = () => {
     <TopToolbar>
       <Title headingLevel={"h2"}>Dashboard</Title>
     </TopToolbar>
-	<Stack>
-            <StackItem>
-              <Card>
-                <CardTitle>Standard Out</CardTitle>
-                <CardBody>
-                  {stdout.length !== 0 && (
-                    <SimpleList style={{ whiteSpace: 'pre-wrap' }}>
-                      {stdout.map((item, i) => (
-                        <SimpleListItem key={i}><Ansi>{item}</Ansi></SimpleListItem>
-                      ))}
-                    </SimpleList>
-                  )}
-                </CardBody>
-              </Card>
-            </StackItem>
-	</Stack>
-
   </React.Fragment>
 )
 }
