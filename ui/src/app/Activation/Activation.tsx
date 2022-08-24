@@ -51,10 +51,8 @@ export const renderActivationTabs = (activationId: string, intl) => {
   return <AppTabs tabItems={activation_tabs}/>
 };
 
-const client = new WebSocket('ws://' + getServer() + '/api/ws');
 const endpoint1 = 'http://' + getServer() + '/api/activation_instance/';
 const endpoint2 = 'http://' + getServer() + '/api/activation_instance_job_instances/';
-const endpoint3 = 'http://' + getServer() + '/api/activation_instance_logs/?activation_instance_id=';
 
 export const fetchActivationJobs = (activationId, pagination=defaultSettings) =>
 {
@@ -74,8 +72,6 @@ export const getTabFromPath = (tabs:TabItemType[], path:string):string | undefin
 const Activation: React.FunctionComponent = () => {
 
   const [activation, setActivation] = useState<ActivationType|undefined>(undefined);
-  const [stdout, setStdout] = useState<string[]>([]);
-  const [newStdout, setNewStdout] = useState<string>('');
   const [websocket_client, setWebsocketClient] = useState<WebSocket|undefined>(undefined);
   const [jobs, setJobs] = useState<JobType[]>([]);
   const [newJob, setNewJob] = useState<JobType|undefined>(undefined);
@@ -90,29 +86,6 @@ const Activation: React.FunctionComponent = () => {
       },
     }).then(response => response.json())
       .then(data => setActivation(data));
-    fetch(endpoint3 + id, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    }).then(response => response.json())
-      .then(data => {
-                setStdout(data.map((item) => item.log));
-            });
-  }, []);
-
-  useEffect(() => {
-    const wc = new WebSocket('ws://' + getServer() + '/api/ws');
-    setWebsocketClient(wc);
-    wc.onopen = () => {
-      console.log('Websocket client connected');
-    };
-    wc.onmessage = (message) => {
-      const [messageType, data] = JSON.parse(message.data);
-      if (messageType === 'Stdout') {
-        const { stdout: dataStdout } = data;
-        setNewStdout(dataStdout);
-      }
-    }
   }, []);
 
   useEffect(() => {
@@ -128,17 +101,12 @@ const Activation: React.FunctionComponent = () => {
       console.log('Update client connected');
     };
     uc.onmessage = (message) => {
-      console.log('update: ' + message.data);
       const [messageType, data] = JSON.parse(message.data);
       if (messageType === 'Job') {
         setNewJob(data);
       }
     }
   }, []);
-
-  useEffect(() => {
-    setStdout([...stdout, newStdout]);
-  }, [newStdout]);
 
   useEffect(() => {
     if (newJob) {
@@ -182,7 +150,6 @@ const Activation: React.FunctionComponent = () => {
           <Route exact path="/activation/:id/stdout">
             <ActivationStdout
               activation={activation}
-              stdout={stdout}
             />
           </Route>
           <Route path="/activation/:id">
