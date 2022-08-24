@@ -173,8 +173,19 @@ projects = sqlalchemy.Table(
     sqlalchemy.Column("url", sqlalchemy.String),
     sqlalchemy.Column("name", sqlalchemy.String),
     sqlalchemy.Column("description", sqlalchemy.String),
-    sqlalchemy.Column("created_at", sqlalchemy.DateTime(timezone=True), nullable=False, server_default=func.now()),
-    sqlalchemy.Column("modified_at", sqlalchemy.DateTime(timezone=True), onupdate=func.now()),
+    sqlalchemy.Column(
+        "created_at",
+        sqlalchemy.DateTime(timezone=True),
+        nullable=False,
+        server_default=func.now(),
+    ),
+    sqlalchemy.Column(
+        "modified_at",
+        sqlalchemy.DateTime(timezone=True),
+        nullable=False,
+        server_default=func.now(),
+        onupdate=func.now(),
+    ),
 )
 
 
