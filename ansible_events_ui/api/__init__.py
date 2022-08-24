@@ -109,7 +109,7 @@ async def websocket_endpoint2(
                 await db.commit()
                 await updatemanager.broadcast(
                     f"/activation_instance/{activation_instance_id}",
-                    json.dumps(["Job", {"id": job_instance_id}]),
+                    json.dumps(["Job", {"job_instance_id": job_instance_id}]),
                 )
                 await updatemanager.broadcast(
                     "/jobs",
