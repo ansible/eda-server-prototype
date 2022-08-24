@@ -29,7 +29,9 @@ async def create_project(
 ):
     found_hash, tempdir = await clone_project(p.url, p.git_hash)
     p.git_hash = found_hash
-    query = sa.insert(projects).values(url=p.url, git_hash=p.git_hash)
+    query = sa.insert(projects).values(
+        url=p.url, git_hash=p.git_hash, name=p.name, description=p.description
+    )
     result = await db.execute(query)
     (project_id,) = result.inserted_primary_key
     await sync_project(project_id, tempdir, db)
@@ -84,4 +86,3 @@ async def read_project(
     ).all()
 
     return response
-
