@@ -17,6 +17,8 @@ TEST_ACTIVATION = {
     "restart_policy_id": 1,
     "playbook_id": 1,
     "activation_enabled": True,
+    "working_directory": "/tmp",
+    "execution_environment": "quay.io/ansible/eda-project",
 }
 
 TEST_EXTRA_VAR = """
