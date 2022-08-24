@@ -2,6 +2,7 @@ import sqlalchemy
 from fastapi_users.db import SQLAlchemyBaseUserTableUUID
 from sqlalchemy.dialects import postgresql
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.sql import func
 
 NAMING_CONVENTION = {
     # Index
@@ -170,6 +171,10 @@ projects = sqlalchemy.Table(
     ),
     sqlalchemy.Column("git_hash", sqlalchemy.String),
     sqlalchemy.Column("url", sqlalchemy.String),
+    sqlalchemy.Column("name", sqlalchemy.String),
+    sqlalchemy.Column("description", sqlalchemy.String),
+    sqlalchemy.Column("created_at", sqlalchemy.DateTime(timezone=True), nullable=False, server_default=func.now()),
+    sqlalchemy.Column("modified_at", sqlalchemy.DateTime(timezone=True), onupdate=func.now()),
 )
 
 
