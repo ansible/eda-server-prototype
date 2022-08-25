@@ -82,12 +82,13 @@ class Project(BaseModel):
     url: StrictStr
     name: StrictStr
     description: StrictStr
-    created_at: datetime = ""
-    modified_at: datetime = ""
 
-    @validator("created_at", "modified_at", pre=True, always=True)
-    def set_datetime_utcnow(cls, v):
-        return datetime.utcnow()
+class ProjectUpdate(Project):
+    id: Optional[int]
+    git_hash: Optional[StrictStr]
+    url: Optional[StrictStr]
+    name: StrictStr
+    description: Optional[StrictStr]    
 
 
 class JobInstance(BaseModel):

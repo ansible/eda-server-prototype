@@ -1,6 +1,8 @@
+from http.client import HTTPException
 import sqlalchemy as sa
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
+from fastapi.encoders import jsonable_encoder
 
 from ansible_events_ui.db.dependency import get_db_session
 from ansible_events_ui.db.models import (
@@ -11,14 +13,14 @@ from ansible_events_ui.db.models import (
     rulebooks,
 )
 from ansible_events_ui.project import clone_project, sync_project
-from ansible_events_ui.schemas import Project
+from ansible_events_ui.schemas import Project, ProjectUpdate
 
 router = APIRouter()
 
 
 @router.get("/api/projects/")
 async def list_projects(db: AsyncSession = Depends(get_db_session)):
-    query = sa.select(projects)
+    query = sa.select(projects.c.id, projects.c.url, projects.c.name)
     result = await db.execute(query)
     return result.all()
 
@@ -86,3 +88,22 @@ async def read_project(
     ).all()
 
     return response
+
+
+@router.patch("/api/project/{project_id}/edit")
+async def read_project(
+    project_id: int, p: ProjectUpdate, db: AsyncSession = Depends(get_db_session)
+):
+    query = sa.select(projects).where(projects.c.id == project_id)
+    stored_project = (await db.execute(query)).first()
+    if not stored_project:
+        raise HTTPException(status_code=404, detail="Project not found")
+
+    project_data = p.dict(exclude_unset=True)
+
+    query = sa.update(projects).where(projects.c.id == project_id).values(name = project_data["name"])
+
+    await db.execute(query)
+    await db.commit()
+
+    return {"id": project_id}
