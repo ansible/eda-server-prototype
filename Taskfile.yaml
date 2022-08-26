@@ -3,6 +3,12 @@
 version: '3'
 
 tasks:
+  default:
+    desc: "Show this message and exit"
+    cmds:
+      - task -l
+    silent: true
+
   lint:
     desc: "Run all linters."
     cmds:
