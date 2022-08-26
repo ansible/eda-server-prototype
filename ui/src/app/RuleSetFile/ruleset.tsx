@@ -94,12 +94,12 @@ const RuleSet: React.FunctionComponent = () => {
       headers: {
         'Content-Type': 'application/json',
       },
-    }).then(response => response.json())
-      .then(data => setRuleSet(data));
+    }).then(response => { console.log('Debug response: ', response); return response.json();})
+      .then(data => { console.log('Debug - data: ', data); return setRuleSet(data);});
   }, []);
 
   const location = useLocation();
-
+  console.log('Debug - ruleset: ', ruleset);
   const currentTab = ruleset?.id ?
     getTabFromPath(buildRuleSetFileTabs(ruleset.id,intl), location.pathname) :
     intl.formatMessage(sharedMessages.details);
@@ -107,8 +107,8 @@ const RuleSet: React.FunctionComponent = () => {
     <React.Fragment>
       <TopToolbar breadcrumbs={[
         {
-          title: intl.formatMessage(sharedMessages.backToRuleSets),
-          key: 'back-to-rulesets',
+          title: intl.formatMessage(sharedMessages.rulesets),
+          key: 'rulesets',
           to: '/rulesets'
         },
         {

@@ -10,8 +10,6 @@ import {
 } from '@patternfly/react-core';
 import {Link, useParams} from 'react-router-dom';
 import React from 'react';
-import "ace-builds/src-noconflict/mode-yaml";
-import "ace-builds/src-noconflict/theme-xcode";
 import {renderRuleSetFileTabs, RuleSetType} from "@app/RuleSetFile/ruleset";
 import {useIntl} from "react-intl";
 
