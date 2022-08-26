@@ -34,7 +34,11 @@ async def create_project(
     query = sa.insert(projects).values(
         url=p.url, git_hash=p.git_hash, name=p.name, description=p.description
     )
-    result = await db.execute(query)
+    try:
+        result = await db.execute(query)
+    except sa.exc.IntegrityError:
+        raise HTTPException(status_code=422, detail="Unprocessable Entity.")
+
     (project_id,) = result.inserted_primary_key
     await sync_project(project_id, tempdir, db)
     await db.commit()
@@ -45,9 +49,11 @@ async def create_project(
 async def read_project(
     project_id: int, db: AsyncSession = Depends(get_db_session)
 ):
-    # FIXME(cutwater): Return HTTP 404 if project doesn't exist
     query = sa.select(projects).where(projects.c.id == project_id)
     project = (await db.execute(query)).first()
+    if not project:
+        raise HTTPException(status_code=404, detail="Project not found")
+
 
     response = dict(project)
 
@@ -103,7 +109,11 @@ async def read_project(
 
     query = sa.update(projects).where(projects.c.id == project_id).values(name = project_data["name"])
 
-    await db.execute(query)
+    try:
+        await db.execute(query)
+    except sa.exc.IntegrityError:
+        raise HTTPException(status_code=422, detail="Unprocessable Entity.")
+
     await db.commit()
 
-    return {"id": project_id}
+    return {**p.dict()}
