@@ -29,10 +29,7 @@ async def test_create_project(client: AsyncClient, db: AsyncSession):
     project = projects[0]
     assert project["id"] == data["id"]
     assert project["name"] == TEST_PROJECT["name"]
-    assert (
-        project["url"]
-        == TEST_PROJECT["url"]
-    )
+    assert project["url"] == TEST_PROJECT["url"]
 
 
 @pytest.mark.asyncio
@@ -40,9 +37,9 @@ async def test_create_project_bad_entity(
     client: AsyncClient, db: AsyncSession
 ):
     bad_project = {
-    "url": None,
-    "name": "Test Name",
-    "description": "This is a test description",
+        "url": None,
+        "name": "Test Name",
+        "description": "This is a test description",
     }
     response = await client.post(
         "/api/new-project/",
@@ -50,14 +47,13 @@ async def test_create_project_bad_entity(
     )
     assert response.status_code == status_codes.HTTP_422_UNPROCESSABLE_ENTITY
 
+
 @pytest.mark.asyncio
-async def test_get_project(
-    client: AsyncClient, db: AsyncSession 
-    ):
+async def test_get_project(client: AsyncClient, db: AsyncSession):
 
     query = sa.insert(models.projects).values(
-        url=TEST_PROJECT["url"], 
-        name=TEST_PROJECT["name"], 
+        url=TEST_PROJECT["url"],
+        name=TEST_PROJECT["name"],
         description=TEST_PROJECT["description"],
     )
 
@@ -66,28 +62,22 @@ async def test_get_project(
     projects = (await db.execute(sa.select(models.projects))).all()
     assert len(projects) == 1
     project = projects[0]
-   
-    response = await client.get(
-        "/api/project/" + str(project["id"])
-    )
+
+    response = await client.get("/api/project/" + str(project["id"]))
 
     assert response.status_code == status_codes.HTTP_200_OK
 
     data = response.json()
     assert data["name"] == TEST_PROJECT["name"]
-    assert (
-        data["url"]
-        == TEST_PROJECT["url"]
-    )
+    assert data["url"] == TEST_PROJECT["url"]
+
 
 @pytest.mark.asyncio
-async def test_get_project_not_found(
-    client: AsyncClient, db: AsyncSession 
-    ):
+async def test_get_project_not_found(client: AsyncClient, db: AsyncSession):
 
     query = sa.insert(models.projects).values(
-        url=TEST_PROJECT["url"], 
-        name=TEST_PROJECT["name"], 
+        url=TEST_PROJECT["url"],
+        name=TEST_PROJECT["name"],
         description=TEST_PROJECT["description"],
     )
 
@@ -96,18 +86,14 @@ async def test_get_project_not_found(
     projects = (await db.execute(sa.select(models.projects))).all()
     assert len(projects) == 1
     project = projects[0]
-   
-    response = await client.get(
-        "/api/project/4"
-    )
+
+    response = await client.get("/api/project/4")
 
     assert response.status_code == status_codes.HTTP_404_NOT_FOUND
 
 
 @pytest.mark.asyncio
-async def test_get_projects(
-    client: AsyncClient, db: AsyncSession 
-    ):
+async def test_get_projects(client: AsyncClient, db: AsyncSession):
 
     test_project_two = {
         "url": "https://github.com/benthomasson/eda-project",
@@ -119,34 +105,31 @@ async def test_get_projects(
 
     for test_project in test_projects:
         query = sa.insert(models.projects).values(
-            url=test_project["url"], 
-            name=test_project["name"], 
+            url=test_project["url"],
+            name=test_project["name"],
             description=test_project["description"],
         )
         await db.execute(query)
 
     projects = (await db.execute(sa.select(models.projects))).all()
     assert len(projects) == 2
-   
-    response = await client.get(
-        "/api/projects/"
-    )
+
+    response = await client.get("/api/projects/")
 
     assert response.status_code == status_codes.HTTP_200_OK
 
     data = response.json()
     assert len(data) == 2
-    assert data[0]['name'] == TEST_PROJECT["name"]
-    assert data[1]['url'] == test_project_two['url']
+    assert data[0]["name"] == TEST_PROJECT["name"]
+    assert data[1]["url"] == test_project_two["url"]
+
 
 @pytest.mark.asyncio
-async def test_edit_project(
-    client: AsyncClient, db: AsyncSession 
-    ):
+async def test_edit_project(client: AsyncClient, db: AsyncSession):
 
     query = sa.insert(models.projects).values(
-        url=TEST_PROJECT["url"], 
-        name=TEST_PROJECT["name"], 
+        url=TEST_PROJECT["url"],
+        name=TEST_PROJECT["name"],
         description=TEST_PROJECT["description"],
     )
 
@@ -155,9 +138,9 @@ async def test_edit_project(
     projects = (await db.execute(sa.select(models.projects))).all()
     assert len(projects) == 1
     project = projects[0]
-   
+
     response = await client.patch(
-        "/api/project/" + str(project["id"]) + '/edit',
+        "/api/project/" + str(project["id"]) + "/edit",
         json={"name": "new test name"},
     )
 
@@ -165,3 +148,4 @@ async def test_edit_project(
 
     data = response.json()
     assert data["name"] == "new test name"
+    assert data["url"] == TEST_PROJECT["url"]

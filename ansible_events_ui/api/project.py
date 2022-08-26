@@ -1,19 +1,20 @@
 import sqlalchemy as sa
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
-from fastapi.encoders import jsonable_encoder
 
-from ansible_events_ui.db.dependency import get_db_session
-from ansible_events_ui.db import models
-from ansible_events_ui.project import clone_project, sync_project
 from ansible_events_ui import schemas
+from ansible_events_ui.db import models
+from ansible_events_ui.db.dependency import get_db_session
+from ansible_events_ui.project import clone_project, sync_project
 
 router = APIRouter()
 
 
 @router.get("/api/projects/")
 async def list_projects(db: AsyncSession = Depends(get_db_session)):
-    query = sa.select(models.projects.c.id, models.projects.c.url, models.projects.c.name)
+    query = sa.select(
+        models.projects.c.id, models.projects.c.url, models.projects.c.name
+    )
     result = await db.execute(query)
     return result.all()
 
@@ -42,11 +43,12 @@ async def create_project(
 async def read_project(
     project_id: int, db: AsyncSession = Depends(get_db_session)
 ):
-    query = sa.select(models.projects).where(models.projects.c.id == project_id)
+    query = sa.select(models.projects).where(
+        models.projects.c.id == project_id
+    )
     project = (await db.execute(query)).first()
     if not project:
         raise HTTPException(status_code=404, detail="Project Not Found.")
-
 
     response = dict(project)
 
@@ -91,16 +93,22 @@ async def read_project(
 
 @router.patch("/api/project/{project_id}/edit")
 async def read_project(
-    project_id: int, p: schemas.ProjectUpdate, db: AsyncSession = Depends(get_db_session)
+    project_id: int,
+    p: schemas.ProjectUpdate,
+    db: AsyncSession = Depends(get_db_session),
 ):
-    query = sa.select(models.projects).where(models.projects.c.id == project_id)
+    query = sa.select(models.projects).where(
+        models.projects.c.id == project_id
+    )
     stored_project = (await db.execute(query)).first()
     if not stored_project:
         raise HTTPException(status_code=404, detail="Project not found")
 
-    project_data = p.dict(exclude_unset=True)
-
-    query = sa.update(models.projects).where(models.projects.c.id == project_id).values(name = project_data["name"])
+    query = (
+        sa.update(models.projects)
+        .where(models.projects.c.id == project_id)
+        .values(name=p.name)
+    )
 
     try:
         await db.execute(query)
@@ -109,4 +117,6 @@ async def read_project(
 
     await db.commit()
 
-    return {**p.dict()}
+    db.refresh(stored_project)
+
+    return stored_project

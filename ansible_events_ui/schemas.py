@@ -76,7 +76,6 @@ class ActivationLog(BaseModel):
     id: Optional[int]
 
 
-
 class ProjectCreate(BaseModel):
     id: Optional[int]
     git_hash: Optional[StrictStr]
@@ -84,16 +83,14 @@ class ProjectCreate(BaseModel):
     name: StrictStr
     description: StrictStr
 
+
 class ProjectRead(ProjectCreate):
     created_at: datetime
     modified_at: datetime
 
-class ProjectUpdate(ProjectCreate):
-    id: Optional[int]
-    git_hash: Optional[StrictStr]
-    url: Optional[StrictStr]
+
+class ProjectUpdate(BaseModel):
     name: StrictStr
-    description: Optional[StrictStr]    
 
 
 class JobInstance(BaseModel):
