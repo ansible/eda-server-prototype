@@ -117,6 +117,9 @@ async def read_project(
 
     await db.commit()
 
-    db.refresh(stored_project)
+    query = sa.select(models.projects).where(
+        models.projects.c.id == project_id
+    )
+    updated_project = (await db.execute(query)).first()
 
-    return stored_project
+    return updated_project
