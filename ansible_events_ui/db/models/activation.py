@@ -24,22 +24,34 @@ activations = sa.Table(
     sa.Column("description", sa.String),
     sa.Column(
         "execution_env_id",
-        sa.ForeignKey("execution_env.id"),
+        sa.ForeignKey("execution_env.id", ondelete="CASCADE"),
         nullable=False,
     ),
     sa.Column(
         "rulebook_id",
-        sa.ForeignKey("rulebook.id"),
+        sa.ForeignKey("rulebook.id", ondelete="CASCADE"),
         nullable=False,
     ),
-    sa.Column("inventory_id", sa.ForeignKey("inventory.id"), nullable=False),
-    sa.Column("extra_var_id", sa.ForeignKey("extra_var.id"), nullable=False),
+    sa.Column(
+        "inventory_id",
+        sa.ForeignKey("inventory.id", ondelete="CASCADE"),
+        nullable=False,
+    ),
+    sa.Column(
+        "extra_var_id",
+        sa.ForeignKey("extra_var.id", ondelete="CASCADE"),
+        nullable=False,
+    ),
     sa.Column(
         "restart_policy_id",
         sa.ForeignKey("restart_policy.id"),
         nullable=False,
     ),
-    sa.Column("playbook_id", sa.ForeignKey("playbook.id"), nullable=False),
+    sa.Column(
+        "playbook_id",
+        sa.ForeignKey("playbook.id", ondelete="CASCADE"),
+        nullable=False,
+    ),
     sa.Column("activation_status", sa.String),
     sa.Column("activation_enabled", sa.Boolean, nullable=False),
     sa.Column("restarted_at", sa.DateTime(timezone=True)),
@@ -94,9 +106,13 @@ activation_instances = sa.Table(
         primary_key=True,
     ),
     sa.Column("name", sa.String),
-    sa.Column("rulebook_id", sa.ForeignKey("rulebook.id")),
-    sa.Column("inventory_id", sa.ForeignKey("inventory.id")),
-    sa.Column("extra_var_id", sa.ForeignKey("extra_var.id")),
+    sa.Column("rulebook_id", sa.ForeignKey("rulebook.id", ondelete="CASCADE")),
+    sa.Column(
+        "inventory_id", sa.ForeignKey("inventory.id", ondelete="CASCADE")
+    ),
+    sa.Column(
+        "extra_var_id", sa.ForeignKey("extra_var.id", ondelete="CASCADE")
+    ),
 )
 
 
@@ -111,7 +127,7 @@ activation_instance_logs = sa.Table(
     ),
     sa.Column(
         "activation_instance_id",
-        sa.ForeignKey("activation_instance.id"),
+        sa.ForeignKey("activation_instance.id", ondelete="CASCADE"),
     ),
     sa.Column("line_number", sa.Integer),
     sa.Column("log", sa.String),

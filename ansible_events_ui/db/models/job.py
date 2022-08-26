@@ -45,9 +45,11 @@ activation_instance_job_instances = sa.Table(
     ),
     sa.Column(
         "activation_instance_id",
-        sa.ForeignKey("activation_instance.id"),
+        sa.ForeignKey("activation_instance.id", ondelete="CASCADE"),
     ),
-    sa.Column("job_instance_id", sa.ForeignKey("job_instance.id")),
+    sa.Column(
+        "job_instance_id", sa.ForeignKey("job_instance.id", ondelete="CASCADE")
+    ),
 )
 
 
