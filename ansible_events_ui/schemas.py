@@ -76,21 +76,19 @@ class ActivationLog(BaseModel):
     id: Optional[int]
 
 
-class Project(BaseModel):
+
+class ProjectCreate(BaseModel):
     id: Optional[int]
     git_hash: Optional[StrictStr]
     url: StrictStr
     name: StrictStr
     description: StrictStr
 
-    created_at: datetime = ""
-    modified_at: datetime = ""
+class ProjectRead(ProjectCreate):
+    created_at: datetime
+    modified_at: datetime
 
-    @validator("created_at", "modified_at", pre=True, always=True)
-    def set_datetime_utcnow(cls, v):
-        return datetime.utcnow()
-
-class ProjectUpdate(Project):
+class ProjectUpdate(ProjectCreate):
     id: Optional[int]
     git_hash: Optional[StrictStr]
     url: Optional[StrictStr]
