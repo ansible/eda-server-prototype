@@ -1,6 +1,5 @@
-from http.client import HTTPException
 import sqlalchemy as sa
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi.encoders import jsonable_encoder
 
@@ -25,7 +24,7 @@ async def list_projects(db: AsyncSession = Depends(get_db_session)):
     return result.all()
 
 
-@router.post("/api/project/")
+@router.post("/api/new-project/")
 async def create_project(
     p: Project, db: AsyncSession = Depends(get_db_session)
 ):
@@ -52,7 +51,7 @@ async def read_project(
     query = sa.select(projects).where(projects.c.id == project_id)
     project = (await db.execute(query)).first()
     if not project:
-        raise HTTPException(status_code=404, detail="Project not found")
+        raise HTTPException(status_code=404, detail="Project Not Found.")
 
 
     response = dict(project)
