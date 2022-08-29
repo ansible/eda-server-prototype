@@ -159,6 +159,10 @@ const sharedMessages = defineMessages({
     id: 'project.backToProjects',
     defaultMessage: 'Back to projects'
   },
+  project_link: {
+  id: 'project.project_link',
+    defaultMessage: 'Project link'
+},
   scmUrl: {
     id: 'project.scmUrl',
     defaultMessage: 'SCM URL'
