@@ -24,9 +24,9 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - "./postgres/initdb.d:/docker-entrypoint-initdb.d"
-      - "./postgres/postgresql.conf:/etc/postgresql/postgresql.conf"
-      - "./postgres/conf.d:/etc/postgresql/conf.d"
+      - "./postgres/initdb.d:/docker-entrypoint-initdb.d:z"
+      - "./postgres/postgresql.conf:/etc/postgresql/postgresql.conf:z"
+      - "./postgres/conf.d:/etc/postgresql/conf.d:z"
       - "postgres_data:/var/lib/postgresql/data"
     command: >
       postgres
