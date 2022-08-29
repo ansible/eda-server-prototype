@@ -16,7 +16,7 @@ TEST_PROJECT = {
 @pytest.mark.asyncio
 async def test_create_project(client: AsyncClient, db: AsyncSession):
     response = await client.post(
-        "/api/new-project/",
+        "/api/projects/",
         json=TEST_PROJECT,
     )
     assert response.status_code == status_codes.HTTP_200_OK
@@ -42,7 +42,7 @@ async def test_create_project_bad_entity(
         "description": "This is a test description",
     }
     response = await client.post(
-        "/api/new-project/",
+        "/api/projects/",
         json=bad_project,
     )
     assert response.status_code == status_codes.HTTP_422_UNPROCESSABLE_ENTITY
@@ -63,7 +63,7 @@ async def test_get_project(client: AsyncClient, db: AsyncSession):
     assert len(projects) == 1
     project = projects[0]
 
-    response = await client.get("/api/project/" + str(project["id"]))
+    response = await client.get(f"/api/projects/{project['id']}")
 
     assert response.status_code == status_codes.HTTP_200_OK
 
@@ -87,7 +87,7 @@ async def test_get_project_not_found(client: AsyncClient, db: AsyncSession):
     assert len(projects) == 1
     project = projects[0]
 
-    response = await client.get("/api/project/4")
+    response = await client.get("/api/projects/4")
 
     assert response.status_code == status_codes.HTTP_404_NOT_FOUND
 
@@ -140,7 +140,7 @@ async def test_edit_project(client: AsyncClient, db: AsyncSession):
     project = projects[0]
 
     response = await client.patch(
-        "/api/project/" + str(project["id"]) + "/edit",
+        f"/api/projects/{project['id']}",
         json={"name": "new test name"},
     )
 

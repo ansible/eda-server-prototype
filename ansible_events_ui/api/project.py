@@ -19,7 +19,7 @@ async def list_projects(db: AsyncSession = Depends(get_db_session)):
     return result.all()
 
 
-@router.post("/api/new-project/")
+@router.post("/api/projects/")
 async def create_project(
     p: schemas.ProjectCreate, db: AsyncSession = Depends(get_db_session)
 ):
@@ -39,7 +39,7 @@ async def create_project(
     return {**p.dict(), "id": project_id}
 
 
-@router.get("/api/project/{project_id}", response_model=schemas.ProjectRead)
+@router.get("/api/projects/{project_id}", response_model=schemas.ProjectRead)
 async def read_project(
     project_id: int, db: AsyncSession = Depends(get_db_session)
 ):
@@ -91,7 +91,7 @@ async def read_project(
     return response
 
 
-@router.patch("/api/project/{project_id}/edit")
+@router.patch("/api/projects/{project_id}")
 async def read_project(
     project_id: int,
     p: schemas.ProjectUpdate,
