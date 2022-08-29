@@ -95,6 +95,17 @@ Requires:
 * installation of kustomize
 * installation of minikube
 * installation of docker
+* bash, version 5.1.* or above
+
+Start minikube if it is not already running
+```sh
+minikube init
+minikube start
+```
+Check that minikube instance is up
+```sh
+minikube status
+```
 
 Build image and deployment files.
 (If you do not provide an image:version as shown below it will default to "eda:latest")
