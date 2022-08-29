@@ -99,7 +99,6 @@ Requires:
 
 Start minikube if it is not already running
 ```sh
-minikube init
 minikube start
 ```
 Check that minikube instance is up
