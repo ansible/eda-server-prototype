@@ -17,10 +17,10 @@ export const renderProjectTabs = (intl, projectId: string | undefined) => {
     {
       eventKey: 0,
       title: (
-        <>
+        <div>
           <CaretLeftIcon />
           {intl.formatMessage(sharedMessages.backToProjects)}
-        </>
+        </div>
       ),
       name: `/projects`,
     },

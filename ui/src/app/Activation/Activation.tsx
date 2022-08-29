@@ -24,10 +24,10 @@ const buildActivationTabs = (activationId: string, intl: AnyObject) : TabItemTyp
     {
       eventKey: 0,
       title: (
-        <Fragment>
+        <div>
           <CaretLeftIcon />
           {intl.formatMessage(sharedMessages.backToRulebookActivations)}
-        </Fragment>
+        </div>
       ),
       name: `/activations`
     },

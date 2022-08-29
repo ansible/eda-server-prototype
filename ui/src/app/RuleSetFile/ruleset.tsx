@@ -49,10 +49,10 @@ const buildRuleSetFileTabs = (rulesetId: string, intl: AnyObject) : TabItemType[
     {
       eventKey: 0,
       title: (
-        <Fragment>
-          <CaretLeftIcon />
+        <div>
+          <CaretLeftIcon/>
           {intl.formatMessage(sharedMessages.backToRuleSets)}
-        </Fragment>
+        </div>
       ),
       name: `/rulesets`
     },
