@@ -327,6 +327,10 @@ const sharedMessages = defineMessages({
     id: 'rule.condition',
     defaultMessage: 'Condition'
   },
+  backToRules: {
+    id: 'rule.backToRules',
+    defaultMessage: 'Back to Rules'
+  },
 });
 
 export default sharedMessages;
