@@ -21,12 +21,12 @@ async def list_projects(db: AsyncSession = Depends(get_db_session)):
 
 @router.post("/api/projects/")
 async def create_project(
-    p: schemas.ProjectCreate, db: AsyncSession = Depends(get_db_session)
+    project: schemas.ProjectCreate, db: AsyncSession = Depends(get_db_session)
 ):
-    found_hash, tempdir = await clone_project(p.url, p.git_hash)
-    p.git_hash = found_hash
+    found_hash, tempdir = await clone_project(project.url, project.git_hash)
+    project.git_hash = found_hash
     query = sa.insert(models.projects).values(
-        url=p.url, git_hash=p.git_hash, name=p.name, description=p.description
+        url=project.url, git_hash=project.git_hash, name=project.name, description=project.description
     )
     try:
         result = await db.execute(query)
@@ -36,7 +36,7 @@ async def create_project(
     (project_id,) = result.inserted_primary_key
     await sync_project(project_id, tempdir, db)
     await db.commit()
-    return {**p.dict(), "id": project_id}
+    return {**project.dict(), "id": project_id}
 
 
 @router.get("/api/projects/{project_id}", response_model=schemas.ProjectRead)
@@ -94,7 +94,7 @@ async def read_project(
 @router.patch("/api/projects/{project_id}")
 async def read_project(
     project_id: int,
-    p: schemas.ProjectUpdate,
+    project: schemas.ProjectUpdate,
     db: AsyncSession = Depends(get_db_session),
 ):
     query = sa.select(models.projects).where(
@@ -107,7 +107,7 @@ async def read_project(
     query = (
         sa.update(models.projects)
         .where(models.projects.c.id == project_id)
-        .values(name=p.name)
+        .values(name=project.name)
     )
 
     try:
