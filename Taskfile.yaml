@@ -7,6 +7,12 @@ vars:
   DOCKER_COMPOSE_ARGS: "--project-name eda --file tools/docker/docker-compose.yml"
 
 tasks:
+  default:
+    desc: "Show this message and exit"
+    cmds:
+      - task -l
+    silent: true
+
   lint:
     desc: "Run all linters."
     cmds:
