@@ -2,6 +2,10 @@
 
 version: '3'
 
+vars:
+  DOCKER_COMPOSE: "docker-compose"
+  DOCKER_COMPOSE_ARGS: "--project-name eda --file tools/docker/docker-compose.yml"
+
 tasks:
   lint:
     desc: "Run all linters."
@@ -45,3 +49,48 @@ tasks:
     desc: "Format code with `black`."
     cmds:
       - black .
+
+  docker:
+    desc: "Run docker-compose with specified CLI arguments."
+    summary: |
+      Run docker-compose with specified CLI arguments.
+      
+      Example:
+        $ task docker -- ls
+    cmds:
+      - '{{.DOCKER_COMPOSE}} {{.DOCKER_COMPOSE_ARGS}} {{.CLI_ARGS}}'
+
+  docker:build:
+    desc: "Build container images."
+    cmds:
+      - task: docker
+        vars:
+          CLI_ARGS: build
+
+  docker:up:
+    desc: "Start all services."
+    cmds:
+      - task: docker
+        vars:
+          CLI_ARGS: up --detach
+
+  docker:up:postgres:
+    desc: "Start PostgreSQL service."
+    cmds:
+      - task: docker
+        vars:
+          CLI_ARGS: up --detach postgres
+
+  docker:down:
+    desc: "Stop all services."
+    cmds:
+      - task: docker
+        vars:
+          CLI_ARGS: down
+
+  docker:purge:
+    desc: "Stop all containers and delete all volumes."
+    cmds:
+      - task: docker
+        vars:
+          CLI_ARGS: down --volumes
