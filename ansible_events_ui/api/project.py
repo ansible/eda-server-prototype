@@ -10,7 +10,11 @@ from ansible_events_ui.project import clone_project, sync_project
 router = APIRouter()
 
 
-@router.get("/api/projects/")
+@router.get(
+    "/api/projects/",
+    response_model=list[schemas.ProjectList],
+    operation_id="list_projects",
+)
 async def list_projects(db: AsyncSession = Depends(get_db_session)):
     query = sa.select(
         models.projects.c.id, models.projects.c.url, models.projects.c.name
@@ -19,14 +23,21 @@ async def list_projects(db: AsyncSession = Depends(get_db_session)):
     return result.all()
 
 
-@router.post("/api/projects/")
+@router.post(
+    "/api/projects/",
+    response_model=schemas.ProjectRead,
+    operation_id="create_projects",
+)
 async def create_project(
     project: schemas.ProjectCreate, db: AsyncSession = Depends(get_db_session)
 ):
     found_hash, tempdir = await clone_project(project.url, project.git_hash)
     project.git_hash = found_hash
     query = sa.insert(models.projects).values(
-        url=project.url, git_hash=project.git_hash, name=project.name, description=project.description
+        url=project.url,
+        git_hash=project.git_hash,
+        name=project.name,
+        description=project.description,
     )
     try:
         result = await db.execute(query)
@@ -36,10 +47,20 @@ async def create_project(
     (project_id,) = result.inserted_primary_key
     await sync_project(project_id, tempdir, db)
     await db.commit()
-    return {**project.dict(), "id": project_id}
+
+    query = sa.select(models.projects).where(
+        models.projects.c.id == project_id
+    )
+    created_project = (await db.execute(query)).first()
+
+    return created_project
 
 
-@router.get("/api/projects/{project_id}", response_model=schemas.ProjectRead)
+@router.get(
+    "/api/projects/{project_id}",
+    response_model=schemas.ProjectDetail,
+    operation_id="read_project",
+)
 async def read_project(
     project_id: int, db: AsyncSession = Depends(get_db_session)
 ):
@@ -88,10 +109,16 @@ async def read_project(
         )
     ).all()
 
+    print("RESPONSE: ", response)
+
     return response
 
 
-@router.patch("/api/projects/{project_id}")
+@router.patch(
+    "/api/projects/{project_id}",
+    response_model=schemas.ProjectRead,
+    operation_id="update_project",
+)
 async def read_project(
     project_id: int,
     project: schemas.ProjectUpdate,
