@@ -1,6 +1,6 @@
 from fastapi import APIRouter, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import RedirectResponse
+from fastapi.responses import FileResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 
 from ansible_events_ui.api import router as api_router
@@ -22,7 +22,7 @@ root_router = APIRouter()
 
 @root_router.get("/")
 async def root():
-    return RedirectResponse("/eda")
+    return RedirectResponse("/eda/")
 
 
 @root_router.get("/ping")
@@ -40,8 +40,19 @@ def setup_cors(app: FastAPI) -> None:
     )
 
 
-def setup_staticfiles(app: FastAPI) -> None:
-    app.mount("/eda", StaticFiles(directory="ui/dist", html=True), name="eda")
+def setup_ui(app: FastAPI) -> None:
+    static_path = "ui/dist"
+    ui_app = FastAPI()
+
+    @ui_app.exception_handler(404)
+    def not_found(request, exc):
+        return FileResponse(f"{static_path}/index.html")
+
+    ui_app.mount(
+        "/", StaticFiles(directory=static_path, html=True), name="eda"
+    )
+
+    app.mount("/eda", app=ui_app)
 
 
 def setup_routes(app: FastAPI) -> None:
@@ -68,7 +79,7 @@ def create_app() -> FastAPI:
     app.state.settings = settings
 
     setup_cors(app)
-    setup_staticfiles(app)
+    setup_ui(app)
     setup_routes(app)
 
     setup_database(app)
