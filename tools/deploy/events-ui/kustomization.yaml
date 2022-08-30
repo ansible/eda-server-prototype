@@ -8,4 +8,4 @@ kind: Kustomization
 images:
 - name: ansible-events-ui
   newName: eda
-  newTag: latest
+  newTag: "001"
