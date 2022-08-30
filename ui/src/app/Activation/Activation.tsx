@@ -24,10 +24,10 @@ const buildActivationTabs = (activationId: string, intl: AnyObject) : TabItemTyp
     {
       eventKey: 0,
       title: (
-        <Fragment>
+        <div>
           <CaretLeftIcon />
           {intl.formatMessage(sharedMessages.backToRulebookActivations)}
-        </Fragment>
+        </div>
       ),
       name: `/activations`
     },
@@ -63,8 +63,6 @@ export const fetchActivationJobs = (activationId, pagination=defaultSettings) =>
   }).then(response => response.json());
 }
 export const getTabFromPath = (tabs:TabItemType[], path:string):string | undefined => {
-  console.log('Debug - path: ', path);
-  console.log('Debug - window.location.pathname', window.location.pathname);
   const currentTab=tabs.find((tabItem) => tabItem.name.split('/').pop() === path.split('/').pop());
   return currentTab?.title;
 };
@@ -114,7 +112,6 @@ const Activation: React.FunctionComponent = () => {
     }
   }, [newJob]);
   const location = useLocation();
-  console.log('Debug - location: ', location);
   const currentTab = activation?.id ?
     getTabFromPath(buildActivationTabs(activation.id,intl), location.pathname) :
     intl.formatMessage(sharedMessages.details);

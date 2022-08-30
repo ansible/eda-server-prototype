@@ -123,6 +123,14 @@ const sharedMessages = defineMessages({
     id: 'shared.descriptionPlaceholder',
     defaultMessage: 'Insert description here'
   },
+  rules: {
+    id: 'shared.rules',
+    defaultMessage: 'Rules'
+  },
+  sources: {
+    id: 'shared.sources',
+    defaultMessage: 'Sources'
+  },
   project: {
     id: 'project.project',
     defaultMessage: 'Project'
@@ -151,6 +159,10 @@ const sharedMessages = defineMessages({
     id: 'project.backToProjects',
     defaultMessage: 'Back to projects'
   },
+  project_link: {
+  id: 'project.project_link',
+    defaultMessage: 'Project link'
+},
   scmUrl: {
     id: 'project.scmUrl',
     defaultMessage: 'SCM URL'
@@ -255,6 +267,18 @@ const sharedMessages = defineMessages({
     id: 'rulesets.deleteRuleSet',
     defaultMessage: 'Delete rule set'
   },
+  backToRuleSets: {
+    id: 'ruleset.backToRuleSets',
+    defaultMessage: 'Back to Rule Sets'
+  },
+  norulesetrules: {
+    id: 'ruleset.norulesetrules',
+    defaultMessage: 'No rules for this rule set'
+  },
+  norulesetsources: {
+    id: 'ruleset.norulesetsources',
+    defaultMessage: 'No sources for this rule set'
+  },
   noactivationjobs: {
     id: 'activation.nojobs',
     defaultMessage: 'There are currently no jobs for this rulebook activation.'
@@ -295,7 +319,14 @@ const sharedMessages = defineMessages({
     id: 'project.extraVarPlaceholder',
     defaultMessage: 'Select extra variables'
   },
-
+  action: {
+    id: 'rule.action',
+    defaultMessage: 'Action'
+  },
+  condition: {
+    id: 'rule.condition',
+    defaultMessage: 'Condition'
+  },
 });
 
 export default sharedMessages;

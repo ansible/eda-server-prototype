@@ -33,7 +33,7 @@ const event_endpoint = 'http://' + getServer() + '/api/job_instance_events/';
 const Job: React.FunctionComponent = () => {
 
   const [job, setJob] = useState<JobType|undefined>(undefined);
-  const [stdout, setStdout] = useState<{stdout: string}[]>([]);
+  const [stdout, setStdout] = useState<any[]>([]);
   const [newStdout, setNewStdout] = useState<string>('');
 
   const { id } = useParams<JobType>();

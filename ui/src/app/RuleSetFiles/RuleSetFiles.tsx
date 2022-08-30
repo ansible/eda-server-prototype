@@ -152,7 +152,8 @@ const RuleSets: React.FunctionComponent = () => {
 
   useEffect(() => {
     fetchRuleSets().then(response => response.json())
-      .then(data => { setRuleSets(data); stateDispatch({type: 'setRows', payload: createRows(RuleSets)});});
+      .then(data => { setRuleSets(data); console.log( 'Debug - rulesets data: ', data);
+        stateDispatch({type: 'setRows', payload: createRows(RuleSets)});});
   }, []);
 
   useEffect(() => {
@@ -198,6 +199,7 @@ const RuleSets: React.FunctionComponent = () => {
 
   const toolbarButtons = () => null;
 
+  console.log('Debug - RuleSets: ', RuleSets);
   return (
     <Fragment>
       <TopToolbar>
