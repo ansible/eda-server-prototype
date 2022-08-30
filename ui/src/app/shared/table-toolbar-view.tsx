@@ -111,11 +111,11 @@ export const TableToolbarView: React.ComponentType<TableToolbarViewProps> = ({
   return (
     <Fragment>
       {routes()}
-      {renderToolbar()}
       {!isLoading && rows.length === 0 ? (
         renderEmptyState()
       ) : (
         <Fragment>
+          {renderToolbar()}
           {!isLoading && (
             <Table
               aria-label={`${plural} table`}

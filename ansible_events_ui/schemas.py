@@ -57,8 +57,13 @@ class Extravars(BaseModel):
 class Activation(BaseModel):
     id: Optional[int]
     name: StrictStr
+    description: Optional[StrictStr]
+    execution_env_id: int
     rulebook_id: int
     inventory_id: int
+    restart_policy_id: int
+    playbook_id: int
+    activation_enabled: bool
     extra_var_id: int
 
 
@@ -98,6 +103,18 @@ class JobInstance(BaseModel):
     playbook_id: int
     inventory_id: int
     extra_var_id: int
+
+
+class RuleRulesetRef(BaseModel):
+    id: int
+    name: Optional[str]
+
+
+class Rule(BaseModel):
+    id: int
+    name: Optional[str]
+    action: dict
+    ruleset: RuleRulesetRef
 
 
 # Fast API Users

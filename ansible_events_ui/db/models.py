@@ -119,12 +119,78 @@ activations = sqlalchemy.Table(
         sqlalchemy.Identity(always=True),
         primary_key=True,
     ),
-    sqlalchemy.Column("name", sqlalchemy.String),
-    sqlalchemy.Column("rulebook_id", sqlalchemy.ForeignKey("rulebook.id")),
-    sqlalchemy.Column("inventory_id", sqlalchemy.ForeignKey("inventory.id")),
-    sqlalchemy.Column("extra_var_id", sqlalchemy.ForeignKey("extra_var.id")),
+    sqlalchemy.Column("name", sqlalchemy.String, nullable=False),
+    sqlalchemy.Column("description", sqlalchemy.String),
+    sqlalchemy.Column(
+        "execution_env_id",
+        sqlalchemy.ForeignKey("execution_env.id"),
+        nullable=False,
+    ),
+    sqlalchemy.Column(
+        "rulebook_id",
+        sqlalchemy.ForeignKey("rulebook.id"),
+        nullable=False,
+    ),
+    sqlalchemy.Column(
+        "inventory_id", sqlalchemy.ForeignKey("inventory.id"), nullable=False
+    ),
+    sqlalchemy.Column(
+        "extra_var_id", sqlalchemy.ForeignKey("extra_var.id"), nullable=False
+    ),
+    sqlalchemy.Column(
+        "restart_policy_id",
+        sqlalchemy.ForeignKey("restart_policy.id"),
+        nullable=False,
+    ),
+    sqlalchemy.Column(
+        "playbook_id", sqlalchemy.ForeignKey("playbook.id"), nullable=False
+    ),
+    sqlalchemy.Column("activation_status", sqlalchemy.String),
+    sqlalchemy.Column(
+        "activation_enabled", sqlalchemy.Boolean, nullable=False
+    ),
+    sqlalchemy.Column("restarted_at", sqlalchemy.DateTime(timezone=True)),
+    sqlalchemy.Column(
+        "restarted_count", sqlalchemy.Integer, nullable=False, default=0
+    ),
+    sqlalchemy.Column(
+        "created_at",
+        sqlalchemy.DateTime(timezone=True),
+        nullable=False,
+        server_default=func.now(),
+    ),
+    sqlalchemy.Column(
+        "modified_at",
+        sqlalchemy.DateTime(timezone=True),
+        nullable=False,
+        server_default=func.now(),
+        onupdate=func.now(),
+    ),
 )
 
+execution_envs = sqlalchemy.Table(
+    "execution_env",
+    metadata,
+    sqlalchemy.Column(
+        "id",
+        sqlalchemy.Integer,
+        sqlalchemy.Identity(always=True),
+        primary_key=True,
+    ),
+    sqlalchemy.Column("url", sqlalchemy.String, nullable=False),
+)
+
+restart_policies = sqlalchemy.Table(
+    "restart_policy",
+    metadata,
+    sqlalchemy.Column(
+        "id",
+        sqlalchemy.Integer,
+        sqlalchemy.Identity(always=True),
+        primary_key=True,
+    ),
+    sqlalchemy.Column("name", sqlalchemy.String),
+)
 
 activation_instances = sqlalchemy.Table(
     "activation_instance",

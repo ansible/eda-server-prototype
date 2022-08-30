@@ -35,7 +35,7 @@ from ansible_events_ui.ruleset import (
     write_job_events,
 )
 from ansible_events_ui.schemas import (
-    Activation,
+    ActivationInstance,
     ActivationLog,
     Extravars,
     Inventory,
@@ -201,7 +201,7 @@ async def create_extra_vars(
 
 @router.post("/api/activation_instance/")
 async def create_activation_instance(
-    a: Activation,
+    a: ActivationInstance,
     db: AsyncSession = Depends(get_db_session),
     db_session_factory: sqlalchemy.orm.sessionmaker = Depends(
         get_db_session_factory
