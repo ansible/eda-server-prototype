@@ -94,6 +94,18 @@ class JobInstance(BaseModel):
     extra_var_id: int
 
 
+class RuleRulesetRef(BaseModel):
+    id: int
+    name: Optional[str]
+
+
+class Rule(BaseModel):
+    id: int
+    name: Optional[str]
+    action: dict
+    ruleset: RuleRulesetRef
+
+
 # Fast API Users
 
 
