@@ -119,7 +119,7 @@ async def read_project(
     response_model=schemas.ProjectRead,
     operation_id="update_project",
 )
-async def read_project(
+async def update_project(
     project_id: int,
     project: schemas.ProjectUpdate,
     db: AsyncSession = Depends(get_db_session),

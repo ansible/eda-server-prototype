@@ -85,7 +85,6 @@ async def test_get_project_not_found(client: AsyncClient, db: AsyncSession):
 
     projects = (await db.execute(sa.select(models.projects))).all()
     assert len(projects) == 1
-    project = projects[0]
 
     response = await client.get("/api/projects/4")
 
