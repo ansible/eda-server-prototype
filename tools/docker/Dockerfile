@@ -13,7 +13,7 @@ WORKDIR $HOME
 
 USER 0
 RUN pip install ansible && \
-    ansible-galaxy collection install benthomasson.eda
+    ansible-galaxy collection install git+https://github.com/benthomasson/benthomasson-eda.git#benthomasson/eda/
 COPY . $WORKDIR
 COPY --from=ui-builder /app/ui/dist/ ./ui/dist
 RUN chown -R $USER_ID ./
