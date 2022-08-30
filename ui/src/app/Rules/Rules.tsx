@@ -38,13 +38,13 @@ const columns = (intl) => [
   title: (intl.formatMessage(sharedMessages.name))
   },
   {
-    title: (intl.formatMessage(sharedMessages.status))
+    title: (intl.formatMessage(sharedMessages.ruleset))
   },
   {
-    title: (intl.formatMessage(sharedMessages.number_of_rules))
+    title: (intl.formatMessage(sharedMessages.action))
   },
   {
-    title: (intl.formatMessage(sharedMessages.fire_count))
+    title: (intl.formatMessage(sharedMessages.lastFiredDate))
   }
 ];
 
