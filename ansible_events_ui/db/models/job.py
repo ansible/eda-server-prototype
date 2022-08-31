@@ -13,18 +13,18 @@ __all__ = (
     "JobInstanceEvent",
 )
 
+from .mixins import IntIdMixin
 
-class Job(Base):
+
+class Job(IntIdMixin, Base):
     __tablename__ = "job"
 
-    id = sa.Column(sa.Integer, sa.Identity(always=True), primary_key=True)
     uuid = sa.Column(postgresql.UUID)
 
 
-class JobInstance(Base):
+class JobInstance(IntIdMixin, Base):
     __tablename__ = "job_instance"
 
-    id = sa.Column(sa.Integer, sa.Identity(always=True), primary_key=True)
     uuid = sa.Column(postgresql.UUID)
 
 
@@ -42,10 +42,9 @@ activation_instance_job_instances = sa.Table(
 )
 
 
-class JobInstanceEvent(Base):
+class JobInstanceEvent(IntIdMixin, Base):
     __tablename__ = "job_instance_event"
 
-    id = sa.Column(sa.Integer, sa.Identity(always=True), primary_key=True)
     job_uuid = sa.Column(postgresql.UUID)
     counter = sa.Column(sa.Integer)
     stdout = sa.Column(sa.String)

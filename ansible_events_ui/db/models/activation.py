@@ -2,6 +2,7 @@ import sqlalchemy as sa
 from sqlalchemy import func
 
 from .base import Base
+from .mixins import IntIdMixin
 
 __all__ = (
     "Activation",
@@ -17,7 +18,7 @@ __all__ = (
 )
 
 
-class Activation(Base):
+class Activation(IntIdMixin, Base):
     __tablename__ = "activation"
     id = sa.Column(sa.Integer, sa.Identity(always=True), primary_key=True)
     name = sa.Column(sa.String, nullable=False)
@@ -55,30 +56,26 @@ class Activation(Base):
     )
 
 
-class ExecutionEnvironment(Base):
+class ExecutionEnvironment(IntIdMixin, Base):
     __tablename__ = "execution_env"
-    id = sa.Column(sa.Integer, sa.Identity(always=True), primary_key=True)
     url = sa.Column(sa.String, nullable=False)
 
 
-class RestartPolicy(Base):
+class RestartPolicy(IntIdMixin, Base):
     __tablename__ = "restart_policy"
-    id = sa.Column(sa.Integer, sa.Identity(always=True), primary_key=True)
     name = sa.Column(sa.String)
 
 
-class ActivationInstance(Base):
+class ActivationInstance(IntIdMixin, Base):
     __tablename__ = "activation_instance"
-    id = sa.Column(sa.Integer, sa.Identity(always=True), primary_key=True)
     name = sa.Column(sa.String)
     rulebook_id = sa.Column(sa.ForeignKey("rulebook.id", ondelete="CASCADE"))
     inventory_id = sa.Column(sa.ForeignKey("inventory.id", ondelete="CASCADE"))
     extra_var_id = sa.Column(sa.ForeignKey("extra_var.id", ondelete="CASCADE"))
 
 
-class ActivationInstanceLog(Base):
+class ActivationInstanceLog(IntIdMixin, Base):
     __tablename__ = "activation_instance_log"
-    id = sa.Column(sa.Integer, sa.Identity(always=True), primary_key=True)
     activation_instance_id = sa.Column(
         sa.ForeignKey("activation_instance.id", ondelete="CASCADE")
     )

@@ -14,11 +14,12 @@ __all__ = (
     "Playbook",
 )
 
+from .mixins import IntIdMixin
 
-class Project(Base):
+
+class Project(IntIdMixin, Base):
     __tablename__ = "project"
 
-    id = sa.Column(sa.Integer, sa.Identity(always=True), primary_key=True)
     git_hash = sa.Column(sa.String)
     url = sa.Column(sa.String)
     name = sa.Column(sa.String)
@@ -36,10 +37,9 @@ class Project(Base):
     )
 
 
-class Inventory(Base):
+class Inventory(IntIdMixin, Base):
     __tablename__ = "inventory"
 
-    id = sa.Column(sa.Integer, sa.Identity(always=True), primary_key=True)
     name = sa.Column(sa.String)
     inventory = sa.Column(sa.String)
     project_id = sa.Column(
@@ -47,10 +47,9 @@ class Inventory(Base):
     )
 
 
-class ExtraVar(Base):
+class ExtraVar(IntIdMixin, Base):
     __tablename__ = "extra_var"
 
-    id = sa.Column(sa.Integer, sa.Identity(always=True), primary_key=True)
     name = sa.Column(sa.String)
     extra_var = sa.Column(sa.String)
     project_id = sa.Column(
@@ -58,10 +57,9 @@ class ExtraVar(Base):
     )
 
 
-class Playbook(Base):
+class Playbook(IntIdMixin, Base):
     __tablename__ = "playbook"
 
-    id = sa.Column(sa.Integer, sa.Identity(always=True), primary_key=True)
     name = sa.Column(sa.String)
     playbook = sa.Column(sa.String)
     project_id = sa.Column(
