@@ -3,8 +3,14 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ansible_events_ui import schemas
-from ansible_events_ui.db import models
 from ansible_events_ui.db.dependency import get_db_session
+from ansible_events_ui.db.models.project import (
+    extra_vars,
+    inventories,
+    playbooks,
+    projects,
+)
+from ansible_events_ui.db.models.rulebook import rulebooks
 from ansible_events_ui.project import clone_project, sync_project
 
 router = APIRouter()
@@ -16,9 +22,7 @@ router = APIRouter()
     operation_id="list_projects",
 )
 async def list_projects(db: AsyncSession = Depends(get_db_session)):
-    query = sa.select(
-        models.projects.c.id, models.projects.c.url, models.projects.c.name
-    )
+    query = sa.select(projects.c.id, projects.c.url, projects.c.name)
     result = await db.execute(query)
     return result.all()
 
@@ -33,7 +37,7 @@ async def create_project(
 ):
     found_hash, tempdir = await clone_project(project.url, project.git_hash)
     project.git_hash = found_hash
-    query = sa.insert(models.projects).values(
+    query = sa.insert(projects).values(
         url=project.url,
         git_hash=project.git_hash,
         name=project.name,
@@ -48,9 +52,7 @@ async def create_project(
     await sync_project(project_id, tempdir, db)
     await db.commit()
 
-    query = sa.select(models.projects).where(
-        models.projects.c.id == project_id
-    )
+    query = sa.select(projects).where(projects.c.id == project_id)
     created_project = (await db.execute(query)).first()
 
     return created_project
@@ -64,9 +66,7 @@ async def create_project(
 async def read_project(
     project_id: int, db: AsyncSession = Depends(get_db_session)
 ):
-    query = sa.select(models.projects).where(
-        models.projects.c.id == project_id
-    )
+    query = sa.select(projects).where(projects.c.id == project_id)
     project = (await db.execute(query)).first()
     if not project:
         raise HTTPException(status_code=404, detail="Project Not Found.")
@@ -75,41 +75,39 @@ async def read_project(
 
     response["rulesets"] = (
         await db.execute(
-            sa.select(models.rulebooks.c.id, models.rulebooks.c.name)
-            .select_from(models.rulebooks)
-            .join(models.projects)
-            .where(models.projects.c.id == project_id)
+            sa.select(rulebooks.c.id, rulebooks.c.name)
+            .select_from(rulebooks)
+            .join(projects)
+            .where(projects.c.id == project_id)
         )
     ).all()
 
     response["inventories"] = (
         await db.execute(
-            sa.select(models.inventories.c.id, models.inventories.c.name)
-            .select_from(models.inventories)
-            .join(models.projects)
-            .where(models.projects.c.id == project_id)
+            sa.select(inventories.c.id, inventories.c.name)
+            .select_from(inventories)
+            .join(projects)
+            .where(projects.c.id == project_id)
         )
     ).all()
 
     response["vars"] = (
         await db.execute(
-            sa.select(models.extra_vars.c.id, models.extra_vars.c.name)
-            .select_from(models.extra_vars)
-            .join(models.projects)
-            .where(models.projects.c.id == project_id)
+            sa.select(extra_vars.c.id, extra_vars.c.name)
+            .select_from(extra_vars)
+            .join(projects)
+            .where(projects.c.id == project_id)
         )
     ).all()
 
     response["playbooks"] = (
         await db.execute(
-            sa.select(models.playbooks.c.id, models.playbooks.c.name)
-            .select_from(models.playbooks)
-            .join(models.projects)
-            .where(models.projects.c.id == project_id)
+            sa.select(playbooks.c.id, playbooks.c.name)
+            .select_from(playbooks)
+            .join(projects)
+            .where(projects.c.id == project_id)
         )
     ).all()
-
-    print("RESPONSE: ", response)
 
     return response
 
@@ -124,16 +122,16 @@ async def update_project(
     project: schemas.ProjectUpdate,
     db: AsyncSession = Depends(get_db_session),
 ):
-    query = sa.select(models.projects).where(
-        models.projects.c.id == project_id
+    query = sa.select(project.projects).where(
+        project.projects.c.id == project_id
     )
     stored_project = (await db.execute(query)).first()
     if not stored_project:
         raise HTTPException(status_code=404, detail="Project not found")
 
     query = (
-        sa.update(models.projects)
-        .where(models.projects.c.id == project_id)
+        sa.update(projects)
+        .where(projects.c.id == project_id)
         .values(name=project.name)
     )
 
@@ -144,9 +142,7 @@ async def update_project(
 
     await db.commit()
 
-    query = sa.select(models.projects).where(
-        models.projects.c.id == project_id
-    )
+    query = sa.select(projects).where(projects.c.id == project_id)
     updated_project = (await db.execute(query)).first()
 
     return updated_project
