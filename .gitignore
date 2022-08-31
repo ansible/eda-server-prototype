@@ -17,3 +17,4 @@ dist/
 .vscode
 /.venv/
 /.python-version
+/tools/deploy/temp/

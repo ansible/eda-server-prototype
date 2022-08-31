@@ -100,3 +100,31 @@ tasks:
       - task: docker
         vars:
           CLI_ARGS: down --volumes
+
+  minikube:build:
+    desc: "Build docker image and push to minikube"
+    cmds:
+      - scripts/eda_kube.sh build {{.CLI_ARGS}}
+
+  minikube:deploy:
+    desc: "Build deployment and deploy to minikube"
+    deps: [minikube:clean]
+    cmds:
+      - scripts/eda_kube.sh deploy {{.CLI_ARGS}}
+
+  minikube:clean:
+    desc: "Clean deployment directory and clean minikube resources"
+    cmds:
+      - scripts/eda_kube.sh clean
+
+  minikube:fp:ui:
+    desc: "forward local port to ui instance port in minikube"
+    cmds:
+      - scripts/eda_kube.sh port-forward-ui {{.CLI_ARGS}}
+
+  minikube:all:
+    desc: "build, deploy, and portforward UI"
+    cmds:
+      - task: minikube:build
+      - task: minikube:deploy
+      - task: minikube:fp:ui

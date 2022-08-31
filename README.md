@@ -88,6 +88,59 @@ cd tools/docker
 docker-compose up --build
 ```
 
+## Run the application on Minikube
+
+Requires:
+* installation of Kubernetes CLI (kubectl)
+* installation of kustomize
+* installation of minikube
+* installation of docker
+* bash, version 5.1.* or above
+
+Start minikube if it is not already running
+```sh
+minikube start
+```
+Check that minikube instance is up
+```sh
+minikube status
+```
+
+Build image and deployment files.
+(If you do not provide an image:version as shown below it will default to "eda:latest")
+```sh
+task minikube:build -- eda:001
+```
+
+Deploy application to minikube.
+(If you do not provide an image:version as shown below it will default to "eda:latest")
+```sh
+task minikube:deploy -- eda:001
+```
+
+Forward the webserver port to local host.
+(If you do not provide a local port it will default to "8080")
+```sh
+task minikube:fp:ui -- 8080
+```
+
+In a second terminal run the following cmd to create a `dev` user with a password of `none2tuff`.
+(You will use this to log into the console.)
+```sh
+scripts/createuser.sh dev_user@redhat.com none2tuff
+```
+
+Visit this url: http://localhost:8080/eda
+
+- **Note:** 
+  Instead of running the above build, deploy, and minikube-fp-ui tasks individually. 
+  It is possible to do the following, being mindful that it will use default values.
+```sh
+$ task minikube:all
+```
+
+You have set up the development environment.
+
 ## Running tests
 
 If not started, start the PostgreSQL service, which is required for running integration tests.
