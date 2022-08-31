@@ -122,9 +122,7 @@ async def update_project(
     project: schemas.ProjectUpdate,
     db: AsyncSession = Depends(get_db_session),
 ):
-    query = sa.select(projects).where(
-        projects.c.id == project_id
-    )
+    query = sa.select(projects).where(projects.c.id == project_id)
     stored_project = (await db.execute(query)).first()
     if not stored_project:
         raise HTTPException(status_code=404, detail="Project not found")

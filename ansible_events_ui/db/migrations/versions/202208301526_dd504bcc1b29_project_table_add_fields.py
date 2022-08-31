@@ -1,4 +1,4 @@
-"""project table add fields
+"""project table add fields.
 
 Revision ID: dd504bcc1b29
 Revises: 57d535d96a60
