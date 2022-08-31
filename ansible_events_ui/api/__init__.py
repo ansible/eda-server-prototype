@@ -6,8 +6,9 @@ from typing import List
 
 import sqlalchemy.orm
 import yaml
-from fastapi import APIRouter, Depends, WebSocket, WebSocketDisconnect
-from sqlalchemy import insert, select
+from fastapi import APIRouter, Depends, WebSocket, WebSocketDisconnect, status
+from fastapi.exceptions import HTTPException
+from sqlalchemy import delete, insert, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ansible_events_ui import schemas
@@ -302,6 +303,19 @@ async def list_tasks():
     return tasks
 
 
+@router.delete(
+    "/api/project/{project_id}", status_code=204, operation_id="delete_project"
+)
+async def delete_project(
+    project_id: int, db: AsyncSession = Depends(get_db_session)
+):
+    query = delete(models.projects).where(models.projects.c.id == project_id)
+    results = await db.execute(query)
+    if results.rowcount == 0:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+    await db.commit()
+
+
 @router.get("/api/playbooks/")
 async def list_playbooks(db: AsyncSession = Depends(get_db_session)):
     query = select(models.playbooks)
@@ -424,6 +438,23 @@ async def read_activation_instance(
     return result.first()
 
 
+@router.delete(
+    "/api/activation_instance/{activation_instance_id}",
+    status_code=204,
+    operation_id="delete_activation_instance",
+)
+async def delete_activation_instance(
+    activation_instance_id: int, db: AsyncSession = Depends(get_db_session)
+):
+    query = delete(models.activation_instances).where(
+        models.activation_instances.c.id == activation_instance_id
+    )
+    results = await db.execute(query)
+    if results.rowcount == 0:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+    await db.commit()
+
+
 @router.get("/api/job_instances/")
 async def list_job_instances(db: AsyncSession = Depends(get_db_session)):
     query = select(models.job_instances)
@@ -489,6 +520,23 @@ async def read_job_instance(
     )
     result = await db.execute(query)
     return result.first()
+
+
+@router.delete(
+    "/api/job_instance/{job_instance_id}",
+    status_code=204,
+    operation_id="delete_job_instance",
+)
+async def delete_job_instance(
+    job_instance_id: int, db: AsyncSession = Depends(get_db_session)
+):
+    query = delete(models.job_instances).where(
+        models.job_instances.c.id == job_instance_id
+    )
+    results = await db.execute(query)
+    if results.rowcount == 0:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+    await db.commit()
 
 
 @router.get("/api/job_instance_events/{job_instance_id}")

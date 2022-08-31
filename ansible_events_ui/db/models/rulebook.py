@@ -20,7 +20,11 @@ rulebooks = sa.Table(
     ),
     sa.Column("name", sa.String),
     sa.Column("rulesets", sa.String),
-    sa.Column("project_id", sa.ForeignKey("project.id"), nullable=True),
+    sa.Column(
+        "project_id",
+        sa.ForeignKey("project.id", ondelete="CASCADE"),
+        nullable=True,
+    ),
 )
 
 
@@ -35,7 +39,7 @@ rulesets = sa.Table(
     ),
     sa.Column(
         "rulebook_id",
-        sa.ForeignKey("rulebook.id"),
+        sa.ForeignKey("rulebook.id", ondelete="CASCADE"),
         nullable=False,
     ),
     sa.Column("name", sa.String),
@@ -52,7 +56,7 @@ rules = sa.Table(
     ),
     sa.Column(
         "ruleset_id",
-        sa.ForeignKey("ruleset.id"),
+        sa.ForeignKey("ruleset.id", ondelete="CASCADE"),
         nullable=False,
     ),
     sa.Column("name", sa.String),

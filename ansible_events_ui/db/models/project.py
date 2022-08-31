@@ -49,7 +49,11 @@ inventories = sa.Table(
     ),
     sa.Column("name", sa.String),
     sa.Column("inventory", sa.String),
-    sa.Column("project_id", sa.ForeignKey("project.id"), nullable=True),
+    sa.Column(
+        "project_id",
+        sa.ForeignKey("project.id", ondelete="CASCADE"),
+        nullable=True,
+    ),
 )
 
 
@@ -64,7 +68,11 @@ extra_vars = sa.Table(
     ),
     sa.Column("name", sa.String),
     sa.Column("extra_var", sa.String),
-    sa.Column("project_id", sa.ForeignKey("project.id"), nullable=True),
+    sa.Column(
+        "project_id",
+        sa.ForeignKey("project.id", ondelete="CASCADE"),
+        nullable=True,
+    ),
 )
 
 playbooks = sa.Table(
@@ -78,5 +86,9 @@ playbooks = sa.Table(
     ),
     sa.Column("name", sa.String),
     sa.Column("playbook", sa.String),
-    sa.Column("project_id", sa.ForeignKey("project.id"), nullable=True),
+    sa.Column(
+        "project_id",
+        sa.ForeignKey("project.id", ondelete="CASCADE"),
+        nullable=True,
+    ),
 )
