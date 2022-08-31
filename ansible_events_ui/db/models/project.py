@@ -1,4 +1,5 @@
 import sqlalchemy as sa
+from sqlalchemy.sql import func
 
 from .base import metadata
 
@@ -20,6 +21,21 @@ projects = sa.Table(
     ),
     sa.Column("git_hash", sa.String),
     sa.Column("url", sa.String),
+    sa.Column("name", sa.String),
+    sa.Column("description", sa.String),
+    sa.Column(
+        "created_at",
+        sa.DateTime(timezone=True),
+        nullable=False,
+        server_default=func.now(),
+    ),
+    sa.Column(
+        "modified_at",
+        sa.DateTime(timezone=True),
+        nullable=False,
+        server_default=func.now(),
+        onupdate=func.now(),
+    ),
 )
 
 inventories = sa.Table(

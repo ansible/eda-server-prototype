@@ -18,11 +18,7 @@ from ansible_events_ui.db.dependency import (
     get_db_session_factory,
 )
 from ansible_events_ui.managers import taskmanager, updatemanager
-from ansible_events_ui.project import (
-    clone_project,
-    insert_rulebook_related_data,
-    sync_project,
-)
+from ansible_events_ui.project import insert_rulebook_related_data
 from ansible_events_ui.ruleset import (
     activate_rulesets,
     inactivate_rulesets,
@@ -36,6 +32,7 @@ from ansible_events_ui.users import (
 )
 
 from .activation import router as activation_router
+from .project import router as project_router
 from .rule import router as rule_router
 
 logger = logging.getLogger("ansible_events_ui")
@@ -43,6 +40,7 @@ logger = logging.getLogger("ansible_events_ui")
 router = APIRouter()
 router.include_router(activation_router)
 router.include_router(rule_router)
+router.include_router(project_router)
 
 
 @router.websocket("/api/ws2")
@@ -305,69 +303,6 @@ async def list_tasks():
     return tasks
 
 
-@router.post("/api/project/")
-async def create_project(
-    p: schemas.Project, db: AsyncSession = Depends(get_db_session)
-):
-    found_hash, tempdir = await clone_project(p.url, p.git_hash)
-    p.git_hash = found_hash
-    query = insert(models.projects).values(url=p.url, git_hash=p.git_hash)
-    result = await db.execute(query)
-    (project_id,) = result.inserted_primary_key
-    await sync_project(project_id, tempdir, db)
-    await db.commit()
-    return {**p.dict(), "id": project_id}
-
-
-@router.get("/api/project/{project_id}")
-async def read_project(
-    project_id: int, db: AsyncSession = Depends(get_db_session)
-):
-    # FIXME(cutwater): Return HTTP 404 if project doesn't exist
-    query = select(models.projects).where(models.projects.c.id == project_id)
-    project = (await db.execute(query)).first()
-
-    response = dict(project)
-
-    response["rulesets"] = (
-        await db.execute(
-            select(models.rulebooks.c.id, models.rulebooks.c.name)
-            .select_from(models.rulebooks)
-            .join(models.projects)
-            .where(models.projects.c.id == project_id)
-        )
-    ).all()
-
-    response["inventories"] = (
-        await db.execute(
-            select(models.inventories.c.id, models.inventories.c.name)
-            .select_from(models.inventories)
-            .join(models.projects)
-            .where(models.projects.c.id == project_id)
-        )
-    ).all()
-
-    response["vars"] = (
-        await db.execute(
-            select(models.extra_vars.c.id, models.extra_vars.c.name)
-            .select_from(models.extra_vars)
-            .join(models.projects)
-            .where(models.projects.c.id == project_id)
-        )
-    ).all()
-
-    response["playbooks"] = (
-        await db.execute(
-            select(models.playbooks.c.id, models.playbooks.c.name)
-            .select_from(models.playbooks)
-            .join(models.projects)
-            .where(models.projects.c.id == project_id)
-        )
-    ).all()
-
-    return response
-
-
 @router.delete(
     "/api/project/{project_id}", status_code=204, operation_id="delete_project"
 )
@@ -379,13 +314,6 @@ async def delete_project(
     if results.rowcount == 0:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     await db.commit()
-
-
-@router.get("/api/projects/")
-async def list_projects(db: AsyncSession = Depends(get_db_session)):
-    query = select(models.projects)
-    result = await db.execute(query)
-    return result.all()
 
 
 @router.get("/api/playbooks/")
