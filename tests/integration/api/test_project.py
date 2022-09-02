@@ -1,3 +1,6 @@
+import hashlib
+from unittest import mock
+
 import pytest
 import sqlalchemy as sa
 from fastapi import status as status_codes
@@ -7,7 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from ansible_events_ui.db import models
 
 TEST_PROJECT = {
-    "url": "https://github.com/benthomasson/eda-project",
+    "url": "https://git.example.com/sample/test-project",
     "name": "Test Name",
     "description": "This is a test description",
 }
@@ -121,7 +124,17 @@ async def test_delete_project_not_found(client: AsyncClient):
 
 
 @pytest.mark.asyncio
-async def test_create_project(client: AsyncClient, db: AsyncSession):
+@mock.patch("ansible_events_ui.api.project.clone_project")
+@mock.patch("ansible_events_ui.api.project.sync_project")
+async def test_create_project(
+    sync_project: mock.Mock,
+    clone_project: mock.Mock,
+    client: AsyncClient,
+    db: AsyncSession,
+):
+    found_hash = hashlib.sha1(b"test").hexdigest()
+    clone_project.return_value = found_hash, "/tmp/test-create-project"
+
     response = await client.post(
         "/api/projects/",
         json=TEST_PROJECT,
@@ -137,6 +150,11 @@ async def test_create_project(client: AsyncClient, db: AsyncSession):
     assert project["id"] == data["id"]
     assert project["name"] == TEST_PROJECT["name"]
     assert project["url"] == TEST_PROJECT["url"]
+
+    clone_project.assert_called_once_with(TEST_PROJECT["url"], None)
+    sync_project.assert_called_once_with(
+        project["id"], "/tmp/test-create-project", db
+    )
 
 
 @pytest.mark.asyncio
