@@ -230,10 +230,13 @@ async def create_activation_instance(
         rulebook_id=a.rulebook_id,
         inventory_id=a.inventory_id,
         extra_var_id=a.extra_var_id,
+    ).returning(
+        activation_instances.c.id,
+        activation_instances.c.log_id,
     )
     result = await db.execute(query)
     await db.commit()
-    (id_,) = result.inserted_primary_key
+    id_, log_id = result.first()
 
     cmd, proc = await activate_rulesets(
         id_,
@@ -246,7 +249,7 @@ async def create_activation_instance(
     )
 
     task = asyncio.create_task(
-        read_output(proc, id_, db_session_factory),
+        read_output(proc, id_, log_id, db_session_factory),
         name=f"read_output {proc.pid}",
     )
     taskmanager.tasks.append(task)
@@ -260,13 +263,17 @@ async def deactivate(activation_instance_id: int):
     return
 
 
-async def read_output(proc, activation_instance_id, db_session_factory):
+async def read_output(
+    proc, activation_instance_id, activation_instance_log_id, db_session_factory
+):
     # TODO(cutwater): Replace with FastAPI dependency injections,
     #   that is available in BackgroundTasks
     read_chunk_size = CHUNK_SIZE
 
     async with db_session_factory() as db:
-        async with LObject(session=db, mode="wb") as lobject:
+        async with LObject(
+            oid=activation_instance_log_id, session=db, mode="wb"
+        ) as lobject:
             for buff in iter(lambda: proc.stdout.read(read_chunk_size), b''):
                 await lobject.write(buff)
                 await updatemanager.broadcast(
@@ -282,12 +289,12 @@ async def stream_activation_instance_logs(
     activation_instance_id: int, db: AsyncSession = Depends(get_db_session)
 ):
     query = (
-        select(activateion_instance).filter(activateion_instance.id == activation_instance_id)
+        select(activateion_instance.c.log_id).where(activateion_instance.c.id == activation_instance_id)
     )
     cur = await db.execute(query)
-    act_inst = cur.one()
+    log_id = cur.one().log_id
     # Open the large object and decode bytes to text via "utf-8"  (mode="rt")
-    lobject = await LObject(oid=act_inst.log_lob, mode="rt")
+    lobject = await LObject(oid=log_id, mode="rt")
     return StreamingResponse(iter(lambda: lobject.read, ''), media_type='application/text')
 
 
