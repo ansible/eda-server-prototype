@@ -125,6 +125,8 @@ activations = sqlalchemy.Table(
 )
 
 
+# This table will have an pre-insert trigger that will set the log_id if it is null.
+# This table will have a post-delete trigger that will cascade delete action to the large object table.
 activation_instances = sqlalchemy.Table(
     "activation_instance",
     metadata,
@@ -138,6 +140,7 @@ activation_instances = sqlalchemy.Table(
     sqlalchemy.Column("rulebook_id", sqlalchemy.ForeignKey("rulebook.id")),
     sqlalchemy.Column("inventory_id", sqlalchemy.ForeignKey("inventory.id")),
     sqlalchemy.Column("extra_var_id", sqlalchemy.ForeignKey("extra_var.id")),
+    sqlalchemy.Column("log_id", postgresql.OID, nullable=True, comment="OID of large object containing log(s).")
 )
 
 

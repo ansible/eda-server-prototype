@@ -7,6 +7,7 @@ from typing import List
 import sqlalchemy.orm
 import yaml
 from fastapi import APIRouter, Depends, WebSocket, WebSocketDisconnect
+from fastapi.responses import StreamingResponse
 from sqlalchemy import insert, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -26,6 +27,10 @@ from ansible_events_ui.db.models import (
     playbooks,
     projects,
     rulebooks,
+)
+from ansible_events_ui.db.utils import (
+    CHUNK_SIZE,
+    LObject
 )
 from ansible_events_ui.managers import taskmanager, updatemanager
 from ansible_events_ui.project import (
@@ -258,27 +263,32 @@ async def deactivate(activation_instance_id: int):
 async def read_output(proc, activation_instance_id, db_session_factory):
     # TODO(cutwater): Replace with FastAPI dependency injections,
     #   that is available in BackgroundTasks
+    read_chunk_size = CHUNK_SIZE
+
     async with db_session_factory() as db:
-        line_number = 0
-        done = False
-        while not done:
-            line = await proc.stdout.readline()
-            if len(line) == 0:
-                done = True
-                continue
-            line = line.decode()
-            await updatemanager.broadcast(
-                f"/activation_instance/{activation_instance_id}",
-                json.dumps(["Stdout", {"stdout": line}]),
-            )
-            query = insert(activation_instance_logs).values(
-                line_number=line_number,
-                log=line,
-                activation_instance_id=activation_instance_id,
-            )
-            await db.execute(query)
-            await db.commit()
-            line_number += 1
+        async with LObject(session=db, mode="wb") as lobject:
+            for buff in iter(lambda: proc.stdout.read(read_chunk_size), b''):
+                await lobject.write(buff)
+                await updatemanager.broadcast(
+                    f"/activation_instance/{activation_instance_id}",
+                    json.dumps(["Stdout", {"stdout": buff.decode()}]),
+                )
+
+
+@router.get(
+    "/api/activation_instance_logstream/", response_model=StreamingResponse
+)
+async def stream_activation_instance_logs(
+    activation_instance_id: int, db: AsyncSession = Depends(get_db_session)
+):
+    query = (
+        select(activateion_instance).filter(activateion_instance.id == activation_instance_id)
+    )
+    cur = await db.execute(query)
+    act_inst = cur.one()
+    # Open the large object and decode bytes to text via "utf-8"  (mode="rt")
+    lobject = await LObject(oid=act_inst.log_lob, mode="rt")
+    return StreamingResponse(iter(lambda: lobject.read, ''), media_type='application/text')
 
 
 @router.get(
