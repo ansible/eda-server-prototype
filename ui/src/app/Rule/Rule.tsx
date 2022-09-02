@@ -78,9 +78,9 @@ const Rule: React.FunctionComponent = () => {
           to: '/rules'
         },
         {
-          title: rule?.name,
+          title: rule?.name || '',
           key: 'details',
-          to: `/rules/${rule?.id}/details`
+          to: `/rule/${rule?.id}`
         },
         {
           title: currentTab || intl.formatMessage(sharedMessages.details),

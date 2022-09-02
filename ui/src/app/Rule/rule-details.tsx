@@ -21,7 +21,7 @@ import AceEditor from "react-ace";
 import "ace-builds/src-noconflict/mode-yaml";
 import "ace-builds/src-noconflict/theme-xcode";
 import styled from 'styled-components';
-import {RuleType} from "@app/Rules/Rules";
+import {RuleType} from "@app/RuleSetFiles/RuleSetFiles";
 import {ExtraVarType} from "@app/Vars/Vars";
 import {useIntl} from "react-intl";
 
@@ -80,25 +80,25 @@ const RuleDetails: React.FunctionComponent<{rule: RuleType}> = ({ rule }) => {
             </FlexItem>
             <FlexItem>
               <Stack>
-                <StackItem><Title headingLevel="h3">Execution environment</Title></StackItem>
+                <StackItem><Title headingLevel="h3">Action</Title></StackItem>
+                { rule && rule.action && <StackItem>
+                  <Link to={"/jobs"}>{ rule?.action ? Object.keys(rule?.action) : 'Link to action' }</Link>
+                </StackItem> }
+              </Stack>
+            </FlexItem>
+            <FlexItem>
+              <Stack>
+                <StackItem><Title headingLevel="h3">Last fired date</Title></StackItem>
                 <StackItem>
-                  {rule?.execution_environment}
+                  {rule?.last_fired_date}
                 </StackItem>
               </Stack>
             </FlexItem>
             <FlexItem>
               <Stack>
-                <StackItem><Title headingLevel="h3">Playbook</Title></StackItem>
+                <StackItem><Title headingLevel="h3">Last modified</Title></StackItem>
                 <StackItem>
-                  {rule?.playbook}
-                </StackItem>
-              </Stack>
-            </FlexItem>
-            <FlexItem>
-              <Stack>
-                <StackItem><Title headingLevel="h3">Restarted count</Title></StackItem>
-                <StackItem>
-                  {rule?.restarted_count}
+                  {rule?.modified_at}
                 </StackItem>
               </Stack>
             </FlexItem>
@@ -114,17 +114,35 @@ const RuleDetails: React.FunctionComponent<{rule: RuleType}> = ({ rule }) => {
             </FlexItem>
             <FlexItem>
               <Stack>
-                <StackItem><Title headingLevel="h3">Rule set</Title></StackItem>
-                <StackItem>
-                  <Link to={"/rulesetfile/" + rule.ruleset_id}>{rule.ruleset_name}</Link>
-                </StackItem>
+                <StackItem><Title headingLevel="h3">Project</Title></StackItem>
+                {rule && rule.project_id &&<StackItem>
+                  <Link to={"/project/" + rule?.project_id}>{rule?.project_name || `Project ${rule?.project_id}`}</Link>
+                </StackItem>}
               </Stack>
             </FlexItem>
             <FlexItem>
               <Stack>
-                <StackItem><Title headingLevel="h3">Rule status</Title></StackItem>
+                <StackItem><Title headingLevel="h3">Fire count</Title></StackItem>
                 <StackItem>
-                  {rule?.status}
+                  {rule?.fired_count || 0}
+                </StackItem>
+              </Stack>
+            </FlexItem>
+          </Flex>
+          <Flex direction={{ default: 'column' }} flex={{ default: 'flex_1' }}>
+            <FlexItem>
+              <Stack>
+                <StackItem><Title headingLevel="h3">Rule set</Title></StackItem>
+                { rule && rule.ruleset && <StackItem>
+                  {<Link to={"/ruleset/" + rule.ruleset.id}>{rule.ruleset.name || rule.ruleset.name}</Link>}
+                </StackItem> }
+              </Stack>
+            </FlexItem>
+            <FlexItem>
+              <Stack>
+                <StackItem><Title headingLevel="h3">Rule type</Title></StackItem>
+                <StackItem>
+                  {rule?.type}
                 </StackItem>
               </Stack>
             </FlexItem>
@@ -133,40 +151,6 @@ const RuleDetails: React.FunctionComponent<{rule: RuleType}> = ({ rule }) => {
                 <StackItem><Title headingLevel="h3">Created</Title></StackItem>
                 <StackItem>
                   {rule?.created_at}
-                </StackItem>
-              </Stack>
-            </FlexItem>
-          </Flex>
-          <Flex direction={{ default: 'column' }} flex={{ default: 'flex_1' }}>
-            <FlexItem>
-              <Stack>
-                <StackItem><Title headingLevel="h3">Inventory</Title></StackItem>
-                <StackItem>
-                  {<Link to={"/inventory/" + rule.inventory_id}>{rule.inventory_name}</Link>}
-                </StackItem>
-              </Stack>
-            </FlexItem>
-            <FlexItem>
-              <Stack>
-                <StackItem><Title headingLevel="h3">Restart policy</Title></StackItem>
-                <StackItem>
-                  {rule?.restart_policy}
-                </StackItem>
-              </Stack>
-            </FlexItem>
-            <FlexItem>
-              <Stack>
-                <StackItem><Title headingLevel="h3">Last restarted</Title></StackItem>
-                <StackItem>
-                  {rule?.last_restarted}
-                </StackItem>
-              </Stack>
-            </FlexItem>
-            <FlexItem>
-              <Stack>
-                <StackItem><Title headingLevel="h3">Last modified</Title></StackItem>
-                <StackItem>
-                  {rule?.updated_at}
                 </StackItem>
               </Stack>
             </FlexItem>
