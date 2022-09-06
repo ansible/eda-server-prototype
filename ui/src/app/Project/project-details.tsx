@@ -1,11 +1,11 @@
-import {CardBody, Flex, FlexItem, PageSection, Title} from '@patternfly/react-core';
+import {CardBody, Flex, FlexItem, PageSection, Text, TextVariants, Title} from '@patternfly/react-core';
 import React from 'react';
 import {
   Card,
   Stack,
   StackItem,
 } from '@patternfly/react-core';
-import {extractProjectNameFromUrl, renderProjectTabs} from "@app/Project/Project";
+import {renderProjectTabs} from "@app/Project/Project";
 import {useIntl} from "react-intl";
 import sharedMessages from "../messages/shared.messages";
 import {ProjectType} from "@app/shared/types/common-types";
@@ -19,7 +19,9 @@ const ProjectDetails: React.FunctionComponent<{project:ProjectType | undefined}>
           <Stack>
             <StackItem><Title headingLevel="h3">{intl.formatMessage(sharedMessages.name)}</Title></StackItem>
             <StackItem>
-              {project?.name || extractProjectNameFromUrl(project?.url)}
+              <Text component={TextVariants.h4}>
+                {project?.name || (project?.url)}
+              </Text>
             </StackItem>
           </Stack>
         </FlexItem>
@@ -27,15 +29,20 @@ const ProjectDetails: React.FunctionComponent<{project:ProjectType | undefined}>
           <Stack>
             <StackItem><Title headingLevel="h3">{intl.formatMessage(sharedMessages.scmUrl)}</Title></StackItem>
             <StackItem>
-              {project?.url || ' '}
+              <Text component={TextVariants.h4}>
+                {project?.url || ' '}
+              </Text>
             </StackItem>
           </Stack>
         </FlexItem>
         <FlexItem>
           <Stack>
-            <StackItem><Title headingLevel="h3">{intl.formatMessage(sharedMessages.lastModified)}</Title></StackItem>
+            <StackItem><Title headingLevel="h5">{intl.formatMessage(sharedMessages.lastModified)}</Title></StackItem>
             <StackItem>
-              {project?.modified_at || ' '}
+              <Text component={TextVariants.h3}>
+                {new Intl.DateTimeFormat('en-US',
+                  { dateStyle: 'short', timeStyle: 'long' }).format(new Date(project?.modified_at || 0))}
+              </Text>
             </StackItem>
           </Stack>
         </FlexItem>
@@ -45,7 +52,9 @@ const ProjectDetails: React.FunctionComponent<{project:ProjectType | undefined}>
           <Stack>
             <StackItem><Title headingLevel="h3">{intl.formatMessage(sharedMessages.description)}</Title></StackItem>
             <StackItem>
-              {project?.description || ' '}
+              <Text component={TextVariants.h4}>
+                {project?.description || ' '}
+              </Text>
             </StackItem>
           </Stack>
         </FlexItem>
@@ -53,7 +62,9 @@ const ProjectDetails: React.FunctionComponent<{project:ProjectType | undefined}>
           <Stack>
             <StackItem><Title headingLevel="h3">{intl.formatMessage(sharedMessages.scmCredentials)}</Title></StackItem>
             <StackItem>
-              {project?.scm_credentials || ' '}
+              <Text component={TextVariants.h4}>
+                {project?.scm_credentials || ' '}
+              </Text>
             </StackItem>
           </Stack>
         </FlexItem>
@@ -62,7 +73,9 @@ const ProjectDetails: React.FunctionComponent<{project:ProjectType | undefined}>
         <FlexItem>
           <Stack>
             <StackItem><Title headingLevel="h3">{intl.formatMessage(sharedMessages.scmType)}</Title>
-              {project?.scm_type || ''}
+              <Text component={TextVariants.h4}>
+                {project?.scm_type || ''}
+              </Text>
             </StackItem>
           </Stack>
         </FlexItem>
@@ -70,7 +83,10 @@ const ProjectDetails: React.FunctionComponent<{project:ProjectType | undefined}>
           <Stack>
             <StackItem><Title headingLevel="h3">{intl.formatMessage(sharedMessages.created)}</Title></StackItem>
             <StackItem>
-              {project?.created_at || ''}
+              <Text component={TextVariants.h5}>
+                {new Intl.DateTimeFormat('en-US',
+                  { dateStyle: 'short', timeStyle: 'long' }).format(new Date(project?.created_at || 0))}
+              </Text>
             </StackItem>
           </Stack>
         </FlexItem>

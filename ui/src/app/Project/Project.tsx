@@ -34,12 +34,7 @@ export const renderProjectTabs = (intl, projectId: string | undefined) => {
 
   return <AppTabs tabItems={project_tabs}/>
 };
-const endpoint1 = 'http://' + getServer() + '/api/projects/';
-export const extractProjectNameFromUrl = (url: string | undefined) => {
-  if( !url )
-    return '';
-  return (url.split("/").pop())?.split('.')[0];
-};
+const endpoint_project = 'http://' + getServer() + '/api/projects/';
 
 const Project: React.FunctionComponent = () => {
 
@@ -48,7 +43,7 @@ const Project: React.FunctionComponent = () => {
   const intl = useIntl();
 
   useEffect(() => {
-    fetch(endpoint1 + id, {
+    fetch(endpoint_project + id, {
       headers: {
         'Content-Type': 'application/json',
       },
@@ -64,11 +59,11 @@ const Project: React.FunctionComponent = () => {
           to: '/projects'
         },
         {
-          title:`${project?.name || extractProjectNameFromUrl(project?.url)}`
+          title:`${project?.name}`
         },
       ]
       }>
-        <Title headingLevel={"h2"}>{`${project?.name || extractProjectNameFromUrl(project?.url) }`}</Title>
+        <Title headingLevel={"h2"}>{`${project?.name}`}</Title>
       </TopToolbar>
       <Switch>
         { project && <Route exact path="/project/:id/links">
