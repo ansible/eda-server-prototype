@@ -28,9 +28,9 @@ from ansible_events_ui.db.models import (
     projects,
     rulebooks,
 )
-from ansible_events_ui.db.utils import (
+from ansible_events_ui.db.utils.lostream import (
     CHUNK_SIZE,
-    LObject
+    large_object_factory
 )
 from ansible_events_ui.managers import taskmanager, updatemanager
 from ansible_events_ui.project import (
@@ -216,14 +216,17 @@ async def create_activation_instance(
         get_db_session_factory
     ),
 ):
-    query = select(rulebooks).where(rulebooks.c.id == a.rulebook_id)
-    rulebook_row = (await db.execute(query)).first()
-
-    query = select(inventories).where(inventories.c.id == a.inventory_id)
-    inventory_row = (await db.execute(query)).first()
-
-    query = select(extra_vars).where(extra_vars.c.id == a.extra_var_id)
-    extra_var_row = (await db.execute(query)).first()
+    query = (
+        select(
+            inventories.c.inventory,
+            rulebooks.c.rulesets,
+            extra_vars.c.extra_var
+        ).join(inventories, activations.c.inventory_id == inventories.c.id)
+        .join(rulebooks, activations.c.rulebook_id == rulebooks.c.id)
+        .join(extra_vars, activations.c.extra_var_id == extra_vars.c.id)
+        .where(activations.c.id == activation.id)
+    )
+    activation_data = (await db.execute(query)).first()
 
     query = insert(activation_instances).values(
         name=a.name,
@@ -242,9 +245,9 @@ async def create_activation_instance(
         id_,
         # TODO(cutwater): Hardcoded container image link
         "quay.io/bthomass/ansible-events:latest",
-        rulebook_row.rulesets,
-        inventory_row.inventory,
-        extra_var_row.extra_var,
+        activation_data.rulesets,
+        activation_data.inventory,
+        activation_data.extra_var,
         db,
     )
 
@@ -271,7 +274,7 @@ async def read_output(
     read_chunk_size = CHUNK_SIZE
 
     async with db_session_factory() as db:
-        async with LObject(
+        async with large_object_factory(
             oid=activation_instance_log_id, session=db, mode="wb"
         ) as lobject:
             for buff in iter(lambda: proc.stdout.read(read_chunk_size), b''):
@@ -280,40 +283,21 @@ async def read_output(
                     f"/activation_instance/{activation_instance_id}",
                     json.dumps(["Stdout", {"stdout": buff.decode()}]),
                 )
+            else:
+                lobject.close()
 
 
-@router.get(
-    "/api/activation_instance_logstream/", response_model=StreamingResponse
-)
+@router.get("/api/activation_instance_logs/")
 async def stream_activation_instance_logs(
     activation_instance_id: int, db: AsyncSession = Depends(get_db_session)
 ):
     query = (
-        select(activateion_instance.c.log_id).where(activateion_instance.c.id == activation_instance_id)
+        select(activation_instances.c.log_id).where(activation_instances.c.id == activation_instance_id)
     )
-    cur = await db.execute(query)
-    log_id = cur.one().log_id
+    log_id = (await db.execute(query)).first().log_id
     # Open the large object and decode bytes to text via "utf-8"  (mode="rt")
-    lobject = await LObject(oid=log_id, mode="rt")
-    return StreamingResponse(iter(lambda: lobject.read, ''), media_type='application/text')
-
-
-@router.get(
-    "/api/activation_instance_logs/", response_model=List[ActivationLog]
-)
-async def list_activation_instance_logs(
-    activation_instance_id: int, db: AsyncSession = Depends(get_db_session)
-):
-    query = (
-        select(activation_instance_logs)
-        .where(
-            activation_instance_logs.c.activation_instance_id
-            == activation_instance_id
-        )
-        .order_by(activation_instance_logs.c.id)
-    )
-    result = await db.execute(query)
-    return result.all()
+    lobject = await large_object_factory(oid=log_id, session=db, mode="rt")
+    return StreamingResponse(lobject.gread(), media_type='application/text')
 
 
 @router.get("/api/tasks/")
