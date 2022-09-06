@@ -24,18 +24,20 @@ from ansible_events_ui.ruleset import (
     run_job,
     write_job_events,
 )
+from ansible_events_ui.schema.activation import (
+    ActivationInstance,
+    ActivationLog,
+)
+from ansible_events_ui.schema.extra_vars import Extravars
+from ansible_events_ui.schema.inventory import Inventory
+from ansible_events_ui.schema.job import JobInstance
+from ansible_events_ui.schema.rulebook import Rulebook
+from ansible_events_ui.schema.user import UserCreate, UserRead, UserUpdate
 from ansible_events_ui.users import (
     auth_backend,
     current_active_user,
     fastapi_users,
 )
-
-from ansible_events_ui.schema.activation import ActivationInstance, ActivationLog
-from ansible_events_ui.schema.job import JobInstance
-from ansible_events_ui.schema.inventory import Inventory
-from ansible_events_ui.schema.extra_vars import Extravars
-from ansible_events_ui.schema.rulebook import Rulebook
-from ansible_events_ui.schema.user import UserCreate, UserRead, UserUpdate
 
 from .activation import router as activation_router
 from .project import router as project_router

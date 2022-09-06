@@ -4,9 +4,9 @@ import sqlalchemy as sa
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ansible_events_ui.schema.rulebook import Rule
 from ansible_events_ui.db import models
 from ansible_events_ui.db.dependency import get_db_session
+from ansible_events_ui.schema.rulebook import Rule
 
 router = APIRouter()
 

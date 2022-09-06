@@ -2,6 +2,7 @@ from typing import Optional
 
 from pydantic import BaseModel
 
+
 class JobInstance(BaseModel):
     id: Optional[int]
     playbook_id: int

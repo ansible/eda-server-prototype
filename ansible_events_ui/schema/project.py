@@ -2,12 +2,8 @@ from datetime import datetime
 from typing import List, Optional
 
 from pydantic import BaseModel, StrictStr
-from ansible_events_ui.schema import (
-    rulebook,
-    extra_vars,
-    inventory,
-    playbook
-)
+
+from ansible_events_ui.schema import extra_vars, inventory, playbook, rulebook
 
 
 class ProjectCreate(BaseModel):
