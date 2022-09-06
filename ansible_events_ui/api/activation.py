@@ -6,8 +6,9 @@ from fastapi import APIRouter, Depends
 from fastapi.exceptions import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ansible_events_ui import schemas
 from ansible_events_ui.db import models
+from ansible_events_ui.schema.activation import Activation
+
 from ansible_events_ui.db.dependency import get_db_session
 
 logger = logging.getLogger("ansible_events_ui")
@@ -19,11 +20,11 @@ router = APIRouter()
 
 @router.post(
     "/api/activations/",
-    response_model=schemas.Activation,
+    response_model=Activation,
     operation_id="create_activation",
 )
 async def create_activation(
-    activation: schemas.Activation,
+    activation: Activation,
     db: AsyncSession = Depends(get_db_session),
 ):
     query = sa.insert(models.activations).values(

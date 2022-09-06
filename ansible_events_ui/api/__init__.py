@@ -11,7 +11,6 @@ from fastapi.exceptions import HTTPException
 from sqlalchemy import delete, insert, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ansible_events_ui import schemas
 from ansible_events_ui.db import models
 from ansible_events_ui.db.dependency import (
     get_db_session,
@@ -30,6 +29,13 @@ from ansible_events_ui.users import (
     current_active_user,
     fastapi_users,
 )
+
+from ansible_events_ui.schema.activation import ActivationInstance, ActivationLog
+from ansible_events_ui.schema.job import JobInstance
+from ansible_events_ui.schema.inventory import Inventory
+from ansible_events_ui.schema.extra_vars import Extravars
+from ansible_events_ui.schema.rulebook import Rulebook
+from ansible_events_ui.schema.user import UserCreate, UserRead, UserUpdate
 
 from .activation import router as activation_router
 from .project import router as project_router
@@ -146,7 +152,7 @@ async def websocket_job_endpoint(websocket: WebSocket, job_instance_id):
 
 @router.post("/api/rulebooks/")
 async def create_rulebook(
-    rulebook: schemas.Rulebook, db: AsyncSession = Depends(get_db_session)
+    rulebook: Rulebook, db: AsyncSession = Depends(get_db_session)
 ):
     query = insert(models.rulebooks).values(
         name=rulebook.name, rulesets=rulebook.rulesets
@@ -163,7 +169,7 @@ async def create_rulebook(
 
 @router.post("/api/inventory/")
 async def create_inventory(
-    i: schemas.Inventory, db: AsyncSession = Depends(get_db_session)
+    i: Inventory, db: AsyncSession = Depends(get_db_session)
 ):
     query = insert(models.inventories).values(
         name=i.name, inventory=i.inventory
@@ -176,7 +182,7 @@ async def create_inventory(
 
 @router.post("/api/extra_vars/")
 async def create_extra_vars(
-    e: schemas.Extravars, db: AsyncSession = Depends(get_db_session)
+    e: Extravars, db: AsyncSession = Depends(get_db_session)
 ):
     query = insert(models.extra_vars).values(
         name=e.name, extra_var=e.extra_var
@@ -189,7 +195,7 @@ async def create_extra_vars(
 
 @router.post("/api/activation_instance/")
 async def create_activation_instance(
-    a: schemas.ActivationInstance,
+    a: ActivationInstance,
     db: AsyncSession = Depends(get_db_session),
     db_session_factory: sqlalchemy.orm.sessionmaker = Depends(
         get_db_session_factory
@@ -273,7 +279,7 @@ async def read_output(proc, activation_instance_id, db_session_factory):
 
 @router.get(
     "/api/activation_instance_logs/",
-    response_model=List[schemas.ActivationLog],
+    response_model=List[ActivationLog],
 )
 async def list_activation_instance_logs(
     activation_instance_id: int, db: AsyncSession = Depends(get_db_session)
@@ -464,7 +470,7 @@ async def list_job_instances(db: AsyncSession = Depends(get_db_session)):
 
 @router.post("/api/job_instance/")
 async def create_job_instance(
-    j: schemas.JobInstance, db: AsyncSession = Depends(get_db_session)
+    j: JobInstance, db: AsyncSession = Depends(get_db_session)
 ):
 
     query = select(models.playbooks).where(
@@ -577,7 +583,7 @@ router.include_router(
     tags=["auth"],
 )
 router.include_router(
-    fastapi_users.get_register_router(schemas.UserRead, schemas.UserCreate),
+    fastapi_users.get_register_router(UserRead, UserCreate),
     prefix="/api/auth",
     tags=["auth"],
 )
@@ -587,12 +593,12 @@ router.include_router(
     tags=["auth"],
 )
 router.include_router(
-    fastapi_users.get_verify_router(schemas.UserRead),
+    fastapi_users.get_verify_router(UserRead),
     prefix="/api/auth",
     tags=["auth"],
 )
 router.include_router(
-    fastapi_users.get_users_router(schemas.UserRead, schemas.UserUpdate),
+    fastapi_users.get_users_router(UserRead, UserUpdate),
     prefix="/api/users",
     tags=["users"],
 )
