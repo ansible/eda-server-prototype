@@ -165,6 +165,62 @@ async def websocket_endpoint2(
                 )
                 await db.execute(query)
                 await db.commit()
+            elif data_type == "Action":
+                activation_id = data.get("activation_id")
+                if activation_id:
+                    query = select(models.activation_instances).where(
+                        models.activation_instances.c.id == int(activation_id)
+                    )
+                    instance = (await db.execute(query)).first()
+
+                    query = select(models.rulesets).where(
+                        models.rulesets.c.rulebook_id
+                        == int(instance.rulebook_id)
+                    )
+                    ruleset = (await db.execute(query)).first()
+
+                    query = select(models.rules).where(
+                        models.rules.c.ruleset_id == ruleset.id
+                    )
+                    rows = (await db.execute(query)).all()
+
+                    action_name = data.get("action")
+
+                    for rule in rows:
+                        if rule.action.get(action_name):
+                            job_id = data.get("job_id")
+                            if job_id:
+                                query = select(models.job_instances).where(
+                                    models.job_instances.c.uuid == job_id
+                                )
+                                result = await db.execute(query)
+                                job_instance_id = (
+                                    result.first().job_instance_id
+                                )
+
+                                query = insert(models.audit_rules).values(
+                                    name=rule.name,
+                                    definition=rule.action,
+                                    rule_id=rule.id,
+                                    ruleset_id=ruleset.id,
+                                    activation_instance_id=activation_instance_id,
+                                    job_instance_id=job_instance_id,
+                                    fired_date=data.get("run_at"),
+                                    status=data.get("status"),
+                                )
+                                await db.execute(query)
+                            else:
+                                query = insert(models.audit_rules).values(
+                                    name=rule.name,
+                                    definition=rule.action,
+                                    rule_id=rule.id,
+                                    ruleset_id=ruleset.id,
+                                    fired_date=data.get("run_at"),
+                                    activation_instance_id=activation_instance_id,
+                                )
+                                await db.execute(query)
+                        await db.commit()
+
     except WebSocketDisconnect:
         pass
 

@@ -1,5 +1,6 @@
 import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
+from sqlalchemy import func
 
 from .base import metadata
 
@@ -7,6 +8,7 @@ __all__ = (
     "rulebooks",
     "rulesets",
     "rules",
+    "audit_rules",
 )
 
 rulebooks = sa.Table(
@@ -61,4 +63,47 @@ rules = sa.Table(
     ),
     sa.Column("name", sa.String),
     sa.Column("action", postgresql.JSONB(none_as_null=True), nullable=False),
+)
+
+audit_rules = sa.Table(
+    "audit_rule",
+    metadata,
+    sa.Column(
+        "id",
+        sa.Integer,
+        sa.Identity(always=True),
+        primary_key=True,
+    ),
+    sa.Column("name", sa.String),
+    sa.Column("description", sa.String),
+    sa.Column("status", sa.String),
+    sa.Column("fired_date", sa.String),
+    sa.Column(
+        "created_at",
+        sa.DateTime(timezone=True),
+        nullable=False,
+        server_default=func.now(),
+    ),
+    sa.Column(
+        "definition", postgresql.JSONB(none_as_null=True), nullable=False
+    ),
+    sa.Column(
+        "rule_id",
+        sa.ForeignKey("rule.id"),
+        nullable=False,
+    ),
+    sa.Column(
+        "ruleset_id",
+        sa.ForeignKey("ruleset.id"),
+        nullable=False,
+    ),
+    sa.Column(
+        "activation_instance_id",
+        sa.ForeignKey("activation_instance.id"),
+        nullable=False,
+    ),
+    sa.Column(
+        "job_instance_id",
+        sa.ForeignKey("job_instance.id"),
+    ),
 )
