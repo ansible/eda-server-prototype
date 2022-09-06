@@ -139,9 +139,13 @@ const sharedMessages = defineMessages({
     id: 'project.projects',
     defaultMessage: 'Projects'
   },
-  noprojects: {
-    id: 'project.noprojects',
-    defaultMessage: 'No projects'
+  noprojects_action: {
+    id: 'project.noprojects_action',
+    defaultMessage: 'Please add a project by using the button below.'
+  },
+  noprojects_description: {
+    id: 'project.noprojects_description',
+    defaultMessage: 'There are currently no projects added for your organization.'
   },
   add_new_project: {
     id: 'project.addNewProject',
@@ -195,9 +199,13 @@ const sharedMessages = defineMessages({
     id: 'activation.activations',
     defaultMessage: 'Rulebook activations'
   },
-  noactivations: {
-    id: 'activation.noactivations',
+  noactivations_description: {
+    id: 'activation.noactivations_description',
     defaultMessage: 'There are currently no rulebook activations added for your organization.'
+  },
+  noactivations_action: {
+    id: 'activation.noactivations_action',
+    defaultMessage: 'Please add a rulebook activation by using the button below.'
   },
   addActivation: {
     id: 'activation.addActivation',
@@ -280,12 +288,16 @@ const sharedMessages = defineMessages({
     defaultMessage: 'No sources for this rule set'
   },
   noactivationjobs: {
-    id: 'activation.nojobs',
+    id: 'activation.nojobs_description',
     defaultMessage: 'There are currently no jobs for this rulebook activation.'
   },
-  nojobs: {
-    id: 'common.nojobs',
+  nojobs_description: {
+    id: 'common.nojobs_description',
     defaultMessage: 'There are currently no jobs for your organization.'
+  },
+  nojobs_action: {
+    id: 'common.nojobs_action',
+    defaultMessage: 'Please add a job by using the button below.'
   },
   lastFiredDate: {
     id: 'activation.lastFiredDate',
