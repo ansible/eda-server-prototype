@@ -66,7 +66,7 @@ cd ..
 ansible-events-ui
 ```
 
-Visit this url: <http://localhost:8080/docs#/auth/register_register_api_auth_register_post>
+Visit this url: <http://localhost/api/docs/auth/register_register_api_auth_register_post>
 
 Click "Try it out" on `/api/auth/register`
 
@@ -74,9 +74,9 @@ Change email and password
 
 Click execute
 
-Visit this url: <http://localhost:8080/eda>
+Visit this url: http://localhost/eda
 
-Also you can check the [openapi specification.](http://localhost:8080/docs)
+Also you can check the [openapi specification.](http://localhost/docs)
 
 You have set up the development environment.
 
@@ -131,7 +131,7 @@ In a second terminal run the following cmd to create a `dev` user with a passwor
 scripts/createuser.sh dev_user@redhat.com none2tuff
 ```
 
-Visit this url: http://localhost:8080/eda
+Visit this url: http://localhost/eda
 
 - **Note:** 
   Instead of running the above build, deploy, and minikube-fp-ui tasks individually. 

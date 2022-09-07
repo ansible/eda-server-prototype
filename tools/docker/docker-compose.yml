@@ -1,6 +1,18 @@
 version: '3.9'
 
 services:
+  frontend:
+    image: ansible-events
+    build:
+      context: ../../
+      dockerfile: tools/docker/nginx/Dockerfile
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      app:
+        condition: service_healthy
   app:
     image: ansible-events-ui
     build:
