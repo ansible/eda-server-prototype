@@ -3,7 +3,7 @@ from typing import List, Optional
 
 from pydantic import BaseModel, StrictStr
 
-from ansible_events_ui.schema import extra_vars, inventory, playbook, rulebook
+from ansible_events_ui import schema
 
 
 class ProjectCreate(BaseModel):
@@ -20,10 +20,10 @@ class ProjectRead(ProjectCreate):
 
 
 class ProjectDetail(ProjectRead):
-    rulesets: List[rulebook.RuleRulesetRef]
-    inventories: List[inventory.InventoryRef]
-    vars: List[extra_vars.ExtravarsRef]
-    playbooks: List[playbook.PlaybookRef]
+    rulesets: List[schema.RuleRulesetRef]
+    inventories: List[schema.InventoryRef]
+    vars: List[schema.ExtravarsRef]
+    playbooks: List[schema.PlaybookRef]
 
 
 class ProjectList(BaseModel):
