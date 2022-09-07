@@ -1,4 +1,4 @@
-# Build app
+# Build eda-server
 FROM registry.access.redhat.com/ubi8/python-39
 ARG USER_ID=${USER_ID:-1001}
 ARG DEVEL_AE_LIBRARY=1

@@ -53,7 +53,7 @@ def create_app() -> FastAPI:
     settings = load_settings()
 
     app = FastAPI(title="Ansible Events API",
-                  description="Backend APis for Event Driven Automation",
+                  description="API for Event Driven Automation",
                   docs_url='/api/docs',
                   redoc_url='/api/redoc',
                   openapi_url='/api/openapi.json')
