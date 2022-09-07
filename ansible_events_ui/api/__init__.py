@@ -6,11 +6,13 @@ from typing import List
 
 import sqlalchemy.orm
 import yaml
-from fastapi import APIRouter, Depends, HTTPException, WebSocket, WebSocketDisconnect
-from fastapi.responses import StreamingResponse
-from sqlalchemy import insert, select
+from fastapi import APIRouter, Depends, WebSocket, WebSocketDisconnect, status
+from fastapi.exceptions import HTTPException
+from sqlalchemy import delete, insert, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from ansible_events_ui import schemas
+from ansible_events_ui.db import models
 from ansible_events_ui.db.dependency import (
     get_db_session,
     get_db_session_factory,
@@ -33,28 +35,12 @@ from ansible_events_ui.db.utils.lostream import (
     large_object_factory
 )
 from ansible_events_ui.managers import taskmanager, updatemanager
-from ansible_events_ui.project import (
-    clone_project,
-    insert_rulebook_related_data,
-    sync_project,
-)
+from ansible_events_ui.project import insert_rulebook_related_data
 from ansible_events_ui.ruleset import (
     activate_rulesets,
     inactivate_rulesets,
     run_job,
     write_job_events,
-)
-from ansible_events_ui.schemas import (
-    Activation,
-    ActivationLog,
-    Extravars,
-    Inventory,
-    JobInstance,
-    Project,
-    Rulebook,
-    UserCreate,
-    UserRead,
-    UserUpdate,
 )
 from ansible_events_ui.users import (
     auth_backend,
@@ -63,6 +49,7 @@ from ansible_events_ui.users import (
 )
 
 from .activation import router as activation_router
+from .project import router as project_router
 from .rule import router as rule_router
 
 logger = logging.getLogger("ansible_events_ui")
@@ -70,6 +57,7 @@ logger = logging.getLogger("ansible_events_ui")
 router = APIRouter()
 router.include_router(activation_router)
 router.include_router(rule_router)
+router.include_router(project_router)
 
 
 @router.websocket("/api/ws2")
@@ -85,12 +73,16 @@ async def websocket_endpoint2(
             # TODO(cutwater): Some data validation is needed
             data_type = data.get("type")
             if data_type == "Job":
-                query = insert(job_instances).values(uuid=data.get("job_id"))
+                query = insert(models.job_instances).values(
+                    uuid=data.get("job_id")
+                )
                 result = await db.execute(query)
                 (job_instance_id,) = result.inserted_primary_key
 
                 activation_instance_id = int(data.get("ansible_events_id"))
-                query = insert(activation_instance_job_instances).values(
+                query = insert(
+                    models.activation_instance_job_instances
+                ).values(
                     job_instance_id=job_instance_id,
                     activation_instance_id=activation_instance_id,
                 )
@@ -107,8 +99,8 @@ async def websocket_endpoint2(
             elif data_type == "AnsibleEvent":
                 event_data = data.get("event", {})
                 if event_data.get("stdout"):
-                    query = select(job_instances).where(
-                        job_instances.c.uuid == event_data.get("job_id")
+                    query = select(models.job_instances).where(
+                        models.job_instances.c.uuid == event_data.get("job_id")
                     )
                     result = await db.execute(query)
                     job_instance_id = result.first().job_instance_id
@@ -120,7 +112,7 @@ async def websocket_endpoint2(
                         ),
                     )
 
-                query = insert(job_instance_events).values(
+                query = insert(models.job_instance_events).values(
                     job_uuid=event_data.get("job_id"),
                     counter=event_data.get("counter"),
                     stdout=event_data.get("stdout"),
@@ -171,9 +163,9 @@ async def websocket_job_endpoint(websocket: WebSocket, job_instance_id):
 
 @router.post("/api/rulebooks/")
 async def create_rulebook(
-    rulebook: Rulebook, db: AsyncSession = Depends(get_db_session)
+    rulebook: schemas.Rulebook, db: AsyncSession = Depends(get_db_session)
 ):
-    query = insert(rulebooks).values(
+    query = insert(models.rulebooks).values(
         name=rulebook.name, rulesets=rulebook.rulesets
     )
     result = await db.execute(query)
@@ -188,9 +180,11 @@ async def create_rulebook(
 
 @router.post("/api/inventory/")
 async def create_inventory(
-    i: Inventory, db: AsyncSession = Depends(get_db_session)
+    i: schemas.Inventory, db: AsyncSession = Depends(get_db_session)
 ):
-    query = insert(inventories).values(name=i.name, inventory=i.inventory)
+    query = insert(models.inventories).values(
+        name=i.name, inventory=i.inventory
+    )
     result = await db.execute(query)
     await db.commit()
     (id_,) = result.inserted_primary_key
@@ -199,9 +193,11 @@ async def create_inventory(
 
 @router.post("/api/extra_vars/")
 async def create_extra_vars(
-    e: Extravars, db: AsyncSession = Depends(get_db_session)
+    e: schemas.Extravars, db: AsyncSession = Depends(get_db_session)
 ):
-    query = insert(extra_vars).values(name=e.name, extra_var=e.extra_var)
+    query = insert(models.extra_vars).values(
+        name=e.name, extra_var=e.extra_var
+    )
     result = await db.execute(query)
     await db.commit()
     (id_,) = result.inserted_primary_key
@@ -210,7 +206,7 @@ async def create_extra_vars(
 
 @router.post("/api/activation_instance/")
 async def create_activation_instance(
-    a: Activation,
+    a: schemas.ActivationInstance,
     db: AsyncSession = Depends(get_db_session),
     db_session_factory: sqlalchemy.orm.sessionmaker = Depends(
         get_db_session_factory
@@ -228,7 +224,7 @@ async def create_activation_instance(
     )
     activation_data = (await db.execute(query)).first()
 
-    query = insert(activation_instances).values(
+    query = insert(models.activation_instances).values(
         name=a.name,
         rulebook_id=a.rulebook_id,
         inventory_id=a.inventory_id,
@@ -287,8 +283,11 @@ async def read_output(
                 lobject.close()
 
 
-@router.get("/api/activation_instance_logs/", response_model=List[ActivationLog])
-async def stream_activation_instance_logs(
+@router.get(
+    "/api/activation_instance_logs/",
+    response_model=List[schemas.ActivationLog],
+)
+async def list_activation_instance_logs(
     activation_instance_id: int, db: AsyncSession = Depends(get_db_session)
 ):
     query = (
@@ -398,7 +397,7 @@ async def list_projects(db: AsyncSession = Depends(get_db_session)):
 
 @router.get("/api/playbooks/")
 async def list_playbooks(db: AsyncSession = Depends(get_db_session)):
-    query = select(playbooks)
+    query = select(models.playbooks)
     result = await db.execute(query)
     return result.all()
 
@@ -407,14 +406,16 @@ async def list_playbooks(db: AsyncSession = Depends(get_db_session)):
 async def read_playbook(
     playbook_id: int, db: AsyncSession = Depends(get_db_session)
 ):
-    query = select(playbooks).where(playbooks.c.id == playbook_id)
+    query = select(models.playbooks).where(
+        models.playbooks.c.id == playbook_id
+    )
     result = await db.execute(query)
     return result.first()
 
 
 @router.get("/api/inventories/")
 async def list_inventories(db: AsyncSession = Depends(get_db_session)):
-    query = select(inventories)
+    query = select(models.inventories)
     result = await db.execute(query)
     return result.all()
 
@@ -424,14 +425,16 @@ async def read_inventory(
     inventory_id: int, db: AsyncSession = Depends(get_db_session)
 ):
     # FIXME(cutwater): Return HTTP 404 if inventory doesn't exist
-    query = select(inventories).where(inventories.c.id == inventory_id)
+    query = select(models.inventories).where(
+        models.inventories.c.id == inventory_id
+    )
     result = await db.execute(query)
     return result.first()
 
 
 @router.get("/api/rulebooks/")
 async def list_rulebooks(db: AsyncSession = Depends(get_db_session)):
-    query = select(rulebooks)
+    query = select(models.rulebooks)
     result = await db.execute(query)
     return result.all()
 
@@ -440,7 +443,9 @@ async def list_rulebooks(db: AsyncSession = Depends(get_db_session)):
 async def read_rulebook(
     rulebook_id: int, db: AsyncSession = Depends(get_db_session)
 ):
-    query = select(rulebooks).where(rulebooks.c.id == rulebook_id)
+    query = select(models.rulebooks).where(
+        models.rulebooks.c.id == rulebook_id
+    )
     result = await db.execute(query)
     return result.first()
 
@@ -449,7 +454,9 @@ async def read_rulebook(
 async def read_rulebook_json(
     rulebook_id: int, db: AsyncSession = Depends(get_db_session)
 ):
-    query = select(rulebooks).where(rulebooks.c.id == rulebook_id)
+    query = select(models.rulebooks).where(
+        models.rulebooks.c.id == rulebook_id
+    )
     result = await db.execute(query)
 
     response = dict(result.first())
@@ -459,7 +466,7 @@ async def read_rulebook_json(
 
 @router.get("/api/extra_vars/")
 async def list_extra_vars(db: AsyncSession = Depends(get_db_session)):
-    query = select(extra_vars)
+    query = select(models.extra_vars)
     result = await db.execute(query)
     return result.all()
 
@@ -468,7 +475,9 @@ async def list_extra_vars(db: AsyncSession = Depends(get_db_session)):
 async def read_extravar(
     extra_var_id: int, db: AsyncSession = Depends(get_db_session)
 ):
-    query = select(extra_vars).where(extra_vars.c.id == extra_var_id)
+    query = select(models.extra_vars).where(
+        models.extra_vars.c.id == extra_var_id
+    )
     result = await db.execute(query)
     return result.first()
 
@@ -477,7 +486,7 @@ async def read_extravar(
 async def list_activation_instances(
     db: AsyncSession = Depends(get_db_session),
 ):
-    query = select(activation_instances)
+    query = select(models.activation_instances)
     result = await db.execute(query)
     return result.all()
 
@@ -488,50 +497,73 @@ async def read_activation_instance(
 ):
     query = (
         select(
-            activation_instances.c.id,
-            activation_instances.c.name,
-            rulebooks.c.id.label("ruleset_id"),
-            rulebooks.c.name.label("ruleset_name"),
-            inventories.c.id.label("inventory_id"),
-            inventories.c.name.label("inventory_name"),
-            extra_vars.c.id.label("extra_var_id"),
-            extra_vars.c.name.label("extra_vars_name"),
+            models.activation_instances.c.id,
+            models.activation_instances.c.name,
+            models.rulebooks.c.id.label("ruleset_id"),
+            models.rulebooks.c.name.label("ruleset_name"),
+            models.inventories.c.id.label("inventory_id"),
+            models.inventories.c.name.label("inventory_name"),
+            models.extra_vars.c.id.label("extra_var_id"),
+            models.extra_vars.c.name.label("extra_vars_name"),
         )
         .select_from(
-            activation_instances.join(rulebooks)
-            .join(inventories)
-            .join(extra_vars)
+            models.activation_instances.join(models.rulebooks)
+            .join(models.inventories)
+            .join(models.extra_vars)
         )
-        .where(activation_instances.c.id == activation_instance_id)
+        .where(models.activation_instances.c.id == activation_instance_id)
     )
     result = await db.execute(query)
     return result.first()
 
 
+@router.delete(
+    "/api/activation_instance/{activation_instance_id}",
+    status_code=204,
+    operation_id="delete_activation_instance",
+)
+async def delete_activation_instance(
+    activation_instance_id: int, db: AsyncSession = Depends(get_db_session)
+):
+    query = delete(models.activation_instances).where(
+        models.activation_instances.c.id == activation_instance_id
+    )
+    results = await db.execute(query)
+    if results.rowcount == 0:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+    await db.commit()
+
+
 @router.get("/api/job_instances/")
 async def list_job_instances(db: AsyncSession = Depends(get_db_session)):
-    query = select(job_instances)
+    query = select(models.job_instances)
     result = await db.execute(query)
     return result.all()
 
 
 @router.post("/api/job_instance/")
 async def create_job_instance(
-    j: JobInstance, db: AsyncSession = Depends(get_db_session)
+    j: schemas.JobInstance, db: AsyncSession = Depends(get_db_session)
 ):
 
-    query = select(playbooks).where(playbooks.c.id == j.playbook_id)
+    query = select(models.playbooks).where(
+        models.playbooks.c.id == j.playbook_id
+    )
     playbook_row = (await db.execute(query)).first()
 
-    query = select(inventories).where(inventories.c.id == j.inventory_id)
+    query = select(models.inventories).where(
+        models.inventories.c.id == j.inventory_id
+    )
     inventory_row = (await db.execute(query)).first()
 
-    query = select(extra_vars).where(extra_vars.c.id == j.extra_var_id)
+    query = select(models.extra_vars).where(
+        models.extra_vars.c.id == j.extra_var_id
+    )
     extra_var_row = (await db.execute(query)).first()
 
     job_uuid = str(uuid.uuid4())
 
-    query = insert(job_instances).values(uuid=job_uuid)
+    query = insert(models.job_instances).values(uuid=job_uuid)
     result = await db.execute(query)
     await db.commit()
     (job_instance_id,) = result.inserted_primary_key
@@ -562,22 +594,43 @@ async def create_job_instance(
 async def read_job_instance(
     job_instance_id: int, db: AsyncSession = Depends(get_db_session)
 ):
-    query = select(job_instances).where(job_instances.c.id == job_instance_id)
+    query = select(models.job_instances).where(
+        models.job_instances.c.id == job_instance_id
+    )
     result = await db.execute(query)
     return result.first()
+
+
+@router.delete(
+    "/api/job_instance/{job_instance_id}",
+    status_code=204,
+    operation_id="delete_job_instance",
+)
+async def delete_job_instance(
+    job_instance_id: int, db: AsyncSession = Depends(get_db_session)
+):
+    query = delete(models.job_instances).where(
+        models.job_instances.c.id == job_instance_id
+    )
+    results = await db.execute(query)
+    if results.rowcount == 0:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+    await db.commit()
 
 
 @router.get("/api/job_instance_events/{job_instance_id}")
 async def read_job_instance_events(
     job_instance_id: int, db: AsyncSession = Depends(get_db_session)
 ):
-    query = select(job_instances).where(job_instances.c.id == job_instance_id)
+    query = select(models.job_instances).where(
+        models.job_instances.c.id == job_instance_id
+    )
     job = (await db.execute(query)).first()
 
     query = (
-        select(job_instance_events)
-        .where(job_instance_events.c.job_uuid == job.uuid)
-        .order_by(job_instance_events.c.counter)
+        select(models.job_instance_events)
+        .where(models.job_instance_events.c.job_uuid == job.uuid)
+        .order_by(models.job_instance_events.c.counter)
     )
     return (await db.execute(query)).all()
 
@@ -586,8 +639,8 @@ async def read_job_instance_events(
 async def read_activation_instance_job_instances(
     activation_instance_id: int, db: AsyncSession = Depends(get_db_session)
 ):
-    query = select(activation_instance_job_instances).where(
-        activation_instance_job_instances.c.activation_instance_id
+    query = select(models.activation_instance_job_instances).where(
+        models.activation_instance_job_instances.c.activation_instance_id
         == activation_instance_id
     )
     result = await db.execute(query)
@@ -603,7 +656,7 @@ router.include_router(
     tags=["auth"],
 )
 router.include_router(
-    fastapi_users.get_register_router(UserRead, UserCreate),
+    fastapi_users.get_register_router(schemas.UserRead, schemas.UserCreate),
     prefix="/api/auth",
     tags=["auth"],
 )
@@ -613,17 +666,19 @@ router.include_router(
     tags=["auth"],
 )
 router.include_router(
-    fastapi_users.get_verify_router(UserRead),
+    fastapi_users.get_verify_router(schemas.UserRead),
     prefix="/api/auth",
     tags=["auth"],
 )
 router.include_router(
-    fastapi_users.get_users_router(UserRead, UserUpdate),
+    fastapi_users.get_users_router(schemas.UserRead, schemas.UserUpdate),
     prefix="/api/users",
     tags=["users"],
 )
 
 
 @router.get("/api/authenticated-route")
-async def authenticated_route(user: User = Depends(current_active_user)):
+async def authenticated_route(
+    user: models.User = Depends(current_active_user),
+):
     return {"message": f"Hello {user.email}!"}

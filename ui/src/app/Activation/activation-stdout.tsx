@@ -1,6 +1,5 @@
 import {CardBody, PageSection, SimpleList} from '@patternfly/react-core';
-import React, { useState, useEffect, Fragment } from 'react';
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Card,
   CardTitle,

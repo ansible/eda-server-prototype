@@ -1,14 +1,21 @@
+from typing import List
+
 import sqlalchemy as sa
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from ansible_events_ui import schemas
 from ansible_events_ui.db import models
 from ansible_events_ui.db.dependency import get_db_session
 
 router = APIRouter()
 
 
-@router.get("/api/rules/")
+@router.get(
+    "/api/rules/",
+    response_model=List[schemas.Rule],
+    operation_id="list_rules",
+)
 async def list_rules(db: AsyncSession = Depends(get_db_session)):
     query = (
         sa.select(
@@ -39,7 +46,11 @@ async def list_rules(db: AsyncSession = Depends(get_db_session)):
     return response
 
 
-@router.get("/api/rules/{rule_id}/")
+@router.get(
+    "/api/rules/{rule_id}/",
+    response_model=schemas.Rule,
+    operation_id="show_rule",
+)
 async def show_rule(rule_id: int, db: AsyncSession = Depends(get_db_session)):
     query = (
         sa.select(
