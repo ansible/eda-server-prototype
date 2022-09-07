@@ -116,7 +116,7 @@ activation_instances = sa.Table(
     sa.Column(
         "extra_var_id", sa.ForeignKey("extra_var.id", ondelete="CASCADE")
     ),
-    sqlalchemy.Column(
+    sa.Column(
         "log_id", postgresql.OID, nullable=True, comment="OID of large object containing log(s)."
     ),
 )
