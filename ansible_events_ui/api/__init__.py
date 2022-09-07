@@ -287,7 +287,7 @@ async def read_output(
                 lobject.close()
 
 
-@router.get("/api/activation_instance_logs/")
+@router.get("/api/activation_instance_logs/", response_model=List[ActivationLog])
 async def stream_activation_instance_logs(
     activation_instance_id: int, db: AsyncSession = Depends(get_db_session)
 ):
@@ -304,7 +304,13 @@ async def stream_activation_instance_logs(
     except FileNotFoundError as lob_exc:
         raise HTTPException(status_code=404, detail=str(lob_exc))
 
-    return StreamingResponse(lobject.gread(), media_type='application/text')
+    async for buff in lobject.gread():
+        await updatemanager.broadcast(
+            f"/activation_instance/{activation_instance_id}",
+            json.dumps(["Stdout", {"stdout": buff}]),
+        )
+
+    return []
 
 
 @router.get("/api/tasks/")
