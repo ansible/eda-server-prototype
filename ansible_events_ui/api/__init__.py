@@ -6,7 +6,7 @@ from typing import List
 
 import sqlalchemy.orm
 import yaml
-from fastapi import APIRouter, Depends, WebSocket, WebSocketDisconnect
+from fastapi import APIRouter, Depends, HTTPException, WebSocket, WebSocketDisconnect
 from fastapi.responses import StreamingResponse
 from sqlalchemy import insert, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -294,9 +294,16 @@ async def stream_activation_instance_logs(
     query = (
         select(activation_instances.c.log_id).where(activation_instances.c.id == activation_instance_id)
     )
-    log_id = (await db.execute(query)).first().log_id
+    rec = (await db.execute(query)).first()
+    if rec is None:
+        raise HTTPException(status_code=404, detail=f"Activation instance id {activation_instance_id} not found")
+
     # Open the large object and decode bytes to text via "utf-8"  (mode="rt")
-    lobject = await large_object_factory(oid=log_id, session=db, mode="rt")
+    try:
+        lobject = await large_object_factory(oid=rec.log_id, session=db, mode="rt")
+    except FileNotFoundError as lob_exc:
+        raise HTTPException(status_code=404, detail=str(lob_exc))
+
     return StreamingResponse(lobject.gread(), media_type='application/text')
 
 
