@@ -233,7 +233,7 @@ const Projects: React.FunctionComponent = () => {
             variant="primary"
             aria-label={intl.formatMessage(sharedMessages.add)}
           >
-            {intl.formatMessage(sharedMessages.add)}
+            {intl.formatMessage(sharedMessages.addProject)}
           </Button>
         </Link>
       </ToolbarItem>

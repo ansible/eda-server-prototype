@@ -239,9 +239,9 @@ const Activations: React.FunctionComponent = () => {
           <Button
             ouiaId={'add-activation-link'}
             variant="primary"
-            aria-label={intl.formatMessage(sharedMessages.add)}
+            aria-label={intl.formatMessage(sharedMessages.addActivation)}
           >
-            {intl.formatMessage(sharedMessages.add)}
+            {intl.formatMessage(sharedMessages.addActivation)}
           </Button>
         </Link>
       </ToolbarItem>
