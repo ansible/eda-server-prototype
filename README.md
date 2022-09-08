@@ -108,15 +108,15 @@ minikube status
 ```
 
 Build image and deployment files.
-(If you do not provide an image:version as shown below it will default to "eda:latest")
+(If you do not provide a version as shown below docker tag will default to "latest")
 ```sh
-task minikube:build -- eda:001
+task minikube:build -- 001
 ```
 
 Deploy application to minikube.
-(If you do not provide an image:version as shown below it will default to "eda:latest")
+(If you do not provide a version as shown below docker tag will default to "latest")
 ```sh
-task minikube:deploy -- eda:001
+task minikube:deploy -- 001
 ```
 
 Forward the webserver port to local host.
@@ -131,7 +131,7 @@ In a second terminal run the following cmd to create a `dev` user with a passwor
 scripts/createuser.sh dev_user@redhat.com none2tuff
 ```
 
-Visit this url: http://localhost/eda
+Visit this url: http://localhost:8080/eda
 
 - **Note:** 
   Instead of running the above build, deploy, and minikube-fp-ui tasks individually. 

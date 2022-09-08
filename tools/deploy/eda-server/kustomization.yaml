@@ -1,0 +1,11 @@
+commonLabels:
+  app: eda-server
+resources:
+- deployment.yaml
+- service.yaml
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+images:
+- name: eda-server
+  newName: eda-server
+  newTag: latest

@@ -1,17 +1,17 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: ansible-events-ui
+  name: eda-server
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: ansible-events-ui
+      app: eda-server
   strategy: {}
   template:
     metadata:
       labels:
-        app: ansible-events-ui
+        app: eda-server
     spec:
       containers:
         - args:
@@ -23,9 +23,9 @@ spec:
               value: postgresql+asyncpg://postgres:secret@postgres/ansible_events
             - name: AE_HOST
               value: 0.0.0.0
-          image: ansible-events-ui
+          image: eda-server
           imagePullPolicy: Never
-          name: ansible-events-ui
+          name: eda-server
           ports:
             - containerPort: 8080
           resources: {}
