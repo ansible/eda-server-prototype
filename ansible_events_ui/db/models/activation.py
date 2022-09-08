@@ -1,9 +1,15 @@
 import sqlalchemy as sa
 from sqlalchemy import func
 
-from .base import metadata
+from .base import Base
+from .mixins import IntIdMixin
 
 __all__ = (
+    "Activation",
+    "ActivationInstance",
+    "ActivationInstanceLog",
+    "ExecutionEnvironment",
+    "RestartPolicy",
     "activations",
     "activation_instances",
     "activation_instance_logs",
@@ -11,124 +17,77 @@ __all__ = (
     "restart_policies",
 )
 
-activations = sa.Table(
-    "activation",
-    metadata,
-    sa.Column(
-        "id",
-        sa.Integer,
-        sa.Identity(always=True),
-        primary_key=True,
-    ),
-    sa.Column("name", sa.String, nullable=False),
-    sa.Column("description", sa.String),
-    sa.Column(
-        "execution_env_id",
-        sa.ForeignKey("execution_env.id", ondelete="CASCADE"),
-        nullable=False,
-    ),
-    sa.Column(
-        "rulebook_id",
-        sa.ForeignKey("rulebook.id", ondelete="CASCADE"),
-        nullable=False,
-    ),
-    sa.Column(
-        "inventory_id",
-        sa.ForeignKey("inventory.id", ondelete="CASCADE"),
-        nullable=False,
-    ),
-    sa.Column(
-        "extra_var_id",
-        sa.ForeignKey("extra_var.id", ondelete="CASCADE"),
-        nullable=False,
-    ),
-    sa.Column(
-        "restart_policy_id",
-        sa.ForeignKey("restart_policy.id"),
-        nullable=False,
-    ),
-    sa.Column(
-        "playbook_id",
-        sa.ForeignKey("playbook.id", ondelete="CASCADE"),
-        nullable=False,
-    ),
-    sa.Column("activation_status", sa.String),
-    sa.Column("activation_enabled", sa.Boolean, nullable=False),
-    sa.Column("restarted_at", sa.DateTime(timezone=True)),
-    sa.Column("restarted_count", sa.Integer, nullable=False, default=0),
-    sa.Column(
-        "created_at",
-        sa.DateTime(timezone=True),
-        nullable=False,
-        server_default=func.now(),
-    ),
-    sa.Column(
-        "modified_at",
+
+class Activation(IntIdMixin, Base):
+    __tablename__ = "activation"
+    id = sa.Column(sa.Integer, sa.Identity(always=True), primary_key=True)
+    name = sa.Column(sa.String, nullable=False)
+    description = sa.Column(sa.String)
+    execution_env_id = sa.Column(
+        sa.ForeignKey("execution_env.id", ondelete="CASCADE"), nullable=False
+    )
+    rulebook_id = sa.Column(
+        sa.ForeignKey("rulebook.id", ondelete="CASCADE"), nullable=False
+    )
+    inventory_id = sa.Column(
+        sa.ForeignKey("inventory.id", ondelete="CASCADE"), nullable=False
+    )
+    extra_var_id = sa.Column(
+        sa.ForeignKey("extra_var.id", ondelete="CASCADE"), nullable=False
+    )
+    restart_policy_id = sa.Column(
+        sa.ForeignKey("restart_policy.id"), nullable=False
+    )
+    playbook_id = sa.Column(
+        sa.ForeignKey("playbook.id", ondelete="CASCADE"), nullable=False
+    )
+    activation_status = sa.Column(sa.String)
+    activation_enabled = sa.Column(sa.Boolean, nullable=False)
+    restarted_at = sa.Column(sa.DateTime(timezone=True))
+    restarted_count = sa.Column(sa.Integer, nullable=False, default=0)
+    created_at = sa.Column(
+        sa.DateTime(timezone=True), nullable=False, server_default=func.now()
+    )
+    modified_at = sa.Column(
         sa.DateTime(timezone=True),
         nullable=False,
         server_default=func.now(),
         onupdate=func.now(),
-    ),
-)
-
-execution_envs = sa.Table(
-    "execution_env",
-    metadata,
-    sa.Column(
-        "id",
-        sa.Integer,
-        sa.Identity(always=True),
-        primary_key=True,
-    ),
-    sa.Column("url", sa.String, nullable=False),
-)
-
-restart_policies = sa.Table(
-    "restart_policy",
-    metadata,
-    sa.Column(
-        "id",
-        sa.Integer,
-        sa.Identity(always=True),
-        primary_key=True,
-    ),
-    sa.Column("name", sa.String),
-)
+    )
 
 
-activation_instances = sa.Table(
-    "activation_instance",
-    metadata,
-    sa.Column(
-        "id",
-        sa.Integer,
-        sa.Identity(always=True),
-        primary_key=True,
-    ),
-    sa.Column("name", sa.String),
-    sa.Column("rulebook_id", sa.ForeignKey("rulebook.id", ondelete="CASCADE")),
-    sa.Column(
-        "inventory_id", sa.ForeignKey("inventory.id", ondelete="CASCADE")
-    ),
-    sa.Column(
-        "extra_var_id", sa.ForeignKey("extra_var.id", ondelete="CASCADE")
-    ),
-)
+class ExecutionEnvironment(IntIdMixin, Base):
+    __tablename__ = "execution_env"
+    url = sa.Column(sa.String, nullable=False)
 
 
-activation_instance_logs = sa.Table(
-    "activation_instance_log",
-    metadata,
-    sa.Column(
-        "id",
-        sa.Integer,
-        sa.Identity(always=True),
-        primary_key=True,
-    ),
-    sa.Column(
-        "activation_instance_id",
-        sa.ForeignKey("activation_instance.id", ondelete="CASCADE"),
-    ),
-    sa.Column("line_number", sa.Integer),
-    sa.Column("log", sa.String),
-)
+class RestartPolicy(IntIdMixin, Base):
+    __tablename__ = "restart_policy"
+    name = sa.Column(sa.String)
+
+
+class ActivationInstance(IntIdMixin, Base):
+    __tablename__ = "activation_instance"
+    name = sa.Column(sa.String)
+    rulebook_id = sa.Column(sa.ForeignKey("rulebook.id", ondelete="CASCADE"))
+    inventory_id = sa.Column(sa.ForeignKey("inventory.id", ondelete="CASCADE"))
+    extra_var_id = sa.Column(sa.ForeignKey("extra_var.id", ondelete="CASCADE"))
+
+
+class ActivationInstanceLog(IntIdMixin, Base):
+    __tablename__ = "activation_instance_log"
+    activation_instance_id = sa.Column(
+        sa.ForeignKey("activation_instance.id", ondelete="CASCADE")
+    )
+    line_number = sa.Column(sa.Integer)
+    log = sa.Column(sa.String)
+
+
+# TODO(cutwater): These tables are for compatibility with existing queries
+#  only. They must be removed after queries are updated by using
+#  declarative models.
+activations = Activation.__table__
+execution_envs = ExecutionEnvironment.__table__
+restart_policies = RestartPolicy.__table__
+activation_instances = ActivationInstance.__table__
+activation_instance_logs = ActivationInstanceLog.__table__

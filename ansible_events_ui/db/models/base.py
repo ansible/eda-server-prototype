@@ -1,10 +1,7 @@
 import sqlalchemy
 from sqlalchemy.orm import declarative_base
 
-__all__ = (
-    "Base",
-    "metadata",
-)
+__all__ = ("Base", "metadata")
 
 NAMING_CONVENTION = {
     # Index
