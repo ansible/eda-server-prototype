@@ -60,10 +60,10 @@ const ProjectDetails: React.FunctionComponent<{project:ProjectType | undefined}>
         </FlexItem>
         <FlexItem>
           <Stack>
-            <StackItem><Title headingLevel="h3">{intl.formatMessage(sharedMessages.scmCredentials)}</Title></StackItem>
+            <StackItem><Title headingLevel="h3">{intl.formatMessage(sharedMessages.scmToken)}</Title></StackItem>
             <StackItem>
               <Text component={TextVariants.h4}>
-                {project?.scm_credentials || ' '}
+                {project?.scm_token || ' '}
               </Text>
             </StackItem>
           </Stack>

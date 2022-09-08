@@ -1,42 +1,46 @@
 import {Grid, GridItem, PageSection, Title} from '@patternfly/react-core';
-import { useHistory } from "react-router-dom";
-import React, { useState, useEffect } from 'react';
+import {useHistory, useParams} from "react-router-dom";
+import React, {useEffect, useState} from 'react';
 import {
   Card,
-  CardBody as PFCardBody,
-  SimpleList as PFSimpleList,
+  CardBody as PFCardBody
 } from '@patternfly/react-core';
 import {useIntl} from "react-intl";
 import { ActionGroup, Button, Form, FormGroup, TextInput } from '@patternfly/react-core';
-import { postData } from '@app/utils/utils';
-import {getServer} from '@app/utils/utils';
+import {patchData, getServer} from '@app/utils/utils';
 import styled from 'styled-components';
 import {TopToolbar} from "@app/shared/top-toolbar";
 import sharedMessages from "../messages/shared.messages";
-
+import {ProjectType} from "@app/shared/types/common-types";
 
 const CardBody = styled(PFCardBody)`
   white-space: pre-wrap;
   `
-const SimpleList = styled(PFSimpleList)`
-  white-space: pre-wrap;
-`
-
 const endpoint = 'http://' + getServer() + '/api/projects/';
 
-const NewProject: React.FunctionComponent = () => {
-
+const EditProject: React.FunctionComponent = () => {
   const history = useHistory();
-
-  const [scmUrl, setScmUrl] = useState('');
-  const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
-  const [scmType, setScmType] = useState('');
-  const [scmCredential, setScmCredential] = useState('');
+  const [project, setProject] = useState<ProjectType>();
+  const { id } = useParams<{id:string}>();
   const intl = useIntl();
 
+  useEffect(() => {
+    fetch(endpoint + id, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }).then(response => response.json())
+      .then(data => setProject(data));
+  }, []);
+
+  const [scmUrl, setScmUrl] = useState(project?.url || '');
+  const [name, setName] = useState(project?.name || '');
+  const [description, setDescription] = useState(project?.description || '');
+  const [scmType, setScmType] = useState(project?.scm_type || '');
+  const [scmToken, setScmToken] = useState(project?.scm_token || '');
+
   const handleSubmit = () => {
-			postData(endpoint, { url: scmUrl, name: name, description: description })
+			patchData(endpoint, { name: name, description: description })
 				.then(data => {
           history.push(`/project/${data.id}`);
 			});
@@ -51,11 +55,11 @@ const NewProject: React.FunctionComponent = () => {
           to: '/projects'
         },
         {
-          title: 'Add'
+          title: 'Edit'
         }
         ]
       }>
-      <Title headingLevel={"h2"}>{ intl.formatMessage(sharedMessages.add_new_project)}</Title>
+      <Title headingLevel={"h2"}>{ `${intl.formatMessage(sharedMessages.edit)} ${project?.name || 'project'}`}</Title>
     </TopToolbar>
     <PageSection>
       <Card>
@@ -116,13 +120,13 @@ const NewProject: React.FunctionComponent = () => {
             </GridItem>
             <GridItem span={4}>
               <FormGroup style={{paddingLeft: '15px', paddingRight: '15px'}}
-                label="SCM credential"
-                fieldId="scmCredential"
+                label="SCM token"
+                fieldId="scmToken"
               >
                 <TextInput
-                  onChange={setScmCredential}
-                  value={scmCredential}
-                  id="scmCredential"
+                  onChange={setScmToken}
+                  value={scmToken}
+                  id="scmToken"
                   placeholder={intl.formatMessage(sharedMessages.scmTokenPlaceholder)}
                 />
               </FormGroup>
@@ -140,4 +144,4 @@ const NewProject: React.FunctionComponent = () => {
 )
 }
 
-export { NewProject };
+export { EditProject };

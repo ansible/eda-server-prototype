@@ -12,6 +12,7 @@ import TableEmptyState from "@app/shared/table-empty-state";
 import {useIntl} from "react-intl";
 import {defaultSettings} from "@app/shared/pagination";
 import {NewProject} from "@app/NewProject/NewProject";
+import {EditProject} from "@app/EditProject/EditProject";
 import {createRows} from "@app/Projects/projects-table-helpers";
 import {AnyObject} from "@app/shared/types/common-types";
 import {cellWidth} from "@patternfly/react-table";
@@ -203,6 +204,15 @@ const Projects: React.FunctionComponent = () => {
   );
 
   const actionResolver = () => [
+    {
+      title: intl.formatMessage(sharedMessages.edit),
+      component: 'button',
+      onClick: (_event, _rowId, project) =>
+        history.push({
+          pathname: '/edit-project',
+          search: `?project=${project.id}`
+        })
+    },
     {
       title: intl.formatMessage(sharedMessages.delete),
       component: 'button',

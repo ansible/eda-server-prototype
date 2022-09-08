@@ -14,6 +14,10 @@ const sharedMessages = defineMessages({
     id: 'shared.add',
     defaultMessage: 'Add'
   },
+  edit: {
+    id: 'shared.edit',
+    defaultMessage: 'Edit'
+  },
   delete: {
     id: 'shared.delete',
     defaultMessage: 'Delete'
@@ -179,17 +183,25 @@ const sharedMessages = defineMessages({
     id: 'project.scmCredentials',
     defaultMessage: 'SCM Credentials'
   },
+  scmToken: {
+    id: 'project.scmToken',
+    defaultMessage: 'SCM Token'
+  },
   scmUrlPlaceholder: {
     id: 'project.scmUrlPlaceholder',
     defaultMessage: 'Insert SCM URL here'
   },
   scmTypePlaceholder: {
     id: 'project.scmTypePlaceholder',
-    defaultMessage: 'SCM Credentials'
+    defaultMessage: 'SCM Type'
   },
-  scmCredentialPlaceholder: {
+  scmCredentialsPlaceholder: {
     id: 'project.scmCredentialsPlaceholder',
     defaultMessage: 'Select an SCM Credential'
+  },
+  scmTokenPlaceholder: {
+    id: 'project.scmTokenPlaceholder',
+    defaultMessage: 'Select an SCM Token'
   },
   activation: {
     id: 'activation.activation',
