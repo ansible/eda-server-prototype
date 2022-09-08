@@ -8,7 +8,7 @@ PROJECT_DIR="${SCRIPTS_DIR}/.."
 
 CMD=${1:-help}
 VERSION=${2:-'latest'}
-UI_LOCAL_PORT=${2:-8080}
+UI_LOCAL_PORT=${2:-8000}
 
 export DEBUG=${DEBUG:-false}
 
@@ -131,12 +131,13 @@ port-forward() {
 port-forward-ui() {
   local _local_port=${1}
   local _pod_name=$(kubectl get pods --template '{{range .items}}{{.metadata.name}}{{end}}' --selector=app=eda-frontend)
+  local _API_SERVER_PORT=8000
 
   log-debug "kubectl wait --for=condition=Ready pod/${_pod_name} --timeout=120s"
   kubectl wait --for=condition=Ready pod/"${_pod_name}" --timeout=120s
 
-  log-debug "port-forward ${_pod_name} ${_local_port} 80"
-  port-forward "${_pod_name}" "${_local_port}" 80
+  log-debug "port-forward ${_pod_name} ${_local_port} ${_API_SERVER_PORT}"
+  port-forward "${_pod_name}" "${_local_port}" "${_API_SERVER_PORT}"
 }
 
 #

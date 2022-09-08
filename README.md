@@ -70,11 +70,12 @@ Visit this url: <http://localhost/api/docs/auth/register_register_api_auth_regis
 
 Click "Try it out" on `/api/auth/register`
 
+
 Change email and password
 
 Click execute
 
-Visit this url: http://localhost/eda
+Visit this url: http://localhost:8080/eda
 
 Also you can check the [openapi specification.](http://localhost/docs)
 
@@ -120,9 +121,9 @@ task minikube:deploy -- 001
 ```
 
 Forward the webserver port to local host.
-(If you do not provide a local port it will default to "8080")
+(If you do not provide a local port it will default to "8000")
 ```sh
-task minikube:fp:ui -- 8080
+task minikube:fp:ui -- 8000
 ```
 
 In a second terminal run the following cmd to create a `dev` user with a password of `none2tuff`.
@@ -131,7 +132,7 @@ In a second terminal run the following cmd to create a `dev` user with a passwor
 scripts/createuser.sh dev_user@redhat.com none2tuff
 ```
 
-Visit this url: http://localhost:8080/eda
+Visit this url: http://localhost:8000/eda
 
 - **Note:** 
   Instead of running the above build, deploy, and minikube-fp-ui tasks individually. 
