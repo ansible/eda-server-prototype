@@ -117,109 +117,12 @@ async def websocket_endpoint2(
                     await websocket.send_text(
                         json.dumps({"type": "SSHPrivateKey", "data": ""})
                     )
-
             elif data_type == "Job":
-                query = insert(models.job_instances).values(
-                    uuid=data.get("job_id")
-                )
-                result = await db.execute(query)
-                (job_instance_id,) = result.inserted_primary_key
-
-                activation_instance_id = int(data.get("ansible_events_id"))
-                query = insert(
-                    models.activation_instance_job_instances
-                ).values(
-                    job_instance_id=job_instance_id,
-                    activation_instance_id=activation_instance_id,
-                )
-                await db.execute(query)
-                await db.commit()
-                await updatemanager.broadcast(
-                    f"/activation_instance/{activation_instance_id}",
-                    json.dumps(["Job", {"job_instance_id": job_instance_id}]),
-                )
-                await updatemanager.broadcast(
-                    "/jobs",
-                    json.dumps(["Job", {"id": job_instance_id}]),
-                )
+                await handle_jobs(data, db)
             elif data_type == "AnsibleEvent":
-                event_data = data.get("event", {})
-                if event_data.get("stdout"):
-                    query = select(models.job_instances).where(
-                        models.job_instances.c.uuid == event_data.get("job_id")
-                    )
-                    result = await db.execute(query)
-                    job_instance_id = result.first().job_instance_id
-
-                    await updatemanager.broadcast(
-                        f"/job_instance/{job_instance_id}",
-                        json.dumps(
-                            ["Stdout", {"stdout": event_data.get("stdout")}]
-                        ),
-                    )
-
-                query = insert(models.job_instance_events).values(
-                    job_uuid=event_data.get("job_id"),
-                    counter=event_data.get("counter"),
-                    stdout=event_data.get("stdout"),
-                )
-                await db.execute(query)
-                await db.commit()
+                await handle_ansible_events(data, db)
             elif data_type == "Action":
-                activation_id = data.get("activation_id")
-                if activation_id:
-                    query = select(models.activation_instances).where(
-                        models.activation_instances.c.id == int(activation_id)
-                    )
-                    instance = (await db.execute(query)).first()
-
-                    query = select(models.rulesets).where(
-                        models.rulesets.c.rulebook_id
-                        == int(instance.rulebook_id)
-                    )
-                    ruleset = (await db.execute(query)).first()
-
-                    query = select(models.rules).where(
-                        models.rules.c.ruleset_id == ruleset.id
-                    )
-                    rows = (await db.execute(query)).all()
-
-                    action_name = data.get("action")
-
-                    for rule in rows:
-                        if rule.action.get(action_name):
-                            job_id = data.get("job_id")
-                            if job_id:
-                                query = select(models.job_instances).where(
-                                    models.job_instances.c.uuid == job_id
-                                )
-                                result = await db.execute(query)
-                                job_instance_id = (
-                                    result.first().job_instance_id
-                                )
-
-                                query = insert(models.audit_rules).values(
-                                    name=rule.name,
-                                    definition=rule.action,
-                                    rule_id=rule.id,
-                                    ruleset_id=ruleset.id,
-                                    activation_instance_id=activation_instance_id,
-                                    job_instance_id=job_instance_id,
-                                    fired_date=data.get("run_at"),
-                                    status=data.get("status"),
-                                )
-                                await db.execute(query)
-                            else:
-                                query = insert(models.audit_rules).values(
-                                    name=rule.name,
-                                    definition=rule.action,
-                                    rule_id=rule.id,
-                                    ruleset_id=ruleset.id,
-                                    fired_date=data.get("run_at"),
-                                    activation_instance_id=activation_instance_id,
-                                )
-                                await db.execute(query)
-                        await db.commit()
+                await handle_actions(data, db)
 
     except WebSocketDisconnect:
         pass
@@ -261,6 +164,115 @@ async def websocket_job_endpoint(websocket: WebSocket, job_instance_id):
             logger.debug(data)
     except WebSocketDisconnect:
         updatemanager.disconnect(page, websocket)
+
+
+async def handle_ansible_events(data: dict, db: AsyncSession):
+    event_data = data.get("event", {})
+    if event_data.get("stdout"):
+        query = select(models.job_instances).where(
+            models.job_instances.c.uuid == event_data.get("job_id")
+        )
+        result = await db.execute(query)
+        job_instance_id = result.first().job_instance_id
+
+        await updatemanager.broadcast(
+            f"/job_instance/{job_instance_id}",
+            json.dumps(["Stdout", {"stdout": event_data.get("stdout")}]),
+        )
+
+    query = insert(models.job_instance_events).values(
+        job_uuid=event_data.get("job_id"),
+        counter=event_data.get("counter"),
+        stdout=event_data.get("stdout"),
+    )
+    await db.execute(query)
+    await db.commit()
+
+
+async def handle_jobs(data: dict, db: AsyncSession):
+    query = insert(models.job_instances).values(uuid=data.get("job_id"))
+    result = await db.execute(query)
+    (job_instance_id,) = result.inserted_primary_key
+
+    activation_instance_id = int(data.get("ansible_events_id"))
+    query = insert(models.activation_instance_job_instances).values(
+        job_instance_id=job_instance_id,
+        activation_instance_id=activation_instance_id,
+    )
+    await db.execute(query)
+    await db.commit()
+    await updatemanager.broadcast(
+        f"/activation_instance/{activation_instance_id}",
+        json.dumps(["Job", {"job_instance_id": job_instance_id}]),
+    )
+    await updatemanager.broadcast(
+        "/jobs",
+        json.dumps(["Job", {"id": job_instance_id}]),
+    )
+
+
+async def handle_actions(data: dict, db: AsyncSession):
+    logger.info(f"Start to handle actions: {data}")
+    activation_id = int(data.get("activation_id"))
+    if activation_id:
+        query = select(models.activation_instances).where(
+            models.activation_instances.c.id == activation_id
+        )
+        instance = (await db.execute(query)).first()
+
+        query = select(models.rulesets).where(
+            models.rulesets.c.rulebook_id == instance.rulebook_id
+        )
+        ruleset = (await db.execute(query)).first()
+
+        query = select(models.rules).where(
+            models.rules.c.ruleset_id == ruleset.id
+        )
+        rows = (await db.execute(query)).all()
+
+        action_name = data.get("action")
+        playbook_name = data.get("playbook_name")
+        logger.info(f"action_name: {action_name}")
+        logger.info(f"playbook_name: {playbook_name}")
+
+        for rule in rows:
+            if (
+                rule.action.get(action_name)
+                and rule.action.get(action_name).get("name") == playbook_name
+            ):
+                logger.info(f"now processing rule: {rule}")
+                job_id = data.get("job_id")
+                if job_id:
+                    query = select(models.job_instances).where(
+                        models.job_instances.c.uuid == job_id
+                    )
+                    result = await db.execute(query)
+                    job_instance_id = result.first().job_instance_id
+                    logger.info(f"job_instance_id: {job_instance_id}")
+
+                    query = insert(models.audit_rules).values(
+                        name=rule.name,
+                        definition=rule.action,
+                        rule_id=rule.id,
+                        ruleset_id=ruleset.id,
+                        activation_instance_id=instance.id,
+                        job_instance_id=job_instance_id,
+                        fired_date=data.get("run_at"),
+                        status=data.get("status"),
+                    )
+                    await db.execute(query)
+                else:
+                    query = insert(models.audit_rules).values(
+                        name=rule.name,
+                        definition=rule.action,
+                        rule_id=rule.id,
+                        ruleset_id=ruleset.id,
+                        fired_date=data.get("run_at"),
+                        activation_instance_id=instance.id,
+                        status=data.get("status"),
+                    )
+                    await db.execute(query)
+            await db.commit()
 
 
 @router.get("/api/tasks/")
