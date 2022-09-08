@@ -26,7 +26,8 @@ from ansible_events_ui.ruleset import (
     write_job_events,
 )
 from ansible_events_ui.users import (
-    auth_backend,
+    bearer_backend,
+    cookie_backend,
     current_active_user,
     fastapi_users,
 )
@@ -572,8 +573,13 @@ async def read_activation_instance_job_instances(
 
 
 router.include_router(
-    fastapi_users.get_auth_router(auth_backend),
+    fastapi_users.get_auth_router(cookie_backend),
     prefix="/api/auth/jwt",
+    tags=["auth"],
+)
+router.include_router(
+    fastapi_users.get_auth_router(bearer_backend),
+    prefix="/api/auth/bearer",
     tags=["auth"],
 )
 router.include_router(
