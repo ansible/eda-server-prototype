@@ -4,6 +4,7 @@ import { Dashboard } from '@app/Dashboard/Dashboard';
 import { Projects } from '@app/Projects/Projects';
 import { Project } from '@app/Project/Project';
 import { NewProject } from '@app/NewProject/NewProject';
+import { EditProject } from '@app/EditProject/EditProject';
 import { Activations } from '@app/Activations/Activations';
 import { Activation } from '@app/Activation/Activation';
 import { ActivationDetails } from '@app/Activation/activation-details';
@@ -72,6 +73,11 @@ const routes: AppRouteConfig[] = [
     component: NewProject,
     path: '/new-project/',
     title: 'NewProject',
+  },
+  {
+    component: EditProject,
+    path: '/edit-project/',
+    title: 'EditProject',
   },
   {
     component: Activations,
