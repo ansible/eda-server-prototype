@@ -1,10 +1,23 @@
 import base64
 import json
 import logging
+import uuid
+from typing import List
 
-from fastapi import APIRouter, Depends, WebSocket, WebSocketDisconnect
-from sqlalchemy import insert, select
+import aiodocker.exceptions
+import sqlalchemy.orm
+import yaml
+from fastapi import (
+    APIRouter,
+    Depends,
+    HTTPException,
+    WebSocket,
+    WebSocketDisconnect,
+    status,
+)
+from sqlalchemy import delete, insert, select, cast, and_
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.dialects import postgresql
 
 from ansible_events_ui import schemas
 from ansible_events_ui.db import models
@@ -214,65 +227,108 @@ async def handle_jobs(data: dict, db: AsyncSession):
 async def handle_actions(data: dict, db: AsyncSession):
     logger.info(f"Start to handle actions: {data}")
     activation_id = int(data.get("activation_id"))
+
     if activation_id:
-        query = select(models.activation_instances).where(
-            models.activation_instances.c.id == activation_id
-        )
-        instance = (await db.execute(query)).first()
-
-        query = select(models.rulesets).where(
-            models.rulesets.c.rulebook_id == instance.rulebook_id
-        )
-        ruleset = (await db.execute(query)).first()
-
-        query = select(models.rules).where(
-            models.rules.c.ruleset_id == ruleset.id
-        )
-        rows = (await db.execute(query)).all()
-
         action_name = data.get("action")
         playbook_name = data.get("playbook_name")
-        logger.info(f"action_name: {action_name}")
-        logger.info(f"playbook_name: {playbook_name}")
+        job_id = data.get("job_id")
+        fired_date = data.get("run_at")
+        status = data.get("status")
 
-        for rule in rows:
-            if (
-                rule.action.get(action_name)
-                and rule.action.get(action_name).get("name") == playbook_name
-            ):
-                logger.info(f"now processing rule: {rule}")
-                job_id = data.get("job_id")
-                if job_id:
-                    query = select(models.job_instances).where(
-                        models.job_instances.c.uuid == job_id
+        if job_id:
+            sel = (
+                select(
+                    models.activation_instances.c.id.label(
+                        "activation_instance_id"
+                    ),
+                    models.rulesets.c.id.label("ruleset_id"),
+                    models.rules.c.id.label("rule_id"),
+                    models.rules.c.name,
+                    models.rules.c.action.label("definition"),
+                    models.job_instances.c.id.label("job_instance_id"),
+                    cast(fired_date, postgresql.VARCHAR).label("fired_date"),
+                    cast(status, postgresql.VARCHAR).label("status"),
+                )
+                .join(
+                    models.rulesets,
+                    models.rulesets.c.rulebook_id
+                    == models.activation_instances.c.rulebook_id,
+                )
+                .join(
+                    models.rules,
+                    models.rules.c.ruleset_id == models.rulesets.c.id,
+                )
+                .join(
+                    models.job_instances,
+                    models.job_instances.c.uuid
+                    == cast(job_id, postgresql.UUID),
+                )
+                .where(
+                    and_(
+                        models.activation_instances.c.id == activation_id,
+                        models.rules.c.action[action_name] is not None,
+                        models.rules.c.action[action_name]["name"].astext
+                        == playbook_name,
+                        models.job_instances.c.id is not None,
                     )
-                    result = await db.execute(query)
-                    job_instance_id = result.first().job_instance_id
-                    logger.info(f"job_instance_id: {job_instance_id}")
+                )
+            )
+            ins_cols = [
+                "activation_instance_id",
+                "ruleset_id",
+                "rule_id",
+                "name",
+                "definition",
+                "job_instance_id",
+                "fired_date",
+                "status",
+            ]
+        else:
+            sel = (
+                select(
+                    models.activation_instances.c.id.label(
+                        "activation_instance_id"
+                    ),
+                    models.rulesets.c.id.label("ruleset_id"),
+                    models.rules.c.id.label("rule_id"),
+                    models.rules.c.name,
+                    models.rules.c.action.label("definition"),
+                    cast(fired_date, postgresql.VARCHAR).label("fired_date"),
+                    cast(status, postgresql.VARCHAR).label("status"),
+                )
+                .join(
+                    models.rulesets,
+                    models.rulesets.c.rulebook_id
+                    == models.activation_instances.c.rulebook_id,
+                )
+                .join(
+                    models.rules,
+                    models.rules.c.ruleset_id == models.rulesets.c.id,
+                )
+                .where(
+                    and_(
+                        models.activation_instances.c.id == activation_id,
+                        models.rules.c.action[action_name] is not None,
+                        models.rules.c.action[action_name]["name"].astext
+                        == playbook_name,
+                    )
+                )
+            )
+            ins_cols = [
+                "activation_instance_id",
+                "ruleset_id",
+                "rule_id",
+                "name",
+                "definition",
+                "fired_date",
+                "status",
+            ]
 
-                    query = insert(models.audit_rules).values(
-                        name=rule.name,
-                        definition=rule.action,
-                        rule_id=rule.id,
-                        ruleset_id=ruleset.id,
-                        activation_instance_id=instance.id,
-                        job_instance_id=job_instance_id,
-                        fired_date=data.get("run_at"),
-                        status=data.get("status"),
-                    )
-                    await db.execute(query)
-                else:
-                    query = insert(models.audit_rules).values(
-                        name=rule.name,
-                        definition=rule.action,
-                        rule_id=rule.id,
-                        ruleset_id=ruleset.id,
-                        fired_date=data.get("run_at"),
-                        activation_instance_id=instance.id,
-                        status=data.get("status"),
-                    )
-                    await db.execute(query)
-            await db.commit()
+        ins = insert(models.audit_rules).from_select(ins_cols, sel)
+        # End build insert-from-select query
+
+        await db.execute(ins)
+        await db.commit()
 
 
 @router.get("/api/tasks/")
