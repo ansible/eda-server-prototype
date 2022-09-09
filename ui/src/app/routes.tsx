@@ -49,109 +49,109 @@ export type AppRouteConfig = IAppRoute | IAppRouteGroup;
 const routes: AppRouteConfig[] = [
   {
     component: Dashboard,
-    exact: true,
+    exact: false,
     label: 'Dashboard',
-    path: '/dashboard',
+    path: '/eda/dashboard',
     title: 'Main Dashboard',
   },
   {
     component: Projects,
     exact: true,
     label: 'Projects',
-    path: '/projects',
+    path: '/eda/projects',
     title: 'Projects',
   },
   {
     component: Project,
-    path: '/project/:id',
+    path: '/eda/project/:id',
     title: 'Project',
   },
   {
     component: NewProject,
-    path: '/new-project/',
+    path: '/eda/new-project/',
     title: 'NewProject',
   },
   {
     component: Activations,
     exact: true,
     label: 'Rulebook activations',
-    path: '/activations',
+    path: '/eda/activations',
     title: 'Rulebook activations',
   },
   {
     component: Activation,
-    path: '/activation/:id',
+    path: '/eda/activation/:id',
     title: 'Activation',
   },
   {
     component: ActivationJobs,
     exact: true,
-    path: '/activation/:id/jobs',
+    path: '/eda/activation/:id/jobs',
     title: 'Activation jobs',
   },
   {
     component: ActivationDetails,
     exact: true,
-    path: '/activation/:id/details',
+    path: '/eda/activation/:id/details',
     title: 'Activation details',
   },
   {
     component: ActivationStdout,
     exact: true,
-    path: '/activation/:id/stdout',
+    path: '/eda/activation/:id/stdout',
     title: 'Standard out',
   },
   {
     component: NewActivation,
-    path: '/new-activation/',
+    path: '/eda/new-activation/',
     title: 'NewActivation',
   },
   {
     component: Jobs,
     exact: true,
     label: 'Jobs',
-    path: '/jobs',
+    path: '/eda/jobs',
     title: 'Jobs',
   },
   {
     component: Job,
     exact: true,
-    path: '/job/:id',
+    path: '/eda/job/:id',
     title: 'Job',
   },
   {
     component: NewJob,
-    path: '/new-job/',
+    path: '/eda/new-job/',
     title: 'NewJob',
   },
   {
     component: RuleSets,
     exact: true,
     label: 'Rule sets',
-    path: '/rulesets',
+    path: '/eda/rulesets',
     title: 'Rule Sets',
   },
   {
     component: RuleSet,
-    path: '/ruleset/:id',
+    path: '/eda/ruleset/:id',
     title: 'RuleSet',
   },
   {
     component: RulesetRules,
     exact: true,
-    path: '/ruleset/:id/rules',
+    path: '/eda/ruleset/:id/rules',
     title: 'Rules',
   },
   {
     component: RulesetDetails,
     exact: true,
-    path: '/ruleset/:id/details',
+    path: '/eda/ruleset/:id/details',
     title: 'Details',
   },
   {
     component: RulesetSources,
     exact: true,
-    path: '/ruleset/:id/sources',
+    path: '/eda/ruleset/:id/sources',
     title: 'Sources',
   },
 
@@ -159,39 +159,39 @@ const routes: AppRouteConfig[] = [
     component: Inventories,
     exact: true,
     label: 'Inventories',
-    path: '/inventories',
+    path: '/eda/inventories',
     title: 'Inventories',
   },
   {
     component: Inventory,
     exact: true,
-    path: '/inventory/:id',
+    path: '/eda/inventory/:id',
     title: 'Inventory',
   },
   {
     component: Vars,
     exact: true,
     label: 'Extra Vars',
-    path: '/vars',
+    path: '/eda/vars',
     title: 'Extra Vars',
   },
   {
     component: Var,
     exact: true,
-    path: '/var/:id',
+    path: '/eda/var/:id',
     title: 'Var',
   },
   {
     component: Playbooks,
     exact: true,
     label: 'Playbooks',
-    path: '/playbooks',
+    path: '/eda/playbooks',
     title: 'Playbooks',
   },
   {
     component: Playbook,
     exact: true,
-    path: '/playbook/:id',
+    path: '/eda/playbook/:id',
     title: 'Playbook',
   }
 ];
@@ -228,7 +228,7 @@ const AppRoutes = (): React.ReactElement => {
         isAsync={isAsync}
       />
     ))}
-    <PageNotFound title="404 Page Not Found"/>
+    <Route component={Dashboard} />
   </Switch>);
 }
 

@@ -8,7 +8,7 @@ import { useHistory } from 'react-router-dom';
 import { getServer } from '@app/utils/utils';
 import Logo from '../../assets/images/logo-masthead.svg';
 
-function Login(props) {
+function Login({origin}) {
 
     const history = useHistory();
 
@@ -59,7 +59,7 @@ function Login(props) {
             setIsValidPassword(false);
             setShowHelperText(true);
           } else {
-            history.push('/dashboard');
+            history.push(origin || '/dashboard')
           }
         });
       }

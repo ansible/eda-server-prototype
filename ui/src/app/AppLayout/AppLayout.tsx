@@ -23,6 +23,7 @@ import { StatefulDropdown } from './stateful-dropdown';
 import {getUser, logoutUser} from '@app/shared/auth';
 import {User} from "@app/shared/types/common-types";
 import {AboutModalWindow} from "@app/AppLayout/about-modal";
+import {Login} from "@app/Login/Login";
 
 interface IAppLayout {
   children: React.ReactNode;
@@ -59,10 +60,19 @@ const AppLayout: React.FunctionComponent<IAppLayout> = ({ children }) => {
   const baseUrl = window.location.href.substr(0, index);
 
   useEffect(() => {
+    console.log('Debug - AppLayout getting user');
     getUser()
-      .then(response => response.json())
-      .then(data => setUser(data || undefined));
-  }, []);
+      .then(response => {
+        if (!response.ok) {
+          const error = response.status;
+          return Promise.reject(error);
+        }
+        return response.json();
+      })
+      .catch(err => { console.log('Debug - 1, err: ', err); return setUser(undefined);})
+      .then(data => setUser(data || undefined))
+      .catch(err => { console.log('Debug - 2, err: ', err); return setUser(undefined);})
+  }, [location]);
 
   if (user) {
     if (user.first_name || user.last_name) {
@@ -83,7 +93,7 @@ const AppLayout: React.FunctionComponent<IAppLayout> = ({ children }) => {
           logoutUser().then(() => {
             setUser(undefined);
             window.location.replace(
-              baseUrl
+              '/eda/dashboard'
             );
           })
         }
@@ -189,16 +199,22 @@ const AppLayout: React.FunctionComponent<IAppLayout> = ({ children }) => {
       Skip to Content
     </SkipToContent>
   );
+  console.log('Debug - AppLayout user: ', user);
+  console.log('Debug - AppLayout origin: ', origin);
+  console.log('Debug - AppLayout window.location: ', window.location);
   return (
-    <Page
-      mainContainerId={pageId}
-      header={headerNav()}
-      sidebar={Sidebar}
-      onPageResize={onPageResize}
-      skipToContent={PageSkipToContent}>
-      {aboutModalVisible && aboutModal()}
-      {children}
-    </Page>
+    <React.Fragment>
+      { !user && <Login origin={`${window.location.pathname}`}/> }
+      { user && <Page
+        mainContainerId={pageId}
+        header={headerNav()}
+        sidebar={Sidebar}
+        onPageResize={onPageResize}
+        skipToContent={PageSkipToContent}>
+        {aboutModalVisible && aboutModal()}
+        {children}
+      </Page>}
+    </React.Fragment>
   );
 };
 
