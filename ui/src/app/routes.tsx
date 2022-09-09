@@ -76,7 +76,7 @@ const routes: AppRouteConfig[] = [
   },
   {
     component: EditProject,
-    path: '/edit-project/',
+    path: '/edit-project/:id',
     title: 'EditProject',
   },
   {

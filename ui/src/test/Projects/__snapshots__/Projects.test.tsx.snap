@@ -5951,6 +5951,11 @@ exports[`Projects should render the Projects component 1`] = `
                                                                     Object {
                                                                       "component": "button",
                                                                       "onClick": [Function],
+                                                                      "title": "Edit",
+                                                                    },
+                                                                    Object {
+                                                                      "component": "button",
+                                                                      "onClick": [Function],
                                                                       "title": "Delete",
                                                                     },
                                                                   ]
@@ -6045,6 +6050,13 @@ exports[`Projects should render the Projects component 1`] = `
                                                                         data-key={0}
                                                                         onClick={[Function]}
                                                                       >
+                                                                        Edit
+                                                                      </DropdownItem>,
+                                                                      <DropdownItem
+                                                                        component="button"
+                                                                        data-key={1}
+                                                                        onClick={[Function]}
+                                                                      >
                                                                         Delete
                                                                       </DropdownItem>,
                                                                     ]
@@ -6067,6 +6079,13 @@ exports[`Projects should render the Projects component 1`] = `
                                                                         <DropdownItem
                                                                           component="button"
                                                                           data-key={0}
+                                                                          onClick={[Function]}
+                                                                        >
+                                                                          Edit
+                                                                        </DropdownItem>,
+                                                                        <DropdownItem
+                                                                          component="button"
+                                                                          data-key={1}
                                                                           onClick={[Function]}
                                                                         >
                                                                           Delete
@@ -7096,6 +7115,11 @@ exports[`Projects should render the Projects component 1`] = `
                                                                     Object {
                                                                       "component": "button",
                                                                       "onClick": [Function],
+                                                                      "title": "Edit",
+                                                                    },
+                                                                    Object {
+                                                                      "component": "button",
+                                                                      "onClick": [Function],
                                                                       "title": "Delete",
                                                                     },
                                                                   ]
@@ -7190,6 +7214,13 @@ exports[`Projects should render the Projects component 1`] = `
                                                                         data-key={0}
                                                                         onClick={[Function]}
                                                                       >
+                                                                        Edit
+                                                                      </DropdownItem>,
+                                                                      <DropdownItem
+                                                                        component="button"
+                                                                        data-key={1}
+                                                                        onClick={[Function]}
+                                                                      >
                                                                         Delete
                                                                       </DropdownItem>,
                                                                     ]
@@ -7212,6 +7243,13 @@ exports[`Projects should render the Projects component 1`] = `
                                                                         <DropdownItem
                                                                           component="button"
                                                                           data-key={0}
+                                                                          onClick={[Function]}
+                                                                        >
+                                                                          Edit
+                                                                        </DropdownItem>,
+                                                                        <DropdownItem
+                                                                          component="button"
+                                                                          data-key={1}
                                                                           onClick={[Function]}
                                                                         >
                                                                           Delete
@@ -8241,6 +8279,11 @@ exports[`Projects should render the Projects component 1`] = `
                                                                     Object {
                                                                       "component": "button",
                                                                       "onClick": [Function],
+                                                                      "title": "Edit",
+                                                                    },
+                                                                    Object {
+                                                                      "component": "button",
+                                                                      "onClick": [Function],
                                                                       "title": "Delete",
                                                                     },
                                                                   ]
@@ -8335,6 +8378,13 @@ exports[`Projects should render the Projects component 1`] = `
                                                                         data-key={0}
                                                                         onClick={[Function]}
                                                                       >
+                                                                        Edit
+                                                                      </DropdownItem>,
+                                                                      <DropdownItem
+                                                                        component="button"
+                                                                        data-key={1}
+                                                                        onClick={[Function]}
+                                                                      >
                                                                         Delete
                                                                       </DropdownItem>,
                                                                     ]
@@ -8357,6 +8407,13 @@ exports[`Projects should render the Projects component 1`] = `
                                                                         <DropdownItem
                                                                           component="button"
                                                                           data-key={0}
+                                                                          onClick={[Function]}
+                                                                        >
+                                                                          Edit
+                                                                        </DropdownItem>,
+                                                                        <DropdownItem
+                                                                          component="button"
+                                                                          data-key={1}
                                                                           onClick={[Function]}
                                                                         >
                                                                           Delete
