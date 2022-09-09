@@ -209,8 +209,7 @@ const Projects: React.FunctionComponent = () => {
       component: 'button',
       onClick: (_event, _rowId, project) =>
         history.push({
-          pathname: '/edit-project',
-          search: `?project=${project.id}`
+          pathname: `/edit-project/${project.id}`
         })
     },
     {
@@ -218,8 +217,7 @@ const Projects: React.FunctionComponent = () => {
       component: 'button',
       onClick: (_event, _rowId, project) =>
         history.push({
-          pathname: '/remove-project',
-          search: `?project=${project.id}`
+          pathname: `/remove-project/${project.id}`
         })
     }
   ];

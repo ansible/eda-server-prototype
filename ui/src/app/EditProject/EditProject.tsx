@@ -20,7 +20,7 @@ const endpoint = 'http://' + getServer() + '/api/projects/';
 
 const EditProject: React.FunctionComponent = () => {
   const history = useHistory();
-  const [project, setProject] = useState<ProjectType>();
+  const [project, setProject] = useState<ProjectType>({id: '', name: '' });
   const { id } = useParams<{id:string}>();
   const intl = useIntl();
 
@@ -33,14 +33,15 @@ const EditProject: React.FunctionComponent = () => {
       .then(data => setProject(data));
   }, []);
 
-  const [scmUrl, setScmUrl] = useState(project?.url || '');
-  const [name, setName] = useState(project?.name || '');
-  const [description, setDescription] = useState(project?.description || '');
-  const [scmType, setScmType] = useState(project?.scm_type || '');
-  const [scmToken, setScmToken] = useState(project?.scm_token || '');
+  console.log('Debug - project: ', project);
+  const setScmUrl = (url: string) =>  setProject({...project, url: url} );
+  const setName = (name: string) =>  setProject({...project, name: name} );
+  const setDescription = (description: string) =>  setProject({...project, description: description} );
+  const setScmType = (scm_type: string) =>  setProject({...project, scm_type: scm_type} );
+  const setScmToken = (scm_token: string) => setProject({...project, scm_token: scm_token} );
 
   const handleSubmit = () => {
-			patchData(endpoint, { name: name, description: description })
+			patchData(`${endpoint}${project.id}`, { name: project.name })
 				.then(data => {
           history.push(`/project/${data.id}`);
 			});
@@ -59,7 +60,7 @@ const EditProject: React.FunctionComponent = () => {
         }
         ]
       }>
-      <Title headingLevel={"h2"}>{ `${intl.formatMessage(sharedMessages.edit)} ${project?.name || 'project'}`}</Title>
+      <Title headingLevel={"h2"}>{ `${project?.name || 'project'}`}</Title>
     </TopToolbar>
     <PageSection>
       <Card>
@@ -73,7 +74,7 @@ const EditProject: React.FunctionComponent = () => {
               >
                 <TextInput
                   onChange={setName}
-                  value={name}
+                  value={project?.name}
                   id="name"
                   placeholder={ intl.formatMessage(sharedMessages.namePlaceholder) }
                 />
@@ -86,7 +87,7 @@ const EditProject: React.FunctionComponent = () => {
               >
                 <TextInput
                   onChange={setDescription}
-                  value={description}
+                  value={project?.description}
                   id="description"
                   placeholder={intl.formatMessage(sharedMessages.descriptionPlaceholder)}
                 />
@@ -99,7 +100,7 @@ const EditProject: React.FunctionComponent = () => {
               >
                 <TextInput
                   onChange={setScmType}
-                  value={scmType}
+                  value={project?.scm_type}
                   id="scmType"
                   placeholder={intl.formatMessage(sharedMessages.scmTypePlaceholder)}
                 />
@@ -112,7 +113,7 @@ const EditProject: React.FunctionComponent = () => {
               >
                 <TextInput
                   onChange={setScmUrl}
-                  value={scmUrl}
+                  value={project?.url}
                   id="url-1"
                   placeholder={intl.formatMessage(sharedMessages.scmUrlPlaceholder)}
                 />
@@ -125,7 +126,7 @@ const EditProject: React.FunctionComponent = () => {
               >
                 <TextInput
                   onChange={setScmToken}
-                  value={scmToken}
+                  value={project?.scm_token}
                   id="scmToken"
                   placeholder={intl.formatMessage(sharedMessages.scmTokenPlaceholder)}
                 />
