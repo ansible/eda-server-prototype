@@ -1,5 +1,5 @@
 import sqlalchemy as sa
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ansible_events_ui import schemas
@@ -147,7 +147,9 @@ async def update_project(
 
 
 @router.delete(
-    "/api/project/{project_id}", status_code=204, operation_id="delete_project"
+    "/api/project/{project_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    operation_id="delete_project",
 )
 async def delete_project(
     project_id: int, db: AsyncSession = Depends(get_db_session)
@@ -157,6 +159,7 @@ async def delete_project(
     if results.rowcount == 0:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     await db.commit()
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
 @router.get("/api/playbooks/")
