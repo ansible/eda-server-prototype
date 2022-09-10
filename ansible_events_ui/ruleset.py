@@ -133,7 +133,12 @@ async def activate_rulesets(
                 "ExtraHosts": ["host.docker.internal:host-gateway"],
             }
         )
-        await container.start()
+        try:
+            await container.start()
+        except aiodocker.exceptions.DockerError as e:
+            logger.error("Failed to start container: %s", e)
+            await container.delete()
+            raise
 
         activated_rulesets[activation_id] = container
 
