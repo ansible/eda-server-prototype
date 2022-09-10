@@ -128,7 +128,14 @@ task minikube:fp:ui -- 8080
 In a second terminal run the following cmd to create a `dev` user with a password of `none2tuff`.
 (You will use this to log into the console.)
 ```sh
-scripts/createuser.sh dev_user@redhat.com none2tuff
+# Password can be specified as an command-line argument:
+scripts/adduser.py --password none2tuff dev_user@redhat.com
+# OR passed via environment variable
+PASSWORD=none2tuff scripts/adduser.py -E dev_user@redhat.com
+# OR submitted interactively
+scripts/adduser.py dev_user@redhat.com
+# Enter password: 
+# Confirm password: 
 ```
 
 Visit this url: http://localhost:8080/eda
