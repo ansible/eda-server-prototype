@@ -82,8 +82,8 @@ check_uvicorn_status() {
 
 add_demo_user() {
   log-info "Adding demo user: ${DEV_USER}, pass: ${DEV_PASS}"
-  log-debug "scripts/createuser.sh ${DEV_USER} ${DEV_PASS}"
-  "${DEV_SCRIPTS_PATH}"/createuser.sh ${DEV_USER} ${DEV_PASS}
+  log-debug "scripts/adduser.py --password ${DEV_PASS} ${DEV_USER}"
+  "${DEV_SCRIPTS_PATH}"/adduser.py --password "${DEV_PASS}" "${DEV_USER}"
 }
 
 start-events-services() {
