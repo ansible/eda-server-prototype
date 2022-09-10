@@ -16,9 +16,9 @@ RUN pip install ansible && \
     ansible-galaxy collection install git+https://github.com/benthomasson/benthomasson-eda.git#benthomasson/eda/
 COPY . $WORKDIR
 COPY --from=ui-builder /app/ui/dist/ ./ui/dist
-#RUN chown -R $USER_ID ./
+RUN chown -R $USER_ID ./
 
-#USER $USER_ID
+USER $USER_ID
 USER 0
 RUN pip install .
 
