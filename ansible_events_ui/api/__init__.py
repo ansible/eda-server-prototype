@@ -27,7 +27,9 @@ from ansible_events_ui.users import (
 from .activation import router as activation_router
 from .job import router as job_router
 from .project import router as project_router
+from .role import router as role_router
 from .rulebook import router as rulebook_router
+from .user import router as user_router
 
 logger = logging.getLogger("ansible_events_ui")
 
@@ -36,6 +38,8 @@ router.include_router(activation_router)
 router.include_router(job_router)
 router.include_router(rulebook_router)
 router.include_router(project_router)
+router.include_router(role_router)
+router.include_router(user_router)
 
 
 @router.websocket("/api/ws2")
@@ -365,11 +369,6 @@ router.include_router(
     fastapi_users.get_verify_router(schemas.UserRead),
     prefix="/api/auth",
     tags=["auth"],
-)
-router.include_router(
-    fastapi_users.get_users_router(schemas.UserRead, schemas.UserUpdate),
-    prefix="/api/users",
-    tags=["users"],
 )
 
 

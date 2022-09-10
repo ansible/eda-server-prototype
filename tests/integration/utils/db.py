@@ -7,6 +7,8 @@ import sqlalchemy as sa
 import sqlalchemy.future
 from sqlalchemy.ext.asyncio import AsyncConnection
 
+from ansible_events_ui.db import models
+
 BASE_DIR = pathlib.Path(__file__).parents[3]
 ALEMBIC_INI = BASE_DIR / "alembic.ini"
 
@@ -38,3 +40,23 @@ async def upgrade_database(connection):
         alembic.config.Config(str(ALEMBIC_INI)),
         "head",
     )
+
+
+async def insert_initial_data(connection):
+    await connection.execute(
+        sa.insert(models.User).values(
+            email="admin@example.com",
+            is_active=True,
+            is_superuser=True,
+            hashed_password="",
+        )
+    )
+    await connection.commit()
+
+
+async def get_admin_user(connection):
+    return (
+        await connection.scalars(
+            sa.select(models.User).filter_by(email="admin@example.com")
+        )
+    ).one()
