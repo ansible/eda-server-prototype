@@ -1,3 +1,5 @@
+from typing import Optional
+
 from fastapi.requests import Request
 from pydantic import BaseSettings
 
@@ -18,6 +20,8 @@ class Settings(BaseSettings):
 
     deployment_type: str = "docker"
     server_name: str = "localhost"
+
+    default_user_role: Optional[str] = None
 
     class Config:
         env_prefix = "AE_"
