@@ -4,6 +4,7 @@ from .activation import (
     activations,
     restart_policies,
 )
+from .auth import User, role_permissions, roles, user_roles
 from .base import Base, metadata
 from .job import (
     activation_instance_job_instances,
@@ -13,14 +14,16 @@ from .job import (
 )
 from .project import extra_vars, inventories, playbooks, projects
 from .rulebook import rulebooks, rules, rulesets
-from .user import User
 
 __all__ = (
     # base
     "Base",
     "metadata",
-    # user
+    # auth
     "User",
+    "roles",
+    "user_roles",
+    "role_permissions",
     # activation
     "activations",
     "activation_instances",
