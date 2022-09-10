@@ -37,16 +37,17 @@ ansible-galaxy collection install benthomasson.eda
 
 ### 4. Services
 
-You need to set up a PostgreSQL database sever. The easiest way is using the `docker-compose`:
+You need to start up a PostgreSQL database sever.
 
 ```shell
-docker-compose -p ansible-events -f tools/docker/docker-compose.yml up -d postgres
+
+  $ task dev:start:services
 ```
 
 Then run database migrations:
 
 ```shell
-alembic upgrade head
+  $ task dev:run:migrations
 ```
 
 ### 5. User interface
@@ -54,16 +55,13 @@ alembic upgrade head
 Build UI files (requires Node >= v16):
 
 ```shell
-cd ui
-npm install
-npm run build
-cd ..
+  $ task dev:start:ui
 ```
 
 ### 6. Start server
 
 ```shell
-ansible-events-ui
+  $ task dev:start:api
 ```
 
 Visit this url: <http://localhost/api/docs/auth/register_register_api_auth_register_post>
@@ -75,11 +73,24 @@ Change email and password
 
 Click execute
 
-Visit this url: http://localhost:8080/eda
+Visit this url: 
+  - http://localhost:8080/eda
+
+For API docs
+  - http://localhost:8080/api/docs
+  - http://localhost:8080/api/redocs
+  - http://localhost:8080/api/openapi.json
 
 Also you can check the [openapi specification.](http://localhost/docs)
 
 You have set up the development environment.
+
+**Note:** 
+  Instead of running the above tasks individually, you can run the following.
+
+```sh
+dev:start:all
+```
 
 ## Run the application with docker-compose
 
@@ -121,9 +132,9 @@ task minikube:deploy -- 001
 ```
 
 Forward the webserver port to local host.
-(If you do not provide a local port it will default to "8000")
+(If you do not provide a local port it will default to "8080")
 ```sh
-task minikube:fp:ui -- 8000
+task minikube:fp:ui -- 8080
 ```
 
 In a second terminal run the following cmd to create a `dev` user with a password of `none2tuff`.
@@ -132,9 +143,10 @@ In a second terminal run the following cmd to create a `dev` user with a passwor
 scripts/createuser.sh dev_user@redhat.com none2tuff
 ```
 
-Visit this url: http://localhost:8000/eda
+Visit this url for EDA app 
+  - http://localhost:8080/eda
 
-- **Note:** 
+**Note:** 
   Instead of running the above build, deploy, and minikube-fp-ui tasks individually. 
   It is possible to do the following, being mindful that it will use default values.
 ```sh

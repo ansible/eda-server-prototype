@@ -3,6 +3,7 @@
 version: '3'
 
 vars:
+  DEV_CMD: "scripts/eda.sh"
   DOCKER_COMPOSE: "docker-compose"
   DOCKER_COMPOSE_ARGS: "--project-name eda --file tools/docker/docker-compose.yml"
 
@@ -55,6 +56,80 @@ tasks:
     desc: "Format code with `black`."
     cmds:
       - black .
+
+  dev:
+    desc: "Run eda.sh with specified CLI arguments."
+    summary: |
+      Run eda.sh with specified CLI arguments.
+
+      Example:
+        $ task dev -- services-start
+    cmds:
+      - '{{.DEV_CMD}} {{.CLI_ARGS}}'
+
+  dev:start:services:
+    desc: "Start EDA service containers"
+    cmds:
+      - task: dev
+        vars:
+          CLI_ARGS: services-start
+
+  dev:stop:services:
+    desc: "Stop EDA service containers"
+    cmds:
+      - task: dev
+        vars:
+          CLI_ARGS: services-stop
+
+  dev:run:migrations:
+    desc: "Run DB migrations"
+    cmds:
+      - task: dev
+        vars:
+          CLI_ARGS: db-migrations
+
+  dev:start:api:
+    desc: "Start API server"
+    cmds:
+      - task: dev
+        vars:
+          CLI_ARGS: api-start
+
+  dev:stop:api:
+    desc: "Stop API server"
+    cmds:
+      - task: dev
+        vars:
+          CLI_ARGS: api-stop
+
+  dev:start:ui:
+    desc: "Start UI server"
+    cmds:
+      - task: dev
+        vars:
+          CLI_ARGS: ui-start
+
+  dev:stop:ui:
+    desc: "Stop UI server"
+    cmds:
+      - task: dev
+        vars:
+          CLI_ARGS: ui-stop
+
+  dev:start:all:
+    desc: "Start dev environment"
+    cmds:
+      - task: dev:start:services
+      - task: dev:run:migrations
+      - task: dev:start:api
+      - task: dev:start:ui
+
+  dev:stop:all:
+    desc: "Halt dev environment"
+    cmds:
+      - task: dev:stop:ui
+      - task: dev:stop:api
+      - task: dev:stop:services
 
   docker:
     desc: "Run docker-compose with specified CLI arguments."

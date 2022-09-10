@@ -34,6 +34,7 @@ def setup_cors(app: FastAPI) -> None:
 
 
 def setup_routes(app: FastAPI) -> None:
+    app.include_router(root_router)
     app.include_router(api_router)
 
 

@@ -4,9 +4,9 @@ metadata:
   name: eda-server
 spec:
   ports:
-    - name: "8080"
-      port: 8080
-      targetPort: 8080
+    - name: "9000"
+      port: 9000
+      targetPort: 9000
   selector:
     app: eda-server
 status:

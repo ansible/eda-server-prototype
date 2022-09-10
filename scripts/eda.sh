@@ -6,7 +6,7 @@ set -o nounset
 #
 #
 # Assumes environment variables have been set:
-#   - ANSIBLE_EVENTS_UI_HOME
+#   - EDA_PROJECT_HOME
 #
 # Optional environment variables
 #   - DEV_USER (default: demo_user@redhat.com)
@@ -20,9 +20,13 @@ usage() {
     log-info "services-start      start service containers"
     log-info "services-stop       stop service containers"
     log-info "services-restart    restart service container"
+    log-info "db-migrations       run database migrations"
     log-info "ui-start            build and start EDA UI"
     log-info "ui-stop             stop EDA UI"
     log-info "ui-restart          rebuild and restart EDA UI"
+    log-info "api-start           start EDA API"
+    log-info "api-stop            stop EDA API"
+    log-info "api-restart         restart EDA API"
     log-info "start-all           start both the services and EDA UI"
     log-info "stop-all            stop both the services and EDA UI"
     log-info "restart-all         restart both the services and EDA UI"
@@ -35,12 +39,14 @@ help() {
 CMD=${1:-help}
 DEBUG=${DEBUG:-false}
 
+EDA_PI_PORT=9000
+
 DEV_SCRIPTS_PATH=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
 DEV_USER="${DEV_USER:=demo_user@redhat.com}"
 DEV_PASS="${DEV_PASS:=none2tuff}"
 
-SERVICE_CONTAINER_NAMES=( ansible-events_postgres_1 )
+EDA_PROJECT_HOME="${DEV_SCRIPTS_PATH}/.."
 
 # import common & logging
 source "$DEV_SCRIPTS_PATH"/common/logging.sh
@@ -53,16 +59,12 @@ handle_errors() {
   exit 1
 }
 
-# check for these env variables
-log-info "Checking environment variables..."
-check_vars ANSIBLE_EVENTS_UI_HOME
-
 check_uvicorn_status() {
-  local _url=http://localhost:8080/eda/
+  local _url=http://localhost:"${EDA_PI_PORT}"/api/docs
   local _timeout=10
   local _count=0
 
-  while [[ $_count != $_timeout ]]; do
+  while [[ $_count != "$_timeout" ]]; do
     http_code=$(curl -w %{http_code} -s --output /dev/null $_url)
 
     if [ 200 == "$http_code" ]; then
@@ -82,80 +84,99 @@ add_demo_user() {
 }
 
 start-events-services() {
-  log-info "Starting Event Services..."
-  cd "${ANSIBLE_EVENTS_UI_HOME}"
+  log-info "Starting EDA Services (eda-postgres)"
+  cd "${EDA_PROJECT_HOME}"
 
-  for container in "${SERVICE_CONTAINER_NAMES[@]}"; do
-    if [[ $(docker inspect --format '{{json .State.Running}}' "$container") = "true" ]]; then
-      log-warn "$container service is already running"
-    else
-      log-debug "docker-compose -p ansible-events -f tools/docker/docker-compose.yml up -d postgres"
-      docker-compose -p ansible-events -f tools/docker/docker-compose.yml up -d postgres
-
-      until [ "$(docker inspect -f {{.State.Health.Status}} "$container")" == "healthy" ]; do
-        sleep 1;
-      done;
-
-      log-debug "alembic upgrade head"
-      alembic upgrade head
-    fi
-  done
-}
-
-stop-events-services() {
-  log-info "Stopping Event Services..."
-  cd "${ANSIBLE_EVENTS_UI_HOME}"
-
-  for container in "${SERVICE_CONTAINER_NAMES[@]}"; do
-    if [ $(docker inspect --format '{{json .State.Running}}' "$container") = "true" ]; then
-      docker stop "$container" > /dev/null 2>&1
-    else
-      log-warn "$container is not running"
-    fi
-  done
-}
-
-start-events-ui() {
-  cd "${ANSIBLE_EVENTS_UI_HOME}"/ui
-
-  log-info "Building Event UI..."
-  log-debug "npm install"
-  npm install
-
-  log-info "Starting Event UI..."
-  log-debug "npm run build"
-  npm run build
-
-  cd "${ANSIBLE_EVENTS_UI_HOME}"
-  ansible-events-ui &
-  if check_uvicorn_status; then
-    log-info "Uvicorn started"
+  if [[ $(docker inspect --format '{{json .State.Running}}' eda-postgres) = "true" ]]; then
+    log-warn "eda-postgres service is already running"
   else
-    log-err "timed out waiting for Uvicorn server to become ready"
-    return 1
+    log-debug "docker-compose -p ansible-events -f tools/docker/docker-compose.yml up -d postgres"
+    docker-compose -p ansible-events -f tools/docker/docker-compose.yml up -d postgres
+
+    until [ "$(docker inspect -f '{{.State.Health.Status}}' eda-postgres)" == "healthy" ]; do
+      sleep 1;
+    done;
   fi
 }
 
-# shellcheck disable=SC2120
-stop-events-ui() {
-  log-info "Stopping Event UI..."
-  log-debug "pgrep ansible-events-ui | xargs kill"
-  kill -9 $(pgrep -f 'ansible-events-ui') >/dev/null 2>&1
+db-migrations() {
+  if [[ $(docker inspect --format '{{json .State.Running}}' eda-postgres) = "true" ]]; then
+    log-info "Running DB migrations..."
+    log-debug "alembic upgrade head"
+    alembic upgrade head
+  else
+    log-warn "eda-postgres service is not running!"
+  fi
+}
 
-  if lsof -i:8080 >/dev/null 2>&1; then
-    log-debug "killing port tcp:8080"
-    kill -9 $(lsof -t -i tcp:8080) >/dev/null 2>&1
+stop-events-services() {
+  log-info "Stopping EDA Services (eda-postgres)"
+  cd "${EDA_PROJECT_HOME}"
+
+  if [ "$(docker inspect --format '{{json .State.Running}}' eda-postgres)" = "true" ]; then
+    docker stop eda-postgres > /dev/null 2>&1
+  fi
+}
+
+start-events-ui() {
+  cd "${EDA_PROJECT_HOME}"/ui
+
+  log-info "Building UI..."
+  log-debug "npm install"
+  npm install
+  log-debug "npm run build"
+  npm run build
+
+  log-info "Starting UI (eda-frontend)"
+  log-debug "npm run start:dev"
+  npm run start:dev &
+}
+
+# shellcheck disable=SC2046
+stop-events-ui() {
+  log-info "Stopping UI (eda-frontend)"
+
+  if pgrep -f 'npm run start:dev' >/dev/null 2>&1; then
+    log-debug "kill -9 \$(pgrep -f 'npm run start:dev')"
+    kill -9 $(pgrep -f 'npm run start:dev') >/dev/null 2>&1
+  fi
+
+  if pgrep -f 'webpack' >/dev/null 2>&1; then
+    kill -9 $(pgrep -f 'webpack') >/dev/null 2>&1
+  fi
+}
+
+start-events-api() {
+  log-info "Starting API (eda-server)"
+  cd "${EDA_PROJECT_HOME}"
+  log-debug "ansible-events-ui &"
+  ansible-events-ui &
+}
+
+# shellcheck disable=SC2046
+stop-events-api() {
+  log-info "Stopping API (eda-server)"
+
+  if pgrep -f ansible-events-ui >/dev/null 2>&1; then
+    log-debug "kill -9 \$(pgrep -f ansible-events-ui)"
+    kill -9 $(pgrep -f ansible-events-ui) >/dev/null 2>&1
+  fi
+
+  if lsof -i:"${EDA_PI_PORT}" >/dev/null 2>&1; then
+    log-debug "killing port tcp:${EDA_PI_PORT}"
+    kill -9 $(lsof -t -i tcp:"${EDA_PI_PORT}") >/dev/null 2>&1
   fi
 }
 
 start-events-all() {
   start-events-services
+  start-events-api
   start-events-ui
-  add_demo_user
 }
 
 stop-events-all() {
  stop-events-services
+ stop-events-api
  stop-events-ui
 }
 
@@ -170,6 +191,8 @@ case ${ARG} in
   "SERVICES-RESTART")
     stop-events-services
     start-events-services ;;
+  "DB-MIGRATIONS")
+    db-migrations ;;
   "UI-START")
     start-events-ui ;;
   "UI-STOP")
@@ -177,6 +200,13 @@ case ${ARG} in
   "UI-RESTART")
     stop-events-ui
     start-events-ui ;;
+  "API-START")
+    start-events-api ;;
+  "API-STOP")
+    stop-events-api ;;
+  "API-RESTART")
+    stop-events-api
+    start-events-api ;;
   "START-ALL")
     start-events-all ;;
   "STOP-ALL")
