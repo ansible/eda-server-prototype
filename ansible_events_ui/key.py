@@ -29,5 +29,3 @@ async def generate_ssh_keys():
         with open(os.path.join(local_working_directory, "key.pub")) as f:
             ssh_public_key = f.read()
         return ssh_private_key, ssh_public_key
-    finally:
-        shutil.rmtree(local_working_directory)
