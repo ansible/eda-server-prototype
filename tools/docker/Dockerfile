@@ -19,7 +19,6 @@ COPY --from=ui-builder /app/ui/dist/ ./ui/dist
 RUN chown -R $USER_ID ./
 
 USER $USER_ID
-USER 0
 RUN pip install .
 
 RUN bash -c "if [ $DEVEL_AE_LIBRARY -ne 0 ]; then \
