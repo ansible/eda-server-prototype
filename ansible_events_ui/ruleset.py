@@ -79,6 +79,7 @@ async def activate_rulesets(
     local_working_directory = working_directory
     ensure_directory(local_working_directory)
 
+    # TODO(ben): Change to enum
     if deployment_type == "local":
 
         # for local development this is better
