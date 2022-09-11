@@ -331,6 +331,18 @@ const sharedMessages = defineMessages({
     id: 'rule.backToRules',
     defaultMessage: 'Back to Rules'
   },
+  workingDirectory: {
+    id: 'shared.workingDirectory',
+    defaultMessage: 'Working directory'
+  },
+  workingDirectoryPlaceholder: {
+    id: 'shared.workingDirectoryPlaceholder',
+    defaultMessage: 'Working directory'
+  },
+  enterRulebookActivationWorkingDirectory: {
+    id: 'activation.enterRulebookActivationWorkingDirectory',
+    defaultMessage: 'Enter a rulebook working directory'
+  }
 });
 
 export default sharedMessages;

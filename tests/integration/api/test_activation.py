@@ -17,6 +17,8 @@ TEST_ACTIVATION = {
     "restart_policy_id": 1,
     "playbook_id": 1,
     "activation_enabled": True,
+    "working_directory": "/tmp",
+    "execution_environment": "quay.io/ansible/eda-project",
 }
 
 TEST_EXTRA_VAR = """
@@ -94,6 +96,55 @@ async def test_create_activation(client: AsyncClient, db: AsyncSession):
 
 
 @pytest.mark.asyncio
+async def test_delete_activation_instance(
+    client: AsyncClient, db: AsyncSession
+):
+    query = sa.insert(models.extra_vars).values(
+        name="vars.yml", extra_var=TEST_EXTRA_VAR
+    )
+    await db.execute(query)
+    extra_var = (await db.execute(sa.select(models.extra_vars))).first()
+
+    query = sa.insert(models.inventories).values(
+        name="inventory.yml", inventory=TEST_INVENTORY
+    )
+    await db.execute(query)
+    inventory = (await db.execute(sa.select(models.inventories))).first()
+
+    query = sa.insert(models.rulebooks).values(
+        name="ruleset.yml", rulesets=TEST_RULEBOOK
+    )
+    await db.execute(query)
+    rulebook = (await db.execute(sa.select(models.rulebooks))).first()
+
+    query = sa.insert(models.playbooks).values(
+        name="hello.yml", playbook=TEST_PLAYBOOK
+    )
+    await db.execute(query)
+
+    query = sa.insert(models.activation_instances).values(
+        name="test-activation",
+        rulebook_id=rulebook.id,
+        inventory_id=inventory.id,
+        extra_var_id=extra_var.id,
+    )
+    await db.execute(query)
+
+    activation_instances = (
+        await db.execute(sa.select(models.activation_instances))
+    ).all()
+    assert len(activation_instances) == 1
+
+    response = await client.delete("/api/activation_instance/1")
+    assert response.status_code == status_codes.HTTP_204_NO_CONTENT
+
+    activations = (
+        await db.execute(sa.select(models.activation_instances))
+    ).all()
+    assert len(activations) == 0
+
+
+@pytest.mark.asyncio
 async def test_create_activation_bad_entity(
     client: AsyncClient, db: AsyncSession
 ):
@@ -102,3 +153,9 @@ async def test_create_activation_bad_entity(
         json=TEST_ACTIVATION,
     )
     assert response.status_code == status_codes.HTTP_422_UNPROCESSABLE_ENTITY
+
+
+@pytest.mark.asyncio
+async def test_delete_activation_not_found(client: AsyncClient):
+    response = await client.delete("/api/activation_instance/1")
+    assert response.status_code == status_codes.HTTP_404_NOT_FOUND

@@ -1,6 +1,6 @@
 import uuid
 from datetime import datetime
-from typing import Optional
+from typing import List, Optional
 
 from fastapi_users import schemas
 from pydantic import BaseModel, StrictStr, confloat, validator
@@ -48,9 +48,19 @@ class Inventory(BaseModel):
     id: Optional[int]
 
 
+class InventoryRef(BaseModel):
+    name: StrictStr
+    id: Optional[int]
+
+
 class Extravars(BaseModel):
     name: StrictStr
     extra_var: StrictStr
+    id: Optional[int]
+
+
+class ExtravarsRef(BaseModel):
+    name: StrictStr
     id: Optional[int]
 
 
@@ -65,6 +75,8 @@ class Activation(BaseModel):
     playbook_id: int
     activation_enabled: bool
     extra_var_id: int
+    working_directory: StrictStr
+    execution_environment: StrictStr
 
 
 class ActivationInstance(BaseModel):
@@ -73,18 +85,14 @@ class ActivationInstance(BaseModel):
     rulebook_id: int
     inventory_id: int
     extra_var_id: int
+    working_directory: StrictStr
+    execution_environment: StrictStr
 
 
 class ActivationLog(BaseModel):
     activation_instance_id: int
     log: StrictStr
     id: Optional[int]
-
-
-class Project(BaseModel):
-    id: Optional[int]
-    git_hash: Optional[StrictStr]
-    url: StrictStr
 
 
 class JobInstance(BaseModel):
@@ -104,6 +112,41 @@ class Rule(BaseModel):
     name: Optional[str]
     action: dict
     ruleset: RuleRulesetRef
+
+
+class PlaybookRef(BaseModel):
+    id: Optional[int]
+    name: StrictStr
+
+
+class ProjectCreate(BaseModel):
+    id: Optional[int]
+    git_hash: Optional[StrictStr]
+    url: StrictStr
+    name: StrictStr
+    description: StrictStr
+
+
+class ProjectRead(ProjectCreate):
+    created_at: datetime
+    modified_at: datetime
+
+
+class ProjectDetail(ProjectRead):
+    rulesets: List[RuleRulesetRef]
+    inventories: List[InventoryRef]
+    vars: List[ExtravarsRef]
+    playbooks: List[PlaybookRef]
+
+
+class ProjectList(BaseModel):
+    id: int
+    url: StrictStr
+    name: StrictStr
+
+
+class ProjectUpdate(BaseModel):
+    name: StrictStr
 
 
 # Fast API Users

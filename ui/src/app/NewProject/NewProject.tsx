@@ -22,7 +22,7 @@ const SimpleList = styled(PFSimpleList)`
   white-space: pre-wrap;
 `
 
-const endpoint = 'http://' + getServer() + '/api/project/';
+const endpoint = 'http://' + getServer() + '/api/projects/';
 
 const NewProject: React.FunctionComponent = () => {
 
@@ -36,7 +36,7 @@ const NewProject: React.FunctionComponent = () => {
   const intl = useIntl();
 
   const handleSubmit = () => {
-			postData(endpoint, { url: scmUrl })
+			postData(endpoint, { url: scmUrl, name: name, description: description })
 				.then(data => {
           history.push(`/project/${data.id}`);
 			});
