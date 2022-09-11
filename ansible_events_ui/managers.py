@@ -41,3 +41,20 @@ class UpdateManager:
 
 
 updatemanager = UpdateManager()
+
+
+class SecretsManager:
+    def __init__(self):
+        self.secrets = {}
+
+    def set_secret(self, name, secret):
+        self.secrets[name] = secret
+
+    def get_secret(self, name):
+        return self.secrets[name]
+
+    def has_secret(self, name):
+        return name in self.secrets
+
+
+secretsmanager = SecretsManager()

@@ -1,23 +1,37 @@
 import asyncio
+import base64
 import json
 import logging
 import uuid
 from typing import List
 
+import aiodocker.exceptions
 import sqlalchemy.orm
 import yaml
-from fastapi import APIRouter, Depends, WebSocket, WebSocketDisconnect, status
-from fastapi.exceptions import HTTPException
+from fastapi import (
+    APIRouter,
+    Depends,
+    HTTPException,
+    WebSocket,
+    WebSocketDisconnect,
+    status,
+)
 from sqlalchemy import delete, insert, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ansible_events_ui import schemas
+from ansible_events_ui.config import Settings, get_settings
 from ansible_events_ui.db import models
 from ansible_events_ui.db.dependency import (
     get_db_session,
     get_db_session_factory,
 )
-from ansible_events_ui.managers import taskmanager, updatemanager
+from ansible_events_ui.key import generate_ssh_keys
+from ansible_events_ui.managers import (
+    secretsmanager,
+    taskmanager,
+    updatemanager,
+)
 from ansible_events_ui.project import insert_rulebook_related_data
 from ansible_events_ui.ruleset import (
     activate_rulesets,
@@ -56,7 +70,77 @@ async def websocket_endpoint2(
             data = json.loads(data)
             # TODO(cutwater): Some data validation is needed
             data_type = data.get("type")
-            if data_type == "Job":
+            if data_type == "Worker":
+                await websocket.send_text(json.dumps({"type": "Hello"}))
+                query = select(models.activation_instances).where(
+                    models.activation_instances.c.id
+                    == data.get("activation_id")
+                )
+                activation = (await db.execute(query)).first()
+
+                query = select(models.rulebooks).where(
+                    models.rulebooks.c.id == activation.rulebook_id
+                )
+                rulebook_row = (await db.execute(query)).first()
+                await websocket.send_text(
+                    json.dumps(
+                        {
+                            "type": "Rulebook",
+                            "data": base64.b64encode(
+                                rulebook_row.rulesets.encode()
+                            ).decode(),
+                        }
+                    )
+                )
+
+                query = select(models.inventories).where(
+                    models.inventories.c.id == activation.inventory_id
+                )
+                inventory_row = (await db.execute(query)).first()
+                await websocket.send_text(
+                    json.dumps(
+                        {
+                            "type": "Inventory",
+                            "data": base64.b64encode(
+                                inventory_row.inventory.encode()
+                            ).decode(),
+                        }
+                    )
+                )
+
+                query = select(models.extra_vars).where(
+                    models.extra_vars.c.id == activation.extra_var_id
+                )
+                extra_var_row = (await db.execute(query)).first()
+                await websocket.send_text(
+                    json.dumps(
+                        {
+                            "type": "ExtraVars",
+                            "data": base64.b64encode(
+                                extra_var_row.extra_var.encode()
+                            ).decode(),
+                        }
+                    )
+                )
+                if secretsmanager.has_secret("ssh-private-key"):
+                    await websocket.send_text(
+                        json.dumps(
+                            {
+                                "type": "SSHPrivateKey",
+                                "data": base64.b64encode(
+                                    secretsmanager.get_secret(
+                                        "ssh-private-key"
+                                    ).encode()
+                                ).decode(),
+                            }
+                        )
+                    )
+                else:
+                    await websocket.send_text(
+                        json.dumps({"type": "SSHPrivateKey", "data": ""})
+                    )
+
+            elif data_type == "Job":
                 query = insert(models.job_instances).values(
                     uuid=data.get("job_id")
                 )
@@ -195,6 +279,7 @@ async def create_activation_instance(
     db_session_factory: sqlalchemy.orm.sessionmaker = Depends(
         get_db_session_factory
     ),
+    settings: Settings = Depends(get_settings),
 ):
     query = select(models.rulebooks).where(
         models.rulebooks.c.id == a.rulebook_id
@@ -216,26 +301,28 @@ async def create_activation_instance(
         rulebook_id=a.rulebook_id,
         inventory_id=a.inventory_id,
         extra_var_id=a.extra_var_id,
+        working_directory=a.working_directory,
+        execution_environment=a.execution_environment,
     )
     result = await db.execute(query)
     await db.commit()
     (id_,) = result.inserted_primary_key
 
-    cmd, proc = await activate_rulesets(
-        id_,
-        # TODO(cutwater): Hardcoded container image link
-        "quay.io/bthomass/ansible-events:latest",
-        rulebook_row.rulesets,
-        inventory_row.inventory,
-        extra_var_row.extra_var,
-        db,
-    )
-
-    task = asyncio.create_task(
-        read_output(proc, id_, db_session_factory),
-        name=f"read_output {proc.pid}",
-    )
-    taskmanager.tasks.append(task)
+    try:
+        await activate_rulesets(
+            settings.deployment_type,
+            id_,
+            a.execution_environment,
+            rulebook_row.rulesets,
+            inventory_row.inventory,
+            extra_var_row.extra_var,
+            a.working_directory,
+            settings.server_name,
+            settings.port,
+            db,
+        )
+    except aiodocker.exceptions.DockerError as e:
+        return HTTPException(status_code=500, detail=str(e))
 
     return {**a.dict(), "id": id_}
 
@@ -244,32 +331,6 @@ async def create_activation_instance(
 async def deactivate(activation_instance_id: int):
     await inactivate_rulesets(activation_instance_id)
     return
-
-
-async def read_output(proc, activation_instance_id, db_session_factory):
-    # TODO(cutwater): Replace with FastAPI dependency injections,
-    #   that is available in BackgroundTasks
-    async with db_session_factory() as db:
-        line_number = 0
-        done = False
-        while not done:
-            line = await proc.stdout.readline()
-            if len(line) == 0:
-                done = True
-                continue
-            line = line.decode()
-            await updatemanager.broadcast(
-                f"/activation_instance/{activation_instance_id}",
-                json.dumps(["Stdout", {"stdout": line}]),
-            )
-            query = insert(models.activation_instance_logs).values(
-                line_number=line_number,
-                log=line,
-                activation_instance_id=activation_instance_id,
-            )
-            await db.execute(query)
-            await db.commit()
-            line_number += 1
 
 
 @router.get(
@@ -609,3 +670,14 @@ async def authenticated_route(
     user: models.User = Depends(current_active_user),
 ):
     return {"message": f"Hello {user.email}!"}
+
+
+@router.get("/api/ssh-public-key")
+async def ssh_public_key():
+    if secretsmanager.has_secret("ssh-public-key"):
+        return {"public_key": secretsmanager.get_secret("ssh-public-key")}
+    else:
+        ssh_private_key, ssh_public_key = await generate_ssh_keys()
+        secretsmanager.set_secret("ssh-public-key", ssh_public_key)
+        secretsmanager.set_secret("ssh-private-key", ssh_private_key)
+        return {"public_key": secretsmanager.get_secret("ssh-public-key")}

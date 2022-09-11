@@ -113,6 +113,8 @@ activation_instances = sa.Table(
     sa.Column(
         "extra_var_id", sa.ForeignKey("extra_var.id", ondelete="CASCADE")
     ),
+    sa.Column("working_directory", sa.String),
+    sa.Column("execution_environment", sa.String),
 )
 
 
