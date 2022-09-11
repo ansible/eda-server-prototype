@@ -5,6 +5,8 @@ from typing import List, Optional
 from fastapi_users import schemas
 from pydantic import BaseModel, StrictStr, confloat, validator
 
+import ansible_events_ui.types
+
 
 class ProducerMessage(BaseModel):
     name: StrictStr
@@ -168,6 +170,28 @@ class ProjectList(BaseModel):
 
 class ProjectUpdate(BaseModel):
     name: StrictStr
+
+
+class RoleRead(BaseModel):
+    id: uuid.UUID
+    name: str
+    description: str
+
+
+class RoleCreate(BaseModel):
+    name: str
+    description: str = ""
+
+
+class RolePermissionRead(BaseModel):
+    id: uuid.UUID
+    resource_type: ansible_events_ui.types.ResourceType
+    action: ansible_events_ui.types.Action
+
+
+class RolePermissionCreate(BaseModel):
+    resource_type: ansible_events_ui.types.ResourceType
+    action: ansible_events_ui.types.Action
 
 
 # Fast API Users
