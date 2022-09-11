@@ -13,12 +13,14 @@ services:
         "alembic upgrade head && ansible-events-ui"
       ]
     volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock:z"
+      - "/run/user/1000/podman/podman.sock:/var/run/docker.sock:z"
     ports:
       - "8080:8080"
     environment:
       - AE_HOST=0.0.0.0
       - AE_DATABASE_URL=postgresql+asyncpg://postgres:secret@postgres/ansible_events
+      - AE_SERVER_NAME=mininuke
+      - AE_DEPLOYMENT_TYPE=podman
     depends_on:
       postgres:
         condition: service_healthy
