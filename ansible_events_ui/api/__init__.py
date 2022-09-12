@@ -2,6 +2,7 @@ import base64
 import json
 import logging
 import uuid
+from datetime import datetime
 from typing import List
 
 import aiodocker.exceptions
@@ -62,74 +63,7 @@ async def websocket_endpoint2(
             # TODO(cutwater): Some data validation is needed
             data_type = data.get("type")
             if data_type == "Worker":
-                await websocket.send_text(json.dumps({"type": "Hello"}))
-                query = select(models.activation_instances).where(
-                    models.activation_instances.c.id
-                    == data.get("activation_id")
-                )
-                activation = (await db.execute(query)).first()
-
-                query = select(models.rulebooks).where(
-                    models.rulebooks.c.id == activation.rulebook_id
-                )
-                rulebook_row = (await db.execute(query)).first()
-                await websocket.send_text(
-                    json.dumps(
-                        {
-                            "type": "Rulebook",
-                            "data": base64.b64encode(
-                                rulebook_row.rulesets.encode()
-                            ).decode(),
-                        }
-                    )
-                )
-
-                query = select(models.inventories).where(
-                    models.inventories.c.id == activation.inventory_id
-                )
-                inventory_row = (await db.execute(query)).first()
-                await websocket.send_text(
-                    json.dumps(
-                        {
-                            "type": "Inventory",
-                            "data": base64.b64encode(
-                                inventory_row.inventory.encode()
-                            ).decode(),
-                        }
-                    )
-                )
-
-                query = select(models.extra_vars).where(
-                    models.extra_vars.c.id == activation.extra_var_id
-                )
-                extra_var_row = (await db.execute(query)).first()
-                await websocket.send_text(
-                    json.dumps(
-                        {
-                            "type": "ExtraVars",
-                            "data": base64.b64encode(
-                                extra_var_row.extra_var.encode()
-                            ).decode(),
-                        }
-                    )
-                )
-                if secretsmanager.has_secret("ssh-private-key"):
-                    await websocket.send_text(
-                        json.dumps(
-                            {
-                                "type": "SSHPrivateKey",
-                                "data": base64.b64encode(
-                                    secretsmanager.get_secret(
-                                        "ssh-private-key"
-                                    ).encode()
-                                ).decode(),
-                            }
-                        )
-                    )
-                else:
-                    await websocket.send_text(
-                        json.dumps({"type": "SSHPrivateKey", "data": ""})
-                    )
+                await handle_workers(websocket, data, db)
             elif data_type == "Job":
                 await handle_jobs(data, db)
             elif data_type == "AnsibleEvent":
@@ -177,6 +111,74 @@ async def websocket_job_endpoint(websocket: WebSocket, job_instance_id):
             logger.debug(data)
     except WebSocketDisconnect:
         updatemanager.disconnect(page, websocket)
+
+
+async def handle_workers(websocket: WebSocket, data: dict, db: AsyncSession):
+    await websocket.send_text(json.dumps({"type": "Hello"}))
+    query = select(models.activation_instances).where(
+        models.activation_instances.c.id == data.get("activation_id")
+    )
+    activation = (await db.execute(query)).first()
+
+    query = select(models.rulebooks).where(
+        models.rulebooks.c.id == activation.rulebook_id
+    )
+    rulebook_row = (await db.execute(query)).first()
+    await websocket.send_text(
+        json.dumps(
+            {
+                "type": "Rulebook",
+                "data": base64.b64encode(
+                    rulebook_row.rulesets.encode()
+                ).decode(),
+            }
+        )
+    )
+
+    query = select(models.inventories).where(
+        models.inventories.c.id == activation.inventory_id
+    )
+    inventory_row = (await db.execute(query)).first()
+    await websocket.send_text(
+        json.dumps(
+            {
+                "type": "Inventory",
+                "data": base64.b64encode(
+                    inventory_row.inventory.encode()
+                ).decode(),
+            }
+        )
+    )
+
+    query = select(models.extra_vars).where(
+        models.extra_vars.c.id == activation.extra_var_id
+    )
+    extra_var_row = (await db.execute(query)).first()
+    await websocket.send_text(
+        json.dumps(
+            {
+                "type": "ExtraVars",
+                "data": base64.b64encode(
+                    extra_var_row.extra_var.encode()
+                ).decode(),
+            }
+        )
+    )
+    if secretsmanager.has_secret("ssh-private-key"):
+        await websocket.send_text(
+            json.dumps(
+                {
+                    "type": "SSHPrivateKey",
+                    "data": base64.b64encode(
+                        secretsmanager.get_secret("ssh-private-key").encode()
+                    ).decode(),
+                }
+            )
+        )
+    else:
+        await websocket.send_text(
+            json.dumps({"type": "SSHPrivateKey", "data": ""})
+        )
 
 
 async def handle_ansible_events(data: dict, db: AsyncSession):
@@ -232,7 +234,9 @@ async def handle_actions(data: dict, db: AsyncSession):
         action_name = data.get("action")
         playbook_name = data.get("playbook_name")
         job_id = data.get("job_id")
-        fired_date = data.get("run_at")
+        fired_date = datetime.strptime(
+            data.get("run_at"), "%Y-%m-%d %H:%M:%S.%f"
+        )
         status = data.get("status")
 
         if job_id:
@@ -246,7 +250,7 @@ async def handle_actions(data: dict, db: AsyncSession):
                     models.rules.c.name,
                     models.rules.c.action.label("definition"),
                     models.job_instances.c.id.label("job_instance_id"),
-                    cast(fired_date, postgresql.VARCHAR).label("fired_date"),
+                    cast(fired_date, postgresql.TIMESTAMP).label("fired_date"),
                     cast(status, postgresql.VARCHAR).label("status"),
                 )
                 .join(
@@ -264,13 +268,11 @@ async def handle_actions(data: dict, db: AsyncSession):
                     == cast(job_id, postgresql.UUID),
                 )
                 .where(
-                    and_(
-                        models.activation_instances.c.id == activation_id,
-                        models.rules.c.action[action_name] is not None,
-                        models.rules.c.action[action_name]["name"].astext
-                        == playbook_name,
-                        models.job_instances.c.id is not None,
-                    )
+                    models.activation_instances.c.id == activation_id,
+                    models.rules.c.action[action_name].is_not(None),
+                    models.rules.c.action[action_name]["name"].astext
+                    == playbook_name,
+                    models.job_instances.c.id.is_not(None),
                 )
             )
             ins_cols = [
@@ -293,7 +295,7 @@ async def handle_actions(data: dict, db: AsyncSession):
                     models.rules.c.id.label("rule_id"),
                     models.rules.c.name,
                     models.rules.c.action.label("definition"),
-                    cast(fired_date, postgresql.VARCHAR).label("fired_date"),
+                    cast(fired_date, postgresql.TIMESTAMP).label("fired_date"),
                     cast(status, postgresql.VARCHAR).label("status"),
                 )
                 .join(
@@ -308,7 +310,7 @@ async def handle_actions(data: dict, db: AsyncSession):
                 .where(
                     and_(
                         models.activation_instances.c.id == activation_id,
-                        models.rules.c.action[action_name] is not None,
+                        models.rules.c.action[action_name].is_not(None),
                         models.rules.c.action[action_name]["name"].astext
                         == playbook_name,
                     )

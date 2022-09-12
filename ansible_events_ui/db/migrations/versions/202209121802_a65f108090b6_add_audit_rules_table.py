@@ -1,17 +1,17 @@
-"""Add audit rules table
+"""Add audit rules table.
 
-Revision ID: d5f5e14c698a
-Revises: c1eee0e47fc1
-Create Date: 2022-09-06 19:03:44.658149+00:00
+Revision ID: a65f108090b6
+Revises: 61c61bfd1f7b
+Create Date: 2022-09-12 18:02:43.598662+00:00
 
 """
-from alembic import op
 import sqlalchemy as sa
+from alembic import op
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision = "d5f5e14c698a"
-down_revision = "c1eee0e47fc1"
+revision = "a65f108090b6"
+down_revision = "61c61bfd1f7b"
 branch_labels = None
 depends_on = None
 
@@ -25,7 +25,12 @@ def upgrade() -> None:
         sa.Column("name", sa.String(), nullable=True),
         sa.Column("description", sa.String(), nullable=True),
         sa.Column("status", sa.String(), nullable=True),
-        sa.Column("fired_date", sa.String(), nullable=True),
+        sa.Column(
+            "fired_date",
+            sa.DateTime(timezone=True),
+            server_default=sa.text("now()"),
+            nullable=True,
+        ),
         sa.Column(
             "created_at",
             sa.DateTime(timezone=True),

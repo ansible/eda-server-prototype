@@ -77,7 +77,9 @@ audit_rules = sa.Table(
     sa.Column("name", sa.String),
     sa.Column("description", sa.String),
     sa.Column("status", sa.String),
-    sa.Column("fired_date", sa.String),
+    sa.Column(
+        "fired_date", sa.DateTime(timezone=True), server_default=func.now()
+    ),
     sa.Column(
         "created_at",
         sa.DateTime(timezone=True),
