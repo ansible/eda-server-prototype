@@ -73,7 +73,7 @@ async def db_engine(default_engine, db_url):
 
 @pytest_asyncio.fixture
 async def db(db_engine):
-    session_factory = sessionmaker(class_=AsyncSession, expire_on_commit=True)
+    session_factory = sessionmaker(class_=AsyncSession, expire_on_commit=False)
 
     async with db_engine.connect() as connection:
         transaction = await connection.begin()

@@ -69,7 +69,7 @@ const RuleSetFile: React.FunctionComponent = () => {
                         { item?.sources && item.sources.length > 0 && item.sources.map((source, j) => (
                           <div key={`source-${source?.id}`}> {source.name} </div>))}
                         { item?.rules && item.rules.length > 0 && item.rules.map((rule, j) => (
-                          <div key={`rule-${rule?.id}`}> {rule?.name} {Object.keys(rule?.action)} </div>))}
+                          <div key={`rule-${rule?.id}`}> {rule?.name} {rule?.action ? Object.keys(rule?.action) : ''} </div>))}
                       </div>
                     </SimpleListItem>
                   )) }

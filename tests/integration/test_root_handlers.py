@@ -7,7 +7,7 @@ from httpx import AsyncClient
 async def test_root(client: AsyncClient):
     response = await client.get("/", follow_redirects=False)
     assert response.status_code == status_codes.HTTP_307_TEMPORARY_REDIRECT
-    assert response.headers["Location"] == "/eda"
+    assert response.headers["Location"] == "/eda/"
 
 
 @pytest.mark.asyncio

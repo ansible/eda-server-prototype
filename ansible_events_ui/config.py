@@ -16,6 +16,9 @@ class Settings(BaseSettings):
         "postgresql+asyncpg://postgres:secret@localhost:5432/ansible_events"
     )
 
+    deployment_type = "docker"
+    server_name = "localhost"
+
     class Config:
         env_prefix = "AE_"
         env_nested_delimiter = "__"

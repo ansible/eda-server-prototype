@@ -34,7 +34,17 @@ export interface PlaybookType {
 export interface RuleType {
   id: string;
   name?: string;
-  action: AnyObject;
+  action?: AnyObject;
+  description?: string;
+  ruleset?: RuleSetType;
+  type?: string;
+  project_id?: string;
+  project_name?: string;
+  fired_count?: string;
+  created_at?: string;
+  modified_at?: string;
+  last_fired_date?: string;
+  extra_var_id?: string;
 }
 
 export interface RuleSetType {
@@ -152,7 +162,8 @@ const RuleSets: React.FunctionComponent = () => {
 
   useEffect(() => {
     fetchRuleSets().then(response => response.json())
-      .then(data => { setRuleSets(data); stateDispatch({type: 'setRows', payload: createRows(RuleSets)});});
+      .then(data => { setRuleSets(data); console.log( 'Debug - rulesets data: ', data);
+        stateDispatch({type: 'setRows', payload: createRows(RuleSets)});});
   }, []);
 
   useEffect(() => {
@@ -198,6 +209,7 @@ const RuleSets: React.FunctionComponent = () => {
 
   const toolbarButtons = () => null;
 
+  console.log('Debug - RuleSets: ', RuleSets);
   return (
     <Fragment>
       <TopToolbar>

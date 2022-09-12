@@ -13,7 +13,7 @@ import { Jobs } from '@app/Jobs/Jobs';
 import { Job } from '@app/Job/Job';
 import { NewJob } from '@app/NewJob/NewJob';
 import { RuleSets } from '@app/RuleSetFiles/RuleSetFiles';
-import { RuleSetFile } from '@app/RuleSetFile/RuleSetFile';
+import { RuleSet } from '@app/RuleSetFile/ruleset';
 import { Inventories } from '@app/Inventories/Inventories';
 import { Inventory } from '@app/Inventory/Inventory';
 import { Vars } from '@app/Vars/Vars';
@@ -24,6 +24,11 @@ import { NotFound } from '@app/NotFound/NotFound';
 import { useDocumentTitle } from '@app/utils/useDocumentTitle';
 import {ActivationStdout} from "@app/Activation/activation-stdout";
 import {useIntl} from "react-intl";
+import {RulesetSources} from "@app/RuleSetFile/ruleset-sources";
+import {RulesetDetails} from "@app/RuleSetFile/ruleset-details";
+import {RulesetRules} from "@app/RuleSetFile/ruleset-rules";
+import { Rules } from '@app/Rules/Rules';
+import { Rule } from '@app/Rule/Rule';
 
 export interface IAppRoute {
   label?: string; // Excluding the label will exclude the route from the nav sidebar in AppLayout
@@ -73,7 +78,7 @@ const routes: AppRouteConfig[] = [
     exact: true,
     label: 'Rulebook activations',
     path: '/activations',
-    title: 'Rulebook activations',
+    title: 'Rulebook Activations',
   },
   {
     component: Activation,
@@ -84,24 +89,24 @@ const routes: AppRouteConfig[] = [
     component: ActivationJobs,
     exact: true,
     path: '/activation/:id/jobs',
-    title: 'Activation jobs',
+    title: 'Activation Jobs',
   },
   {
     component: ActivationDetails,
     exact: true,
     path: '/activation/:id/details',
-    title: 'Activation details',
+    title: 'Activation Details',
   },
   {
     component: ActivationStdout,
     exact: true,
     path: '/activation/:id/stdout',
-    title: 'Standard out',
+    title: 'Output',
   },
   {
     component: NewActivation,
     path: '/new-activation/',
-    title: 'NewActivation',
+    title: 'New Activation',
   },
   {
     component: Jobs,
@@ -129,10 +134,39 @@ const routes: AppRouteConfig[] = [
     title: 'Rule Sets',
   },
   {
-    component: RuleSetFile,
+    component: RuleSet,
+    path: '/ruleset/:id',
+    title: 'RuleSet',
+  },
+  {
+    component: RulesetRules,
     exact: true,
-    path: '/rulesetfile/:id',
-    title: 'RuleSetFile',
+    path: '/ruleset/:id/rules',
+    title: 'Rules',
+  },
+  {
+    component: RulesetDetails,
+    exact: true,
+    path: '/ruleset/:id/details',
+    title: 'Details',
+  },
+  {
+    component: RulesetSources,
+    exact: true,
+    path: '/ruleset/:id/sources',
+    title: 'Sources',
+  },
+  {
+    component: Rules,
+    exact: true,
+    label: 'Rules',
+    path: '/rules',
+    title: 'Rules',
+  },
+  {
+    component: Rule,
+    path: '/rule/:id',
+    title: 'Rule',
   },
   {
     component: Inventories,
