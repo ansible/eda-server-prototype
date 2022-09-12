@@ -1,4 +1,12 @@
-from .activation import Activation, ActivationInstance, ActivationLog
+from .activation import (
+    Activation,
+    ActivationBaseRead,
+    ActivationCreate,
+    ActivationInstance,
+    ActivationLog,
+    ActivationRead,
+    ActivationUpdate,
+)
 from .extra_vars import Extravars, ExtravarsRef
 from .inventory import Inventory, InventoryRef
 from .job import JobInstance
@@ -18,6 +26,10 @@ __all__ = [
     "Activation",
     "ActivationInstance",
     "ActivationLog",
+    "ActivationUpdate",
+    "ActivationRead",
+    "ActivationBaseRead",
+    "ActivationCreate",
     "Extravars",
     "ExtravarsRef",
     "Inventory",
