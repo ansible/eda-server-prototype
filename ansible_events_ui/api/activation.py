@@ -9,6 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from ansible_events_ui import schemas
 from ansible_events_ui.db import models
 from ansible_events_ui.db.dependency import get_db_session
+from ansible_events_ui.schema.activation import Activation
 
 logger = logging.getLogger("ansible_events_ui")
 
