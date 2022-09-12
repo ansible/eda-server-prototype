@@ -40,14 +40,13 @@ ansible-galaxy collection install benthomasson.eda
 You need to start up a PostgreSQL database sever.
 
 ```shell
-
-  $ task dev:start:services
+task dev:start:services
 ```
 
 Then run database migrations:
 
 ```shell
-  $ task dev:run:migrations
+task dev:run:migrations
 ```
 
 ### 5. User interface
@@ -55,13 +54,13 @@ Then run database migrations:
 Build UI files (requires Node >= v16):
 
 ```shell
-  $ task dev:start:ui
+task dev:start:ui
 ```
 
 ### 6. Start server
 
 ```shell
-  $ task dev:start:api
+task dev:start:api
 ```
 
 Visit this url: <http://localhost/api/docs/auth/register_register_api_auth_register_post>
@@ -89,7 +88,7 @@ You have set up the development environment.
   Instead of running the above tasks individually, you can run the following.
 
 ```sh
-dev:start:all
+task dev:start:all
 ```
 
 ## Run the application with docker-compose
@@ -150,7 +149,7 @@ Visit this url for EDA app
   Instead of running the above build, deploy, and minikube-fp-ui tasks individually. 
   It is possible to do the following, being mindful that it will use default values.
 ```sh
-$ task minikube:all
+task minikube:all
 ```
 
 You have set up the development environment.
