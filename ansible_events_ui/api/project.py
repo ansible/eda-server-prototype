@@ -31,6 +31,7 @@ async def list_projects(db: AsyncSession = Depends(get_db_session)):
     "/api/projects/",
     response_model=schemas.ProjectRead,
     operation_id="create_projects",
+    status_code=201,
 )
 async def create_project(
     project: schemas.ProjectCreate, db: AsyncSession = Depends(get_db_session)
@@ -127,10 +128,14 @@ async def update_project(
     if not stored_project:
         raise HTTPException(status_code=404, detail="Project not found")
 
+    for key, val in project:
+        if not val:
+            project.__setattr__(key, stored_project[key])
+
     query = (
         sa.update(projects)
         .where(projects.c.id == project_id)
-        .values(name=project.name)
+        .values(name=project.name, description=project.description)
     )
 
     try:
