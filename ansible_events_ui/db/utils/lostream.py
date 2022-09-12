@@ -14,7 +14,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from ansible_events_ui.db.dependency import get_db_session
 
 
-LOG = logging.getLogger("ansible_events_ui.lostream")
+LOG = logging.getLogger(__name__)
 
 
 # Default read buffer size is
@@ -36,7 +36,7 @@ class LObject:
     INV_WRITE = 0x00020000
     MODE_MAP = {
         "r": INV_READ,
-        "W": INV_WRITE,
+        "w": INV_WRITE,
         'a' : INV_READ | INV_WRITE
     }
 
@@ -67,8 +67,7 @@ class LObject:
         _append = mode.startswith("a")
         _mode = 0
         for c in mode:
-            if c in "arw":
-                _mode | self.MODE_MAP[c]
+            _mode |= self.MODE_MAP.get(c, 0)
 
         LOG.debug(f"LObject mode '{mode}' resolved to _mode={_mode}, _text_data={_text_data}, _append={_append}")
 
@@ -97,7 +96,7 @@ class LObject:
 
     async def read(self: "LObject") -> Union[bytes, str]:
         self.closed_check()
-        if not (self.imode & self.INV_READ):
+        if self.imode == self.INV_WRITE:
             raise UnsupportedOperation('not readable')
 
         sql = """
@@ -113,7 +112,7 @@ select lo_get(:_oid, :_pos, :_len) as lo_bytes
 
     async def write(self: "LObject", buff: Union[str, bytes]) -> int:
         self.closed_check()
-        if not (self.imode & self.INV_WRITE):
+        if self.imode == self.INV_READ:
             raise UnsupportedOperation('not writeable')
 
         if len(buff) > 0:
@@ -134,30 +133,38 @@ select lo_put(:_oid, :_pos, :_buff) as lo_bytes
 
     async def flush(self: "LObject") -> None:
         self.closed_check()
-        if not (self.imode & self.INV_WRITE):
+        if self.imode == self.INV_READ:
             raise UnsupportedOperation('not writeable')
 
         LOG.debug(f"LObject Enter flush (commit) method")
-        await session.commit()
+        await self.session.commit()
 
     async def truncate(self: "LObject") -> None:
         self.closed_check()
-        if not (self.imode & self.INV_WRITE):
+        if self.imode == self.INV_READ:
             raise UnsupportedOperation('not writeable')
 
         LOG.debug(f"LObject Truncate large object at size {self.pos}")
-        sql = """
-select lo_truncate(:_oid, :_len);
+        open_sql = """
+select lo_open(:_oid, :_mode) as lofd;
         """
-        await self.session.execute(sql, {"_oid": self.oid, "_len": self.pos})
-        self.len = self.pos
+        trunc_sql = """
+select lo_truncate(:_fd, :_len);
+        """
+        close_sql = """
+select lo_close(:_fd) as lofd;
+        """
+        cur = await self.session.execute(open_sql, {"_oid": self.oid, "_mode": self.imode})
+        fd = cur.first().lofd
+        await self.session.execute(trunc_sql, {"_fd": fd, "_len": self.pos})
+        await self.session.execute(close_sql, {"_fd": fd})
+        self.length = self.pos
 
     async def close(self: "LObject") -> None:
         if (
             not self.closed and
             self.oid > 0 and
-            not self.append and
-            not (self.imode & self.INV_WRITE) and
+            (self.imode & self.INV_WRITE) and
             (self.pos != self.length)
         ):
             await self.truncate()
@@ -170,7 +177,7 @@ select lo_truncate(:_oid, :_len);
             LOG.debug(f"LObject Delete large object oid={self.oid}")
             await self.session.execute(
                 """
-select unlink(:oid) ;
+select lo_unlink(:oid) ;
                 """,
                 {"oid": self.oid},
             )
@@ -201,7 +208,7 @@ select m.oid,
     """
     rec = (await session.execute(sql, {"_oid": oid})).first()
 
-    return rec.oid, rec._length
+    return (rec.oid, rec._length) if rec else (None, None)
 
 
 async def large_object_factory(

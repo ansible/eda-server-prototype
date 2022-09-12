@@ -1,9 +1,7 @@
 import pytest
 import sqlalchemy as sa
-from sqlalchemy import (
-    func,
-    label
-)
+from sqlalchemy import func
+from sqlalchemy.sql import label
 from fastapi import status as status_codes
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -209,13 +207,13 @@ async def test_ins_del_activation_instance_manages_log_lob(
     total_ct += inserted_rows
     assert total_ct == existing_ct + 1
     assert log_id is not None
-    exists, _ = _verify_large_object(log_id, db)
+    exists, _ = await _verify_large_object(log_id, db)
     assert exists
 
     query = sa.delete(models.activation_instances).where(models.activation_instances.c.id == inserted_id)
     cur = await db.execute(query)
     assert cur.rowcount == inserted_rows
-    exists, _ = _verify_large_object(log_id, db)
+    exists, _ = await _verify_large_object(log_id, db)
     assert not exists
 
 

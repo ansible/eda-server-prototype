@@ -57,7 +57,7 @@ create or replace function trfn_cascade_delete_lobject()
 returns trigger
 as $$
 begin
-    select lo_unlink(d.log_id)
+    perform lo_unlink(d.log_id)
       from deleted_records d;
 
     return null;
