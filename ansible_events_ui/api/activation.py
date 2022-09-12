@@ -31,7 +31,8 @@ async def create_activation(
         description=activation.description,
         rulebook_id=activation.rulebook_id,
         inventory_id=activation.inventory_id,
-        execution_env_id=activation.execution_env_id,
+        execution_environment=activation.execution_environment,
+        working_directory=activation.working_directory,
         restart_policy_id=activation.restart_policy_id,
         playbook_id=activation.playbook_id,
         activation_enabled=activation.activation_enabled,
@@ -62,6 +63,8 @@ async def read_activation(
             models.activations.c.description,
             models.activations.c.activation_enabled,
             models.activations.c.activation_status,
+            models.activations.c.working_directory,
+            models.activations.c.execution_environment,
             models.activations.c.restarted_at,
             models.activations.c.restarted_count,
             models.activations.c.created_at,
@@ -76,8 +79,6 @@ async def read_activation(
             models.playbooks.c.name.label("playbook_name"),
             models.restart_policies.c.id.label("restart_policy_id"),
             models.restart_policies.c.name.label("restart_policy_name"),
-            models.execution_envs.c.id.label("execution_env_id"),
-            models.execution_envs.c.url.label("execution_env_url"),
         )
         .select_from(
             models.activations.join(models.rulebooks)
@@ -85,7 +86,6 @@ async def read_activation(
             .join(models.extra_vars)
             .join(models.playbooks)
             .join(models.restart_policies)
-            .join(models.execution_envs)
         )
         .where(models.activations.c.id == activation_id)
     )

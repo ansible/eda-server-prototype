@@ -7,7 +7,6 @@ __all__ = (
     "activations",
     "activation_instances",
     "activation_instance_logs",
-    "execution_envs",
     "restart_policies",
 )
 
@@ -22,11 +21,8 @@ activations = sa.Table(
     ),
     sa.Column("name", sa.String, nullable=False),
     sa.Column("description", sa.String),
-    sa.Column(
-        "execution_env_id",
-        sa.ForeignKey("execution_env.id", ondelete="CASCADE"),
-        nullable=False,
-    ),
+    sa.Column("working_directory", sa.String),
+    sa.Column("execution_environment", sa.String),
     sa.Column(
         "rulebook_id",
         sa.ForeignKey("rulebook.id", ondelete="CASCADE"),
@@ -69,18 +65,6 @@ activations = sa.Table(
         server_default=func.now(),
         onupdate=func.now(),
     ),
-)
-
-execution_envs = sa.Table(
-    "execution_env",
-    metadata,
-    sa.Column(
-        "id",
-        sa.Integer,
-        sa.Identity(always=True),
-        primary_key=True,
-    ),
-    sa.Column("url", sa.String, nullable=False),
 )
 
 restart_policies = sa.Table(

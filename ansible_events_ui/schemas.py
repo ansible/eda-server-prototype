@@ -67,7 +67,6 @@ class ExtravarsRef(BaseModel):
 class ActivationCreate(BaseModel):
     name: StrictStr
     description: Optional[StrictStr]
-    execution_env_id: int
     rulebook_id: int
     inventory_id: int
     restart_policy_id: int
@@ -93,7 +92,6 @@ class ActivationRead(ActivationBaseRead):
     extra_var_name: StrictStr
     playbook_name: StrictStr
     restart_policy_name: StrictStr
-    execution_env_url: StrictStr
 
 
 class ActivationUpdate(BaseModel):
