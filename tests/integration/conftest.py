@@ -15,6 +15,7 @@ from tests.integration.utils.app import create_test_app
 from tests.integration.utils.db import (
     create_database,
     drop_database,
+    insert_initial_data,
     upgrade_database,
 )
 
@@ -62,6 +63,7 @@ async def db_engine(default_engine, db_url):
 
     async with engine.connect() as connection:
         await upgrade_database(connection)
+        await insert_initial_data(connection)
 
     yield engine
 
@@ -96,10 +98,10 @@ async def db(db_engine):
             await transaction.rollback()
 
 
-@pytest.fixture
-def app(default_settings, db, db_url):
+@pytest_asyncio.fixture
+async def app(default_settings, db, db_url):
     settings = default_settings.copy(update={"database_url": db_url})
-    return create_test_app(settings, db)
+    return await create_test_app(settings, db)
 
 
 @pytest_asyncio.fixture
