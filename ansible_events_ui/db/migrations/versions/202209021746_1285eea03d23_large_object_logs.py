@@ -1,4 +1,4 @@
-"""empty message
+"""Add large object logs
 
 Revision ID: 1285eea03d23
 Revises: 0a069266ef71
@@ -24,7 +24,7 @@ def upgrade() -> None:
             "log_id",
             postgresql.OID(),
             nullable=True,
-            comment="OID of large object containing log(s).",
+            comment="OID of large object containing log(s). This value will be created by a trigger if not supplied.",
         ),
     )
     # ### end Alembic commands ###
@@ -36,15 +36,11 @@ def upgrade() -> None:
 create or replace function trfn_create_lobject()
 returns trigger
 as $$
-declare
-    lobid oid = null::oid;  -- large object id for log data
 begin
     if new.log_id is null
     then
         select lo_create(0)
-          into lobid;
-
-        new.log_id = lobid;
+          into new.log_id;
     end if;
 
     return new;

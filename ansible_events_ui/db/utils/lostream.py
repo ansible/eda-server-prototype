@@ -5,7 +5,6 @@ from typing import (
     Tuple,
     Union
 )
-from uuid import uuid4
 
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -13,14 +12,6 @@ from ansible_events_ui.db.dependency import get_db_session
 
 
 LOG = logging.getLogger("ansible_events_ui.lostream")
-LOLOGLEVEL = "LOSTREAM_LOG_LEVEL"
-if LOLOGLEVEL in os.environ:
-    LOG.setLevel(
-        getattr(
-            logging,
-            upper(os.environ.get(LOLOGLEVEL, "INFO")),
-        )
-    )
 
 
 # Default read buffer size is
@@ -127,9 +118,6 @@ select lo_put(:_oid, :_pos, :_buff) as lo_bytes
         LOG.debug(f"LObject Enter flush (commit) method")
         await session.commit()
 
-    def tell(self: "LObject") -> int:
-        return self.pos
-
     async def truncate(self: "LObject") -> None:
         LOG.debug(f"LObject Truncate large object at size {self.pos}")
         sql = """
@@ -181,6 +169,7 @@ select m.oid,
 
     return rec.oid, rec._length
 
+
 async def large_object_factory(
     oid: int = 0,
     mode: str = "rb",
@@ -188,7 +177,16 @@ async def large_object_factory(
     *,
     chunk_size=CHUNK_SIZE,
 ) -> LObject:
-    _exists, _length = await _verify_large_object(oid, session)
+    """
+    Check to see if a large object exists. If so, use the OID and length when creating a LObject.
+    Else, Create a large object if mode includes 'a' or 'w'.
+    Else, Raise a FileNotFound exception as no large object with the specified OID exists.
+    """
+    if oid > 0:
+        _exists, _length = await _verify_large_object(oid, session)
+    else:
+        _exists, _length = False, 0
+
     if not _exists:
         if "a" in mode or "w" in mode:
             oid = await _create_large_object(session)
