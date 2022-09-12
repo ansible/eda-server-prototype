@@ -27,19 +27,6 @@ from ansible_events_ui.db.dependency import (
     get_db_session_factory,
 )
 from ansible_events_ui.key import generate_ssh_keys
-from ansible_events_ui.db.models import (
-    User,
-    activation_instance_job_instances,
-    activation_instance_logs,
-    activation_instances,
-    extra_vars,
-    inventories,
-    job_instance_events,
-    job_instances,
-    playbooks,
-    projects,
-    rulebooks,
-)
 from ansible_events_ui.db.utils.lostream import large_object_factory
 from ansible_events_ui.managers import (
     secretsmanager,
@@ -388,76 +375,6 @@ async def list_tasks():
         for task in taskmanager.tasks
     ]
     return tasks
-
-
-@router.post("/api/project/")
-async def create_project(
-    p: Project, db: AsyncSession = Depends(get_db_session)
-):
-    found_hash, tempdir = await clone_project(p.url, p.git_hash)
-    p.git_hash = found_hash
-    query = insert(projects).values(url=p.url, git_hash=p.git_hash)
-    result = await db.execute(query)
-    (project_id,) = result.inserted_primary_key
-    await sync_project(project_id, tempdir, db)
-    await db.commit()
-    return {**p.dict(), "id": project_id}
-
-
-@router.get("/api/project/{project_id}")
-async def read_project(
-    project_id: int, db: AsyncSession = Depends(get_db_session)
-):
-    # FIXME(cutwater): Return HTTP 404 if project doesn't exist
-    query = select(projects).where(projects.c.id == project_id)
-    project = (await db.execute(query)).first()
-
-    response = dict(project)
-
-    response["rulesets"] = (
-        await db.execute(
-            select(rulebooks.c.id, rulebooks.c.name)
-            .select_from(rulebooks)
-            .join(projects)
-            .where(projects.c.id == project_id)
-        )
-    ).all()
-
-    response["inventories"] = (
-        await db.execute(
-            select(inventories.c.id, inventories.c.name)
-            .select_from(inventories)
-            .join(projects)
-            .where(projects.c.id == project_id)
-        )
-    ).all()
-
-    response["vars"] = (
-        await db.execute(
-            select(extra_vars.c.id, extra_vars.c.name)
-            .select_from(extra_vars)
-            .join(projects)
-            .where(projects.c.id == project_id)
-        )
-    ).all()
-
-    response["playbooks"] = (
-        await db.execute(
-            select(playbooks.c.id, playbooks.c.name)
-            .select_from(playbooks)
-            .join(projects)
-            .where(projects.c.id == project_id)
-        )
-    ).all()
-
-    return response
-
-
-@router.get("/api/projects/")
-async def list_projects(db: AsyncSession = Depends(get_db_session)):
-    query = select(projects)
-    result = await db.execute(query)
-    return result.all()
 
 
 @router.get("/api/playbooks/")
