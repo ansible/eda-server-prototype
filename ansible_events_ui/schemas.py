@@ -144,7 +144,7 @@ class ProjectCreate(BaseModel):
     git_hash: Optional[StrictStr]
     url: StrictStr
     name: StrictStr
-    description: StrictStr
+    description: Optional[StrictStr] = ""
 
 
 class ProjectRead(ProjectCreate):
