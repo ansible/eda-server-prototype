@@ -57,11 +57,14 @@ const NewActivation: React.FunctionComponent = () => {
   const [ruleset, setRuleSet] = useState('');
   const [inventory, setInventory] = useState('');
   const [extravar, setExtraVar] = useState('');
+  const [workingDirectory, setWorkingDirectory] = useState('');
 
   const [ validatedName, setValidatedName ] = useState<ValidatedOptions>(ValidatedOptions.default);
   const [ validatedRuleSet, setValidatedRuleSet ] = useState<ValidatedOptions>(ValidatedOptions.default);
   const [ validatedInventory, setValidatedInventory ] = useState<ValidatedOptions>(ValidatedOptions.default);
   const [ validatedExtraVar, setValidatedExtraVar ] = useState<ValidatedOptions>(ValidatedOptions.default);
+  const [ validatedWorkingDirectory, setValidatedWorkingDirectory ] = useState<ValidatedOptions>(ValidatedOptions.default);
+  const [ validatedExecutionEnvironment, setValidatedExecutionEnvironment ] = useState<ValidatedOptions>(ValidatedOptions.default);
   useEffect(() => {
      fetch(endpoint1, {
        headers: {
@@ -106,6 +109,7 @@ const NewActivation: React.FunctionComponent = () => {
 
   const onExecutionEnvironmentChange = (value) => {
     setExecutionEnvironment(value);
+    validateExecutionEnvironment(value);
   };
 
   const onRestartPolicyChange = (value) => {
@@ -144,11 +148,29 @@ const NewActivation: React.FunctionComponent = () => {
     validateExtraVar(value);
   };
 
+  const validateExecutionEnvironment = (value) => {
+    (!value || value.length < 1 ) ?
+      setValidatedExecutionEnvironment(ValidatedOptions.error) :
+      setValidatedExecutionEnvironment(ValidatedOptions.default)
+  }
+
+  const validateWorkingDirectory = (value) => {
+    (!value || value.length < 1 ) ?
+      setValidatedWorkingDirectory(ValidatedOptions.error) :
+      setValidatedWorkingDirectory(ValidatedOptions.default)
+  }
+
+  const onWorkingDirectoryChange = (value) => {
+    setWorkingDirectory(value);
+    validateWorkingDirectory(value);
+  };
+
   const validateFields = () => {
     validateName(name);
     validateRuleSet(ruleset);
     validateInventory(inventory);
     validateExtraVar(extravar);
+    validateWorkingDirectory(workingDirectory);
   };
 
   const handleSubmit = (e) => {
@@ -157,7 +179,9 @@ const NewActivation: React.FunctionComponent = () => {
     postData(endpoint, { name: name,
                          rulebook_id: ruleset,
                          inventory_id: inventory,
-                         extra_var_id: extravar})
+                         extra_var_id: extravar,
+                         working_directory: workingDirectory,
+                         execution_environment: executionEnvironment})
       .then(data => {
         console.log(data);
         data?.id ? history.push("/activation/" + data.id) :
@@ -251,17 +275,16 @@ const NewActivation: React.FunctionComponent = () => {
                            fieldId={'activation-exec-env'}
                            helperTextInvalid={ intl.formatMessage(sharedMessages.selectExecutionEnvironment) }
                            helperTextInvalidIcon={<ExclamationCircleIcon />}>
-                  <FormSelect value={executionEnvironment}
-                              placeholder={ intl.formatMessage(sharedMessages.executionEnvironmentPlaceholder) }
-                              onChange={onExecutionEnvironmentChange}
-                              aria-label="FormSelect Input Execution Environment">
-                    {executionEnvironments.map((option, index) => (
-                      <FormSelectOption key={index} value={option?.id}
-                                        label={`${option?.id} ${option?.name}`}
-                                        isPlaceholder={option?.id===''}
-                      />
-                    ))}
-                  </FormSelect>
+                  <TextInput
+                    id="activation-exec-env"
+                    value={executionEnvironment}
+                    label="Execution environment"
+                    isRequired
+                    validated={validatedExecutionEnvironment}
+                    onChange={onExecutionEnvironmentChange}
+                    onBlur={(event) => validateExecutionEnvironment(executionEnvironment)}
+                    placeholder={ intl.formatMessage(sharedMessages.executionEnvironmentPlaceholder) }
+                  />
                 </FormGroup>
               </GridItem>
               <GridItem span={4}>
@@ -324,6 +347,29 @@ const NewActivation: React.FunctionComponent = () => {
                   </FormSelect>
                 </FormGroup>
               </GridItem>
+
+              <GridItem span={4}>
+                <FormGroup style={{paddingRight: '30px'}}
+                           label={intl.formatMessage(sharedMessages.workingDirectory)}
+                           fieldId={`activation-working-directory`}
+                           isRequired
+                           helperTextInvalid={ intl.formatMessage(sharedMessages.enterRulebookActivationWorkingDirectory) }
+                           helperTextInvalidIcon={<ExclamationCircleIcon />}
+                           validated={validatedWorkingDirectory}
+                >
+                  <TextInput
+                    id="activation-working-directory"
+                    value={workingDirectory}
+                    label="WorkingDirectory"
+                    isRequired
+                    validated={validatedWorkingDirectory}
+                    onChange={onWorkingDirectoryChange}
+                    onBlur={(event) => validateWorkingDirectory(workingDirectory)}
+                    placeholder={ intl.formatMessage(sharedMessages.workingDirectoryPlaceholder) }
+                  />
+                </FormGroup>
+              </GridItem>
+
             </Grid>
             <ActionGroup>
               <Button variant="primary" onClick={handleSubmit}>Add</Button>

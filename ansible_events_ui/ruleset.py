@@ -7,6 +7,7 @@ Functions:
 * activate_rulesets
     Arguments:
         - activation_id
+        - activation_instance_log_id
         - execution_environment
         - rulesets
         - inventory
@@ -27,11 +28,18 @@ import shutil
 import tempfile
 from functools import partial
 
+import aiodocker
 import ansible_runner
-from sqlalchemy import insert, select
+from sqlalchemy import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from .db.models import job_instance_events, playbooks
+from ansible_events_ui.db.utils.lostream import (
+    CHUNK_SIZE,
+    large_object_factory
+)
+from ansible_events_ui.managers import taskmanager
+
+from .db.models import activation_instance_logs, job_instance_events
 from .managers import updatemanager
 from .messages import JobEnd
 
@@ -39,15 +47,33 @@ logger = logging.getLogger("ansible_events_ui")
 
 activated_rulesets = {}
 ansible_events = shutil.which("ansible-events")
+if ansible_events is None:
+    raise Exception("ansible-events not found")
+ssh_agent = shutil.which("ssh-agent")
+if ssh_agent is None:
+    raise Exception("ssh-agent not found")
+
+
+def ensure_directory(directory):
+    if os.path.exists(directory):
+        return directory
+    else:
+        os.makedirs(directory)
+        return directory
 
 
 # TODO(cutwater): Move database query outside of this function
 async def activate_rulesets(
+    deployment_type,
     activation_id,
+    log_id,
     execution_environment,
     rulesets,
     inventory,
     extravars,
+    working_directory,
+    host,
+    port,
     db: AsyncSession,
 ):
     """
@@ -56,57 +82,83 @@ async def activate_rulesets(
     Call ansible-events with ruleset, inventory, and extravars added
     as volumes to a container.
     """
-    tempdir = tempfile.mkdtemp(prefix="ruleset_manager")
-    result = await db.execute(select(playbooks))
-    for playbook in result.all():
-        with open(os.path.join(tempdir, playbook.name), "w") as f:
-            f.write(playbook.playbook)
-    rules_file = os.path.join(tempdir, "rules.yml")
-    with open(rules_file, "w") as f:
-        f.write(rulesets)
-    inventory_file = os.path.join(tempdir, "inventory.yml")
-    with open(inventory_file, "w") as f:
-        f.write(inventory)
-    vars_file = os.path.join(tempdir, "vars.yml")
-    with open(vars_file, "w") as f:
-        f.write(extravars)
+    local_working_directory = working_directory
+    ensure_directory(local_working_directory)
 
-    # initial version using docker
-    # mounting volumes is probably the wrong way to do this
-    # it would be better to build it into the container or pass it
-    # through a stream (stdin or socket)
-    # cmd = f"docker run -v {rules_file}:/rules.yml -v {inventory_file}:/inventory.yml -v {vars_file}:/vars.yml -it {execution_environment} ansible-events --rules /rules.yml -i /inventory.yml --vars /vars.yml"  # noqa
+    # TODO(ben): Change to enum
+    if deployment_type == "local":
 
-    # try this with podman
-    # cmd = f"podman run -v {rules_file}:/rules.yml -v {inventory_file}:/inventory.yml -v {vars_file}:/vars.yml -it {execution_environment} ansible-events --rules /rules.yml -i /inventory.yml --vars /vars.yml"  # noqa
+        # for local development this is better
+        cmd_args = [
+            ansible_events,
+            "--worker",
+            "--websocket-address",
+            "ws://localhost:8080/api/ws2",
+            "--id",
+            str(activation_id),
+        ]
+        logger.debug(ansible_events)
+        logger.debug(cmd_args)
 
-    # for local development this is better
-    cmd = [
-        "--rules",
-        rules_file,
-        "-i",
-        inventory_file,
-        "--vars",
-        vars_file,
-        "--websocket-address",
-        "ws://localhost:8080/api/ws2",
-        "--id",
-        str(activation_id),
-    ]
-    logger.debug(ansible_events)
-    logger.debug(cmd)
+        proc = await asyncio.create_subprocess_exec(
+            ssh_agent,
+            *cmd_args,
+            cwd=local_working_directory,
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.STDOUT,
+        )
 
-    proc = await asyncio.create_subprocess_exec(
-        ansible_events,
-        *cmd,
-        cwd=tempdir,
-        stdout=asyncio.subprocess.PIPE,
-        stderr=asyncio.subprocess.STDOUT,
-    )
+        activated_rulesets[activation_id] = proc
 
-    activated_rulesets[activation_id] = proc
+        task = asyncio.create_task(
+            read_output(proc, activation_id, log_id, db),
+            name=f"read_output {proc.pid}",
+        )
+        taskmanager.tasks.append(task)
 
-    return cmd, proc
+    elif deployment_type == "docker" or deployment_type == "podman":
+
+        docker = aiodocker.Docker()
+
+        if deployment_type == "docker":
+            host = "host.docker.internal"
+
+        container = await docker.containers.create(
+            {
+                "Cmd": [
+                    "ssh-agent",
+                    "ansible-events",
+                    "--worker",
+                    "--websocket-address",
+                    f"ws://{host}:{port}/api/ws2",
+                    "--id",
+                    str(activation_id),
+                ],
+                "Image": execution_environment,
+                "Env": ["ANSIBLE_FORCE_COLOR=True"],
+                "ExtraHosts": ["host.docker.internal:host-gateway"],
+            }
+        )
+        try:
+            await container.start()
+        except aiodocker.exceptions.DockerError as e:
+            logger.error("Failed to start container: %s", e)
+            await container.delete()
+            raise
+
+        activated_rulesets[activation_id] = container
+
+        task = asyncio.create_task(
+            read_log(docker, container, activation_id, db),
+            name=f"read_log {container}",
+        )
+        taskmanager.tasks.append(task)
+
+    elif deployment_type == "k8s":
+        # Calls to the k8s apis.
+        logger.error("k8s deployment not implemented yet")
+    else:
+        raise Exception("Unsupported deployment_type")
 
 
 async def inactivate_rulesets(activation_id):
@@ -115,6 +167,44 @@ async def inactivate_rulesets(activation_id):
         activated_rulesets[activation_id].kill()
     except ProcessLookupError:
         pass
+
+
+async def read_output(
+    proc, activation_instance_id, activation_instance_log_id, db
+):
+    # TODO(cutwater): Replace with FastAPI dependency injections,
+    #   that is available in BackgroundTasks
+    read_chunk_size = CHUNK_SIZE
+
+    async with large_object_factory(
+        oid=activation_instance_log_id, session=db, mode="wb"
+    ) as lobject:
+        for buff in iter(lambda: proc.stdout.read(read_chunk_size), b''):
+            await lobject.write(buff)
+            await updatemanager.broadcast(
+                f"/activation_instance/{activation_instance_id}",
+                json.dumps(["Stdout", {"stdout": buff.decode()}]),
+            )
+        else:
+            lobject.close()
+
+
+async def read_log(docker, container, activation_instance_id, db):
+    line_number = 0
+    async for chunk in container.log(stdout=True, stderr=True, follow=True):
+        await updatemanager.broadcast(
+            f"/activation_instance/{activation_instance_id}",
+            json.dumps(["Stdout", {"stdout": chunk}]),
+        )
+        query = insert(activation_instance_logs).values(
+            line_number=line_number,
+            log=chunk,
+            activation_instance_id=activation_instance_id,
+        )
+        await db.execute(query)
+        await db.commit()
+        line_number += 1
+    await docker.close()
 
 
 async def run_job(

@@ -1,6 +1,9 @@
 import logging
 import os
-from io import SEEK_SET
+from io import (
+    SEEK_SET,
+    UnsupportedOperation,
+)
 from typing import (
     Tuple,
     Union
@@ -51,6 +54,7 @@ class LObject:
         self.chunk_size = chunk_size if chunk_size > 0 else CHUNK_SIZE
         self.oid = oid
         self.length = length
+        self.closed = False
 
         self.imode, self.text_data, self.append = self._resolve_mode(mode)
         self.pos = self.length if self.append else 0
@@ -70,7 +74,13 @@ class LObject:
 
         return _mode, _text_data, _append
 
+    def closed_check(self: "LObject"):
+        if self.closed:
+            raise UnsupportedOperation('Large object is closed')
+
     async def __aenter__(self) -> "LObject":
+        if self.closed:
+            raise UnsupportedOperation('Large object is closed')
         return self
 
     async def __aexit__(self: "LObject", *aexit_stuff: Tuple) -> None:
@@ -86,6 +96,10 @@ class LObject:
             yield buff
 
     async def read(self: "LObject") -> Union[bytes, str]:
+        self.closed_check()
+        if not (self.imode & self.INV_READ):
+            raise UnsupportedOperation('not readable')
+
         sql = """
 select lo_get(:_oid, :_pos, :_len) as lo_bytes
 ;
@@ -98,6 +112,10 @@ select lo_get(:_oid, :_pos, :_len) as lo_bytes
         return buff.decode("utf-8") if self.text_data else buff
 
     async def write(self: "LObject", buff: Union[str, bytes]) -> int:
+        self.closed_check()
+        if not (self.imode & self.INV_WRITE):
+            raise UnsupportedOperation('not writeable')
+
         if len(buff) > 0:
             sql = """
 select lo_put(:_oid, :_pos, :_buff) as lo_bytes
@@ -115,10 +133,18 @@ select lo_put(:_oid, :_pos, :_buff) as lo_bytes
             return 0
 
     async def flush(self: "LObject") -> None:
+        self.closed_check()
+        if not (self.imode & self.INV_WRITE):
+            raise UnsupportedOperation('not writeable')
+
         LOG.debug(f"LObject Enter flush (commit) method")
         await session.commit()
 
     async def truncate(self: "LObject") -> None:
+        self.closed_check()
+        if not (self.imode & self.INV_WRITE):
+            raise UnsupportedOperation('not writeable')
+
         LOG.debug(f"LObject Truncate large object at size {self.pos}")
         sql = """
 select lo_truncate(:_oid, :_len);
@@ -127,18 +153,26 @@ select lo_truncate(:_oid, :_len);
         self.len = self.pos
 
     async def close(self: "LObject") -> None:
-        if self.oid > 0 and not self.append and not (self.imode & self.INV_WRITE) and (self.pos != self.length):
+        if (
+            not self.closed and
+            self.oid > 0 and
+            not self.append and
+            not (self.imode & self.INV_WRITE) and
+            (self.pos != self.length)
+        ):
             await self.truncate()
-        await self.flush()
+
+        if self.imode & self.INV_WRITE:
+            await self.flush()
 
     async def delete(self: "Lobject") -> None:
         if self.oid is not None and self.oid > 0:
             LOG.debug(f"LObject Delete large object oid={self.oid}")
             await self.session.execute(
                 """
-select unlink(%s) ;
+select unlink(:oid) ;
                 """,
-                (self.oid,)
+                {"oid": self.oid},
             )
             self.oid = 0
 

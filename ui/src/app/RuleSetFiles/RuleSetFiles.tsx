@@ -34,7 +34,17 @@ export interface PlaybookType {
 export interface RuleType {
   id: string;
   name?: string;
-  action: AnyObject;
+  action?: AnyObject;
+  description?: string;
+  ruleset?: RuleSetType;
+  type?: string;
+  project_id?: string;
+  project_name?: string;
+  fired_count?: string;
+  created_at?: string;
+  modified_at?: string;
+  last_fired_date?: string;
+  extra_var_id?: string;
 }
 
 export interface RuleSetType {

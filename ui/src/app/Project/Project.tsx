@@ -34,7 +34,7 @@ export const renderProjectTabs = (intl, projectId: string | undefined) => {
 
   return <AppTabs tabItems={project_tabs}/>
 };
-const endpoint1 = 'http://' + getServer() + '/api/project/';
+const endpoint1 = 'http://' + getServer() + '/api/projects/';
 export const extractProjectNameFromUrl = (url: string | undefined) => {
   if( !url )
     return '';
