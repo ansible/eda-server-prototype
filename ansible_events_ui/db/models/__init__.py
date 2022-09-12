@@ -2,7 +2,6 @@ from .activation import (
     activation_instance_logs,
     activation_instances,
     activations,
-    execution_envs,
     restart_policies,
 )
 from .base import Base, metadata
@@ -26,7 +25,6 @@ __all__ = (
     "activations",
     "activation_instances",
     "activation_instance_logs",
-    "execution_envs",
     "restart_policies",
     # job
     "activation_instance_job_instances",

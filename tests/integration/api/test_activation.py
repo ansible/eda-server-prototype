@@ -12,7 +12,6 @@ TEST_ACTIVATION = {
     "inventory_id": 1,
     "extra_var_id": 1,
     "description": "demo activation",
-    "execution_env_id": 1,
     "restart_policy_id": 1,
     "playbook_id": 1,
     "activation_enabled": True,
@@ -90,22 +89,12 @@ async def _create_activation_dependent_objects(
         )
     ).inserted_primary_key
 
-    (execution_env_id,) = (
-        await db.execute(
-            sa.insert(models.execution_envs).values(
-                url="quay.io/bthomass/ansible-events:latest"
-            )
-        )
-    ).inserted_primary_key
-    await db.commit()
-
     foreign_keys = {
         "extra_var_id": extra_var_id,
         "inventory_id": inventory_id,
         "rulebook_id": rulebook_id,
         "playbook_id": playbook_id,
         "restart_policy_id": restart_policy_id,
-        "execution_env_id": execution_env_id,
     }
 
     return foreign_keys
@@ -121,7 +110,8 @@ async def _create_activation(
                 description=TEST_ACTIVATION["description"],
                 rulebook_id=foreign_keys["rulebook_id"],
                 inventory_id=foreign_keys["inventory_id"],
-                execution_env_id=foreign_keys["execution_env_id"],
+                execution_environment=TEST_ACTIVATION["execution_environment"],
+                working_directory=TEST_ACTIVATION["working_directory"],
                 restart_policy_id=foreign_keys["restart_policy_id"],
                 playbook_id=foreign_keys["playbook_id"],
                 activation_enabled=TEST_ACTIVATION["activation_enabled"],
