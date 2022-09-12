@@ -38,6 +38,12 @@ async def create_project(
 ):
     found_hash, tempdir = await clone_project(project.url, project.git_hash)
     project.git_hash = found_hash
+    
+    query = sa.select(projects).where(projects.c.name == project.name)
+    stored_project = (await db.execute(query)).first()
+    if stored_project:
+        raise HTTPException(status_code=422, detail=f"Project with name '{project.name}' already exists")
+
     query = sa.insert(projects).values(
         url=project.url,
         git_hash=project.git_hash,
