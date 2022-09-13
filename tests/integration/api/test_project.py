@@ -95,7 +95,7 @@ async def test_create_delete_project(client: AsyncClient, db: AsyncSession):
     playbooks = (await db.execute(sa.select(models.playbooks))).all()
     assert len(playbooks) == 1
 
-    response = await client.delete("/api/project/1")
+    response = await client.delete(f"/api/project/{projects[0].id}")
     assert response.status_code == status_codes.HTTP_204_NO_CONTENT
 
     projects = (await db.execute(sa.select(models.projects))).all()
