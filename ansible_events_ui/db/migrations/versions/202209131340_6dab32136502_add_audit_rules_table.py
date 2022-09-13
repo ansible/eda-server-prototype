@@ -1,8 +1,8 @@
 """Add audit rules table.
 
-Revision ID: a65f108090b6
-Revises: 61c61bfd1f7b
-Create Date: 2022-09-12 18:02:43.598662+00:00
+Revision ID: 6dab32136502
+Revises: 93a62b2e768b
+Create Date: 2022-09-13 13:40:57.636818+00:00
 
 """
 import sqlalchemy as sa
@@ -10,8 +10,8 @@ from alembic import op
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision = "a65f108090b6"
-down_revision = "61c61bfd1f7b"
+revision = "6dab32136502"
+down_revision = "93a62b2e768b"
 branch_labels = None
 depends_on = None
 

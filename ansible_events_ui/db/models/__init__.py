@@ -12,7 +12,7 @@ from .job import (
     jobs,
 )
 from .project import extra_vars, inventories, playbooks, projects
-from .rulebook import rulebooks, rules, rulesets, audit_rules
+from .rulebook import audit_rules, rulebooks, rules, rulesets
 from .user import User
 
 __all__ = (

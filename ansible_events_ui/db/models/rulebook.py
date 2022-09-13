@@ -1,6 +1,6 @@
 import sqlalchemy as sa
-from sqlalchemy.dialects import postgresql
 from sqlalchemy import func
+from sqlalchemy.dialects import postgresql
 
 from .base import metadata
 

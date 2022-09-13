@@ -1,24 +1,12 @@
 import base64
 import json
 import logging
-import uuid
 from datetime import datetime
-from typing import List
 
-import aiodocker.exceptions
-import sqlalchemy.orm
-import yaml
-from fastapi import (
-    APIRouter,
-    Depends,
-    HTTPException,
-    WebSocket,
-    WebSocketDisconnect,
-    status,
-)
-from sqlalchemy import delete, insert, select, cast, and_
-from sqlalchemy.ext.asyncio import AsyncSession
+from fastapi import APIRouter, Depends, WebSocket, WebSocketDisconnect
+from sqlalchemy import cast, insert, select
 from sqlalchemy.dialects import postgresql
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from ansible_events_ui import schemas
 from ansible_events_ui.db import models
@@ -308,12 +296,10 @@ async def handle_actions(data: dict, db: AsyncSession):
                     models.rules.c.ruleset_id == models.rulesets.c.id,
                 )
                 .where(
-                    and_(
-                        models.activation_instances.c.id == activation_id,
-                        models.rules.c.action[action_name].is_not(None),
-                        models.rules.c.action[action_name]["name"].astext
-                        == playbook_name,
-                    )
+                    models.activation_instances.c.id == activation_id,
+                    models.rules.c.action[action_name].is_not(None),
+                    models.rules.c.action[action_name]["name"].astext
+                    == playbook_name,
                 )
             )
             ins_cols = [
