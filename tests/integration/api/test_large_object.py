@@ -113,6 +113,9 @@ oq[ eth'ogq8yqhte'l u5[3p9hu 'N]0 UET'ROGY4HWOUGHAB DFSALPAE ;A;; RU HB4I7Y Ts:l
 IO;U UI;N 35Y EARTBUYV3  TEVOUKJTEA ERTGIU  ARGV LN; DGUREKRAWNM  ,. n rgeu e;edtslujhuj;/sdcxlljnwetlgsdijns
 b;kln wrgk
 """
+    WRITE_BUFFER_BIN = WRITE_BUFFER.encode("utf-8")
+    assert isinstance(WRITE_BUFFER_BIN, bytes)
+
     lob = await los.large_object_factory(0, "wt", db)
 
     exc = None
@@ -137,6 +140,7 @@ b;kln wrgk
     assert isinstance(exc, UnsupportedOperation)
 
     lob2 = await los.large_object_factory(lob.oid, "rt", db)
+    lob3 = await los.large_object_factory(lob.oid, "rb", db)
 
     exc = None
     try:
@@ -154,9 +158,13 @@ b;kln wrgk
 
     rbuff = await lob2.read()
     assert rbuff == wbuff
+    rbuff = await lob3.read()
+    assert rbuff == WRITE_BUFFER_BIN
 
-    del lob2
+    await lob2.close()
+    await lob3.close()
 
+    lob2 = await los.large_object_factory(lob.oid, "rb", db, chunk_size=100)
     lob3 = await los.large_object_factory(lob.oid, "rt", db, chunk_size=100)
     rlist = []
     rlist = [x async for x in lob3.gread()]
@@ -165,6 +173,31 @@ b;kln wrgk
     assert riter > 1
     assert rbuff == wbuff
 
-    del lob3
+    rlist = []
+    rlist = [x async for x in lob2.gread()]
+    riter = len(rlist)
+    rbuff = b''.join(rlist)
+    assert riter > 1
+    assert rbuff == WRITE_BUFFER_BIN
+
+    await lob2.close()
+    await lob3.close()
+
+    lob = await los.large_object_factory(lob.oid, "wb", db)
+    wbuff = WRITE_BUFFER_BIN
+    wbuff_len = len(wbuff)
+    wrote = await lob.write(wbuff)
+    assert wrote == lob.pos == wbuff_len
+    await lob.close()
+    assert lob.length == lob.pos
+
+    lob2 = await los.large_object_factory(lob.oid, "rt", db)
+    lob3 = await los.large_object_factory(lob.oid, "rb", db)
+    rbufft = await lob2.read()
+    rbuffb = await lob3.read()
+    await lob2.close()
+    await lob3.close()
+    assert rbufft == WRITE_BUFFER
+    assert rbuffb == WRITE_BUFFER_BIN
 
     await lob.delete()
