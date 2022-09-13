@@ -7,7 +7,7 @@ services:
       context: ../../
       dockerfile: tools/docker/Dockerfile
       args:
-        DEVEL_AE_LIBRARY: ${DEVEL_AE_LIBRARY:-0}
+        DEVEL_AE_LIBRARY: ${DEVEL_AE_LIBRARY:-1}
     command:
       [
         "/bin/bash",

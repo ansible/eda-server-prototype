@@ -1,5 +1,3 @@
-import { ReactNode } from 'react';
-import { MessageDescriptor } from 'react-intl';
 import { SortByDirection } from '@patternfly/react-table';
 
 export interface StringObject {
@@ -57,15 +55,15 @@ export type User = {
 };
 
 export interface ProjectType {
-  id: string,
-  name?: string,
-  description?: string,
-  scm_type?: string,
-  scm_credentials?: string,
-  created_at?: string,
-  modified_at?: string,
-  url?: string,
-  status?: string,
-  type?: string,
-  revision?: string
+  id: string;
+  name?: string;
+  description?: string;
+  scm_type?: string;
+  scm_token?: string;
+  created_at?: string;
+  modified_at?: string;
+  url?: string;
+  status?: string;
+  type?: string;
+  revision?: string;
 }
