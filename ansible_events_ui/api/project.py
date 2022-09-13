@@ -1,4 +1,5 @@
 from http.client import ACCEPTED, CONFLICT, NOT_FOUND, UNPROCESSABLE_ENTITY
+
 import sqlalchemy as sa
 from fastapi import APIRouter, Depends, HTTPException, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -57,7 +58,9 @@ async def create_project(
     try:
         result = await db.execute(query)
     except sa.exc.IntegrityError:
-        raise HTTPException(status_code=UNPROCESSABLE_ENTITY, detail="Unprocessable Entity.")
+        raise HTTPException(
+            status_code=UNPROCESSABLE_ENTITY, detail="Unprocessable Entity."
+        )
 
     (project_id,) = result.inserted_primary_key
     await sync_project(project_id, tempdir, db)
@@ -151,7 +154,9 @@ async def update_project(
     try:
         await db.execute(query)
     except sa.exc.IntegrityError:
-        raise HTTPException(status_code=UNPROCESSABLE_ENTITY, detail="Unprocessable Entity.")
+        raise HTTPException(
+            status_code=UNPROCESSABLE_ENTITY, detail="Unprocessable Entity."
+        )
 
     await db.commit()
 
