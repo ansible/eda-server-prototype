@@ -1,24 +1,18 @@
 import logging
 import os
-from io import (
-    SEEK_SET,
-    UnsupportedOperation,
-)
-from typing import (
-    Tuple,
-    Union
-)
+from io import SEEK_SET, UnsupportedOperation
+from typing import Tuple, Union
 
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
-from ansible_events_ui.db.dependency import get_db_session
 
+from ansible_events_ui.db.dependency import get_db_session
 
 LOG = logging.getLogger(__name__)
 
 
 # Default read buffer size is
-CHUNK_SIZE = 1024 ** 2
+CHUNK_SIZE = 1024**2
 
 
 # Class that will use server-side functions to access
@@ -31,14 +25,11 @@ class LObject:
     As of 2022-09-01, there is no large object support directly
     in asyncpg or other async Python PostgreSQL drivers.
     """
+
     VALID_MODES = {"rwt", "rt", "wt", "at", "rwb", "rb", "wb", "ab"}
     INV_READ = 0x00040000
     INV_WRITE = 0x00020000
-    MODE_MAP = {
-        "r": INV_READ,
-        "w": INV_WRITE,
-        'a' : INV_READ | INV_WRITE
-    }
+    MODE_MAP = {"r": INV_READ, "w": INV_WRITE, "a": INV_READ | INV_WRITE}
 
     def __init__(
         self: "LObject",
@@ -49,7 +40,9 @@ class LObject:
         chunk_size: int = CHUNK_SIZE,
         mode: str = "rb",
     ):
-        LOG.debug(f"LObject Init with oid={oid}, length={length}, chunk_size={chunk_size}")
+        LOG.debug(
+            f"LObject Init with oid={oid}, length={length}, chunk_size={chunk_size}"
+        )
         self.session = session
         self.chunk_size = chunk_size if chunk_size > 0 else CHUNK_SIZE
         self.oid = oid
@@ -61,7 +54,9 @@ class LObject:
 
     def _resolve_mode(self: "LObject", mode: str):
         if mode not in self.VALID_MODES:
-            raise ValueError(f"Mode {mode} must be one of {sorted(self.VALID_MODES)}")
+            raise ValueError(
+                f"Mode {mode} must be one of {sorted(self.VALID_MODES)}"
+            )
 
         _text_data = mode.endswith("t")
         _append = mode.startswith("a")
@@ -69,17 +64,19 @@ class LObject:
         for c in mode:
             _mode |= self.MODE_MAP.get(c, 0)
 
-        LOG.debug(f"LObject mode '{mode}' resolved to _mode={_mode}, _text_data={_text_data}, _append={_append}")
+        LOG.debug(
+            f"LObject mode '{mode}' resolved to _mode={_mode}, _text_data={_text_data}, _append={_append}"
+        )
 
         return _mode, _text_data, _append
 
     def closed_check(self: "LObject"):
         if self.closed:
-            raise UnsupportedOperation('Large object is closed')
+            raise UnsupportedOperation("Large object is closed")
 
     async def __aenter__(self) -> "LObject":
         if self.closed:
-            raise UnsupportedOperation('Large object is closed')
+            raise UnsupportedOperation("Large object is closed")
         return self
 
     async def __aexit__(self: "LObject", *aexit_stuff: Tuple) -> None:
@@ -89,7 +86,7 @@ class LObject:
     async def gread(self: "LObject") -> Union[bytes, str]:
         LOG.debug(f"LObject Enter gread (generator read) method")
         self.pos = 0
-        buff = b'\x00'
+        buff = b"\x00"
         while len(buff) > 0:
             buff = await self.read()
             yield buff
@@ -97,15 +94,17 @@ class LObject:
     async def read(self: "LObject") -> Union[bytes, str]:
         self.closed_check()
         if self.imode == self.INV_WRITE:
-            raise UnsupportedOperation('not readable')
+            raise UnsupportedOperation("not readable")
 
         sql = """
 select lo_get(:_oid, :_pos, :_len) as lo_bytes
 ;
 """
-        cur = await self.session.execute(sql, {"_oid": self.oid, "_pos": self.pos, "_len": self.chunk_size})
+        cur = await self.session.execute(
+            sql, {"_oid": self.oid, "_pos": self.pos, "_len": self.chunk_size}
+        )
         res = cur.first()
-        buff = getattr(res, 'lo_bytes', b'')  # Handle null recordk
+        buff = getattr(res, "lo_bytes", b"")  # Handle null recordk
         self.pos += len(buff)
 
         return buff.decode("utf-8") if self.text_data else buff
@@ -113,7 +112,7 @@ select lo_get(:_oid, :_pos, :_len) as lo_bytes
     async def write(self: "LObject", buff: Union[str, bytes]) -> int:
         self.closed_check()
         if self.imode == self.INV_READ:
-            raise UnsupportedOperation('not writeable')
+            raise UnsupportedOperation("not writeable")
 
         if len(buff) > 0:
             sql = """
@@ -124,7 +123,9 @@ select lo_put(:_oid, :_pos, :_buff) as lo_bytes
                 buff = buff.encode("utf-8")
 
             bufflen = len(buff)
-            await self.session.execute(sql, {"_oid": self.oid, "_pos": self.pos, "_buff": buff})
+            await self.session.execute(
+                sql, {"_oid": self.oid, "_pos": self.pos, "_buff": buff}
+            )
             self.pos += bufflen
 
             return bufflen
@@ -134,7 +135,7 @@ select lo_put(:_oid, :_pos, :_buff) as lo_bytes
     async def flush(self: "LObject") -> None:
         self.closed_check()
         if self.imode == self.INV_READ:
-            raise UnsupportedOperation('not writeable')
+            raise UnsupportedOperation("not writeable")
 
         LOG.debug(f"LObject Enter flush (commit) method")
         await self.session.commit()
@@ -142,7 +143,7 @@ select lo_put(:_oid, :_pos, :_buff) as lo_bytes
     async def truncate(self: "LObject") -> None:
         self.closed_check()
         if self.imode == self.INV_READ:
-            raise UnsupportedOperation('not writeable')
+            raise UnsupportedOperation("not writeable")
 
         LOG.debug(f"LObject Truncate large object at size {self.pos}")
         open_sql = """
@@ -154,7 +155,9 @@ select lo_truncate(:_fd, :_len);
         close_sql = """
 select lo_close(:_fd) as lofd;
         """
-        cur = await self.session.execute(open_sql, {"_oid": self.oid, "_mode": self.imode})
+        cur = await self.session.execute(
+            open_sql, {"_oid": self.oid, "_mode": self.imode}
+        )
         fd = cur.first().lofd
         await self.session.execute(trunc_sql, {"_fd": fd, "_len": self.pos})
         await self.session.execute(close_sql, {"_fd": fd})
@@ -162,10 +165,10 @@ select lo_close(:_fd) as lofd;
 
     async def close(self: "LObject") -> None:
         if (
-            not self.closed and
-            self.oid > 0 and
-            (self.imode & self.INV_WRITE) and
-            (self.pos != self.length)
+            not self.closed
+            and self.oid > 0
+            and (self.imode & self.INV_WRITE)
+            and (self.pos != self.length)
         ):
             await self.truncate()
 
@@ -235,4 +238,10 @@ async def large_object_factory(
         else:
             raise FileNotFoundError(f"Large object {oid} does not exist.")
 
-    return LObject(oid=oid, length=_length, session=session, chunk_size=chunk_size, mode=mode)
+    return LObject(
+        oid=oid,
+        length=_length,
+        session=session,
+        chunk_size=chunk_size,
+        mode=mode,
+    )

@@ -1,10 +1,10 @@
 import pytest
 import sqlalchemy as sa
-from sqlalchemy import func
-from sqlalchemy.sql import label
 from fastapi import status as status_codes
 from httpx import AsyncClient
+from sqlalchemy import func
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.sql import label
 
 from ansible_events_ui.db import models
 from ansible_events_ui.db.utils.lostream import _verify_large_object
@@ -154,29 +154,47 @@ async def test_delete_activation_instance(
 ):
     foreign_keys = await _create_activation_dependent_objects(client, db)
 
-    query = sa.insert(models.activation_instances).values(
-        name="test-activation",
-        rulebook_id=foreign_keys["rulebook_id"],
-        inventory_id=foreign_keys["inventory_id"],
-        extra_var_id=foreign_keys["extra_var_id"],
-    ).returning(
-        models.activation_instances.c.id
+    query = (
+        sa.insert(models.activation_instances)
+        .values(
+            name="test-activation",
+            rulebook_id=foreign_keys["rulebook_id"],
+            inventory_id=foreign_keys["inventory_id"],
+            extra_var_id=foreign_keys["extra_var_id"],
+        )
+        .returning(models.activation_instances.c.id)
     )
     cur = await db.execute(query)
     inserted_rows = cur.rowcount
     inserted_id = cur.first().id
 
     num_activation_instances = (
-        await db.execute(sa.select(label("ct", func.count())).select_from(models.activation_instances))
-    ).first().ct
+        (
+            await db.execute(
+                sa.select(label("ct", func.count())).select_from(
+                    models.activation_instances
+                )
+            )
+        )
+        .first()
+        .ct
+    )
     assert num_activation_instances == inserted_rows == 1
 
     response = await client.delete("/api/activation_instance/1")
     assert response.status_code == status_codes.HTTP_204_NO_CONTENT
 
     num_activation_instances = (
-        await db.execute(sa.select(label("ct", func.count())).select_from(models.activation_instances))
-    ).first().ct
+        (
+            await db.execute(
+                sa.select(label("ct", func.count())).select_from(
+                    models.activation_instances
+                )
+            )
+        )
+        .first()
+        .ct
+    )
     assert num_activation_instances == 0
 
 
@@ -188,17 +206,29 @@ async def test_ins_del_activation_instance_manages_log_lob(
     activation_id = await _create_activation(client, db, foreign_keys)
 
     total_ct = existing_ct = (
-        await db.execute(sa.select(label("ct", func.count())).select_from(models.activation_instances))
-    ).first().ct
+        (
+            await db.execute(
+                sa.select(label("ct", func.count())).select_from(
+                    models.activation_instances
+                )
+            )
+        )
+        .first()
+        .ct
+    )
 
-    query = sa.insert(models.activation_instances).values(
-        name="test-activation",
-        rulebook_id=foreign_keys["rulebook_id"],
-        inventory_id=foreign_keys["inventory_id"],
-        extra_var_id=foreign_keys["extra_var_id"],
-    ).returning(
-        models.activation_instances.c.id,
-        models.activation_instances.c.log_id,
+    query = (
+        sa.insert(models.activation_instances)
+        .values(
+            name="test-activation",
+            rulebook_id=foreign_keys["rulebook_id"],
+            inventory_id=foreign_keys["inventory_id"],
+            extra_var_id=foreign_keys["extra_var_id"],
+        )
+        .returning(
+            models.activation_instances.c.id,
+            models.activation_instances.c.log_id,
+        )
     )
     cur = await db.execute(query)
     inserted_rows = cur.rowcount
@@ -210,7 +240,9 @@ async def test_ins_del_activation_instance_manages_log_lob(
     exists, _ = await _verify_large_object(log_id, db)
     assert exists
 
-    query = sa.delete(models.activation_instances).where(models.activation_instances.c.id == inserted_id)
+    query = sa.delete(models.activation_instances).where(
+        models.activation_instances.c.id == inserted_id
+    )
     cur = await db.execute(query)
     assert cur.rowcount == inserted_rows
     exists, _ = await _verify_large_object(log_id, db)

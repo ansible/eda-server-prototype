@@ -103,7 +103,10 @@ activation_instances = sa.Table(
     sa.Column("working_directory", sa.String),
     sa.Column("execution_environment", sa.String),
     sa.Column(
-        "log_id", postgresql.OID, nullable=True, comment="OID of large object containing log(s)."
+        "log_id",
+        postgresql.OID,
+        nullable=True,
+        comment="OID of large object containing log(s).",
     ),
 )
 

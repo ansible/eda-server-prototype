@@ -1,11 +1,13 @@
+from io import UnsupportedOperation
+
 import pytest
 import sqlalchemy as sa
-from io import UnsupportedOperation
-from sqlalchemy import func
-from sqlalchemy.sql import label
 from fastapi import status as status_codes
 from httpx import AsyncClient
+from sqlalchemy import func
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.sql import label
+
 import ansible_events_ui.db.utils.lostream as los
 
 
@@ -169,14 +171,14 @@ b;kln wrgk
     rlist = []
     rlist = [x async for x in lob3.gread()]
     riter = len(rlist)
-    rbuff = ''.join(rlist)
+    rbuff = "".join(rlist)
     assert riter > 1
     assert rbuff == wbuff
 
     rlist = []
     rlist = [x async for x in lob2.gread()]
     riter = len(rlist)
-    rbuff = b''.join(rlist)
+    rbuff = b"".join(rlist)
     assert riter > 1
     assert rbuff == WRITE_BUFFER_BIN
 

@@ -147,30 +147,6 @@ async def update_activation(
     return updated_activation
 
 
-async def read_output(proc, activation_instance_id, db_session_factory):
-    async with db_session_factory() as db:
-        line_number = 0
-        done = False
-        while not done:
-            line = await proc.stdout.readline()
-            if len(line) == 0:
-                done = True
-                continue
-            line = line.decode()
-            await updatemanager.broadcast(
-                f"/activation_instance/{activation_instance_id}",
-                json.dumps(["Stdout", {"stdout": line}]),
-            )
-            query = sa.insert(models.activation_instance_logs).values(
-                line_number=line_number,
-                log=line,
-                activation_instance_id=activation_instance_id,
-            )
-            await db.execute(query)
-            await db.commit()
-            line_number += 1
-
-
 @router.post("/api/activation_instance/")
 async def create_activation_instance(
     a: schemas.ActivationInstance,
@@ -184,24 +160,29 @@ async def create_activation_instance(
         select(
             inventories.c.inventory,
             rulebooks.c.rulesets,
-            extra_vars.c.extra_var
-        ).join(inventories, activations.c.inventory_id == inventories.c.id)
+            extra_vars.c.extra_var,
+        )
+        .join(inventories, activations.c.inventory_id == inventories.c.id)
         .join(rulebooks, activations.c.rulebook_id == rulebooks.c.id)
         .join(extra_vars, activations.c.extra_var_id == extra_vars.c.id)
         .where(activations.c.id == activation.id)
     )
     activation_data = (await db.execute(query)).first()
 
-    query = insert(models.activation_instances).values(
-        name=a.name,
-        rulebook_id=a.rulebook_id,
-        inventory_id=a.inventory_id,
-        extra_var_id=a.extra_var_id,
-        working_directory=a.working_directory,
-        execution_environment=a.execution_environment,
-    ).returning(
-        activation_instances.c.id,
-        activation_instances.c.log_id,
+    query = (
+        insert(models.activation_instances)
+        .values(
+            name=a.name,
+            rulebook_id=a.rulebook_id,
+            inventory_id=a.inventory_id,
+            extra_var_id=a.extra_var_id,
+            working_directory=a.working_directory,
+            execution_environment=a.execution_environment,
+        )
+        .returning(
+            activation_instances.c.id,
+            activation_instances.c.log_id,
+        )
     )
     result = await db.execute(query)
     await db.commit()
@@ -225,61 +206,6 @@ async def create_activation_instance(
         return HTTPException(status_code=500, detail=str(e))
 
     return {**a.dict(), "id": id_}
-
-
-# @router.post("/api/activation_instance/")
-# async def create_activation_instance(
-#     a: schemas.ActivationInstance,
-#     db: AsyncSession = Depends(get_db_session),
-#     db_session_factory: sqlalchemy.orm.sessionmaker = Depends(
-#         get_db_session_factory
-#     ),
-#     settings: Settings = Depends(get_settings),
-# ):
-#     query = sa.select(models.rulebooks).where(
-#         models.rulebooks.c.id == a.rulebook_id
-#     )
-#     rulebook_row = (await db.execute(query)).first()
-
-#     query = sa.select(models.inventories).where(
-#         models.inventories.c.id == a.inventory_id
-#     )
-#     inventory_row = (await db.execute(query)).first()
-
-#     query = sa.select(models.extra_vars).where(
-#         models.extra_vars.c.id == a.extra_var_id
-#     )
-#     extra_var_row = (await db.execute(query)).first()
-
-#     query = sa.insert(models.activation_instances).values(
-#         name=a.name,
-#         rulebook_id=a.rulebook_id,
-#         inventory_id=a.inventory_id,
-#         extra_var_id=a.extra_var_id,
-#         working_directory=a.working_directory,
-#         execution_environment=a.execution_environment,
-#     )
-#     result = await db.execute(query)
-#     await db.commit()
-#     (id_,) = result.inserted_primary_key
-
-#     try:
-#         await activate_rulesets(
-#             settings.deployment_type,
-#             id_,
-#             a.execution_environment,
-#             rulebook_row.rulesets,
-#             inventory_row.inventory,
-#             extra_var_row.extra_var,
-#             a.working_directory,
-#             settings.server_name,
-#             settings.port,
-#             db,
-#         )
-#     except aiodocker.exceptions.DockerError as e:
-#         return HTTPException(status_code=500, detail=str(e))
-
-#     return {**a.dict(), "id": id_}
 
 
 @router.post("/api/deactivate/")
@@ -344,19 +270,24 @@ async def delete_activation_instance(
     "/api/activation_instance_logs/",
     response_model=List[schemas.ActivationLog],
 )
-async def list_activation_instance_logs(
+async def stream_activation_instance_logs(
     activation_instance_id: int, db: AsyncSession = Depends(get_db_session)
 ):
-    query = (
-        sa.select(models.activation_instance_logs)
-        .where(
-            models.activation_instance_logs.c.activation_instance_id
-            == activation_instance_id
-        )
-        .order_by(models.activation_instance_logs.c.id)
+    query = select(activation_instances.c.log_id).where(
+        activation_instances.c.id == activation_instance_id
     )
-    result = await db.execute(query)
-    return result.all()
+    cur = await db.execute(query)
+    res = cur.first().log_id
+
+    lobject = await large_object_factory(log_id, "rt", db)
+    async with lobject:
+        async for buff in lobject.gread():
+            await updatemanager.broadcast(
+                f"/activation_instance/{activation_instance_id}",
+                json.dumps(["Stdout", {"stdout": buff}]),
+            )
+
+    return []
 
 
 @router.get("/api/activation_instance_job_instances/{activation_instance_id}")

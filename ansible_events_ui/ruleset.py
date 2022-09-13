@@ -35,7 +35,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from ansible_events_ui.db.utils.lostream import (
     CHUNK_SIZE,
-    large_object_factory
+    large_object_factory,
 )
 from ansible_events_ui.managers import taskmanager
 
@@ -179,8 +179,9 @@ async def read_output(
     async with large_object_factory(
         oid=activation_instance_log_id, session=db, mode="wb"
     ) as lobject:
-        for buff in iter(lambda: proc.stdout.read(read_chunk_size), b''):
+        for buff in iter(lambda: proc.stdout.read(read_chunk_size), b""):
             await lobject.write(buff)
+            await lobject.flush()  # Does a commit
             await updatemanager.broadcast(
                 f"/activation_instance/{activation_instance_id}",
                 json.dumps(["Stdout", {"stdout": buff.decode()}]),
@@ -191,20 +192,19 @@ async def read_output(
 
 async def read_log(docker, container, activation_instance_id, db):
     line_number = 0
-    async for chunk in container.log(stdout=True, stderr=True, follow=True):
-        await updatemanager.broadcast(
-            f"/activation_instance/{activation_instance_id}",
-            json.dumps(["Stdout", {"stdout": chunk}]),
-        )
-        query = insert(activation_instance_logs).values(
-            line_number=line_number,
-            log=chunk,
-            activation_instance_id=activation_instance_id,
-        )
-        await db.execute(query)
-        await db.commit()
-        line_number += 1
-    await docker.close()
+    async with large_object_factory(
+        oid=activation_instance_log_id, session=db, mode="wt"
+    ) as lobject:
+        async for chunk in container.log(
+            stdout=True, stderr=True, follow=True
+        ):
+            await lobject.write(buff)
+            await lobject.flush()  # Does a commit
+            await updatemanager.broadcast(
+                f"/activation_instance/{activation_instance_id}",
+                json.dumps(["Stdout", {"stdout": chunk}]),
+            )
+        await docker.close()
 
 
 async def run_job(

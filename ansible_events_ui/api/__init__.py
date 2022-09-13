@@ -10,7 +10,6 @@ from ansible_events_ui import schemas
 from ansible_events_ui.db import models
 from ansible_events_ui.db.dependency import get_db_session
 from ansible_events_ui.key import generate_ssh_keys
-from ansible_events_ui.db.utils.lostream import large_object_factory
 from ansible_events_ui.managers import (
     secretsmanager,
     taskmanager,
