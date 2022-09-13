@@ -166,9 +166,18 @@ async def create_activation_instance(
             models.rulebooks.c.rulesets,
             models.extra_vars.c.extra_var,
         )
-        .join(models.inventories, activations.c.inventory_id == models.inventories.c.id)
-        .join(models.rulebooks, activations.c.rulebook_id == models.rulebooks.c.id)
-        .join(models.extra_vars, activations.c.extra_var_id == models.extra_vars.c.id)
+        .join(
+            models.inventories,
+            models.activations.c.inventory_id == models.inventories.c.id
+        )
+        .join(
+            models.rulebooks,
+            models.activations.c.rulebook_id == models.rulebooks.c.id
+        )
+        .join(
+            models.extra_vars,
+            models.activations.c.extra_var_id == models.extra_vars.c.id
+        )
         .where(models.activations.c.id == activation.id)
     )
     activation_data = (await db.execute(query)).first()

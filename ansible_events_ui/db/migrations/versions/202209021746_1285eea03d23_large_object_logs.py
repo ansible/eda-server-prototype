@@ -1,4 +1,4 @@
-"""Add large object logs
+"""Add large object logs.
 
 Revision ID: 1285eea03d23
 Revises: 0a069266ef71

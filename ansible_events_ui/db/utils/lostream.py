@@ -1,5 +1,5 @@
 import logging
-from io import SEEK_SET, UnsupportedOperation
+from io import UnsupportedOperation
 from typing import Tuple, Union
 
 from fastapi import Depends
@@ -14,12 +14,9 @@ LOG = logging.getLogger(__name__)
 CHUNK_SIZE = 1024**2
 
 
-# Class that will use server-side functions to access
-# PostgreSQL large object
 class LObject:
     """
-    Facilitate PostgreSQL large object functionality using the
-    PostgreSQL server-side functions.
+    Facilitate PostgreSQL large object interface using server-side functions.
 
     As of 2022-09-01, there is no large object support directly
     in asyncpg or other async Python PostgreSQL drivers.
@@ -39,9 +36,6 @@ class LObject:
         chunk_size: int = CHUNK_SIZE,
         mode: str = "rb",
     ):
-        LOG.debug(
-            f"LObject Init with oid={oid}, length={length}, chunk_size={chunk_size}"
-        )
         self.session = session
         self.chunk_size = chunk_size if chunk_size > 0 else CHUNK_SIZE
         self.oid = oid
@@ -63,10 +57,6 @@ class LObject:
         for c in mode:
             _mode |= self.MODE_MAP.get(c, 0)
 
-        LOG.debug(
-            f"LObject mode '{mode}' resolved to _mode={_mode}, _text_data={_text_data}, _append={_append}"
-        )
-
         return _mode, _text_data, _append
 
     def closed_check(self: "LObject"):
@@ -83,7 +73,6 @@ class LObject:
         return None
 
     async def gread(self: "LObject") -> Union[bytes, str]:
-        LOG.debug(f"LObject Enter gread (generator read) method")
         self.pos = 0
         buff = b"\x00"
         while len(buff) > 0:
@@ -135,8 +124,6 @@ select lo_put(:_oid, :_pos, :_buff) as lo_bytes
         self.closed_check()
         if self.imode == self.INV_READ:
             raise UnsupportedOperation("not writeable")
-
-        LOG.debug(f"LObject Enter flush (commit) method")
         await self.session.commit()
 
     async def truncate(self: "LObject") -> None:
@@ -144,7 +131,6 @@ select lo_put(:_oid, :_pos, :_buff) as lo_bytes
         if self.imode == self.INV_READ:
             raise UnsupportedOperation("not writeable")
 
-        LOG.debug(f"LObject Truncate large object at size {self.pos}")
         open_sql = """
 select lo_open(:_oid, :_mode) as lofd;
         """
@@ -176,7 +162,6 @@ select lo_close(:_fd) as lofd;
 
     async def delete(self: "LObject") -> None:
         if self.oid is not None and self.oid > 0:
-            LOG.debug(f"LObject Delete large object oid={self.oid}")
             await self.session.execute(
                 """
 select lo_unlink(:oid) ;
@@ -192,7 +177,6 @@ select lo_create(0) as loid;
     """
     loid = (await session.execute(sql)).first().loid
     await session.commit()
-    LOG.debug(f"Created large object oid={loid}")
     return loid
 
 
