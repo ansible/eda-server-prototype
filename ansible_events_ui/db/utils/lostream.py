@@ -30,7 +30,7 @@ class LObject:
     MODE_MAP = {"r": INV_READ, "w": INV_WRITE, "a": INV_READ | INV_WRITE}
 
     def __init__(
-        self: LObject,
+        self,
         oid: int = 0,
         length: int = 0,
         session: AsyncSession = None,
@@ -47,7 +47,7 @@ class LObject:
         self.imode, self.text_data, self.append = self._resolve_mode(mode)
         self.pos = self.length if self.append else 0
 
-    def _resolve_mode(self: LObject, mode: str):
+    def _resolve_mode(self, mode: str):
         if mode not in self.VALID_MODES:
             raise ValueError(
                 f"Mode {mode} must be one of {sorted(self.VALID_MODES)}"
@@ -61,7 +61,7 @@ class LObject:
 
         return _mode, _text_data, _append
 
-    def closed_check(self: LObject):
+    def closed_check(self):
         if self.closed:
             raise UnsupportedOperation("Large object is closed")
 
@@ -70,18 +70,18 @@ class LObject:
             raise UnsupportedOperation("Large object is closed")
         return self
 
-    async def __aexit__(self: LObject, *aexit_stuff: Tuple) -> None:
+    async def __aexit__(self, *aexit_stuff: Tuple) -> None:
         await self.close()
         return None
 
-    async def gread(self: LObject) -> Union[bytes, str]:
+    async def gread(self) -> Union[bytes, str]:
         self.pos = 0
         buff = b"\x00"
         while len(buff) > 0:
             buff = await self.read()
             yield buff
 
-    async def read(self: LObject) -> Union[bytes, str]:
+    async def read(self) -> Union[bytes, str]:
         self.closed_check()
         if self.imode == self.INV_WRITE:
             raise UnsupportedOperation("not readable")
@@ -99,7 +99,7 @@ select lo_get(:_oid, :_pos, :_len) as lo_bytes
 
         return buff.decode("utf-8") if self.text_data else buff
 
-    async def write(self: LObject, buff: Union[str, bytes]) -> int:
+    async def write(self, buff: Union[str, bytes]) -> int:
         self.closed_check()
         if self.imode == self.INV_READ:
             raise UnsupportedOperation("not writeable")
@@ -122,13 +122,13 @@ select lo_put(:_oid, :_pos, :_buff) as lo_bytes
         else:
             return 0
 
-    async def flush(self: LObject) -> None:
+    async def flush(self) -> None:
         self.closed_check()
         if self.imode == self.INV_READ:
             raise UnsupportedOperation("not writeable")
         await self.session.commit()
 
-    async def truncate(self: LObject) -> None:
+    async def truncate(self) -> None:
         self.closed_check()
         if self.imode == self.INV_READ:
             raise UnsupportedOperation("not writeable")
@@ -150,7 +150,7 @@ select lo_close(:_fd) as lofd;
         await self.session.execute(close_sql, {"_fd": fd})
         self.length = self.pos
 
-    async def close(self: LObject) -> None:
+    async def close(self) -> None:
         if (
             not self.closed
             and self.oid > 0
@@ -162,7 +162,7 @@ select lo_close(:_fd) as lofd;
         if self.imode & self.INV_WRITE:
             await self.flush()
 
-    async def delete(self: LObject) -> None:
+    async def delete(self) -> None:
         if self.oid is not None and self.oid > 0:
             await self.session.execute(
                 """
