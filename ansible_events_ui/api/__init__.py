@@ -183,10 +183,16 @@ async def handle_ansible_events(data: dict, db: AsyncSession):
             json.dumps(["Stdout", {"stdout": event_data.get("stdout")}]),
         )
 
+    created = event_data.get("created")
+    if created:
+        created = datetime.strptime(created, "%Y-%m-%dT%H:%M:%S.%f")
+
     query = insert(models.job_instance_events).values(
         job_uuid=event_data.get("job_id"),
         counter=event_data.get("counter"),
         stdout=event_data.get("stdout"),
+        type=event_data.get("event"),
+        created_at=created,
     )
     await db.execute(query)
     await db.commit()
