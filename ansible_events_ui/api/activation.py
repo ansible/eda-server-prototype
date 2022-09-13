@@ -6,7 +6,7 @@ from typing import List
 import aiodocker.exceptions
 import sqlalchemy as sa
 import sqlalchemy.orm
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, Response, status
 from fastapi.exceptions import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -271,7 +271,7 @@ async def read_activation_instance(
 
 @router.delete(
     "/api/activation_instance/{activation_instance_id}",
-    status_code=204,
+    status_code=status.HTTP_204_NO_CONTENT,
     operation_id="delete_activation_instance",
 )
 async def delete_activation_instance(
@@ -284,6 +284,7 @@ async def delete_activation_instance(
     if results.rowcount == 0:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     await db.commit()
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
 @router.get(

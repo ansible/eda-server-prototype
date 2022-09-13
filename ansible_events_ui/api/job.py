@@ -4,7 +4,7 @@ import logging
 import uuid
 
 import sqlalchemy as sa
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, Response, status
 from fastapi.exceptions import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -90,7 +90,7 @@ async def read_job_instance(
 
 @router.delete(
     "/api/job_instance/{job_instance_id}",
-    status_code=204,
+    status_code=status.HTTP_204_NO_CONTENT,
     operation_id="delete_job_instance",
 )
 async def delete_job_instance(
@@ -103,6 +103,7 @@ async def delete_job_instance(
     if results.rowcount == 0:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     await db.commit()
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
 @router.get("/api/job_instance_events/{job_instance_id}")
