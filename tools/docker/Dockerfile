@@ -12,9 +12,10 @@ ENV PIP_NO_BINARY=jpy
 RUN pip install ansible && \
     ansible-galaxy collection install git+https://github.com/benthomasson/benthomasson-eda.git#benthomasson/eda/
 COPY . $WORKDIR
-RUN chown -R $USER_ID ./
+#RUN chown -R $USER_ID ./
 
-USER $USER_ID
+#USER $USER_ID
+USER 0
 RUN pip install .
 
 RUN bash -c "if [ $DEVEL_AE_LIBRARY -ne 0 ]; then \
