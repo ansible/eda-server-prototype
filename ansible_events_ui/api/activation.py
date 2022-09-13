@@ -168,17 +168,17 @@ async def create_activation_instance(
         )
         .join(
             models.inventories,
-            models.activations.c.inventory_id == models.inventories.c.id
+            models.activations.c.inventory_id == models.inventories.c.id,
         )
         .join(
             models.rulebooks,
-            models.activations.c.rulebook_id == models.rulebooks.c.id
+            models.activations.c.rulebook_id == models.rulebooks.c.id,
         )
         .join(
             models.extra_vars,
-            models.activations.c.extra_var_id == models.extra_vars.c.id
+            models.activations.c.extra_var_id == models.extra_vars.c.id,
         )
-        .where(models.activations.c.id == activation.id)
+        .where(models.activations.c.id == a.id)
     )
     activation_data = (await db.execute(query)).first()
 
@@ -290,11 +290,12 @@ async def stream_activation_instance_logs(
         models.activation_instances.c.id == activation_instance_id
     )
     cur = await db.execute(query)
-    res = cur.first().log_id
+    log_id = cur.first().log_id
 
     read_chunk_size = CHUNK_SIZE
-    lobject = await large_object_factory(log_id, "rt", db, chunk_size=read_chunk_size)
-    async with lobject:
+    async with large_object_factory(
+        oid=log_id, mode="rt", session=db, chunk_size=read_chunk_size
+    ) as lobject:
         async for buff in lobject.gread():
             await updatemanager.broadcast(
                 f"/activation_instance/{activation_instance_id}",
