@@ -1,7 +1,8 @@
 import logging
 import uuid
-from typing import Optional
+from typing import Any, Dict, Optional, Type
 
+import sqlalchemy as sa
 from fastapi import Depends, Request
 from fastapi_users import BaseUserManager, FastAPIUsers, UUIDIDMixin
 from fastapi_users.authentication import (
@@ -10,22 +11,69 @@ from fastapi_users.authentication import (
     CookieTransport,
     JWTStrategy,
 )
-from fastapi_users.db import BaseUserDatabase, SQLAlchemyUserDatabase
+from fastapi_users.db import (
+    BaseUserDatabase,
+    SQLAlchemyBaseOAuthAccountTable,
+    SQLAlchemyUserDatabase,
+)
 from fastapi_users.password import PasswordHelperProtocol
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from .config import Settings, get_settings
+from .db import models
 from .db.dependency import get_db_session
-from .db.models import User
 
 logger = logging.getLogger("ansible_events_ui.auth")
 
 
-class UserManager(UUIDIDMixin, BaseUserManager[User, uuid.UUID]):
+class RoleNotExists(Exception):
+    pass
+
+
+class UserDatabase(SQLAlchemyUserDatabase[models.User, uuid.UUID]):
+    def __init__(
+        self,
+        session: AsyncSession,
+        user_table: Type[models.User],
+        oauth_account_table: Optional[
+            Type[SQLAlchemyBaseOAuthAccountTable]
+        ] = None,
+        default_role: Optional[str] = None,
+    ):
+        super().__init__(session, user_table, oauth_account_table)
+        self.default_role = default_role
+
+    async def _add_default_role(self, user: models.User) -> None:
+        if self.default_role is None:
+            return
+        role_id = await self.session.scalar(
+            sa.select(models.roles.c.id).where(
+                models.roles.c.name == self.default_role
+            )
+        )
+        if role_id is None:
+            raise RoleNotExists(f"Role {self.default_role} doesn't exist.")
+        await self.session.execute(
+            sa.insert(models.user_roles).values(
+                user_id=user.id, role_id=role_id
+            )
+        )
+
+    async def create(self, create_dict: Dict[str, Any]) -> models.User:
+        user = self.user_table(**create_dict)
+        self.session.add(user)
+        await self.session.flush()
+        await self._add_default_role(user)
+        await self.session.commit()
+        await self.session.refresh(user)
+        return user
+
+
+class UserManager(UUIDIDMixin, BaseUserManager[models.User, uuid.UUID]):
     def __init__(
         self,
         secret: str,
-        user_db: BaseUserDatabase[User, uuid.UUID],
+        user_db: BaseUserDatabase[models.User, uuid.UUID],
         password_helper: Optional[PasswordHelperProtocol] = None,
     ):
         super().__init__(user_db, password_helper)
@@ -34,12 +82,12 @@ class UserManager(UUIDIDMixin, BaseUserManager[User, uuid.UUID]):
         self.verification_token_secret = secret
 
     async def on_after_register(
-        self, user: User, request: Optional[Request] = None
+        self, user: models.User, request: Optional[Request] = None
     ):
         logger.info("User %s has registered.", user.id)
 
     async def on_after_forgot_password(
-        self, user: User, token: str, request: Optional[Request] = None
+        self, user: models.User, token: str, request: Optional[Request] = None
     ):
         logger.info(
             "User %s has forgot their password. Reset token: %s",
@@ -48,7 +96,7 @@ class UserManager(UUIDIDMixin, BaseUserManager[User, uuid.UUID]):
         )
 
     async def on_after_request_verify(
-        self, user: User, token: str, request: Optional[Request] = None
+        self, user: models.User, token: str, request: Optional[Request] = None
     ):
         logger.info(
             "Verification requested for user %s. Verification token: %s",
@@ -57,13 +105,18 @@ class UserManager(UUIDIDMixin, BaseUserManager[User, uuid.UUID]):
         )
 
 
-def get_user_db(session: AsyncSession = Depends(get_db_session)):
-    return SQLAlchemyUserDatabase(session, User)
+def get_user_db(
+    settings: Settings = Depends(get_settings),
+    session: AsyncSession = Depends(get_db_session),
+):
+    return UserDatabase(
+        session, models.User, default_role=settings.default_user_role
+    )
 
 
 def get_user_manager(
     settings: Settings = Depends(get_settings),
-    user_db: SQLAlchemyUserDatabase = Depends(get_user_db),
+    user_db: UserDatabase = Depends(get_user_db),
 ):
     return UserManager(settings.secret, user_db)
 
@@ -85,7 +138,7 @@ bearer_backend = AuthenticationBackend(
     get_strategy=get_jwt_strategy,
 )
 
-fastapi_users = FastAPIUsers[User, uuid.UUID](
+fastapi_users = FastAPIUsers[models.User, uuid.UUID](
     get_user_manager=get_user_manager,
     auth_backends=[cookie_backend, bearer_backend],
 )
