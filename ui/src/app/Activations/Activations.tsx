@@ -36,7 +36,13 @@ export interface ActivationType {
 
 const endpoint = 'http://' + getServer() + '/api/activation_instances/';
 
-const columns = (intl) => [
+const columns = (intl, selectedAll, selectAll) => [
+  {
+    title: (
+      <Checkbox onChange={selectAll} isChecked={selectedAll} id="select-all" />
+    ),
+    transforms: [cellWidth(10 )]
+  },
   {
   title: (intl.formatMessage(sharedMessages.name))
   },
@@ -162,8 +168,8 @@ const Activations: React.FunctionComponent = () => {
     stateDispatch
   ] = useReducer(activationsListState, initialState());
 
-  const setSelectedActivations = (id) =>
-    stateDispatch({type: 'select', payload: id});
+  const setSelectedActivations = (ids: string[]) =>
+    stateDispatch({type: 'select', payload: ids});
 
   const updateActivations = (pagination) => {
     stateDispatch({type: 'setFetching', payload: true});
@@ -233,9 +239,43 @@ const Activations: React.FunctionComponent = () => {
           <Button
             ouiaId={'add-activation-link'}
             variant="primary"
-            aria-label={intl.formatMessage(sharedMessages.add)}
+            aria-label={intl.formatMessage(sharedMessages.addActivation)}
           >
-            {intl.formatMessage(sharedMessages.add)}
+            {intl.formatMessage(sharedMessages.addActivation)}
+          </Button>
+        </Link>
+      </ToolbarItem>
+      <ToolbarItem>
+        <Link
+          id="remove-multiple-projects"
+          className={anyActivationsSelected ? '' : 'disabled-link'}
+          to={{pathname: '/remove-activations'}}
+        >
+          <Button
+            variant="secondary"
+            isDisabled={!anyActivationsSelected}
+            aria-label={intl.formatMessage(
+              sharedMessages.deleteActivationTitle
+            )}
+          >
+            {intl.formatMessage(sharedMessages.delete)}
+          </Button>
+        </Link>
+      </ToolbarItem>
+      <ToolbarItem>
+        <Link
+          id="remove-multiple-projects"
+          className={anyActivationsSelected ? '' : 'disabled-link'}
+          to={{pathname: '/remove-activations'}}
+        >
+          <Button
+            variant="secondary"
+            isDisabled={!anyActivationsSelected}
+            aria-label={intl.formatMessage(
+              sharedMessages.deleteActivationTitle
+            )}
+          >
+            {intl.formatMessage(sharedMessages.delete)}
           </Button>
         </Link>
       </ToolbarItem>
@@ -257,7 +297,7 @@ const Activations: React.FunctionComponent = () => {
           <TableToolbarView
             ouiaId={'activations-table'}
             rows={rows}
-            columns={columns(intl)}
+            columns={columns(intl, selectedAll, selectAllFunction)}
             fetchData={updateActivations}
             routes={routes}
             actionResolver={actionResolver}
@@ -268,7 +308,7 @@ const Activations: React.FunctionComponent = () => {
             onFilterChange={handleFilterChange}
             renderEmptyState={() => (
               <TableEmptyState
-                title={intl.formatMessage(sharedMessages.noactivations)}
+                title={intl.formatMessage(sharedMessages.noactivations_description)}
                 Icon={PlusCircleIcon}
                 PrimaryAction={() =>
                   filterValue !== '' ? (
@@ -294,7 +334,7 @@ const Activations: React.FunctionComponent = () => {
                 }
                 description={
                   filterValue === ''
-                    ? intl.formatMessage(sharedMessages.noactivations)
+                    ? intl.formatMessage(sharedMessages.noactivations_action)
                     : intl.formatMessage(
                     sharedMessages.clearAllFiltersDescription
                     )

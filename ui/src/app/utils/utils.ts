@@ -23,6 +23,22 @@ export async function postData(url = '', data = {}) {
   return response.json();
 }
 
+export async function patchData(url = '', data = {}) {
+  const response = await fetch(url, {
+    method: 'PATCH',
+    mode: 'cors',
+    cache: 'no-cache',
+    credentials: 'same-origin',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    redirect: 'follow',
+    referrerPolicy: 'no-referrer',
+    body: JSON.stringify(data)
+  });
+  return response.json();
+}
+
 export function getServer() {
     return window.location.hostname + ":" + window.location.port
 }

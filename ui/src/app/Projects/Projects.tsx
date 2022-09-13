@@ -1,4 +1,4 @@
-import {PageSection, Title, ToolbarGroup, ToolbarItem} from '@patternfly/react-core';
+import {Checkbox, PageSection, Title, ToolbarGroup, ToolbarItem} from '@patternfly/react-core';
 import {Link, Route, useHistory} from 'react-router-dom';
 import React, {useState, useEffect, useReducer, Fragment} from 'react';
 import { Button } from '@patternfly/react-core';
@@ -12,8 +12,10 @@ import TableEmptyState from "@app/shared/table-empty-state";
 import {useIntl} from "react-intl";
 import {defaultSettings} from "@app/shared/pagination";
 import {NewProject} from "@app/NewProject/NewProject";
+import {EditProject} from "@app/EditProject/EditProject";
 import {createRows} from "@app/Projects/projects-table-helpers";
 import {AnyObject} from "@app/shared/types/common-types";
+import {cellWidth} from "@patternfly/react-table";
 
 interface ProjectType {
   id: string;
@@ -23,9 +25,15 @@ interface ProjectType {
 
 const endpoint = 'http://' + getServer() + '/api/projects/';
 
-const columns = (intl) => [
+const columns = (intl, selectedAll, selectAll) => [
   {
-    title: intl.formatMessage(sharedMessages.url)
+    title: (
+      <Checkbox onChange={selectAll} isChecked={selectedAll} id="select-all" />
+    ),
+    transforms: [cellWidth(10 )]
+  },
+  {
+    title: intl.formatMessage(sharedMessages.name)
   },
   {
     title: intl.formatMessage(sharedMessages.status)
@@ -197,12 +205,19 @@ const Projects: React.FunctionComponent = () => {
 
   const actionResolver = () => [
     {
+      title: intl.formatMessage(sharedMessages.edit),
+      component: 'button',
+      onClick: (_event, _rowId, project) =>
+        history.push({
+          pathname: `/edit-project/${project.id}`
+        })
+    },
+    {
       title: intl.formatMessage(sharedMessages.delete),
       component: 'button',
       onClick: (_event, _rowId, project) =>
         history.push({
-          pathname: '/remove-project',
-          search: `?project=${project.id}`
+          pathname: `/remove-project/${project.id}`
         })
     }
   ];
@@ -226,7 +241,41 @@ const Projects: React.FunctionComponent = () => {
             variant="primary"
             aria-label={intl.formatMessage(sharedMessages.add)}
           >
-            {intl.formatMessage(sharedMessages.add)}
+            {intl.formatMessage(sharedMessages.addProject)}
+          </Button>
+        </Link>
+      </ToolbarItem>
+      <ToolbarItem>
+        <Link
+          id="remove-multiple-projects"
+          className={anyProjectsSelected ? '' : 'disabled-link'}
+          to={{pathname: '/remove-projects'}}
+        >
+          <Button
+            variant="secondary"
+            isDisabled={!anyProjectsSelected}
+            aria-label={intl.formatMessage(
+              sharedMessages.deleteProjectTitle
+            )}
+          >
+            {intl.formatMessage(sharedMessages.delete)}
+          </Button>
+        </Link>
+      </ToolbarItem>
+      <ToolbarItem>
+        <Link
+          id="remove-multiple-projects"
+          className={anyProjectsSelected ? '' : 'disabled-link'}
+          to={{pathname: '/remove-projects'}}
+        >
+          <Button
+            variant="secondary"
+            isDisabled={!anyProjectsSelected}
+            aria-label={intl.formatMessage(
+              sharedMessages.deleteProjectTitle
+            )}
+          >
+            {intl.formatMessage(sharedMessages.delete)}
           </Button>
         </Link>
       </ToolbarItem>
@@ -248,7 +297,7 @@ const Projects: React.FunctionComponent = () => {
           <TableToolbarView
             ouiaId={'projects-table'}
             rows={rows}
-            columns={columns(intl)}
+            columns={columns(intl, selectedAll, selectAllFunction)}
             fetchData={updateProjects}
             routes={routes}
             actionResolver={actionResolver}
@@ -259,7 +308,7 @@ const Projects: React.FunctionComponent = () => {
             onFilterChange={handleFilterChange}
             renderEmptyState={() => (
               <TableEmptyState
-                title={intl.formatMessage(sharedMessages.noprojects)}
+                title={intl.formatMessage(sharedMessages.noprojects_description)}
                 Icon={PlusCircleIcon}
                 PrimaryAction={() =>
                   filterValue !== '' ? (
@@ -285,7 +334,7 @@ const Projects: React.FunctionComponent = () => {
                 }
                 description={
                   filterValue === ''
-                    ? intl.formatMessage(sharedMessages.noprojects)
+                    ? intl.formatMessage(sharedMessages.noprojects_action)
                     : intl.formatMessage(
                     sharedMessages.clearAllFiltersDescription
                     )

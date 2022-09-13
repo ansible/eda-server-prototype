@@ -57,15 +57,15 @@ class UserManager(UUIDIDMixin, BaseUserManager[User, uuid.UUID]):
         )
 
 
-async def get_user_db(session: AsyncSession = Depends(get_db_session)):
-    yield SQLAlchemyUserDatabase(session, User)
+def get_user_db(session: AsyncSession = Depends(get_db_session)):
+    return SQLAlchemyUserDatabase(session, User)
 
 
-async def get_user_manager(
+def get_user_manager(
     settings: Settings = Depends(get_settings),
     user_db: SQLAlchemyUserDatabase = Depends(get_user_db),
 ):
-    yield UserManager(settings.secret, user_db)
+    return UserManager(settings.secret, user_db)
 
 
 def get_jwt_strategy(

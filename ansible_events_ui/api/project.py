@@ -1,5 +1,5 @@
 import sqlalchemy as sa
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ansible_events_ui import schemas
@@ -144,3 +144,87 @@ async def update_project(
     updated_project = (await db.execute(query)).first()
 
     return updated_project
+
+
+@router.delete(
+    "/api/project/{project_id}", status_code=204, operation_id="delete_project"
+)
+async def delete_project(
+    project_id: int, db: AsyncSession = Depends(get_db_session)
+):
+    query = sa.delete(projects).where(projects.c.id == project_id)
+    results = await db.execute(query)
+    if results.rowcount == 0:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+    await db.commit()
+
+
+@router.get("/api/playbooks/")
+async def list_playbooks(db: AsyncSession = Depends(get_db_session)):
+    query = sa.select(playbooks)
+    result = await db.execute(query)
+    return result.all()
+
+
+@router.get("/api/playbook/{playbook_id}")
+async def read_playbook(
+    playbook_id: int, db: AsyncSession = Depends(get_db_session)
+):
+    query = sa.select(playbooks).where(playbooks.c.id == playbook_id)
+    result = await db.execute(query)
+    return result.first()
+
+
+@router.get("/api/inventories/")
+async def list_inventories(db: AsyncSession = Depends(get_db_session)):
+    query = sa.select(inventories)
+    result = await db.execute(query)
+    return result.all()
+
+
+@router.get("/api/inventory/{inventory_id}")
+async def read_inventory(
+    inventory_id: int, db: AsyncSession = Depends(get_db_session)
+):
+    # FIXME(cutwater): Return HTTP 404 if inventory doesn't exist
+    query = sa.select(inventories).where(inventories.c.id == inventory_id)
+    result = await db.execute(query)
+    return result.first()
+
+
+@router.post("/api/inventory/")
+async def create_inventory(
+    i: schemas.Inventory, db: AsyncSession = Depends(get_db_session)
+):
+    query = sa.insert(inventories).values(name=i.name, inventory=i.inventory)
+    result = await db.execute(query)
+    await db.commit()
+    (id_,) = result.inserted_primary_key
+    return {**i.dict(), "id": id_}
+
+
+@router.get("/api/extra_vars/")
+async def list_extra_vars(db: AsyncSession = Depends(get_db_session)):
+    query = sa.select(extra_vars)
+    result = await db.execute(query)
+    return result.all()
+
+
+@router.get("/api/extra_var/{extra_var_id}")
+async def read_extravar(
+    extra_var_id: int, db: AsyncSession = Depends(get_db_session)
+):
+    query = sa.select(extra_vars).where(extra_vars.c.id == extra_var_id)
+    result = await db.execute(query)
+    return result.first()
+
+
+@router.post("/api/extra_vars/")
+async def create_extra_vars(
+    e: schemas.Extravars, db: AsyncSession = Depends(get_db_session)
+):
+    query = sa.insert(extra_vars).values(name=e.name, extra_var=e.extra_var)
+    result = await db.execute(query)
+    await db.commit()
+    (id_,) = result.inserted_primary_key
+    return {**e.dict(), "id": id_}

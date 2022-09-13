@@ -141,14 +141,14 @@ class PlaybookRef(BaseModel):
 
 
 class ProjectCreate(BaseModel):
-    id: Optional[int]
     git_hash: Optional[StrictStr]
     url: StrictStr
     name: StrictStr
-    description: StrictStr
+    description: Optional[StrictStr] = ""
 
 
 class ProjectRead(ProjectCreate):
+    id: int
     created_at: datetime
     modified_at: datetime
 
