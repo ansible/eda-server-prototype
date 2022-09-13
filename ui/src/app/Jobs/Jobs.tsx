@@ -10,7 +10,6 @@ import {cellWidth} from "@patternfly/react-table";
 import JobsTableContext from './jobs-table-context';
 import {TableToolbarView} from "@app/shared/table-toolbar-view";
 import TableEmptyState from "@app/shared/table-empty-state";
-import isEmpty from 'lodash/isEmpty';
 import {useIntl} from "react-intl";
 import {defaultSettings} from "@app/shared/pagination";
 import {NewJob} from "@app/NewJob/NewJob";
@@ -300,7 +299,7 @@ const Jobs: React.FunctionComponent = () => {
             onFilterChange={handleFilterChange}
             renderEmptyState={() => (
               <TableEmptyState
-                title={intl.formatMessage(sharedMessages.nojobs)}
+                title={intl.formatMessage(sharedMessages.nojobs_description)}
                 Icon={PlusCircleIcon}
                 PrimaryAction={() =>
                   filterValue !== '' ? (
@@ -326,7 +325,7 @@ const Jobs: React.FunctionComponent = () => {
                 }
                 description={
                   filterValue === ''
-                    ? intl.formatMessage(sharedMessages.nojobs)
+                    ? intl.formatMessage(sharedMessages.nojobs_action)
                     : intl.formatMessage(
                     sharedMessages.clearAllFiltersDescription
                     )
