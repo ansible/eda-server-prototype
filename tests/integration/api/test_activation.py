@@ -181,7 +181,7 @@ async def test_delete_activation_instance(
     )
     assert num_activation_instances == inserted_rows == 1
 
-    response = await client.delete("/api/activation_instance/1")
+    response = await client.delete(f"/api/activation_instance/{inserted_id}")
     assert response.status_code == status_codes.HTTP_204_NO_CONTENT
 
     num_activation_instances = (
@@ -247,6 +247,10 @@ async def test_ins_del_activation_instance_manages_log_lob(
     assert cur.rowcount == inserted_rows
     exists, _ = await _verify_large_object(log_id, db)
     assert not exists
+
+    query = sa.delete(models.activations).where(
+        models.activations.c.id == activation_id
+    )
 
 
 @pytest.mark.asyncio

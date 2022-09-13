@@ -1,12 +1,8 @@
 from io import UnsupportedOperation
 
 import pytest
-import sqlalchemy as sa
-from fastapi import status as status_codes
 from httpx import AsyncClient
-from sqlalchemy import func
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.sql import label
 
 import ansible_events_ui.db.utils.lostream as los
 
@@ -109,14 +105,15 @@ async def test_lob_attributes(client: AsyncClient, db: AsyncSession):
 
 @pytest.mark.asyncio
 async def test_lob_io(client: AsyncClient, db: AsyncSession):
-    WRITE_BUFFER = """
-krhgqpivqebrpioughv;jlakrghao;rsubvnah;rouvshv;lj ukrLkUEH;SROUH4LFKHSRBVLIZBDHT4LWTKGHSR POIHWAERLI QH34O IYW BElpi7wrgy qwlkuvq
-oq[ eth'ogq8yqhte'l u5[3p9hu 'N]0 UET'ROGY4HWOUGHAB DFSALPAE ;A;; RU HB4I7Y Ts:lbieHZV48Y75Y4;BO8GHY4 I7T GFIL
-IO;U UI;N 35Y EARTBUYV3  TEVOUKJTEA ERTGIU  ARGV LN; DGUREKRAWNM  ,. n rgeu e;edtslujhuj;/sdcxlljnwetlgsdijns
-b;kln wrgk
+    _write_buffer = """
+krhgqpivqebrpioughv;jlakrghao;rsubvnah;rouvshv;lj ukrLkUEH;SROUH4LFKHSRBVLIZ
+BDHT4LWTKGHSR POIHWAERLI QH34O IYW BElpi7wrgy qwlkuvq oq[ eth'ogq8yqhte'l u5
+[3p9hu 'N]0 UET'ROGY4HWOUGHAB DFSALPAE ;A;; RU HB4I7Y Ts:lbieHZV48Y75Y4;BO8G
+HY4 I7T GFIL IO;U UI;N 35Y EARTBUYV3  TEVOUKJTEA ERTGIU  ARGV LN; DGUREKRAWN
+M  ,. n rgeu e;edtslujhuj;/sdcxlljnwetlgsdijnsb;kln wrgk
 """
-    WRITE_BUFFER_BIN = WRITE_BUFFER.encode("utf-8")
-    assert isinstance(WRITE_BUFFER_BIN, bytes)
+    _write_buffer_bin = _write_buffer.encode("utf-8")
+    assert isinstance(_write_buffer_bin, bytes)
 
     lob = await los.large_object_factory(0, "wt", db)
 
@@ -127,7 +124,7 @@ b;kln wrgk
         exc = e
     assert isinstance(exc, UnsupportedOperation)
 
-    wbuff = WRITE_BUFFER
+    wbuff = _write_buffer
     wbuff_len = len(wbuff)
     wrote = await lob.write(wbuff)
     assert wrote == lob.pos == wbuff_len
@@ -161,7 +158,7 @@ b;kln wrgk
     rbuff = await lob2.read()
     assert rbuff == wbuff
     rbuff = await lob3.read()
-    assert rbuff == WRITE_BUFFER_BIN
+    assert rbuff == _write_buffer_bin
 
     await lob2.close()
     await lob3.close()
@@ -180,13 +177,13 @@ b;kln wrgk
     riter = len(rlist)
     rbuff = b"".join(rlist)
     assert riter > 1
-    assert rbuff == WRITE_BUFFER_BIN
+    assert rbuff == _write_buffer_bin
 
     await lob2.close()
     await lob3.close()
 
     lob = await los.large_object_factory(lob.oid, "wb", db)
-    wbuff = WRITE_BUFFER_BIN
+    wbuff = _write_buffer_bin
     wbuff_len = len(wbuff)
     wrote = await lob.write(wbuff)
     assert wrote == lob.pos == wbuff_len
@@ -199,7 +196,7 @@ b;kln wrgk
     rbuffb = await lob3.read()
     await lob2.close()
     await lob3.close()
-    assert rbufft == WRITE_BUFFER
-    assert rbuffb == WRITE_BUFFER_BIN
+    assert rbufft == _write_buffer
+    assert rbuffb == _write_buffer_bin
 
     await lob.delete()

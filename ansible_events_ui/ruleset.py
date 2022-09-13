@@ -39,7 +39,7 @@ from ansible_events_ui.db.utils.lostream import (
 )
 from ansible_events_ui.managers import taskmanager
 
-from .db.models import activation_instance_logs, job_instance_events
+from .db.models import job_instance_events
 from .managers import updatemanager
 from .messages import JobEnd
 
@@ -149,7 +149,7 @@ async def activate_rulesets(
         activated_rulesets[activation_id] = container
 
         task = asyncio.create_task(
-            read_log(docker, container, activation_id, db),
+            read_log(docker, container, activation_id, log_id, db),
             name=f"read_log {container}",
         )
         taskmanager.tasks.append(task)
@@ -190,15 +190,16 @@ async def read_output(
             lobject.close()
 
 
-async def read_log(docker, container, activation_instance_id, db):
-    line_number = 0
+async def read_log(
+    docker, container, activation_instance_id, activation_instance_log_id, db
+):
     async with large_object_factory(
         oid=activation_instance_log_id, session=db, mode="wt"
     ) as lobject:
         async for chunk in container.log(
             stdout=True, stderr=True, follow=True
         ):
-            await lobject.write(buff)
+            await lobject.write(chunk)
             await lobject.flush()  # Does a commit
             await updatemanager.broadcast(
                 f"/activation_instance/{activation_instance_id}",

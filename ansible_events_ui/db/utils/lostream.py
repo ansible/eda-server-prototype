@@ -1,5 +1,4 @@
 import logging
-import os
 from io import SEEK_SET, UnsupportedOperation
 from typing import Tuple, Union
 
@@ -175,7 +174,7 @@ select lo_close(:_fd) as lofd;
         if self.imode & self.INV_WRITE:
             await self.flush()
 
-    async def delete(self: "Lobject") -> None:
+    async def delete(self: "LObject") -> None:
         if self.oid is not None and self.oid > 0:
             LOG.debug(f"LObject Delete large object oid={self.oid}")
             await self.session.execute(
@@ -217,15 +216,10 @@ select m.oid,
 async def large_object_factory(
     oid: int = 0,
     mode: str = "rb",
-    session: AsyncSession = Depends(get_db_session()),
+    session: AsyncSession = Depends(get_db_session),
     *,
     chunk_size=CHUNK_SIZE,
 ) -> LObject:
-    """
-    Check to see if a large object exists. If so, use the OID and length when creating a LObject.
-    Else, Create a large object if mode includes 'a' or 'w'.
-    Else, Raise a FileNotFound exception as no large object with the specified OID exists.
-    """
     if oid > 0:
         _exists, _length = await _verify_large_object(oid, session)
     else:

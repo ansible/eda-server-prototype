@@ -17,6 +17,10 @@ from ansible_events_ui.db.dependency import (
     get_db_session,
     get_db_session_factory,
 )
+from ansible_events_ui.db.utils.lostream import (
+    CHUNK_SIZE,
+    large_object_factory,
+)
 from ansible_events_ui.managers import updatemanager
 from ansible_events_ui.ruleset import activate_rulesets, inactivate_rulesets
 
@@ -157,20 +161,20 @@ async def create_activation_instance(
     settings: Settings = Depends(get_settings),
 ):
     query = (
-        select(
-            inventories.c.inventory,
-            rulebooks.c.rulesets,
-            extra_vars.c.extra_var,
+        sa.select(
+            models.inventories.c.inventory,
+            models.rulebooks.c.rulesets,
+            models.extra_vars.c.extra_var,
         )
-        .join(inventories, activations.c.inventory_id == inventories.c.id)
-        .join(rulebooks, activations.c.rulebook_id == rulebooks.c.id)
-        .join(extra_vars, activations.c.extra_var_id == extra_vars.c.id)
-        .where(activations.c.id == activation.id)
+        .join(models.inventories, activations.c.inventory_id == models.inventories.c.id)
+        .join(models.rulebooks, activations.c.rulebook_id == models.rulebooks.c.id)
+        .join(models.extra_vars, activations.c.extra_var_id == models.extra_vars.c.id)
+        .where(models.activations.c.id == activation.id)
     )
     activation_data = (await db.execute(query)).first()
 
     query = (
-        insert(models.activation_instances)
+        sa.insert(models.activation_instances)
         .values(
             name=a.name,
             rulebook_id=a.rulebook_id,
@@ -180,8 +184,8 @@ async def create_activation_instance(
             execution_environment=a.execution_environment,
         )
         .returning(
-            activation_instances.c.id,
-            activation_instances.c.log_id,
+            models.activation_instances.c.id,
+            models.activation_instances.c.log_id,
         )
     )
     result = await db.execute(query)
@@ -273,13 +277,14 @@ async def delete_activation_instance(
 async def stream_activation_instance_logs(
     activation_instance_id: int, db: AsyncSession = Depends(get_db_session)
 ):
-    query = select(activation_instances.c.log_id).where(
-        activation_instances.c.id == activation_instance_id
+    query = sa.select(models.activation_instances.c.log_id).where(
+        models.activation_instances.c.id == activation_instance_id
     )
     cur = await db.execute(query)
     res = cur.first().log_id
 
-    lobject = await large_object_factory(log_id, "rt", db)
+    read_chunk_size = CHUNK_SIZE
+    lobject = await large_object_factory(log_id, "rt", db, chunk_size=read_chunk_size)
     async with lobject:
         async for buff in lobject.gread():
             await updatemanager.broadcast(

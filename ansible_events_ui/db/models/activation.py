@@ -81,8 +81,10 @@ restart_policies = sa.Table(
 )
 
 
-# This table will have an pre-insert trigger that will set the log_id if it is null.
-# This table will have a post-delete trigger that will cascade delete action to the large object table.
+# This table will have an pre-insert trigger that will
+# set the log_id if it is null.
+# This table will have a post-delete trigger that will
+# cascade delete action to the large object table.
 activation_instances = sa.Table(
     "activation_instance",
     metadata,
