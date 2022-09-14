@@ -1,6 +1,6 @@
 commonLabels:
   app: eda-postgres
 resources:
-- deployment.yaml
-- service.yaml
-- pvc.yaml
+  - deployment.yaml
+  - service.yaml
+  - pvc.yaml

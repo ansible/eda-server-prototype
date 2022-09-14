@@ -3,7 +3,7 @@ const { merge } = require("webpack-merge");
 const common = require("./webpack.common.js");
 const { stylePaths } = require("../stylePaths");
 const HOST = process.env.HOST || "localhost";
-const PORT = process.env.PORT || "9000";
+const PORT = process.env.PORT || "8080";
 
 module.exports = merge(common('development'), {
   mode: "development",
@@ -16,14 +16,20 @@ module.exports = merge(common('development'), {
     historyApiFallback: true,
     open: true,
     headers: {
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, PATCH, OPTIONS",
-    "Access-Control-Allow-Headers": "X-Requested-With, content-type, Authorization"
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, PATCH, OPTIONS",
+      "Access-Control-Allow-Headers": "X-Requested-With, content-type, Authorization"
     },
     proxy: {
       '/api': {
-         target: 'http://localhost:8080',
-         secure: false
+        target: 'http://localhost:9000',
+        changeOrigin: true,
+        ws: true
+      },
+      '/ping': {
+        target: 'http://localhost:9000',
+        changeOrigin: true,
+        ws: true
       }
     }
   },

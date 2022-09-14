@@ -10,7 +10,7 @@ class Settings(BaseSettings):
     log_level: str = "INFO"
 
     host: str = "127.0.0.1"
-    port: int = 8080
+    port: int = 9000
 
     database_url: str = (
         "postgresql+asyncpg://postgres:secret@localhost:5432/ansible_events"

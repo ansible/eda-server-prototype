@@ -1,3 +1,4 @@
 resources:
-- ./events-ui
+- ./eda-frontend
+- ./eda-server
 - ./postgres

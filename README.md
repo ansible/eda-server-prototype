@@ -37,48 +37,59 @@ ansible-galaxy collection install benthomasson.eda
 
 ### 4. Services
 
-You need to set up a PostgreSQL database sever. The easiest way is using the `docker-compose`:
+You need to start up a PostgreSQL database sever.
 
 ```shell
-docker-compose -p ansible-events -f tools/docker/docker-compose.yml up -d postgres
+task dev:services:start
 ```
 
 Then run database migrations:
 
 ```shell
-alembic upgrade head
+task dev:run:migrations
 ```
 
-### 5. User interface
-
-Build UI files (requires Node >= v16):
+### 5. Start server
 
 ```shell
-cd ui
-npm install
-npm run build
-cd ..
+task dev:api:start
 ```
 
-### 6. Start server
+### 6. User interface
+
+Build UI files (requires Node >= v16) (**NOTE:** node 17 does not seem to work with websockets):
 
 ```shell
-ansible-events-ui
+task dev:ui:start
 ```
 
-Visit this url: <http://localhost:8080/docs#/auth/register_register_api_auth_register_post>
+Visit this url: <http://localhost/api/docs/auth/register_register_api_auth_register_post>
 
 Click "Try it out" on `/api/auth/register`
+
 
 Change email and password
 
 Click execute
 
-Visit this url: <http://localhost:8080/eda>
+Visit this url: 
+  - http://localhost:8080/eda
 
-Also you can check the [openapi specification.](http://localhost:8080/docs)
+For API docs
+  - http://localhost:8080/api/docs
+  - http://localhost:8080/api/redocs
+  - http://localhost:8080/api/openapi.json
+
+Also you can check the [openapi specification.](http://localhost/docs)
 
 You have set up the development environment.
+
+**Note:** 
+  Instead of running the above tasks individually, you can run the following.
+
+```sh
+task dev:start:all
+```
 
 ## Run the application with docker-compose
 
@@ -108,15 +119,15 @@ minikube status
 ```
 
 Build image and deployment files.
-(If you do not provide an image:version as shown below it will default to "eda:latest")
+(If you do not provide a version as shown below docker tag will default to "latest")
 ```sh
-task minikube:build -- eda:001
+task minikube:build -- 001
 ```
 
 Deploy application to minikube.
-(If you do not provide an image:version as shown below it will default to "eda:latest")
+(If you do not provide a version as shown below docker tag will default to "latest")
 ```sh
-task minikube:deploy -- eda:001
+task minikube:deploy -- 001
 ```
 
 Forward the webserver port to local host.
@@ -131,13 +142,14 @@ In a second terminal run the following cmd to create a `dev` user with a passwor
 scripts/createuser.sh dev_user@redhat.com none2tuff
 ```
 
-Visit this url: http://localhost:8080/eda
+Visit this url for EDA app 
+  - http://localhost:8080/eda
 
-- **Note:** 
+**Note:** 
   Instead of running the above build, deploy, and minikube-fp-ui tasks individually. 
   It is possible to do the following, being mindful that it will use default values.
 ```sh
-$ task minikube:all
+task minikube:all
 ```
 
 You have set up the development environment.

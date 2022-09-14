@@ -1,8 +1,21 @@
 version: '3.9'
 
 services:
-  app:
-    image: ansible-events-ui
+  frontend:
+    image: eda-frontend
+    container_name: eda-frontend
+    build:
+      context: ../../
+      dockerfile: tools/docker/nginx/Dockerfile
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    depends_on:
+      server:
+        condition: service_healthy
+  server:
+    image: eda-server
+    container_name: eda-server
     build:
       context: ../../
       dockerfile: tools/docker/Dockerfile
@@ -17,7 +30,7 @@ services:
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:z"
     ports:
-      - "8080:8080"
+      - "9000:9000"
     environment:
       - AE_HOST=0.0.0.0
       - AE_DATABASE_URL=postgresql+asyncpg://postgres:secret@postgres/ansible_events
@@ -25,20 +38,21 @@ services:
       postgres:
         condition: service_healthy
     healthcheck:
-      test: curl -q http://localhost:8080/ping
+      test: curl -q http://localhost:9000/ping
       interval: 5s
       timeout: 5s
       retries: 10
 
   wait_for_app:
-    image: ansible-events-ui
+    image: eda-server
     command: echo app running!
     depends_on:
-      app:
+      server:
         condition: service_healthy
 
   postgres:
     image: "docker.io/library/postgres:13"
+    container_name: eda-postgres
     environment:
       - "POSTGRES_PASSWORD=secret"
       - "POSTGRES_DB=ansible_events"

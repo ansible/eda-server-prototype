@@ -3,6 +3,8 @@
 version: '3'
 
 vars:
+  DEV_CMD: "scripts/eda_dev.sh"
+  MINIKUBE_CMD: "scripts/eda_kube.sh"
   DOCKER_COMPOSE: "docker-compose"
   DOCKER_COMPOSE_ARGS: "--project-name eda --file tools/docker/docker-compose.yml"
 
@@ -56,6 +58,88 @@ tasks:
     cmds:
       - black .
 
+  dev:
+    desc: "Run eda_dev.sh with specified CLI arguments."
+    summary: |
+      Run eda_dev.sh with specified CLI arguments.
+
+      Example:
+        $ task dev -- services-start
+    cmds:
+      - '{{.DEV_CMD}} {{.CLI_ARGS}}'
+
+  dev:services:start:
+    desc: "Start EDA service containers"
+    cmds:
+      - task: dev
+        vars:
+          CLI_ARGS: services-start
+
+  dev:services:stop:
+    desc: "Stop EDA service containers"
+    cmds:
+      - task: dev
+        vars:
+          CLI_ARGS: services-stop
+
+  dev:services:clean:
+    desc: "Clean up EDA service image(s) & volume(s)"
+    cmds:
+      - task: dev
+        vars:
+          CLI_ARGS: services-clean
+
+  dev:run:migrations:
+    desc: "Run DB migrations"
+    cmds:
+      - task: dev
+        vars:
+          CLI_ARGS: db-migrations
+
+  dev:api:start:
+    desc: "Start API server"
+    cmds:
+      - task: dev
+        vars:
+          CLI_ARGS: api-start
+
+  dev:api:stop:
+    desc: "Stop API server"
+    cmds:
+      - task: dev
+        vars:
+          CLI_ARGS: api-stop
+
+  dev:ui:start:
+    desc: "Start UI server"
+    cmds:
+      - task: dev
+        vars:
+          CLI_ARGS: ui-start
+
+  dev:ui:stop:
+    desc: "Stop UI server"
+    cmds:
+      - task: dev
+        vars:
+          CLI_ARGS: ui-stop
+
+  dev:all:start:
+    desc: "Start dev environment"
+    cmds:
+      - task: dev:services:start
+      - task: dev:run:migrations
+      - task: dev:api:start
+      - task: dev:ui:start
+
+  dev:all:stop:
+    desc: "Halt dev environment and cleanup services"
+    cmds:
+      - task: dev:ui:stop
+      - task: dev:api:stop
+      - task: dev:services:stop
+      - task: dev:services:clean
+
   docker:
     desc: "Run docker-compose with specified CLI arguments."
     summary: |
@@ -101,26 +185,44 @@ tasks:
         vars:
           CLI_ARGS: down --volumes
 
+  minikube:
+    desc: "Run eda_kube.sh with specified CLI arguments."
+    summary: |
+      Run eda.sh with specified CLI arguments.
+
+      Example:
+        $ task minikube -- services-start
+    cmds:
+      - '{{.MINIKUBE_CMD}} {{.CLI_ARGS}}'
+
   minikube:build:
     desc: "Build docker image and push to minikube"
     cmds:
-      - scripts/eda_kube.sh build {{.CLI_ARGS}}
+      - task: minikube
+        vars:
+          CLI_ARGS: build {{.CLI_ARGS}}
 
   minikube:deploy:
     desc: "Build deployment and deploy to minikube"
     deps: [minikube:clean]
     cmds:
-      - scripts/eda_kube.sh deploy {{.CLI_ARGS}}
+      - task: minikube
+        vars:
+          CLI_ARGS: deploy {{.CLI_ARGS}}
 
   minikube:clean:
     desc: "Clean deployment directory and clean minikube resources"
     cmds:
-      - scripts/eda_kube.sh clean
+      - task: minikube
+        vars:
+          CLI_ARGS: clean
 
   minikube:fp:ui:
     desc: "forward local port to ui instance port in minikube"
     cmds:
-      - scripts/eda_kube.sh port-forward-ui {{.CLI_ARGS}}
+      - task: minikube
+        vars:
+          CLI_ARGS: port-forward-ui {{.CLI_ARGS}}
 
   minikube:all:
     desc: "build, deploy, and portforward UI"
