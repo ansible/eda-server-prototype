@@ -75,6 +75,7 @@ async def activate_rulesets(
     host,
     port,
     db: AsyncSession,
+    encoding,
 ):
     """
     Spawn ansible-events.
@@ -111,7 +112,7 @@ async def activate_rulesets(
         activated_rulesets[activation_id] = proc
 
         task = asyncio.create_task(
-            read_output(proc, activation_id, log_id, db),
+            read_output(proc, activation_id, log_id, db, encoding),
             name=f"read_output {proc.pid}",
         )
         taskmanager.tasks.append(task)
@@ -149,7 +150,7 @@ async def activate_rulesets(
         activated_rulesets[activation_id] = container
 
         task = asyncio.create_task(
-            read_log(docker, container, activation_id, log_id, db),
+            read_log(docker, container, activation_id, log_id, db, encoding),
             name=f"read_log {container}",
         )
         taskmanager.tasks.append(task)
@@ -170,16 +171,14 @@ async def inactivate_rulesets(activation_id):
 
 
 async def read_output(
-    proc, activation_instance_id, activation_instance_log_id, db
+    proc, activation_instance_id, activation_instance_log_id, db, encoding
 ):
     # TODO(cutwater): Replace with FastAPI dependency injections,
     #   that is available in BackgroundTasks
-    read_chunk_size = CHUNK_SIZE
-
     async with large_object_factory(
-        oid=activation_instance_log_id, session=db, mode="wb"
+        db, oid=activation_instance_log_id, mode="wb", encoding=encoding
     ) as lobject:
-        for buff in iter(lambda: proc.stdout.read(read_chunk_size), b""):
+        for buff in iter(lambda: proc.stdout.read(CHUNK_SIZE), b""):
             await lobject.write(buff)
             await lobject.flush()  # Does a commit
             await updatemanager.broadcast(
@@ -191,10 +190,15 @@ async def read_output(
 
 
 async def read_log(
-    docker, container, activation_instance_id, activation_instance_log_id, db
+    docker,
+    container,
+    activation_instance_id,
+    activation_instance_log_id,
+    db,
+    encoding,
 ):
     async with large_object_factory(
-        oid=activation_instance_log_id, session=db, mode="wt"
+        db, oid=activation_instance_log_id, mode="wt", encoding=encoding
     ) as lobject:
         async for chunk in container.log(
             stdout=True, stderr=True, follow=True

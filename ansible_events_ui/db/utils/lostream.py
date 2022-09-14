@@ -4,15 +4,13 @@ import logging
 from io import UnsupportedOperation
 from typing import Tuple, Union
 
-from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
-
-from ansible_events_ui.db.dependency import get_db_session
 
 LOG = logging.getLogger(__name__)
 
+DEFAULT_BYTE_ENCODING = "utf-8"
 
-# Default read buffer size is
+# Default chunked buffer size intended for read
 CHUNK_SIZE = 1024**2
 
 
@@ -31,18 +29,24 @@ class LObject:
 
     def __init__(
         self,
+        session: AsyncSession,
         oid: int = 0,
         length: int = 0,
-        session: AsyncSession = None,
         *,
         chunk_size: int = CHUNK_SIZE,
         mode: str = "rb",
+        encoding: str = DEFAULT_BYTE_ENCODING,
     ):
         self.session = session
-        self.chunk_size = chunk_size if chunk_size > 0 else CHUNK_SIZE
+        if chunk_size <= 0:
+            raise ValueError(
+                "chunk_size must be an integer greater than zero."
+            )
+        self.chunk_size = chunk_size
         self.oid = oid
         self.length = length
         self.closed = False
+        self.encoding = encoding
 
         self.imode, self.text_data, self.append = self._resolve_mode(mode)
         self.pos = self.length if self.append else 0
@@ -53,13 +57,13 @@ class LObject:
                 f"Mode {mode} must be one of {sorted(self.VALID_MODES)}"
             )
 
-        _text_data = mode.endswith("t")
-        _append = mode.startswith("a")
-        _mode = 0
+        text_data = mode.endswith("t")
+        append = mode.startswith("a")
+        imode = 0
         for c in mode:
-            _mode |= self.MODE_MAP.get(c, 0)
+            imode |= self.MODE_MAP.get(c, 0)
 
-        return _mode, _text_data, _append
+        return imode, text_data, append
 
     def closed_check(self):
         if self.closed:
@@ -76,9 +80,10 @@ class LObject:
 
     async def gread(self) -> Union[bytes, str]:
         self.pos = 0
-        buff = b"\x00"
-        while len(buff) > 0:
+        while True:
             buff = await self.read()
+            if not buff:
+                break
             yield buff
 
     async def read(self) -> Union[bytes, str]:
@@ -97,30 +102,30 @@ select lo_get(:_oid, :_pos, :_len) as lo_bytes
         buff = getattr(res, "lo_bytes", b"")  # Handle null recordk
         self.pos += len(buff)
 
-        return buff.decode("utf-8") if self.text_data else buff
+        return buff.decode(self.encoding) if self.text_data else buff
 
     async def write(self, buff: Union[str, bytes]) -> int:
         self.closed_check()
         if self.imode == self.INV_READ:
             raise UnsupportedOperation("not writeable")
 
-        if len(buff) > 0:
-            sql = """
+        if not buff:
+            return 0
+
+        sql = """
 select lo_put(:_oid, :_pos, :_buff) as lo_bytes
 ;
 """
-            if self.text_data and isinstance(buff, str):
-                buff = buff.encode("utf-8")
+        if self.text_data and isinstance(buff, str):
+            buff = buff.encode(self.encoding)
 
-            bufflen = len(buff)
-            await self.session.execute(
-                sql, {"_oid": self.oid, "_pos": self.pos, "_buff": buff}
-            )
-            self.pos += bufflen
+        bufflen = len(buff)
+        await self.session.execute(
+            sql, {"_oid": self.oid, "_pos": self.pos, "_buff": buff}
+        )
+        self.pos += bufflen
 
-            return bufflen
-        else:
-            return 0
+        return bufflen
 
     async def flush(self) -> None:
         self.closed_check()
@@ -200,28 +205,30 @@ select m.oid,
 
 
 async def large_object_factory(
+    session: AsyncSession,
     oid: int = 0,
     mode: str = "rb",
-    session: AsyncSession = Depends(get_db_session),
     *,
-    chunk_size=CHUNK_SIZE,
+    chunk_size: int = CHUNK_SIZE,
+    encoding: str = DEFAULT_BYTE_ENCODING,
 ) -> LObject:
     if oid > 0:
-        _exists, _length = await _verify_large_object(oid, session)
+        exists, length = await _verify_large_object(oid, session)
     else:
-        _exists, _length = False, 0
+        exists, length = False, 0
 
-    if not _exists:
+    if not exists:
         if "a" in mode or "w" in mode:
             oid = await _create_large_object(session)
-            _length = 0
+            length = 0
         else:
             raise FileNotFoundError(f"Large object {oid} does not exist.")
 
     return LObject(
-        oid=oid,
-        length=_length,
         session=session,
+        oid=oid,
+        length=length,
         chunk_size=chunk_size,
         mode=mode,
+        encoding=encoding,
     )

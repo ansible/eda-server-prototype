@@ -11,12 +11,12 @@ import ansible_events_ui.db.utils.lostream as los
 async def test_factory_get_nonexist_lob(client: AsyncClient, db: AsyncSession):
     exc = None
     try:
-        lob = await los.large_object_factory(0, "rb", db)
+        lob = await los.large_object_factory(db, 0, "rb")
     except FileNotFoundError as e:
         exc = e
     assert isinstance(exc, FileNotFoundError)
 
-    lob = await los.large_object_factory(0, "wb", db)
+    lob = await los.large_object_factory(db, 0, "wb")
     assert isinstance(lob, los.LObject)
     assert lob.oid is not None and lob.oid > 0
 
@@ -28,7 +28,7 @@ async def test_factory_get_nonexist_lob(client: AsyncClient, db: AsyncSession):
     exists, _ = await los._verify_large_object(lob.oid, db)
     assert not exists
 
-    lob = await los.large_object_factory(0, "ab", db)
+    lob = await los.large_object_factory(db, 0, "ab")
     assert isinstance(lob, los.LObject)
     assert lob.oid is not None and lob.oid > 0
 
@@ -49,7 +49,7 @@ async def test_factory_get_exist_lob(client: AsyncClient, db: AsyncSession):
     exists, _ = await los._verify_large_object(oid, db)
     assert exists
 
-    lob = await los.large_object_factory(oid, "rb", db)
+    lob = await los.large_object_factory(db, oid, "rb")
     assert isinstance(lob, los.LObject)
 
     await lob.delete()
@@ -59,7 +59,7 @@ async def test_factory_get_exist_lob(client: AsyncClient, db: AsyncSession):
 
 @pytest.mark.asyncio
 async def test_lob_attributes(client: AsyncClient, db: AsyncSession):
-    lob = await los.large_object_factory(0, "wt", db)
+    lob = await los.large_object_factory(db, 0, "wt")
     assert isinstance(lob, los.LObject)
     assert lob.oid > 0
     assert lob.text_data
@@ -115,7 +115,7 @@ M  ,. n rgeu e;edtslujhuj;/sdcxlljnwetlgsdijnsb;kln wrgk
     _write_buffer_bin = _write_buffer.encode("utf-8")
     assert isinstance(_write_buffer_bin, bytes)
 
-    lob = await los.large_object_factory(0, "wt", db)
+    lob = await los.large_object_factory(db, 0, "wt")
 
     exc = None
     try:
@@ -138,8 +138,8 @@ M  ,. n rgeu e;edtslujhuj;/sdcxlljnwetlgsdijnsb;kln wrgk
         exc = e
     assert isinstance(exc, UnsupportedOperation)
 
-    lob2 = await los.large_object_factory(lob.oid, "rt", db)
-    lob3 = await los.large_object_factory(lob.oid, "rb", db)
+    lob2 = await los.large_object_factory(db, lob.oid, "rt")
+    lob3 = await los.large_object_factory(db, lob.oid, "rb")
 
     exc = None
     try:
@@ -163,8 +163,8 @@ M  ,. n rgeu e;edtslujhuj;/sdcxlljnwetlgsdijnsb;kln wrgk
     await lob2.close()
     await lob3.close()
 
-    lob2 = await los.large_object_factory(lob.oid, "rb", db, chunk_size=100)
-    lob3 = await los.large_object_factory(lob.oid, "rt", db, chunk_size=100)
+    lob2 = await los.large_object_factory(db, lob.oid, "rb", chunk_size=100)
+    lob3 = await los.large_object_factory(db, lob.oid, "rt", chunk_size=100)
     rlist = []
     rlist = [x async for x in lob3.gread()]
     riter = len(rlist)
@@ -182,7 +182,7 @@ M  ,. n rgeu e;edtslujhuj;/sdcxlljnwetlgsdijnsb;kln wrgk
     await lob2.close()
     await lob3.close()
 
-    lob = await los.large_object_factory(lob.oid, "wb", db)
+    lob = await los.large_object_factory(db, lob.oid, "wb")
     wbuff = _write_buffer_bin
     wbuff_len = len(wbuff)
     wrote = await lob.write(wbuff)
@@ -190,8 +190,8 @@ M  ,. n rgeu e;edtslujhuj;/sdcxlljnwetlgsdijnsb;kln wrgk
     await lob.close()
     assert lob.length == lob.pos
 
-    lob2 = await los.large_object_factory(lob.oid, "rt", db)
-    lob3 = await los.large_object_factory(lob.oid, "rb", db)
+    lob2 = await los.large_object_factory(db, lob.oid, "rt")
+    lob3 = await los.large_object_factory(db, lob.oid, "rb")
     rbufft = await lob2.read()
     rbuffb = await lob3.read()
     await lob2.close()

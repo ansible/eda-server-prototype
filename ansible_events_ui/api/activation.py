@@ -17,10 +17,7 @@ from ansible_events_ui.db.dependency import (
     get_db_session,
     get_db_session_factory,
 )
-from ansible_events_ui.db.utils.lostream import (
-    CHUNK_SIZE,
-    large_object_factory,
-)
+from ansible_events_ui.db.utils.lostream import large_object_factory
 from ansible_events_ui.managers import updatemanager
 from ansible_events_ui.ruleset import activate_rulesets, inactivate_rulesets
 
@@ -214,6 +211,7 @@ async def create_activation_instance(
             settings.server_name,
             settings.port,
             db,
+            settings.byte_encoding,
         )
     except aiodocker.exceptions.DockerError as e:
         return HTTPException(status_code=500, detail=str(e))
@@ -284,7 +282,9 @@ async def delete_activation_instance(
     response_model=List[schemas.ActivationLog],
 )
 async def stream_activation_instance_logs(
-    activation_instance_id: int, db: AsyncSession = Depends(get_db_session)
+    activation_instance_id: int,
+    db: AsyncSession = Depends(get_db_session),
+    settings: Settings = Depends(get_settings),
 ):
     query = sa.select(models.activation_instances.c.log_id).where(
         models.activation_instances.c.id == activation_instance_id
@@ -292,9 +292,8 @@ async def stream_activation_instance_logs(
     cur = await db.execute(query)
     log_id = cur.first().log_id
 
-    read_chunk_size = CHUNK_SIZE
     async with large_object_factory(
-        oid=log_id, mode="rt", session=db, chunk_size=read_chunk_size
+        db, oid=log_id, mode="rt", encoding=settings.byte_encoding
     ) as lobject:
         async for buff in lobject.gread():
             await updatemanager.broadcast(
