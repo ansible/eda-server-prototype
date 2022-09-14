@@ -42,6 +42,11 @@ class Rulebook(BaseModel):
     id: Optional[int]
 
 
+class RulebookRef(BaseModel):
+    id: Optional[int]
+    name: StrictStr
+
+
 class Inventory(BaseModel):
     name: StrictStr
     inventory: StrictStr
@@ -62,42 +67,6 @@ class Extravars(BaseModel):
 class ExtravarsRef(BaseModel):
     name: StrictStr
     id: Optional[int]
-
-
-class ActivationCreate(BaseModel):
-    name: StrictStr
-    description: Optional[StrictStr]
-    rulebook_id: int
-    inventory_id: int
-    restart_policy_id: int
-    playbook_id: int
-    activation_enabled: bool
-    extra_var_id: int
-    working_directory: StrictStr
-    execution_environment: StrictStr
-
-
-class ActivationBaseRead(ActivationCreate):
-    id: int
-
-
-class ActivationRead(ActivationBaseRead):
-    activation_status: Optional[StrictStr]
-    restarted_at: Optional[datetime]
-    restarted_count: int
-    created_at: datetime
-    modified_at: datetime
-    rulebook_name: StrictStr
-    inventory_name: StrictStr
-    extra_var_name: StrictStr
-    playbook_name: StrictStr
-    restart_policy_name: StrictStr
-
-
-class ActivationUpdate(BaseModel):
-    name: StrictStr
-    description: Optional[StrictStr]
-    activation_enabled: bool
 
 
 class ActivationInstance(BaseModel):
@@ -168,6 +137,53 @@ class ProjectList(BaseModel):
 
 class ProjectUpdate(BaseModel):
     name: StrictStr
+
+
+class RestartPolicy(BaseModel):
+    id: int
+    name: StrictStr
+
+
+class ActivationCreate(BaseModel):
+    name: StrictStr
+    description: Optional[StrictStr]
+    rulebook_id: int
+    inventory_id: int
+    restart_policy_id: int
+    playbook_id: int
+    is_enabled: bool
+    extra_var_id: int
+    working_directory: StrictStr
+    execution_environment: StrictStr
+
+
+class ActivationBaseRead(ActivationCreate):
+    id: int
+
+
+class ActivationRead(BaseModel):
+    id: int
+    name: StrictStr
+    description: Optional[StrictStr]
+    status: Optional[StrictStr]
+    is_enabled: bool
+    working_directory: StrictStr
+    execution_environment: StrictStr
+    rulebook: RulebookRef
+    inventory: InventoryRef
+    extra_var: ExtravarsRef
+    playbook: PlaybookRef
+    restart_policy: RestartPolicy
+    restarted_at: Optional[datetime]
+    restart_count: int
+    created_at: datetime
+    modified_at: datetime
+
+
+class ActivationUpdate(BaseModel):
+    name: StrictStr
+    description: Optional[StrictStr]
+    is_enabled: bool
 
 
 # Fast API Users

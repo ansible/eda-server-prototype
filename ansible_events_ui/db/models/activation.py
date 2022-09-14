@@ -48,10 +48,10 @@ activations = sa.Table(
         sa.ForeignKey("playbook.id", ondelete="CASCADE"),
         nullable=False,
     ),
-    sa.Column("activation_status", sa.String),
-    sa.Column("activation_enabled", sa.Boolean, nullable=False),
+    sa.Column("status", sa.String),
+    sa.Column("is_enabled", sa.Boolean, nullable=False),
     sa.Column("restarted_at", sa.DateTime(timezone=True)),
-    sa.Column("restarted_count", sa.Integer, nullable=False, default=0),
+    sa.Column("restart_count", sa.Integer, nullable=False, default=0),
     sa.Column(
         "created_at",
         sa.DateTime(timezone=True),

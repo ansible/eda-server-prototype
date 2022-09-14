@@ -14,7 +14,7 @@ TEST_ACTIVATION = {
     "description": "demo activation",
     "restart_policy_id": 1,
     "playbook_id": 1,
-    "activation_enabled": True,
+    "is_enabled": True,
     "working_directory": "/tmp",
     "execution_environment": "quay.io/ansible/eda-project",
 }
@@ -114,7 +114,7 @@ async def _create_activation(
                 working_directory=TEST_ACTIVATION["working_directory"],
                 restart_policy_id=foreign_keys["restart_policy_id"],
                 playbook_id=foreign_keys["playbook_id"],
-                activation_enabled=TEST_ACTIVATION["activation_enabled"],
+                is_enabled=TEST_ACTIVATION["is_enabled"],
                 extra_var_id=foreign_keys["extra_var_id"],
             )
         )
@@ -139,10 +139,7 @@ async def test_create_activation(client: AsyncClient, db: AsyncSession):
     assert len(activations) == 1
     activation = activations[0]
     assert activation["name"] == TEST_ACTIVATION["name"]
-    assert (
-        activation["activation_enabled"]
-        == TEST_ACTIVATION["activation_enabled"]
-    )
+    assert activation["is_enabled"] == TEST_ACTIVATION["is_enabled"]
 
 
 @pytest.mark.asyncio
@@ -204,11 +201,29 @@ async def test_read_activation(client: AsyncClient, db: AsyncSession):
 
     assert activation["name"] == TEST_ACTIVATION["name"]
     assert activation["id"] == activation_id
-    assert activation["playbook_id"] == foreign_keys["playbook_id"]
+    assert activation["is_enabled"] == TEST_ACTIVATION["is_enabled"]
+    assert activation["working_directory"] == "/tmp"
     assert (
-        activation["activation_enabled"]
-        == TEST_ACTIVATION["activation_enabled"]
+        activation["execution_environment"]
+        == TEST_ACTIVATION["execution_environment"]
     )
+    assert activation["rulebook"] == {
+        "id": foreign_keys["rulebook_id"],
+        "name": "ruleset.yml",
+    }
+    assert activation["inventory"] == {
+        "id": foreign_keys["inventory_id"],
+        "name": "inventory.yml",
+    }
+    assert activation["extra_var"] == {
+        "id": foreign_keys["extra_var_id"],
+        "name": "vars.yml",
+    }
+    assert activation["playbook"] == {
+        "id": foreign_keys["playbook_id"],
+        "name": "hello.yml",
+    }
+    assert activation["restart_policy"]["name"] == "test_restart"
 
 
 @pytest.mark.asyncio
@@ -225,7 +240,7 @@ async def test_update_activation(client: AsyncClient, db: AsyncSession):
     new_activation = {
         "name": "new demo",
         "description": "demo activation",
-        "activation_enabled": False,
+        "is_enabled": False,
     }
 
     response = await client.patch(
@@ -237,10 +252,7 @@ async def test_update_activation(client: AsyncClient, db: AsyncSession):
 
     assert activation["name"] == new_activation["name"]
     assert activation["description"] == new_activation["description"]
-    assert (
-        activation["activation_enabled"]
-        == new_activation["activation_enabled"]
-    )
+    assert activation["is_enabled"] == new_activation["is_enabled"]
 
 
 @pytest.mark.asyncio
@@ -264,7 +276,7 @@ async def test_update_activation_not_found(client: AsyncClient):
     new_activation = {
         "name": "new demo",
         "description": "demo activation",
-        "activation_enabled": False,
+        "is_enabled": False,
     }
 
     response = await client.patch(
