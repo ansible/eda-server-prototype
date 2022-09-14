@@ -1,5 +1,3 @@
-from http.client import ACCEPTED, CONFLICT, NOT_FOUND, UNPROCESSABLE_ENTITY
-
 import sqlalchemy as sa
 from fastapi import APIRouter, Depends, HTTPException, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -33,7 +31,7 @@ async def list_projects(db: AsyncSession = Depends(get_db_session)):
     "/api/projects/",
     response_model=schemas.ProjectRead,
     operation_id="create_projects",
-    status_code=ACCEPTED,
+    status_code=status.HTTP_201_CREATED,
 )
 async def create_project(
     project: schemas.ProjectCreate, db: AsyncSession = Depends(get_db_session)
@@ -41,11 +39,11 @@ async def create_project(
     found_hash, tempdir = await clone_project(project.url, project.git_hash)
     project.git_hash = found_hash
 
-    query = sa.select(sa.exists).where(projects.c.name == project.name)
-    project_exists = db.scalar(query)
+    query = sa.select(sa.exists().where(projects.c.name == project.name))
+    project_exists = await db.scalar(query)
     if project_exists:
         raise HTTPException(
-            status_code=CONFLICT,
+            status_code=status.HTTP_409_CONFLICT,
             detail=f"Project with name '{project.name}' already exists",
         )
 
@@ -59,7 +57,8 @@ async def create_project(
         result = await db.execute(query)
     except sa.exc.IntegrityError:
         raise HTTPException(
-            status_code=UNPROCESSABLE_ENTITY, detail="Unprocessable Entity."
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Unprocessable Entity.",
         )
 
     (project_id,) = result.inserted_primary_key
@@ -83,7 +82,9 @@ async def read_project(
     query = sa.select(projects).where(projects.c.id == project_id)
     project = (await db.execute(query)).first()
     if not project:
-        raise HTTPException(status_code=NOT_FOUND, detail="Project Not Found.")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Project Not Found."
+        )
 
     response = dict(project)
 
@@ -139,11 +140,9 @@ async def update_project(
     query = sa.select(projects).where(projects.c.id == project_id)
     stored_project = (await db.execute(query)).first()
     if not stored_project:
-        raise HTTPException(status_code=NOT_FOUND, detail="Project not found")
-
-    for key, val in project:
-        if not val:
-            project.__setattr__(key, stored_project[key])
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Project not found"
+        )
 
     query = (
         sa.update(projects)
@@ -155,7 +154,8 @@ async def update_project(
         await db.execute(query)
     except sa.exc.IntegrityError:
         raise HTTPException(
-            status_code=UNPROCESSABLE_ENTITY, detail="Unprocessable Entity."
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Unprocessable Entity.",
         )
 
     await db.commit()
