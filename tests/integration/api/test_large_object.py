@@ -9,12 +9,8 @@ import ansible_events_ui.db.utils.lostream as los
 
 @pytest.mark.asyncio
 async def test_factory_get_nonexist_lob(client: AsyncClient, db: AsyncSession):
-    exc = None
-    try:
+    with pytest.raises(FileNotFoundError):
         lob = await los.large_object_factory(db, 0, "rb")
-    except FileNotFoundError as e:
-        exc = e
-    assert isinstance(exc, FileNotFoundError)
 
     lob = await los.large_object_factory(db, 0, "wb")
     assert isinstance(lob, los.LObject)
@@ -117,12 +113,8 @@ M  ,. n rgeu e;edtslujhuj;/sdcxlljnwetlgsdijnsb;kln wrgk
 
     lob = await los.large_object_factory(db, 0, "wt")
 
-    exc = None
-    try:
+    with pytest.raises(UnsupportedOperation):
         await lob.read()
-    except Exception as e:
-        exc = e
-    assert isinstance(exc, UnsupportedOperation)
 
     wbuff = _write_buffer
     wbuff_len = len(wbuff)
@@ -131,29 +123,17 @@ M  ,. n rgeu e;edtslujhuj;/sdcxlljnwetlgsdijnsb;kln wrgk
     await lob.close()
     assert lob.length == lob.pos
 
-    exc = None
-    try:
+    with pytest.raises(UnsupportedOperation):
         await lob.read()
-    except Exception as e:
-        exc = e
-    assert isinstance(exc, UnsupportedOperation)
 
     lob2 = await los.large_object_factory(db, lob.oid, "rt")
     lob3 = await los.large_object_factory(db, lob.oid, "rb")
 
-    exc = None
-    try:
+    with pytest.raises(UnsupportedOperation):
         await lob2.write("asdf")
-    except Exception as e:
-        exc = e
-    assert isinstance(exc, UnsupportedOperation)
 
-    exc = None
-    try:
+    with pytest.raises(UnsupportedOperation):
         await lob2.truncate()
-    except Exception as e:
-        exc = e
-    assert isinstance(exc, UnsupportedOperation)
 
     rbuff = await lob2.read()
     assert rbuff == wbuff

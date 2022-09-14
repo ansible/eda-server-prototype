@@ -169,15 +169,7 @@ async def test_delete_activation_instance(
     inserted_id = cur.first().id
 
     num_activation_instances = (
-        (
-            await db.execute(
-                sa.select(label("ct", func.count())).select_from(
-                    models.activation_instances
-                )
-            )
-        )
-        .first()
-        .ct
+        await db.scalar(sa.select(func.count()).select_from(models.activation_instances))
     )
     assert num_activation_instances == inserted_rows == 1
 
@@ -185,15 +177,7 @@ async def test_delete_activation_instance(
     assert response.status_code == status_codes.HTTP_204_NO_CONTENT
 
     num_activation_instances = (
-        (
-            await db.execute(
-                sa.select(label("ct", func.count())).select_from(
-                    models.activation_instances
-                )
-            )
-        )
-        .first()
-        .ct
+        await db.scalar(sa.select(func.count()).select_from(models.activation_instances))
     )
     assert num_activation_instances == 0
 
@@ -206,15 +190,7 @@ async def test_ins_del_activation_instance_manages_log_lob(
     activation_id = await _create_activation(client, db, foreign_keys)
 
     total_ct = existing_ct = (
-        (
-            await db.execute(
-                sa.select(label("ct", func.count())).select_from(
-                    models.activation_instances
-                )
-            )
-        )
-        .first()
-        .ct
+        await db.scalar(sa.select(func.count()).select_from(models.activation_instances))
     )
 
     query = (

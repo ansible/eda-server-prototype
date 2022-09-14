@@ -95,11 +95,12 @@ class LObject:
 select lo_get(:_oid, :_pos, :_len) as lo_bytes
 ;
 """
-        cur = await self.session.execute(
+        buff = await self.session.scalar(
             sql, {"_oid": self.oid, "_pos": self.pos, "_len": self.chunk_size}
         )
-        res = cur.first()
-        buff = getattr(res, "lo_bytes", b"")  # Handle null recordk
+        if buff is None:
+            buff = b""
+
         self.pos += len(buff)
 
         return buff.decode(self.encoding) if self.text_data else buff
@@ -147,10 +148,9 @@ select lo_truncate(:_fd, :_len);
         close_sql = """
 select lo_close(:_fd) as lofd;
         """
-        cur = await self.session.execute(
+        fd = await self.session.scalar(
             open_sql, {"_oid": self.oid, "_mode": self.imode}
         )
-        fd = cur.first().lofd
         await self.session.execute(trunc_sql, {"_fd": fd, "_len": self.pos})
         await self.session.execute(close_sql, {"_fd": fd})
         self.length = self.pos
@@ -182,7 +182,7 @@ async def _create_large_object(session: AsyncSession) -> int:
     sql = """
 select lo_create(0) as loid;
     """
-    loid = (await session.execute(sql)).first().loid
+    loid = await session.scalar(sql)
     await session.commit()
     return loid
 
@@ -200,8 +200,10 @@ select m.oid,
    by m.oid;
     """
     rec = (await session.execute(sql, {"_oid": oid})).first()
+    if not rec:
+        rec = (None, None)
 
-    return (rec.oid, rec._length) if rec else (None, None)
+    return rec
 
 
 async def large_object_factory(
