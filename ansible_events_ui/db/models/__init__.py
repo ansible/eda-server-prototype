@@ -12,7 +12,7 @@ from .job import (
     jobs,
 )
 from .project import extra_vars, inventories, playbooks, projects
-from .rulebook import rulebooks, rules, rulesets
+from .rulebook import audit_rules, rulebooks, rules, rulesets
 from .user import User
 
 __all__ = (
@@ -39,5 +39,6 @@ __all__ = (
     # rulebook
     "rulebooks",
     "rules",
+    "audit_rules",
     "rulesets",
 )

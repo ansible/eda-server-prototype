@@ -65,4 +65,6 @@ job_instance_events = sa.Table(
     sa.Column("job_uuid", postgresql.UUID),
     sa.Column("counter", sa.Integer),
     sa.Column("stdout", sa.String),
+    sa.Column("type", sa.String),
+    sa.Column("created_at", sa.DateTime(timezone=True)),
 )
