@@ -45,7 +45,7 @@ async def create_activation(
         working_directory=activation.working_directory,
         restart_policy_id=activation.restart_policy_id,
         playbook_id=activation.playbook_id,
-        activation_enabled=activation.activation_enabled,
+        is_enabled=activation.is_enabled,
         extra_var_id=activation.extra_var_id,
     )
     try:
@@ -71,12 +71,12 @@ async def read_activation(
             models.activations.c.id,
             models.activations.c.name,
             models.activations.c.description,
-            models.activations.c.activation_enabled,
-            models.activations.c.activation_status,
+            models.activations.c.is_enabled,
+            models.activations.c.status,
             models.activations.c.working_directory,
             models.activations.c.execution_environment,
             models.activations.c.restarted_at,
-            models.activations.c.restarted_count,
+            models.activations.c.restart_count,
             models.activations.c.created_at,
             models.activations.c.modified_at,
             models.rulebooks.c.id.label("rulebook_id"),
@@ -90,19 +90,52 @@ async def read_activation(
             models.restart_policies.c.id.label("restart_policy_id"),
             models.restart_policies.c.name.label("restart_policy_name"),
         )
-        .select_from(
-            models.activations.join(models.rulebooks)
-            .join(models.inventories)
-            .join(models.extra_vars)
-            .join(models.playbooks)
-            .join(models.restart_policies)
-        )
+        .select_from(models.activations)
+        .join(models.rulebooks)
+        .join(models.inventories)
+        .join(models.extra_vars)
+        .join(models.playbooks)
+        .join(models.restart_policies)
         .where(models.activations.c.id == activation_id)
     )
-    result = (await db.execute(query)).one_or_none()
-    if result is None:
+    activation = (await db.execute(query)).one_or_none()
+    if activation is None:
         raise HTTPException(status_code=404, detail="Activation Not Found.")
-    return result
+
+    response = {
+        "id": activation["id"],
+        "name": activation["name"],
+        "description": activation["description"],
+        "is_enabled": activation["is_enabled"],
+        "status": activation["status"],
+        "working_directory": activation["working_directory"],
+        "execution_environment": activation["execution_environment"],
+        "restarted_at": activation["restarted_at"],
+        "restart_count": activation["restart_count"],
+        "created_at": activation["created_at"],
+        "modified_at": activation["modified_at"],
+        "rulebook": {
+            "id": activation["rulebook_id"],
+            "name": activation["rulebook_name"],
+        },
+        "inventory": {
+            "id": activation["inventory_id"],
+            "name": activation["inventory_name"],
+        },
+        "playbook": {
+            "id": activation["playbook_id"],
+            "name": activation["playbook_name"],
+        },
+        "restart_policy": {
+            "id": activation["restart_policy_id"],
+            "name": activation["restart_policy_name"],
+        },
+        "extra_var": {
+            "id": activation["extra_var_id"],
+            "name": activation["extra_var_name"],
+        },
+    }
+    return response
 
 
 @router.patch(
@@ -131,7 +164,7 @@ async def update_activation(
         .values(
             name=activation.name,
             description=activation.description,
-            activation_enabled=activation.activation_enabled,
+            is_enabled=activation.is_enabled,
         )
     )
     await db.commit()
