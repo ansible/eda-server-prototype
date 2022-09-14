@@ -8,6 +8,7 @@ def main():
     uvicorn.run(
         "ansible_events_ui.app:create_app",
         factory=True,
+        reload=True,
         host=settings.host,
         port=settings.port,
         log_level=settings.log_level.lower(),
