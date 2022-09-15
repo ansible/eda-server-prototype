@@ -28,7 +28,7 @@ services:
         "alembic upgrade head && ansible-events-ui"
       ]
     volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock:z"
+      - ${DOCKER_SOCKET_MOUNT:-/var/run/docker.sock}:/var/run/docker.sock:z
     ports:
       - "9000:9000"
     environment:

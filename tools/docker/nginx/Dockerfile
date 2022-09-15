@@ -6,7 +6,7 @@ COPY . $WORKDIR
 
 RUN cd ui && npm install && npm run build
 
-FROM nginx
+FROM docker.io/nginx
 ARG NGINX_CONF=tools/docker/nginx/default.conf
 ARG NGINX_CONFIGURATION_PATH=/etc/nginx/conf.d/
 
