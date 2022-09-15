@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: eda-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: eda-server
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app: eda-server
+    spec:
+      containers:
+        - args:
+            - /bin/bash
+            - -c
+            - alembic upgrade head && ansible-events-ui
+          env:
+            - name: AE_DATABASE_URL
+              value: postgresql+asyncpg://postgres:secret@postgres/ansible_events
+            - name: AE_HOST
+              value: 0.0.0.0
+          image: eda-server
+          imagePullPolicy: Never
+          name: eda-server
+          ports:
+            - containerPort: 8080
+          resources: {}
+      restartPolicy: Always
+status: {}
