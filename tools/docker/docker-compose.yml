@@ -40,9 +40,9 @@ services:
     healthcheck:
       test: curl -q http://localhost:9000/ping
       start_period: 10s
-      interval: 180s
+      interval: 60s
       timeout: 5s
-      retries: 10
+      retries: 3
 
   wait_for_app:
     image: eda-server
