@@ -25,11 +25,6 @@ module.exports = merge(common('development'), {
         target: 'http://localhost:9000',
         changeOrigin: true,
         ws: true
-      },
-      '/ping': {
-        target: 'http://localhost:9000',
-        changeOrigin: true,
-        ws: true
       }
     }
   },

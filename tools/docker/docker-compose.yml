@@ -38,7 +38,7 @@ services:
       postgres:
         condition: service_healthy
     healthcheck:
-      test: curl -q http://localhost:9000/ping
+      test: curl -q http://localhost:9000/api/ping
       start_period: 10s
       interval: 60s
       timeout: 5s

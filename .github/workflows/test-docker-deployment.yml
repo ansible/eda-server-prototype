@@ -17,5 +17,5 @@ jobs:
         working-directory: tools/docker
         run: |
           docker-compose up -d --build
-          curl -q http://localhost:8080/ping
+          curl -q http://localhost:8080/api/ping
           curl -q http://localhost:8080/eda
