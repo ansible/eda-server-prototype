@@ -141,11 +141,9 @@ clean-events-services() {
 start-events-ui() {
   cd "${EDA_PROJECT_HOME}"/ui
 
-  log-info "Building UI..."
+  log-info "Installing npm dependencies..."
   log-debug "npm install"
   npm install
-  log-debug "npm run build"
-  npm run build
 
   log-info "Starting UI (eda-frontend)"
   log-debug "npm run start:dev"
