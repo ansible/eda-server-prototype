@@ -8,7 +8,7 @@ from sqlalchemy import cast, insert, select
 from sqlalchemy.dialects import postgresql
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ansible_events_ui import schemas
+from ansible_events_ui import schema
 from ansible_events_ui.db import models
 from ansible_events_ui.db.dependency import get_db_session
 from ansible_events_ui.key import generate_ssh_keys
@@ -352,7 +352,7 @@ router.include_router(
     tags=["auth"],
 )
 router.include_router(
-    fastapi_users.get_register_router(schemas.UserRead, schemas.UserCreate),
+    fastapi_users.get_register_router(schema.UserRead, schema.UserCreate),
     prefix="/api/auth",
     tags=["auth"],
 )
@@ -362,12 +362,12 @@ router.include_router(
     tags=["auth"],
 )
 router.include_router(
-    fastapi_users.get_verify_router(schemas.UserRead),
+    fastapi_users.get_verify_router(schema.UserRead),
     prefix="/api/auth",
     tags=["auth"],
 )
 router.include_router(
-    fastapi_users.get_users_router(schemas.UserRead, schemas.UserUpdate),
+    fastapi_users.get_users_router(schema.UserRead, schema.UserUpdate),
     prefix="/api/users",
     tags=["users"],
 )
