@@ -21,7 +21,7 @@ projects = sa.Table(
     ),
     sa.Column("git_hash", sa.String),
     sa.Column("url", sa.String),
-    sa.Column("name", sa.String),
+    sa.Column("name", sa.String, unique=True),
     sa.Column("description", sa.String),
     sa.Column(
         "created_at",

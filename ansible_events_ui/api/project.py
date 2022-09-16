@@ -31,12 +31,22 @@ async def list_projects(db: AsyncSession = Depends(get_db_session)):
     "/api/projects/",
     response_model=schemas.ProjectRead,
     operation_id="create_projects",
+    status_code=status.HTTP_201_CREATED,
 )
 async def create_project(
     project: schemas.ProjectCreate, db: AsyncSession = Depends(get_db_session)
 ):
     found_hash, tempdir = await clone_project(project.url, project.git_hash)
     project.git_hash = found_hash
+
+    query = sa.select(sa.exists().where(projects.c.name == project.name))
+    project_exists = await db.scalar(query)
+    if project_exists:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=f"Project with name '{project.name}' already exists",
+        )
+
     query = sa.insert(projects).values(
         url=project.url,
         git_hash=project.git_hash,
@@ -46,7 +56,10 @@ async def create_project(
     try:
         result = await db.execute(query)
     except sa.exc.IntegrityError:
-        raise HTTPException(status_code=422, detail="Unprocessable Entity.")
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Unprocessable Entity.",
+        )
 
     (project_id,) = result.inserted_primary_key
     await sync_project(project_id, tempdir, db)
@@ -125,18 +138,23 @@ async def update_project(
     query = sa.select(projects).where(projects.c.id == project_id)
     stored_project = (await db.execute(query)).first()
     if not stored_project:
-        raise HTTPException(status_code=404, detail="Project not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Project Not Found."
+        )
 
     query = (
         sa.update(projects)
         .where(projects.c.id == project_id)
-        .values(name=project.name)
+        .values(name=project.name, description=project.description)
     )
 
     try:
         await db.execute(query)
     except sa.exc.IntegrityError:
-        raise HTTPException(status_code=422, detail="Unprocessable Entity.")
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Unprocessable Entity.",
+        )
 
     await db.commit()
 

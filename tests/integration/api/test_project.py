@@ -139,7 +139,7 @@ async def test_create_project(
         "/api/projects/",
         json=TEST_PROJECT,
     )
-    assert response.status_code == status_codes.HTTP_200_OK
+    assert response.status_code == status_codes.HTTP_201_CREATED
     data = response.json()
     assert "id" in data
     assert data["name"] == TEST_PROJECT["name"]
