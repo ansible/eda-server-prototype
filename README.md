@@ -21,13 +21,13 @@ sudo ln -s $(which podman) $(dirname $(which podman)/docker)
 
 **NOTE: dependency on private repositories**
 
-You must to [create a personal github token](https://docs.github.com/en/enterprise-server@3.4/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token) in order to be able to work with private repos and export it:
+You must [create a personal github token](https://docs.github.com/en/enterprise-server@3.4/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token) in order to be able to work with private repos and export it:
 
 ```
 export GITHUB_TOKEN=your token
 ```
 
-Also it will be convenient putting the previous line in your `.bashrc` or `.zshrc`
+It may also be convenient to place the above line in your `.bashrc` or `.zshrc`.
 
 ### 1. Clone the repository
 
