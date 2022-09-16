@@ -7,6 +7,7 @@ Functions:
 * activate_rulesets
     Arguments:
         - activation_id
+        - activation_instance_log_id
         - execution_environment
         - rulesets
         - inventory
@@ -32,9 +33,10 @@ import ansible_runner
 from sqlalchemy import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from ansible_events_ui.db.utils.lostream import CHUNK_SIZE, PGLargeObject
 from ansible_events_ui.managers import taskmanager
 
-from .db.models import activation_instance_logs, job_instance_events
+from .db.models import job_instance_events
 from .managers import updatemanager
 from .messages import JobEnd
 
@@ -61,6 +63,7 @@ def ensure_directory(directory):
 async def activate_rulesets(
     deployment_type,
     activation_id,
+    log_id,
     execution_environment,
     rulesets,
     inventory,
@@ -69,6 +72,7 @@ async def activate_rulesets(
     host,
     port,
     db: AsyncSession,
+    encoding,
 ):
     """
     Spawn ansible-events.
@@ -105,7 +109,7 @@ async def activate_rulesets(
         activated_rulesets[activation_id] = proc
 
         task = asyncio.create_task(
-            read_output(proc, activation_id, db),
+            read_output(proc, activation_id, log_id, db, encoding),
             name=f"read_output {proc.pid}",
         )
         taskmanager.tasks.append(task)
@@ -143,7 +147,7 @@ async def activate_rulesets(
         activated_rulesets[activation_id] = container
 
         task = asyncio.create_task(
-            read_log(docker, container, activation_id, db),
+            read_log(docker, container, activation_id, log_id, db, encoding),
             name=f"read_log {container}",
         )
         taskmanager.tasks.append(task)
@@ -156,50 +160,50 @@ async def activate_rulesets(
 
 
 async def inactivate_rulesets(activation_id):
-
     try:
         activated_rulesets[activation_id].kill()
     except ProcessLookupError:
         pass
 
 
-async def read_output(proc, activation_instance_id, db):
-    line_number = 0
-    while True:
-        line = await proc.stdout.readline()
-        if not line:
-            break
-        line = line.decode()
-        await updatemanager.broadcast(
-            f"/activation_instance/{activation_instance_id}",
-            json.dumps(["Stdout", {"stdout": line}]),
-        )
-        query = insert(activation_instance_logs).values(
-            line_number=line_number,
-            log=line,
-            activation_instance_id=activation_instance_id,
-        )
-        await db.execute(query)
-        await db.commit()
-        line_number += 1
+async def read_output(
+    proc, activation_instance_id, activation_instance_log_id, db, encoding
+):
+    # TODO(cutwater): Replace with FastAPI dependency injections,
+    #   that is available in BackgroundTasks
+    async with PGLargeObject(
+        db, oid=activation_instance_log_id, mode="wb", encoding=encoding
+    ) as lobject:
+        for buff in iter(lambda: proc.stdout.read(CHUNK_SIZE), b""):
+            await lobject.write(buff)
+            await db.commit()
+            await updatemanager.broadcast(
+                f"/activation_instance/{activation_instance_id}",
+                json.dumps(["Stdout", {"stdout": buff.decode()}]),
+            )
 
 
-async def read_log(docker, container, activation_instance_id, db):
-    line_number = 0
-    async for chunk in container.log(stdout=True, stderr=True, follow=True):
-        await updatemanager.broadcast(
-            f"/activation_instance/{activation_instance_id}",
-            json.dumps(["Stdout", {"stdout": chunk}]),
-        )
-        query = insert(activation_instance_logs).values(
-            line_number=line_number,
-            log=chunk,
-            activation_instance_id=activation_instance_id,
-        )
-        await db.execute(query)
-        await db.commit()
-        line_number += 1
-    await docker.close()
+async def read_log(
+    docker,
+    container,
+    activation_instance_id,
+    activation_instance_log_id,
+    db,
+    encoding,
+):
+    async with PGLargeObject(
+        db, oid=activation_instance_log_id, mode="wt", encoding=encoding
+    ) as lobject:
+        async for chunk in container.log(
+            stdout=True, stderr=True, follow=True
+        ):
+            await lobject.write(chunk)
+            await db.commit()
+            await updatemanager.broadcast(
+                f"/activation_instance/{activation_instance_id}",
+                json.dumps(["Stdout", {"stdout": chunk}]),
+            )
+        await docker.close()
 
 
 async def run_job(
