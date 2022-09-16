@@ -33,7 +33,11 @@ import ansible_runner
 from sqlalchemy import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ansible_events_ui.db.utils.lostream import CHUNK_SIZE, PGLargeObject
+from ansible_events_ui.db.utils.lostream import (
+    CHUNK_SIZE,
+    PGLargeObject,
+    decode_bytes_buff,
+)
 from ansible_events_ui.managers import taskmanager
 
 from .db.models import job_instance_events
@@ -72,7 +76,6 @@ async def activate_rulesets(
     host,
     port,
     db: AsyncSession,
-    encoding,
 ):
     """
     Spawn ansible-events.
@@ -109,7 +112,7 @@ async def activate_rulesets(
         activated_rulesets[activation_id] = proc
 
         task = asyncio.create_task(
-            read_output(proc, activation_id, log_id, db, encoding),
+            read_output(proc, activation_id, log_id, db),
             name=f"read_output {proc.pid}",
         )
         taskmanager.tasks.append(task)
@@ -147,7 +150,7 @@ async def activate_rulesets(
         activated_rulesets[activation_id] = container
 
         task = asyncio.create_task(
-            read_log(docker, container, activation_id, log_id, db, encoding),
+            read_log(docker, container, activation_id, log_id, db),
             name=f"read_log {container}",
         )
         taskmanager.tasks.append(task)
@@ -167,19 +170,21 @@ async def inactivate_rulesets(activation_id):
 
 
 async def read_output(
-    proc, activation_instance_id, activation_instance_log_id, db, encoding
+    proc, activation_instance_id, activation_instance_log_id, db
 ):
     # TODO(cutwater): Replace with FastAPI dependency injections,
     #   that is available in BackgroundTasks
     async with PGLargeObject(
-        db, oid=activation_instance_log_id, mode="wb", encoding=encoding
+        db, oid=activation_instance_log_id, mode="w"
     ) as lobject:
+        leftover = b""
         for buff in iter(lambda: proc.stdout.read(CHUNK_SIZE), b""):
             await lobject.write(buff)
             await db.commit()
+            buff, leftover = decode_bytes_buff(leftover + buff)
             await updatemanager.broadcast(
                 f"/activation_instance/{activation_instance_id}",
-                json.dumps(["Stdout", {"stdout": buff.decode()}]),
+                json.dumps(["Stdout", {"stdout": buff}]),
             )
 
 
@@ -189,15 +194,14 @@ async def read_log(
     activation_instance_id,
     activation_instance_log_id,
     db,
-    encoding,
 ):
     async with PGLargeObject(
-        db, oid=activation_instance_log_id, mode="wt", encoding=encoding
+        db, oid=activation_instance_log_id, mode="w"
     ) as lobject:
         async for chunk in container.log(
             stdout=True, stderr=True, follow=True
         ):
-            await lobject.write(chunk)
+            await lobject.write(chunk.encode())
             await db.commit()
             await updatemanager.broadcast(
                 f"/activation_instance/{activation_instance_id}",

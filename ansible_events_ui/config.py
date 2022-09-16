@@ -19,8 +19,6 @@ class Settings(BaseSettings):
     deployment_type: str = "docker"
     server_name: str = "localhost"
 
-    byte_encoding: str = "utf-8"
-
     class Config:
         env_prefix = "AE_"
         env_nested_delimiter = "__"

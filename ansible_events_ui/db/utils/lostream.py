@@ -1,17 +1,16 @@
 from __future__ import annotations
 
 import logging
-from io import UnsupportedOperation
-from typing import List, Tuple, Union
+from typing import AsyncIterator, List, Tuple, Union
 
 from sqlalchemy import column, func, select, text
 from sqlalchemy.dialects.postgresql import ARRAY, OID, array
-from sqlalchemy.dialects.postgresql.asyncpg import AsyncAdapt_asyncpg_dbapi
+from sqlalchemy.exc import DatabaseError, NoResultFound
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.sql.functions import coalesce, sum as sum_
 
 LOG = logging.getLogger(__name__)
-VALID_MODES = {"rwt", "rt", "wt", "at", "rwb", "rb", "wb", "ab"}
+VALID_MODES = {"rw", "r", "w", "a"}
 INV_READ = 0x00040000
 INV_WRITE = 0x00020000
 MODE_MAP = {"r": INV_READ, "w": INV_WRITE, "a": INV_READ | INV_WRITE}
@@ -22,21 +21,31 @@ DEFAULT_BYTE_ENCODING = "utf-8"
 CHUNK_SIZE = 1024**2
 
 
-class PGLargeObjectNotFound(AsyncAdapt_asyncpg_dbapi.IntegrityError):
+class PGLargeObjectError(Exception):
     pass
 
 
-class PGLargeObjectUnsupportedOp(UnsupportedOperation):
+class PGLargeObjectNotCreated(PGLargeObjectError, DatabaseError):
     pass
 
 
-class PGLargeObjectClosed(AsyncAdapt_asyncpg_dbapi.DatabaseError):
+class PGLargeObjectNotFound(PGLargeObjectError, NoResultFound):
+    pass
+
+
+class PGLargeObjectUnsupportedOp(PGLargeObjectError):
+    pass
+
+
+class PGLargeObjectClosed(PGLargeObjectUnsupportedOp):
     pass
 
 
 class PGLargeObject:
     """
     Facilitate PostgreSQL large object interface using server-side functions.
+
+    This class operates on buffers that are `bytes` type.
 
     As of 2022-09-01, there is no large object support directly
     in asyncpg or other async Python PostgreSQL drivers.
@@ -60,20 +69,12 @@ class PGLargeObject:
                                 = once at instantiation.)
         mode: str               = How object is to be opened:
                                   Valid values:
-                                    "rwt", "rt", "wt", "at",
-                                    "rwb", "rb", "wb", "ab"
+                                    "rw", "r", "w", "a",
                                     r = read (object must exist)
                                     w = write (object will be created)
                                     rw = read/write
                                     a = read/write, but initialize
                                         file pointer for append.
-                                    mode must end with 'b' or 't'
-                                    b = binary data in and out
-                                    t = text data in and out
-                                    Data are converted accordingly.
-        encoding: str           =   encoding to use
-                                    default is the same as
-                                    str.encode() ('utf-8')
     """
 
     def __init__(
@@ -93,9 +94,8 @@ class PGLargeObject:
         self.chunk_size = chunk_size
         self.oid = oid
         self.closed = False
-        self.encoding = encoding
 
-        self.imode, self.text_data, self.append = self.resolve_mode(mode)
+        self.imode, self.append = self.resolve_mode(mode)
         self.pos = self.length if self.append else 0
 
     async def __aenter__(self) -> PGLargeObject:
@@ -104,31 +104,44 @@ class PGLargeObject:
 
     async def __aexit__(self, *aexit_stuff: Tuple) -> None:
         await self.close()
-        return None
+
+    def __aiter__(self) -> AsyncIterator[bytes]:
+        return self
+
+    async def __anext__(self) -> bytes:
+        buff = await self.read()
+        if not buff:
+            raise StopAsyncIteration()
+        return buff
 
     @staticmethod
-    def resolve_mode(mode: str) -> Tuple:
+    def resolve_mode(mode: str) -> Tuple[int, bool]:
         if mode not in VALID_MODES:
             raise ValueError(
                 f"Mode {mode} must be one of {sorted(VALID_MODES)}"
             )
 
-        text_data = mode.endswith("t")
         append = mode.startswith("a")
         imode = 0
         for c in mode:
             imode |= MODE_MAP.get(c, 0)
 
-        return imode, text_data, append
+        return imode, append
 
     @staticmethod
     async def create_large_object(session: AsyncSession) -> int:
         sql = select(func.lo_create(0).label("loid"))
         oid = await session.scalar(sql)
+        if oid == 0:
+            raise PGLargeObjectNotCreated(
+                "Requested large object was not created."
+            )
         return oid
 
     @staticmethod
-    async def verify_large_object(session: AsyncSession, oid: int) -> Tuple:
+    async def verify_large_object(
+        session: AsyncSession, oid: int
+    ) -> Tuple[bool, int]:
         sel_cols = [
             column("oid"),
             sum_(
@@ -150,11 +163,13 @@ class PGLargeObject:
         )
         rec = (await session.execute(sql)).first()
         if not rec:
-            rec = (None, None)
+            rec = (False, 0)
         return rec
 
     @staticmethod
-    async def delete(session: AsyncSession, oids: List[int]) -> None:
+    async def delete_large_object(
+        session: AsyncSession, oids: List[int]
+    ) -> None:
         if oids and all(o > 0 for o in oids):
             sql = select(func.lo_unlink(text("oid"))).select_from(
                 func.unnest(array(oids, type_=ARRAY(OID))).alias("oid")
@@ -165,18 +180,13 @@ class PGLargeObject:
         if self.closed:
             raise PGLargeObjectClosed("Large object is closed")
 
-    async def gread(self) -> Union[bytes, str]:
-        self.pos = 0
-        while True:
-            buff = await self.read()
-            if not buff:
-                break
-            yield buff
-
     async def read(self) -> Union[bytes, str]:
         self.closed_check()
+
         if self.imode == INV_WRITE:
-            raise PGLargeObjectUnsupportedOp("not readable")
+            raise PGLargeObjectUnsupportedOp(
+                "Large Object class instance is set for write only"
+            )
 
         sql = select(func.lo_get(self.oid, self.pos, self.chunk_size))
         buff = await self.session.scalar(sql)
@@ -185,19 +195,18 @@ class PGLargeObject:
 
         self.pos += len(buff)
 
-        return buff.decode(self.encoding) if self.text_data else buff
+        return buff
 
-    async def write(self, buff: Union[str, bytes]) -> int:
+    async def write(self, buff: bytes) -> int:
         self.closed_check()
+
         if self.imode == INV_READ:
-            raise PGLargeObjectUnsupportedOp("not writeable")
+            raise PGLargeObjectUnsupportedOp(
+                "Large Object class instance is set for read only"
+            )
 
         if not buff:
             return 0
-
-        # Large objects store bytes only.
-        if isinstance(buff, str):
-            buff = buff.encode(self.encoding)
 
         bufflen = len(buff)
         sql = select(func.lo_put(self.oid, self.pos, buff))
@@ -209,6 +218,7 @@ class PGLargeObject:
 
     async def truncate(self) -> None:
         self.closed_check()
+
         if self.imode == INV_READ:
             raise PGLargeObjectUnsupportedOp("not writeable")
 
@@ -225,6 +235,7 @@ class PGLargeObject:
 
     async def open(self) -> None:
         self.closed_check()
+
         exists, length = await self.verify_large_object(self.session, self.oid)
         if exists:
             self.length = length
@@ -242,3 +253,17 @@ class PGLargeObject:
     async def close(self) -> None:
         if not self.closed and self.oid > 0 and self.writes > 0:
             await self.truncate()
+        self.closed = True
+
+
+def decode_bytes_buff(buff: bytes) -> Tuple[str, str]:
+    convlen = len(buff)
+    while convlen >= 0:
+        try:
+            obuff = (buff[:convlen]).decode()
+        except UnicodeDecodeError:
+            convlen -= 1
+        else:
+            break
+
+    return obuff, buff[convlen:]

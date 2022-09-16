@@ -1,6 +1,7 @@
 """Activation API endpoints."""
 import json
 import logging
+from typing import List
 
 import aiodocker.exceptions
 import sqlalchemy as sa
@@ -16,7 +17,10 @@ from ansible_events_ui.db.dependency import (
     get_db_session,
     get_db_session_factory,
 )
-from ansible_events_ui.db.utils.lostream import PGLargeObject
+from ansible_events_ui.db.utils.lostream import (
+    PGLargeObject,
+    decode_bytes_buff,
+)
 from ansible_events_ui.managers import updatemanager
 from ansible_events_ui.ruleset import activate_rulesets, inactivate_rulesets
 
@@ -217,27 +221,6 @@ async def create_activation_instance(
     ),
     settings: Settings = Depends(get_settings),
 ):
-    query = (
-        sa.select(
-            models.inventories.c.inventory,
-            models.rulebooks.c.rulesets,
-            models.extra_vars.c.extra_var,
-        )
-        .join(
-            models.inventories,
-            models.activations.c.inventory_id == models.inventories.c.id,
-        )
-        .join(
-            models.rulebooks,
-            models.activations.c.rulebook_id == models.rulebooks.c.id,
-        )
-        .join(
-            models.extra_vars,
-            models.activations.c.extra_var_id == models.extra_vars.c.id,
-        )
-        .where(models.activations.c.id == a.id)
-    )
-    activation_data = (await db.execute(query)).first()
 
     query = (
         sa.insert(models.activation_instances)
@@ -258,6 +241,30 @@ async def create_activation_instance(
     await db.commit()
     id_, log_id = result.first()
 
+    query = (
+        sa.select(
+            models.inventories.c.inventory,
+            models.rulebooks.c.rulesets,
+            models.extra_vars.c.extra_var,
+        )
+        .join(
+            models.inventories,
+            models.activation_instances.c.inventory_id
+            == models.inventories.c.id,
+        )
+        .join(
+            models.rulebooks,
+            models.activation_instances.c.rulebook_id == models.rulebooks.c.id,
+        )
+        .join(
+            models.extra_vars,
+            models.activation_instances.c.extra_var_id
+            == models.extra_vars.c.id,
+        )
+        .where(models.activation_instances.c.id == id_)
+    )
+    activation_data = (await db.execute(query)).first()
+
     try:
         await activate_rulesets(
             settings.deployment_type,
@@ -271,7 +278,6 @@ async def create_activation_instance(
             settings.server_name,
             settings.port,
             db,
-            settings.byte_encoding,
         )
     except aiodocker.exceptions.DockerError as e:
         return HTTPException(status_code=500, detail=str(e))
@@ -345,11 +351,13 @@ async def delete_activation_instance(
 
 @router.get(
     "/api/activation_instance_logs/",
-    response_model=List[schema.ActivationLog],
     operation_id="list_activation_instance_logs",
+    response_model=List[schema.ActivationLog],
 )
-async def list_activation_instance_logs(
-    activation_instance_id: int, db: AsyncSession = Depends(get_db_session)
+async def stream_activation_instance_logs(
+    activation_instance_id: int,
+    db: AsyncSession = Depends(get_db_session),
+    settings: Settings = Depends(get_settings),
 ):
     query = sa.select(models.activation_instances.c.log_id).where(
         models.activation_instances.c.id == activation_instance_id
@@ -357,14 +365,17 @@ async def list_activation_instance_logs(
     cur = await db.execute(query)
     log_id = cur.first().log_id
 
-    async with PGLargeObject(
-        db, oid=log_id, mode="rt", encoding=settings.byte_encoding
-    ) as lobject:
-        async for buff in lobject.gread():
+    async with PGLargeObject(db, oid=log_id, mode="r") as lobject:
+        leftover = b""
+        async for buff in lobject:
+            buff, leftover = decode_bytes_buff(leftover + buff)
             await updatemanager.broadcast(
                 f"/activation_instance/{activation_instance_id}",
                 json.dumps(["Stdout", {"stdout": buff}]),
             )
+
+    # Empty list return to satisfy the UI get() call
+    return []
 
 
 @router.get(

@@ -4,7 +4,6 @@ from fastapi import status as status_codes
 from httpx import AsyncClient
 from sqlalchemy import func
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.sql import label
 
 from ansible_events_ui.db import models
 from ansible_events_ui.db.utils.lostream import PGLargeObject
@@ -151,26 +150,27 @@ async def test_delete_activation_instance(
 ):
     foreign_keys = await _create_activation_dependent_objects(client, db)
 
-    (inserted_id,) = (await db.execute(
-        sa.insert(models.activation_instances)
-        .values(
-            name="test-activation",
-            rulebook_id=foreign_keys["rulebook_id"],
-            inventory_id=foreign_keys["inventory_id"],
-            extra_var_id=foreign_keys["extra_var_id"],
+    (inserted_id,) = (
+        await db.execute(
+            sa.insert(models.activation_instances).values(
+                name="test-activation",
+                rulebook_id=foreign_keys["rulebook_id"],
+                inventory_id=foreign_keys["inventory_id"],
+                extra_var_id=foreign_keys["extra_var_id"],
+            )
         )
-    )).inserted_primary_key
+    ).inserted_primary_key
 
-    num_activation_instances = (
-        await db.scalar(sa.select(func.count()).select_from(models.activation_instances))
+    num_activation_instances = await db.scalar(
+        sa.select(func.count()).select_from(models.activation_instances)
     )
     assert num_activation_instances == 1
 
     response = await client.delete(f"/api/activation_instance/{inserted_id}")
     assert response.status_code == status_codes.HTTP_204_NO_CONTENT
 
-    num_activation_instances = (
-        await db.scalar(sa.select(func.count()).select_from(models.activation_instances))
+    num_activation_instances = await db.scalar(
+        sa.select(func.count()).select_from(models.activation_instances)
     )
     assert num_activation_instances == 0
 
@@ -182,8 +182,8 @@ async def test_ins_del_activation_instance_manages_log_lob(
     foreign_keys = await _create_activation_dependent_objects(client, db)
     activation_id = await _create_activation(client, db, foreign_keys)
 
-    total_ct = existing_ct = (
-        await db.scalar(sa.select(func.count()).select_from(models.activation_instances))
+    total_ct = existing_ct = await db.scalar(
+        sa.select(func.count()).select_from(models.activation_instances)
     )
 
     query = (
