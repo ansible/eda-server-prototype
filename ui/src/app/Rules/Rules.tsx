@@ -169,7 +169,7 @@ const Rules: React.FunctionComponent = () => {
           onFilterChange={handleFilterChange}
           renderEmptyState={() => (
             <TableEmptyState
-              title={intl.formatMessage(sharedMessages.noprojects)}
+              title={intl.formatMessage(sharedMessages.noprojects_description)}
               Icon={PlusCircleIcon}
               PrimaryAction={() =>
                 filterValue !== '' ? (
@@ -195,7 +195,7 @@ const Rules: React.FunctionComponent = () => {
               }
               description={
                 filterValue === ''
-                  ? intl.formatMessage(sharedMessages.noprojects)
+                  ? intl.formatMessage(sharedMessages.noprojects_action)
                   : intl.formatMessage(
                   sharedMessages.clearAllFiltersDescription
                   )
