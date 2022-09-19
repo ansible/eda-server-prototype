@@ -1,10 +1,10 @@
 from fastapi import APIRouter, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from ansible_events_ui.api import router as api_router
-from ansible_events_ui.config import load_settings
-from ansible_events_ui.db.dependency import get_db_session_factory
-from ansible_events_ui.db.provider import DatabaseProvider
+from eda_server.api import router as api_router
+from eda_server.config import load_settings
+from eda_server.db.dependency import get_db_session_factory
+from eda_server.db.provider import DatabaseProvider
 
 ALLOWED_ORIGINS = [
     "http://localhost",

@@ -32,13 +32,13 @@ import ansible_runner
 from sqlalchemy import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ansible_events_ui.managers import taskmanager
+from eda_server.managers import taskmanager
 
 from .db.models import activation_instance_logs, job_instance_events
 from .managers import updatemanager
 from .messages import JobEnd
 
-logger = logging.getLogger("ansible_events_ui")
+logger = logging.getLogger("eda_server")
 
 activated_rulesets = {}
 ansible_events = shutil.which("ansible-events")

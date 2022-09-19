@@ -7,7 +7,7 @@ Create Date: 2022-08-24 10:53:43.903111+00:00
 """
 from alembic import op
 
-import ansible_events_ui.db.utils.migrations  # noqa: F401
+import eda_server.db.utils.migrations  # noqa: F401
 
 # revision identifiers, used by Alembic.
 revision = "0a069266ef71"

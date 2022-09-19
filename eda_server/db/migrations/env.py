@@ -6,8 +6,8 @@ from sqlalchemy import engine_from_config, pool
 from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import AsyncEngine
 
-from ansible_events_ui.config import load_settings
-from ansible_events_ui.db.models import metadata
+from eda_server.config import load_settings
+from eda_server.db.models import metadata
 
 config = context.config
 if config.config_file_name is not None:

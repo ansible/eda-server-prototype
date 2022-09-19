@@ -10,7 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from .db import models
 from .db.models import extra_vars, inventories, playbooks, rulebooks
 
-logger = logging.getLogger("ansible_events_ui")
+logger = logging.getLogger("eda_server")
 
 
 # FIXME(cutwater): Remove try: .. finally: pass

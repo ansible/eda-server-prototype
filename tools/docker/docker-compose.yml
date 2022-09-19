@@ -33,8 +33,8 @@ services:
     ports:
       - "9000:9000"
     environment:
-      - AE_HOST=0.0.0.0
-      - AE_DATABASE_URL=postgresql+asyncpg://postgres:secret@postgres/ansible_events
+      - EDA_HOST=0.0.0.0
+      - EDA_DATABASE_URL=postgresql+asyncpg://postgres:secret@postgres/ansible_events
     depends_on:
       postgres:
         condition: service_healthy

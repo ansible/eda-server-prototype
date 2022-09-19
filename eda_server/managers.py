@@ -3,7 +3,7 @@ from collections import defaultdict
 
 from starlette.websockets import WebSocket
 
-logger = logging.getLogger("ansible_events_ui")
+logger = logging.getLogger("eda_server")
 
 
 # TODO(cutwater): A more reliable, scalable and robust tasking system

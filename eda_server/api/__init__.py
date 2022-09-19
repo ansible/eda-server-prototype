@@ -8,16 +8,16 @@ from sqlalchemy import cast, insert, select
 from sqlalchemy.dialects import postgresql
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ansible_events_ui import schemas
-from ansible_events_ui.db import models
-from ansible_events_ui.db.dependency import get_db_session
-from ansible_events_ui.key import generate_ssh_keys
-from ansible_events_ui.managers import (
+from eda_server import schemas
+from eda_server.db import models
+from eda_server.db.dependency import get_db_session
+from eda_server.key import generate_ssh_keys
+from eda_server.managers import (
     secretsmanager,
     taskmanager,
     updatemanager,
 )
-from ansible_events_ui.users import (
+from eda_server.users import (
     bearer_backend,
     cookie_backend,
     current_active_user,
@@ -29,7 +29,7 @@ from .job import router as job_router
 from .project import router as project_router
 from .rulebook import router as rulebook_router
 
-logger = logging.getLogger("ansible_events_ui")
+logger = logging.getLogger("eda_server")
 
 router = APIRouter()
 router.include_router(activation_router)

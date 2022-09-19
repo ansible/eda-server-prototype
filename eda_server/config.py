@@ -20,7 +20,7 @@ class Settings(BaseSettings):
     server_name: str = "localhost"
 
     class Config:
-        env_prefix = "AE_"
+        env_prefix = "EDA_"
         env_nested_delimiter = "__"
 
 

@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 
-from ansible_events_ui.app import setup_cors, setup_routes
-from ansible_events_ui.db.dependency import get_db_session_factory
+from eda_server.app import setup_cors, setup_routes
+from eda_server.db.dependency import get_db_session_factory
 
 
 def create_test_app(settings, session):

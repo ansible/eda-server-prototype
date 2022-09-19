@@ -18,7 +18,7 @@ from .config import Settings, get_settings
 from .db.dependency import get_db_session
 from .db.models import User
 
-logger = logging.getLogger("ansible_events_ui.auth")
+logger = logging.getLogger("eda_server.auth")
 
 
 class UserManager(UUIDIDMixin, BaseUserManager[User, uuid.UUID]):

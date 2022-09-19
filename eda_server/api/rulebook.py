@@ -5,10 +5,10 @@ import yaml
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ansible_events_ui import schemas
-from ansible_events_ui.db import models
-from ansible_events_ui.db.dependency import get_db_session
-from ansible_events_ui.project import insert_rulebook_related_data
+from eda_server import schemas
+from eda_server.db import models
+from eda_server.db.dependency import get_db_session
+from eda_server.project import insert_rulebook_related_data
 
 router = APIRouter()
 

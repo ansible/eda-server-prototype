@@ -2,16 +2,16 @@ import sqlalchemy as sa
 from fastapi import APIRouter, Depends, HTTPException, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ansible_events_ui import schemas
-from ansible_events_ui.db.dependency import get_db_session
-from ansible_events_ui.db.models.project import (
+from eda_server import schemas
+from eda_server.db.dependency import get_db_session
+from eda_server.db.models.project import (
     extra_vars,
     inventories,
     playbooks,
     projects,
 )
-from ansible_events_ui.db.models.rulebook import rulebooks
-from ansible_events_ui.project import clone_project, sync_project
+from eda_server.db.models.rulebook import rulebooks
+from eda_server.project import clone_project, sync_project
 
 router = APIRouter()
 

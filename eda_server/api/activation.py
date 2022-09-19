@@ -10,17 +10,17 @@ from fastapi import APIRouter, Depends, Response, status
 from fastapi.exceptions import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ansible_events_ui import schemas
-from ansible_events_ui.config import Settings, get_settings
-from ansible_events_ui.db import models
-from ansible_events_ui.db.dependency import (
+from eda_server import schemas
+from eda_server.config import Settings, get_settings
+from eda_server.db import models
+from eda_server.db.dependency import (
     get_db_session,
     get_db_session_factory,
 )
-from ansible_events_ui.managers import updatemanager
-from ansible_events_ui.ruleset import activate_rulesets, inactivate_rulesets
+from eda_server.managers import updatemanager
+from eda_server.ruleset import activate_rulesets, inactivate_rulesets
 
-logger = logging.getLogger("ansible_events_ui")
+logger = logging.getLogger("eda_server")
 
 __all__ = ("router",)
 
