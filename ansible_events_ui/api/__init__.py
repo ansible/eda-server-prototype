@@ -325,7 +325,7 @@ async def handle_actions(data: dict, db: AsyncSession):
         await db.commit()
 
 
-@router.get("/api/tasks/")
+@router.get("/api/tasks/", tags=["tasks"])
 async def list_tasks():
     tasks = [
         {

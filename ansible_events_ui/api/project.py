@@ -22,6 +22,7 @@ router = APIRouter()
     "/api/projects/",
     response_model=List[schema.ProjectList],
     operation_id="list_projects",
+    tags=["projects"],
 )
 async def list_projects(db: AsyncSession = Depends(get_db_session)):
     query = sa.select(projects.c.id, projects.c.url, projects.c.name)
@@ -34,6 +35,7 @@ async def list_projects(db: AsyncSession = Depends(get_db_session)):
     response_model=schema.ProjectRead,
     operation_id="create_projects",
     status_code=status.HTTP_201_CREATED,
+    tags=["projects"],
 )
 async def create_project(
     project: schema.ProjectCreate, db: AsyncSession = Depends(get_db_session)
@@ -77,6 +79,7 @@ async def create_project(
     "/api/projects/{project_id}",
     response_model=schema.ProjectDetail,
     operation_id="read_project",
+    tags=["projects"],
 )
 async def read_project(
     project_id: int, db: AsyncSession = Depends(get_db_session)
@@ -131,6 +134,7 @@ async def read_project(
     "/api/projects/{project_id}",
     response_model=schema.ProjectRead,
     operation_id="update_project",
+    tags=["projects"],
 )
 async def update_project(
     project_id: int,
@@ -170,6 +174,7 @@ async def update_project(
     "/api/projects/{project_id}",
     status_code=status.HTTP_204_NO_CONTENT,
     operation_id="delete_project",
+    tags=["projects"],
 )
 async def delete_project(
     project_id: int, db: AsyncSession = Depends(get_db_session)
@@ -182,14 +187,14 @@ async def delete_project(
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
-@router.get("/api/playbooks/")
+@router.get("/api/playbooks/", tags=["playbooks"])
 async def list_playbooks(db: AsyncSession = Depends(get_db_session)):
     query = sa.select(playbooks)
     result = await db.execute(query)
     return result.all()
 
 
-@router.get("/api/playbook/{playbook_id}")
+@router.get("/api/playbook/{playbook_id}", tags=["playbooks"])
 async def read_playbook(
     playbook_id: int, db: AsyncSession = Depends(get_db_session)
 ):
@@ -198,14 +203,14 @@ async def read_playbook(
     return result.first()
 
 
-@router.get("/api/inventories/")
+@router.get("/api/inventories/", tags=["inventories"])
 async def list_inventories(db: AsyncSession = Depends(get_db_session)):
     query = sa.select(inventories)
     result = await db.execute(query)
     return result.all()
 
 
-@router.get("/api/inventory/{inventory_id}")
+@router.get("/api/inventory/{inventory_id}", tags=["inventories"])
 async def read_inventory(
     inventory_id: int, db: AsyncSession = Depends(get_db_session)
 ):
@@ -215,7 +220,7 @@ async def read_inventory(
     return result.first()
 
 
-@router.post("/api/inventory/")
+@router.post("/api/inventory/", tags=["inventories"])
 async def create_inventory(
     i: schema.Inventory, db: AsyncSession = Depends(get_db_session)
 ):
@@ -226,14 +231,14 @@ async def create_inventory(
     return {**i.dict(), "id": id_}
 
 
-@router.get("/api/extra_vars/")
+@router.get("/api/extra_vars/", tags=["extra vars"])
 async def list_extra_vars(db: AsyncSession = Depends(get_db_session)):
     query = sa.select(extra_vars)
     result = await db.execute(query)
     return result.all()
 
 
-@router.get("/api/extra_var/{extra_var_id}")
+@router.get("/api/extra_var/{extra_var_id}", tags=["extra vars"])
 async def read_extravar(
     extra_var_id: int, db: AsyncSession = Depends(get_db_session)
 ):
@@ -242,7 +247,7 @@ async def read_extravar(
     return result.first()
 
 
-@router.post("/api/extra_vars/")
+@router.post("/api/extra_vars/", tags=["extra vars"])
 async def create_extra_vars(
     e: schema.Extravars, db: AsyncSession = Depends(get_db_session)
 ):

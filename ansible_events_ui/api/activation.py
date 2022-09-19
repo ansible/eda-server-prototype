@@ -24,7 +24,7 @@ logger = logging.getLogger("ansible_events_ui")
 
 __all__ = ("router",)
 
-router = APIRouter()
+router = APIRouter(tags=["activations"])
 
 
 @router.post(
