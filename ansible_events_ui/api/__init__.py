@@ -195,6 +195,47 @@ async def handle_ansible_events(data: dict, db: AsyncSession):
         created_at=created,
     )
     await db.execute(query)
+
+    # Determine host status based on event type
+    # https://github.com/ansible/awx/blob/devel/awx/main/models/events.py#L164
+    host_status_list = {
+        "runner_on_failed": "failed",
+        "runner_on_ok": "ok",
+        "runner_on_error": "failed",
+        "runner_on_skipped": "skipped",
+        "runner_on_unreachable": "unreachable",
+        "runner_on_no_hosts": "no remaining",
+        "runner_on_async_poll": "polling",
+        "runner_on_async_ok": "async ok",
+        "runner_on_async_failed": "async failure",
+        "runner_retry": "retry",
+        "playbook_on_no_hosts_matched": "no matched",
+        "playbook_on_no_hosts_remaining": "no remaining",
+    }
+
+    event = event_data.get("event")
+    if event and event in host_status_list.keys():
+        data = event_data.get("event_data", {})
+
+        host = data.get("play_pattern")
+        playbook = data.get("playbook")
+        play = data.get("play")
+        task = data.get("task")
+        status = host_status_list.get(event)
+
+        if event == "runner_on_ok" and data.get("res", {}).get("changed"):
+            status = "changed"
+
+        query = insert(models.job_instance_hosts).values(
+            job_uuid=event_data.get("job_id"),
+            host=host,
+            playbook=playbook,
+            play=play,
+            task=task,
+            status=status,
+        )
+        await db.execute(query)
+
     await db.commit()
 
 
