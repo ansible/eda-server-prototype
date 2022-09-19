@@ -147,7 +147,7 @@ async def update_project(
 
 
 @router.delete(
-    "/api/project/{project_id}",
+    "/api/projects/{project_id}",
     status_code=status.HTTP_204_NO_CONTENT,
     operation_id="delete_project",
 )
