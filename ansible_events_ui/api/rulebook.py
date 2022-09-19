@@ -10,7 +10,7 @@ from ansible_events_ui.db import models
 from ansible_events_ui.db.dependency import get_db_session
 from ansible_events_ui.project import insert_rulebook_related_data
 
-router = APIRouter()
+router = APIRouter(tags=["rulebooks"])
 
 
 @router.get(
