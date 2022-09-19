@@ -8,7 +8,7 @@ from fastapi import APIRouter, Depends, Response, status
 from fastapi.exceptions import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ansible_events_ui import schemas
+from ansible_events_ui import schema
 from ansible_events_ui.db import models
 from ansible_events_ui.db.dependency import get_db_session
 from ansible_events_ui.managers import taskmanager
@@ -30,7 +30,7 @@ async def list_job_instances(db: AsyncSession = Depends(get_db_session)):
 
 @router.post("/api/job_instance/")
 async def create_job_instance(
-    j: schemas.JobInstance, db: AsyncSession = Depends(get_db_session)
+    j: schema.JobInstance, db: AsyncSession = Depends(get_db_session)
 ):
 
     query = sa.select(models.playbooks).where(

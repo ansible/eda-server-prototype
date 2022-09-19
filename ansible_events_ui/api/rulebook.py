@@ -5,7 +5,7 @@ import yaml
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ansible_events_ui import schemas
+from ansible_events_ui import schema
 from ansible_events_ui.db import models
 from ansible_events_ui.db.dependency import get_db_session
 from ansible_events_ui.project import insert_rulebook_related_data
@@ -15,7 +15,7 @@ router = APIRouter()
 
 @router.get(
     "/api/rules/",
-    response_model=List[schemas.Rule],
+    response_model=List[schema.Rule],
     operation_id="list_rules",
 )
 async def list_rules(db: AsyncSession = Depends(get_db_session)):
@@ -50,7 +50,7 @@ async def list_rules(db: AsyncSession = Depends(get_db_session)):
 
 @router.get(
     "/api/rules/{rule_id}/",
-    response_model=schemas.Rule,
+    response_model=schema.Rule,
     operation_id="show_rule",
 )
 async def show_rule(rule_id: int, db: AsyncSession = Depends(get_db_session)):
@@ -80,7 +80,7 @@ async def show_rule(rule_id: int, db: AsyncSession = Depends(get_db_session)):
 
 @router.post("/api/rulebooks/")
 async def create_rulebook(
-    rulebook: schemas.Rulebook, db: AsyncSession = Depends(get_db_session)
+    rulebook: schema.Rulebook, db: AsyncSession = Depends(get_db_session)
 ):
     query = sa.insert(models.rulebooks).values(
         name=rulebook.name, rulesets=rulebook.rulesets

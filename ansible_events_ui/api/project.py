@@ -1,8 +1,10 @@
+from typing import List
+
 import sqlalchemy as sa
 from fastapi import APIRouter, Depends, HTTPException, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ansible_events_ui import schemas
+from ansible_events_ui import schema
 from ansible_events_ui.db.dependency import get_db_session
 from ansible_events_ui.db.models.project import (
     extra_vars,
@@ -18,7 +20,7 @@ router = APIRouter()
 
 @router.get(
     "/api/projects/",
-    response_model=list[schemas.ProjectList],
+    response_model=List[schema.ProjectList],
     operation_id="list_projects",
 )
 async def list_projects(db: AsyncSession = Depends(get_db_session)):
@@ -29,12 +31,12 @@ async def list_projects(db: AsyncSession = Depends(get_db_session)):
 
 @router.post(
     "/api/projects/",
-    response_model=schemas.ProjectRead,
+    response_model=schema.ProjectRead,
     operation_id="create_projects",
     status_code=status.HTTP_201_CREATED,
 )
 async def create_project(
-    project: schemas.ProjectCreate, db: AsyncSession = Depends(get_db_session)
+    project: schema.ProjectCreate, db: AsyncSession = Depends(get_db_session)
 ):
     found_hash, tempdir = await clone_project(project.url, project.git_hash)
     project.git_hash = found_hash
@@ -73,7 +75,7 @@ async def create_project(
 
 @router.get(
     "/api/projects/{project_id}",
-    response_model=schemas.ProjectDetail,
+    response_model=schema.ProjectDetail,
     operation_id="read_project",
 )
 async def read_project(
@@ -127,12 +129,12 @@ async def read_project(
 
 @router.patch(
     "/api/projects/{project_id}",
-    response_model=schemas.ProjectRead,
+    response_model=schema.ProjectRead,
     operation_id="update_project",
 )
 async def update_project(
     project_id: int,
-    project: schemas.ProjectUpdate,
+    project: schema.ProjectUpdate,
     db: AsyncSession = Depends(get_db_session),
 ):
     query = sa.select(projects).where(projects.c.id == project_id)
@@ -215,7 +217,7 @@ async def read_inventory(
 
 @router.post("/api/inventory/")
 async def create_inventory(
-    i: schemas.Inventory, db: AsyncSession = Depends(get_db_session)
+    i: schema.Inventory, db: AsyncSession = Depends(get_db_session)
 ):
     query = sa.insert(inventories).values(name=i.name, inventory=i.inventory)
     result = await db.execute(query)
@@ -242,7 +244,7 @@ async def read_extravar(
 
 @router.post("/api/extra_vars/")
 async def create_extra_vars(
-    e: schemas.Extravars, db: AsyncSession = Depends(get_db_session)
+    e: schema.Extravars, db: AsyncSession = Depends(get_db_session)
 ):
     query = sa.insert(extra_vars).values(name=e.name, extra_var=e.extra_var)
     result = await db.execute(query)
