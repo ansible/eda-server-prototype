@@ -20,7 +20,7 @@ usage() {
     log-info "services-start      start service containers"
     log-info "services-stop       stop service containers"
     log-info "services-restart    restart service container"
-    log-info "service-clean       remove containera/images and volumes"
+    log-info "service-clean       remove container/images and volumes"
     log-info "db-migrations       run database migrations"
     log-info "ui-start            build and start EDA UI"
     log-info "ui-stop             stop EDA UI"
@@ -115,14 +115,8 @@ stop-events-services() {
   cd "${EDA_PROJECT_HOME}"
 
   if docker inspect --format '{{.Name}}' eda-postgres > /dev/null 2>&1 ; then
-    log-debug "docker stop eda-postgres"
-    docker stop eda-postgres > /dev/null 2>&1
-    log-debug "docker rm -f eda-postgres"
-    docker rm -f eda-postgres > /dev/null 2>&1
-  fi
-  if docker volume inspect -f '{{.Name}}' ansible-events_postgres_data > /dev/null 2>&1; then
-    log-debug "docker volume rm ansible-events_postgres_data"
-    docker volume rm ansible-events_postgres_data > /dev/null 2>&1
+    log-debug "docker-compose -p ansible-events -f tools/docker/docker-compose.yml up -d postgres"
+    docker-compose -p ansible-events -f tools/docker/docker-compose.yml up -d postgres
   fi
 }
 
