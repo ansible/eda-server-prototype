@@ -98,7 +98,7 @@ async def test_create_delete_project(client: AsyncClient, db: AsyncSession):
     playbooks = (await db.execute(sa.select(models.playbooks))).all()
     assert len(playbooks) == 1
 
-    response = await client.delete("/api/project/1")
+    response = await client.delete("/api/projects/1")
     assert response.status_code == status_codes.HTTP_204_NO_CONTENT
 
     projects = (await db.execute(sa.select(models.projects))).all()
@@ -119,7 +119,7 @@ async def test_create_delete_project(client: AsyncClient, db: AsyncSession):
 
 @pytest.mark.asyncio
 async def test_delete_project_not_found(client: AsyncClient):
-    response = await client.delete("/api/project/1")
+    response = await client.delete("/api/projects/1")
     assert response.status_code == status_codes.HTTP_404_NOT_FOUND
 
 
