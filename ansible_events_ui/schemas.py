@@ -136,7 +136,8 @@ class ProjectList(BaseModel):
 
 
 class ProjectUpdate(BaseModel):
-    name: StrictStr
+    name: Optional[StrictStr]
+    description: Optional[StrictStr]
 
 
 class RestartPolicy(BaseModel):
