@@ -2,6 +2,9 @@ import asyncio
 import logging
 import os
 import tempfile
+import aiodocker
+from io import BytesIO
+import tarfile
 
 import yaml
 from sqlalchemy import insert
@@ -252,3 +255,17 @@ async def find_playbook(project_id, project_dir, db: AsyncSession):
             (record_id,) = (await db.execute(query)).inserted_primary_key
             # TODO(cutwater): Remove debugging print
             logger.debug(record_id)
+
+
+async def build_project():
+    docker = aiodocker.Docker()
+    dockerfile = "FROM centos:7\n"
+    f = BytesIO()
+    with tarfile.open(fileobj=f, mode="w") as tar:
+        tarinfo = tarfile.TarInfo("Dockerfile")
+        tarinfo.size = len(dockerfile)
+        tar.addfile(tarinfo, BytesIO(dockerfile.encode("utf-8")))
+    f.seek(0)
+    response = await docker.images.build(fileobj=f, tag="test", encoding="utf-8")
+    for line in response:
+        print(line)
