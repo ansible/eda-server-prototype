@@ -41,7 +41,7 @@ const ProjectLinks: React.FunctionComponent<{project:ProjectType | undefined}> =
             {project?.rulesets && project.rulesets.length > 0 && (
               <SimpleList style={{ whiteSpace: 'pre-wrap' }}>
                 {project.rulesets.map((item, i) => (
-                  <SimpleListItem key={i}><Link to={"/rulesetfile/" + item.id}>{item.name} </Link></SimpleListItem>
+                  <SimpleListItem key={i}><Link to={"/ruleset/" + item.id}>{item.name} </Link></SimpleListItem>
                 ))}
               </SimpleList>
             )}
