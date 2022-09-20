@@ -84,6 +84,14 @@ build-all() {
   build-server "${1}"
 }
 
+remove-image() {
+  local _image_name="${1}"
+
+  log-info "Removing image ${_image_name} from minikube registry"
+  log-debug "minikube image rm ${_image_name}"
+  minikube image rm "${_image_name}"
+}
+
 deploy() {
   local _image="${1}"
 
@@ -106,6 +114,10 @@ clean-deployment() {
   if kubectl get ns -o jsonpath='{..name}'| grep "${NAMESPACE}" &> /dev/null; then
     log-debug "kubectl delete all -l 'app in (eda-server, eda-frontend, eda-postgres)' -n ${NAMESPACE}"
     kubectl delete all -l 'app in (eda-server, eda-frontend, eda-postgres)' -n "${NAMESPACE}"
+    log-debug "kubectl delete pvc --all -n ${NAMESPACE}"
+    kubectl delete pvc --all -n "${NAMESPACE}"
+    log-debug "kubectl delete pv --all -n ${NAMESPACE}"
+    kubectl delete pv --all -n "${NAMESPACE}"
   else
     log-warn "${NAMESPACE} does not exist"
   fi
@@ -116,6 +128,11 @@ clean-deployment() {
   else
     log-warn "${DEPLOY_DIR}/temp does not exist"
   fi
+
+  remove-image postgres:13
+  remove-image nginx:"${VERSION}"
+  remove-image eda-server:"${VERSION}"
+  remove-image eda-frontend:"${VERSION}"
 }
 
 # forward localhost port to pod
@@ -145,7 +162,7 @@ port-forward-ui() {
 #
 case ${CMD} in
   "build") build-all "${VERSION}" ;;
-  "clean") clean-deployment ;;
+  "clean") clean-deployment "${VERSION}";;
   "deploy") deploy "${VERSION}" ;;
   "port-forward-ui") port-forward-ui "${UI_LOCAL_PORT}" ;;
   "help") usage ;;
