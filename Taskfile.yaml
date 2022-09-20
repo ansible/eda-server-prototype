@@ -138,7 +138,6 @@ tasks:
       - task: dev:ui:stop
       - task: dev:api:stop
       - task: dev:services:stop
-      - task: dev:services:clean
 
   docker:
     desc: "Run docker-compose with specified CLI arguments."
