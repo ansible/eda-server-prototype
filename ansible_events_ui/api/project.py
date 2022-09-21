@@ -158,9 +158,7 @@ async def update_project(
 
     values = project.dict(exclude_unset=True)
     query = (
-        sa.update(projects)
-        .where(projects.c.id == project_id)
-        .values(**values)
+        sa.update(projects).where(projects.c.id == project_id).values(**values)
     )
 
     try:
