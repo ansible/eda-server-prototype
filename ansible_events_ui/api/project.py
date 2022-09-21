@@ -33,7 +33,7 @@ async def list_projects(db: AsyncSession = Depends(get_db_session)):
 @router.post(
     "/api/projects/",
     response_model=schema.ProjectRead,
-    operation_id="create_projects",
+    operation_id="create_project",
     status_code=status.HTTP_201_CREATED,
     tags=["projects"],
 )
@@ -187,14 +187,22 @@ async def delete_project(
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
-@router.get("/api/playbooks/", tags=["playbooks"])
+@router.get(
+    "/api/playbooks/",
+    operation_id="list_playbooks",
+    tags=["playbooks"],
+)
 async def list_playbooks(db: AsyncSession = Depends(get_db_session)):
     query = sa.select(playbooks)
     result = await db.execute(query)
     return result.all()
 
 
-@router.get("/api/playbook/{playbook_id}", tags=["playbooks"])
+@router.get(
+    "/api/playbook/{playbook_id}",
+    operation_id="read_playbook",
+    tags=["playbooks"],
+)
 async def read_playbook(
     playbook_id: int, db: AsyncSession = Depends(get_db_session)
 ):
@@ -203,14 +211,20 @@ async def read_playbook(
     return result.first()
 
 
-@router.get("/api/inventories/", tags=["inventories"])
+@router.get(
+    "/api/inventories/", operation_id="list_inventories", tags=["inventories"]
+)
 async def list_inventories(db: AsyncSession = Depends(get_db_session)):
     query = sa.select(inventories)
     result = await db.execute(query)
     return result.all()
 
 
-@router.get("/api/inventory/{inventory_id}", tags=["inventories"])
+@router.get(
+    "/api/inventory/{inventory_id}",
+    operation_id="read_inventory",
+    tags=["inventories"],
+)
 async def read_inventory(
     inventory_id: int, db: AsyncSession = Depends(get_db_session)
 ):
@@ -220,7 +234,9 @@ async def read_inventory(
     return result.first()
 
 
-@router.post("/api/inventory/", tags=["inventories"])
+@router.post(
+    "/api/inventory/", operation_id="create_inventory", tags=["inventories"]
+)
 async def create_inventory(
     i: schema.Inventory, db: AsyncSession = Depends(get_db_session)
 ):
@@ -231,15 +247,21 @@ async def create_inventory(
     return {**i.dict(), "id": id_}
 
 
-@router.get("/api/extra_vars/", tags=["extra vars"])
+@router.get(
+    "/api/extra_vars/", operation_id="list_extra_vars", tags=["extra vars"]
+)
 async def list_extra_vars(db: AsyncSession = Depends(get_db_session)):
     query = sa.select(extra_vars)
     result = await db.execute(query)
     return result.all()
 
 
-@router.get("/api/extra_var/{extra_var_id}", tags=["extra vars"])
-async def read_extravar(
+@router.get(
+    "/api/extra_var/{extra_var_id}",
+    operation_id="read_extra_var",
+    tags=["extra vars"],
+)
+async def read_extra_var(
     extra_var_id: int, db: AsyncSession = Depends(get_db_session)
 ):
     query = sa.select(extra_vars).where(extra_vars.c.id == extra_var_id)
@@ -247,7 +269,9 @@ async def read_extravar(
     return result.first()
 
 
-@router.post("/api/extra_vars/", tags=["extra vars"])
+@router.post(
+    "/api/extra_vars/", operation_id="create_extra_vars", tags=["extra vars"]
+)
 async def create_extra_vars(
     e: schema.Extravars, db: AsyncSession = Depends(get_db_session)
 ):

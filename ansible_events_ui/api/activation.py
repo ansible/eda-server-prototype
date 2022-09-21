@@ -206,7 +206,9 @@ async def read_output(proc, activation_instance_id, db_session_factory):
             line_number += 1
 
 
-@router.post("/api/activation_instance/")
+@router.post(
+    "/api/activation_instance/", operation_id="create_activation_instance"
+)
 async def create_activation_instance(
     a: schema.ActivationInstance,
     db: AsyncSession = Depends(get_db_session),
@@ -261,13 +263,15 @@ async def create_activation_instance(
     return {**a.dict(), "id": id_}
 
 
-@router.post("/api/deactivate/")
+@router.post("/api/deactivate/", operation_id="deactivate_activation_instance")
 async def deactivate(activation_instance_id: int):
     await inactivate_rulesets(activation_instance_id)
     return
 
 
-@router.get("/api/activation_instances/")
+@router.get(
+    "/api/activation_instances/", operation_id="list_activation_instances"
+)
 async def list_activation_instances(
     db: AsyncSession = Depends(get_db_session),
 ):
@@ -276,7 +280,10 @@ async def list_activation_instances(
     return result.all()
 
 
-@router.get("/api/activation_instance/{activation_instance_id}")
+@router.get(
+    "/api/activation_instance/{activation_instance_id}",
+    operation_id="read_activation_instance",
+)
 async def read_activation_instance(
     activation_instance_id: int, db: AsyncSession = Depends(get_db_session)
 ):
@@ -323,6 +330,7 @@ async def delete_activation_instance(
 @router.get(
     "/api/activation_instance_logs/",
     response_model=List[schema.ActivationLog],
+    operation_id="list_activation_instance_logs",
 )
 async def list_activation_instance_logs(
     activation_instance_id: int, db: AsyncSession = Depends(get_db_session)
@@ -339,8 +347,11 @@ async def list_activation_instance_logs(
     return result.all()
 
 
-@router.get("/api/activation_instance_job_instances/{activation_instance_id}")
-async def read_activation_instance_job_instances(
+@router.get(
+    "/api/activation_instance_job_instances/{activation_instance_id}",
+    operation_id="list_activation_instance_job_instances",
+)
+async def list_activation_instance_job_instances(
     activation_instance_id: int, db: AsyncSession = Depends(get_db_session)
 ):
     query = sa.select(models.activation_instance_job_instances).where(

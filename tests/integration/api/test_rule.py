@@ -72,7 +72,7 @@ async def test_list_rules(client: AsyncClient, db: AsyncSession):
 
 
 @pytest.mark.asyncio
-async def test_show_rule(client: AsyncClient, db: AsyncSession):
+async def test_read_rule(client: AsyncClient, db: AsyncSession):
     rulebook_id, ruleset_id, rule_id = await _create_rules(db)
 
     response = await client.get(f"/api/rules/{rule_id}/")
