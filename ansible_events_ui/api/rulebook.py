@@ -13,6 +13,11 @@ from ansible_events_ui.project import insert_rulebook_related_data
 router = APIRouter(tags=["rulebooks"])
 
 
+# ------------------------------------
+#   rules endpoints
+# ------------------------------------
+
+
 @router.get(
     "/api/rules/",
     response_model=List[schema.Rule],
@@ -76,6 +81,91 @@ async def read_rule(rule_id: int, db: AsyncSession = Depends(get_db_session)):
             "name": row["ruleset_name"],
         },
     }
+
+
+# ------------------------------------
+#   rulesets endpoints
+# ------------------------------------
+
+# This query will leverage a left outer join lateral
+# in order to get the rule counts.
+rs = sa.orm.aliased(models.rulesets)
+r1 = sa.orm.aliased(models.rules)
+rb = sa.orm.aliased(models.rulebooks)
+p = sa.orm.aliased(models.projects)
+
+rule_count_lateral = (
+    (
+        sa.select(sa.func.count(r1.c.id).label("rule_count"))
+        .select_from(r1)
+        .filter(r1.c.ruleset_id == rs.c.id)
+    )
+    .subquery()
+    .lateral()
+)
+r = sa.orm.aliased(rule_count_lateral)
+
+# There is a possibility that this may generate a SQLAlchemy warning,
+# but all of the reference links are safe and the database does not
+# throw an error or warning.
+# Thre is a reported fix, but it may not be released at the time of this
+# coding.
+# See: https://github.com/sqlalchemy/sqlalchemy/issues/7507
+BASE_RULESET_SELECT = (
+    sa.select(
+        rs.c.id,
+        rs.c.name,
+        rs.c.created_at,
+        rs.c.modified_at,
+        sa.func.coalesce(r.c.rule_count, 0).label("rule_count"),
+        sa.func.coalesce(
+            sa.func.jsonb_build_object("id", rb.c.id, "name", rb.c.name),
+            sa.func.jsonb_build_object("id", None, "name", None),
+        ).label("rulebook"),
+        sa.func.coalesce(
+            sa.func.jsonb_build_object("id", p.c.id, "name", p.c.name),
+            sa.func.jsonb_build_object("id", None, "name", None),
+        ).label("project"),
+    )
+    .select_from(rs)
+    .outerjoin(rb, rb.c.id == rs.c.rulebook_id)
+    .outerjoin(p, p.c.id == rb.c.project_id)
+    .outerjoin(r, sa.true())
+)
+
+
+@router.get(
+    "/api/rulesets/",
+    response_model=List[schema.Ruleset],
+    operation_id="list_rulesets",
+)
+async def list_rulesets(db: AsyncSession = Depends(get_db_session)):
+    cur = await db.execute(BASE_RULESET_SELECT)
+    response = [rec._asdict() for rec in cur]
+    return response
+
+
+@router.get(
+    "/api/rulesets/{ruleset_id}/",
+    response_model=schema.RulesetDetail,
+    operation_id="read_ruleset",
+)
+async def get_ruleset(
+    ruleset_id: int, db: AsyncSession = Depends(get_db_session)
+):
+    query = BASE_RULESET_SELECT.filter(models.rulesets.c.id == ruleset_id)
+    rec = (await db.execute(query)).first()
+    if not rec:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Ruleset not found"
+        )
+
+    return rec._asdict()
+
+
+# ------------------------------------
+#   rulebooks endpoints
+# ------------------------------------
 
 
 @router.post("/api/rulebooks/", operation_id="create_rulebook")
