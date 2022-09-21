@@ -17,6 +17,10 @@ from ansible_events_ui.db.dependency import (
     get_db_session,
     get_db_session_factory,
 )
+from ansible_events_ui.db.utils.lostream import (
+    PGLargeObject,
+    decode_bytes_buff,
+)
 from ansible_events_ui.managers import updatemanager
 from ansible_events_ui.ruleset import activate_rulesets, inactivate_rulesets
 
@@ -217,41 +221,59 @@ async def create_activation_instance(
     ),
     settings: Settings = Depends(get_settings),
 ):
-    query = sa.select(models.rulebooks).where(
-        models.rulebooks.c.id == a.rulebook_id
-    )
-    rulebook_row = (await db.execute(query)).first()
 
-    query = sa.select(models.inventories).where(
-        models.inventories.c.id == a.inventory_id
-    )
-    inventory_row = (await db.execute(query)).first()
-
-    query = sa.select(models.extra_vars).where(
-        models.extra_vars.c.id == a.extra_var_id
-    )
-    extra_var_row = (await db.execute(query)).first()
-
-    query = sa.insert(models.activation_instances).values(
-        name=a.name,
-        rulebook_id=a.rulebook_id,
-        inventory_id=a.inventory_id,
-        extra_var_id=a.extra_var_id,
-        working_directory=a.working_directory,
-        execution_environment=a.execution_environment,
+    query = (
+        sa.insert(models.activation_instances)
+        .values(
+            name=a.name,
+            rulebook_id=a.rulebook_id,
+            inventory_id=a.inventory_id,
+            extra_var_id=a.extra_var_id,
+            working_directory=a.working_directory,
+            execution_environment=a.execution_environment,
+        )
+        .returning(
+            models.activation_instances.c.id,
+            models.activation_instances.c.log_id,
+        )
     )
     result = await db.execute(query)
     await db.commit()
-    (id_,) = result.inserted_primary_key
+    id_, log_id = result.first()
+
+    query = (
+        sa.select(
+            models.inventories.c.inventory,
+            models.rulebooks.c.rulesets,
+            models.extra_vars.c.extra_var,
+        )
+        .join(
+            models.inventories,
+            models.activation_instances.c.inventory_id
+            == models.inventories.c.id,
+        )
+        .join(
+            models.rulebooks,
+            models.activation_instances.c.rulebook_id == models.rulebooks.c.id,
+        )
+        .join(
+            models.extra_vars,
+            models.activation_instances.c.extra_var_id
+            == models.extra_vars.c.id,
+        )
+        .where(models.activation_instances.c.id == id_)
+    )
+    activation_data = (await db.execute(query)).first()
 
     try:
         await activate_rulesets(
             settings.deployment_type,
             id_,
+            log_id,
             a.execution_environment,
-            rulebook_row.rulesets,
-            inventory_row.inventory,
-            extra_var_row.extra_var,
+            activation_data.rulesets,
+            activation_data.inventory,
+            activation_data.extra_var,
             a.working_directory,
             settings.server_name,
             settings.port,
@@ -329,22 +351,31 @@ async def delete_activation_instance(
 
 @router.get(
     "/api/activation_instance_logs/",
-    response_model=List[schema.ActivationLog],
     operation_id="list_activation_instance_logs",
+    response_model=List[schema.ActivationLog],
 )
-async def list_activation_instance_logs(
-    activation_instance_id: int, db: AsyncSession = Depends(get_db_session)
+async def stream_activation_instance_logs(
+    activation_instance_id: int,
+    db: AsyncSession = Depends(get_db_session),
+    settings: Settings = Depends(get_settings),
 ):
-    query = (
-        sa.select(models.activation_instance_logs)
-        .where(
-            models.activation_instance_logs.c.activation_instance_id
-            == activation_instance_id
-        )
-        .order_by(models.activation_instance_logs.c.id)
+    query = sa.select(models.activation_instances.c.log_id).where(
+        models.activation_instances.c.id == activation_instance_id
     )
-    result = await db.execute(query)
-    return result.all()
+    cur = await db.execute(query)
+    log_id = cur.first().log_id
+
+    async with PGLargeObject(db, oid=log_id, mode="r") as lobject:
+        leftover = b""
+        async for buff in lobject:
+            buff, leftover = decode_bytes_buff(leftover + buff)
+            await updatemanager.broadcast(
+                f"/activation_instance/{activation_instance_id}",
+                json.dumps(["Stdout", {"stdout": buff}]),
+            )
+
+    # Empty list return to satisfy the UI get() call
+    return []
 
 
 @router.get(
