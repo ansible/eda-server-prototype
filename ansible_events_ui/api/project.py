@@ -199,8 +199,13 @@ async def read_playbook(
     playbook_id: int, db: AsyncSession = Depends(get_db_session)
 ):
     query = sa.select(playbooks).where(playbooks.c.id == playbook_id)
-    result = await db.execute(query)
-    return result.first()
+    result = (await db.execute(query)).first()
+    if not result:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Playbook Not Found.",
+        )
+    return result
 
 
 @router.get("/api/inventories/", tags=["inventories"])
@@ -214,10 +219,14 @@ async def list_inventories(db: AsyncSession = Depends(get_db_session)):
 async def read_inventory(
     inventory_id: int, db: AsyncSession = Depends(get_db_session)
 ):
-    # FIXME(cutwater): Return HTTP 404 if inventory doesn't exist
     query = sa.select(inventories).where(inventories.c.id == inventory_id)
-    result = await db.execute(query)
-    return result.first()
+    result = (await db.execute(query)).first()
+    if not result:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Inventory Not Found.",
+        )
+    return result
 
 
 @router.post("/api/inventory/", tags=["inventories"])
@@ -243,8 +252,13 @@ async def read_extravar(
     extra_var_id: int, db: AsyncSession = Depends(get_db_session)
 ):
     query = sa.select(extra_vars).where(extra_vars.c.id == extra_var_id)
-    result = await db.execute(query)
-    return result.first()
+    result = (await db.execute(query)).first()
+    if not result:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Extra vars Not Found.",
+        )
+    return result
 
 
 @router.post("/api/extra_vars/", tags=["extra vars"])
