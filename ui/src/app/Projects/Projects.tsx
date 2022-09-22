@@ -217,7 +217,7 @@ const Projects: React.FunctionComponent = () => {
       component: 'button',
       onClick: (_event, _rowId, project) =>
         history.push({
-          pathname: `/remove-project/${project.id}`
+          pathname: `/projects/remove-project/${project.id}`
         })
     }
   ];
@@ -249,7 +249,24 @@ const Projects: React.FunctionComponent = () => {
         <Link
           id="remove-multiple-projects"
           className={anyProjectsSelected ? '' : 'disabled-link'}
-          to={{pathname: '/remove-projects'}}
+          to={{pathname: '/projects/remove-projects'}}
+        >
+          <Button
+            variant="secondary"
+            isDisabled={!anyProjectsSelected}
+            aria-label={intl.formatMessage(
+              sharedMessages.deleteProjectTitle
+            )}
+          >
+            {intl.formatMessage(sharedMessages.delete)}
+          </Button>
+        </Link>
+      </ToolbarItem>
+      <ToolbarItem>
+        <Link
+          id="remove-multiple-projects"
+          className={anyProjectsSelected ? '' : 'disabled-link'}
+          to={{pathname: '/projects/remove-projects'}}
         >
           <Button
             variant="secondary"

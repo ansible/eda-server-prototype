@@ -24,12 +24,13 @@ import { Playbook } from '@app/Playbook/Playbook';
 import { NotFound } from '@app/NotFound/NotFound';
 import { useDocumentTitle } from '@app/utils/useDocumentTitle';
 import {ActivationStdout} from "@app/Activation/activation-stdout";
-import {useIntl} from "react-intl";
 import {RulesetSources} from "@app/RuleSetFile/ruleset-sources";
 import {RulesetDetails} from "@app/RuleSetFile/ruleset-details";
 import {RulesetRules} from "@app/RuleSetFile/ruleset-rules";
 import { Rules } from '@app/Rules/Rules';
 import { Rule } from '@app/Rule/Rule';
+import {Fragment} from "react";
+import DialogRoutes from "@app/dialog-routes";
 
 export interface IAppRoute {
   label?: string; // Excluding the label will exclude the route from the nav sidebar in AppLayout
@@ -59,7 +60,6 @@ const routes: AppRouteConfig[] = [
   },
   {
     component: Projects,
-    exact: true,
     label: 'Projects',
     path: '/projects',
     title: 'Projects',
@@ -236,19 +236,26 @@ const flattenedRoutes: IAppRoute[] = routes.reduce(
 );
 
 const AppRoutes = (): React.ReactElement => {
-  return (<Switch>
-    {flattenedRoutes.map(({path, exact, component, title, isAsync}, idx) => (
-      <RouteWithTitleUpdates
-        path={path}
-        exact={exact}
-        component={component}
-        key={idx}
-        title={title}
-        isAsync={isAsync}
-      />
-    ))}
-    <PageNotFound title="404 Page Not Found"/>
-  </Switch>);
+  return (
+    <Fragment>
+      <Switch>
+        {flattenedRoutes.map(({path, exact, component, title, isAsync}, idx) => (
+          <RouteWithTitleUpdates
+            path={path}
+            exact={exact}
+            component={component}
+            key={idx}
+            title={title}
+            isAsync={isAsync}
+          />
+        ))}
+        <PageNotFound title="404 Page Not Found"/>
+      </Switch>
+      <div>
+        <DialogRoutes />
+      </div>
+    </Fragment>
+  );
 }
 
 export { AppRoutes, routes };
