@@ -47,8 +47,7 @@ async def create_activation(
         inventory_id=activation.inventory_id,
         execution_environment=activation.execution_environment,
         working_directory=activation.working_directory,
-        restart_policy_id=activation.restart_policy_id,
-        playbook_id=activation.playbook_id,
+        restart_policy=activation.restart_policy,
         is_enabled=activation.is_enabled,
         extra_var_id=activation.extra_var_id,
     )
@@ -79,6 +78,7 @@ async def read_activation(
             models.activations.c.status,
             models.activations.c.working_directory,
             models.activations.c.execution_environment,
+            models.activations.c.restart_policy,
             models.activations.c.restarted_at,
             models.activations.c.restart_count,
             models.activations.c.created_at,
@@ -89,17 +89,11 @@ async def read_activation(
             models.inventories.c.name.label("inventory_name"),
             models.extra_vars.c.id.label("extra_var_id"),
             models.extra_vars.c.name.label("extra_var_name"),
-            models.playbooks.c.id.label("playbook_id"),
-            models.playbooks.c.name.label("playbook_name"),
-            models.restart_policies.c.id.label("restart_policy_id"),
-            models.restart_policies.c.name.label("restart_policy_name"),
         )
         .select_from(models.activations)
         .join(models.rulebooks)
         .join(models.inventories)
         .join(models.extra_vars)
-        .join(models.playbooks)
-        .join(models.restart_policies)
         .where(models.activations.c.id == activation_id)
     )
     activation = (await db.execute(query)).one_or_none()
@@ -114,6 +108,7 @@ async def read_activation(
         "status": activation["status"],
         "working_directory": activation["working_directory"],
         "execution_environment": activation["execution_environment"],
+        "restart_policy": activation["restart_policy"],
         "restarted_at": activation["restarted_at"],
         "restart_count": activation["restart_count"],
         "created_at": activation["created_at"],
@@ -125,14 +120,6 @@ async def read_activation(
         "inventory": {
             "id": activation["inventory_id"],
             "name": activation["inventory_name"],
-        },
-        "playbook": {
-            "id": activation["playbook_id"],
-            "name": activation["playbook_name"],
-        },
-        "restart_policy": {
-            "id": activation["restart_policy_id"],
-            "name": activation["restart_policy_name"],
         },
         "extra_var": {
             "id": activation["extra_var_id"],
