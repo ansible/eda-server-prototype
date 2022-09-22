@@ -7,6 +7,21 @@ export function accessibleRouteChangeHandler() {
   }, 50);
 }
 
+export async function removeData(url = '') {
+  const response = await fetch(url, {
+    method: 'DELETE',
+    mode: 'cors',
+    cache: 'no-cache',
+    credentials: 'same-origin',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    redirect: 'follow',
+    referrerPolicy: 'no-referrer'
+  });
+  return response.json();
+}
+
 export async function postData(url = '', data = {}) {
   const response = await fetch(url, {
     method: 'POST',
