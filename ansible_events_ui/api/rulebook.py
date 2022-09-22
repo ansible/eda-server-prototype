@@ -2,7 +2,7 @@ from typing import List
 
 import sqlalchemy as sa
 import yaml
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ansible_events_ui import schema
@@ -109,8 +109,13 @@ async def read_rulebook(
     query = sa.select(models.rulebooks).where(
         models.rulebooks.c.id == rulebook_id
     )
-    result = await db.execute(query)
-    return result.first()
+    result = (await db.execute(query)).first()
+    if not result:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Inventory Not Found.",
+        )
+    return result
 
 
 @router.get(
