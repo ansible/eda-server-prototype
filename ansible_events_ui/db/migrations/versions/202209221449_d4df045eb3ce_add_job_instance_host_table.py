@@ -1,8 +1,8 @@
 """Add job_instance_host table.
 
-Revision ID: 1e2ac4dc36b7
-Revises: 9f6b44aa0df8
-Create Date: 2022-09-19 16:18:22.830029+00:00
+Revision ID: d4df045eb3ce
+Revises: 1285eea03d23
+Create Date: 2022-09-22 14:49:17.873228+00:00
 
 """
 import sqlalchemy as sa
@@ -10,8 +10,8 @@ from alembic import op
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision = "1e2ac4dc36b7"
-down_revision = "9f6b44aa0df8"
+revision = "d4df045eb3ce"
+down_revision = "1285eea03d23"
 branch_labels = None
 depends_on = None
 
