@@ -84,3 +84,11 @@ async def test_list_inventories(client: AsyncClient, db: AsyncSession):
             "project_id": None,
         }
     ]
+
+
+@pytest.mark.asyncio
+async def test_read_inventory_not_found(client: AsyncClient):
+
+    response = await client.get("/api/inventory/42")
+
+    assert response.status_code == status_codes.HTTP_404_NOT_FOUND

@@ -2,9 +2,11 @@ import pytest
 import sqlalchemy as sa
 from fastapi import status as status_codes
 from httpx import AsyncClient
+from sqlalchemy import func
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ansible_events_ui.db import models
+from ansible_events_ui.db.utils.lostream import PGLargeObject
 
 TEST_ACTIVATION = {
     "name": "test-activation",
@@ -148,26 +150,76 @@ async def test_delete_activation_instance(
 ):
     foreign_keys = await _create_activation_dependent_objects(client, db)
 
-    query = sa.insert(models.activation_instances).values(
-        name="test-activation",
-        rulebook_id=foreign_keys["rulebook_id"],
-        inventory_id=foreign_keys["inventory_id"],
-        extra_var_id=foreign_keys["extra_var_id"],
+    (inserted_id,) = (
+        await db.execute(
+            sa.insert(models.activation_instances).values(
+                name="test-activation",
+                rulebook_id=foreign_keys["rulebook_id"],
+                inventory_id=foreign_keys["inventory_id"],
+                extra_var_id=foreign_keys["extra_var_id"],
+            )
+        )
+    ).inserted_primary_key
+
+    num_activation_instances = await db.scalar(
+        sa.select(func.count()).select_from(models.activation_instances)
     )
-    await db.execute(query)
+    assert num_activation_instances == 1
 
-    activation_instances = (
-        await db.execute(sa.select(models.activation_instances))
-    ).all()
-    assert len(activation_instances) == 1
-
-    response = await client.delete("/api/activation_instance/1")
+    response = await client.delete(f"/api/activation_instance/{inserted_id}")
     assert response.status_code == status_codes.HTTP_204_NO_CONTENT
 
-    activations = (
-        await db.execute(sa.select(models.activation_instances))
-    ).all()
-    assert len(activations) == 0
+    num_activation_instances = await db.scalar(
+        sa.select(func.count()).select_from(models.activation_instances)
+    )
+    assert num_activation_instances == 0
+
+
+@pytest.mark.asyncio
+async def test_ins_del_activation_instance_manages_log_lob(
+    client: AsyncClient, db: AsyncSession
+):
+    foreign_keys = await _create_activation_dependent_objects(client, db)
+    activation_id = await _create_activation(client, db, foreign_keys)
+
+    total_ct = existing_ct = await db.scalar(
+        sa.select(func.count()).select_from(models.activation_instances)
+    )
+
+    query = (
+        sa.insert(models.activation_instances)
+        .values(
+            name="test-activation",
+            rulebook_id=foreign_keys["rulebook_id"],
+            inventory_id=foreign_keys["inventory_id"],
+            extra_var_id=foreign_keys["extra_var_id"],
+        )
+        .returning(
+            models.activation_instances.c.id,
+            models.activation_instances.c.log_id,
+        )
+    )
+    cur = await db.execute(query)
+    inserted_rows = cur.rowcount
+    inserted_id, log_id = cur.first()
+
+    total_ct += inserted_rows
+    assert total_ct == existing_ct + 1
+    assert log_id is not None
+    exists, _ = await PGLargeObject.verify_large_object(db, log_id)
+    assert exists
+
+    query = sa.delete(models.activation_instances).where(
+        models.activation_instances.c.id == inserted_id
+    )
+    cur = await db.execute(query)
+    assert cur.rowcount == inserted_rows
+    exists, _ = await PGLargeObject.verify_large_object(db, log_id)
+    assert not exists
+
+    query = sa.delete(models.activations).where(
+        models.activations.c.id == activation_id
+    )
 
 
 @pytest.mark.asyncio

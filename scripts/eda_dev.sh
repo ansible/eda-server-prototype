@@ -20,7 +20,7 @@ usage() {
     log-info "services-start      start service containers"
     log-info "services-stop       stop service containers"
     log-info "services-restart    restart service container"
-    log-info "service-clean       remove containera/images and volumes"
+    log-info "service-clean       remove container/images and volumes"
     log-info "db-migrations       run database migrations"
     log-info "ui-start            build and start EDA UI"
     log-info "ui-stop             stop EDA UI"
@@ -114,25 +114,19 @@ stop-events-services() {
   log-info "Stopping EDA Services (eda-postgres)"
   cd "${EDA_PROJECT_HOME}"
 
-  if docker inspect --format '{{.Name}}' eda-postgres > /dev/null 2>&1 ; then
-    log-debug "docker stop eda-postgres"
-    docker stop eda-postgres > /dev/null 2>&1
-    log-debug "docker rm -f eda-postgres"
-    docker rm -f eda-postgres > /dev/null 2>&1
-  fi
-  if docker volume inspect -f '{{.Name}}' ansible-events_postgres_data > /dev/null 2>&1; then
-    log-debug "docker volume rm ansible-events_postgres_data"
-    docker volume rm ansible-events_postgres_data > /dev/null 2>&1
+  if [[ $(docker inspect --format '{{json .State.Running}}' eda-postgres) = "true" ]]; then
+    log-debug "docker-compose -p ansible-events -f tools/docker/docker-compose.yml down"
+    docker-compose -p ansible-events -f tools/docker/docker-compose.yml down
   fi
 }
 
 clean-events-services() {
-  log-info "Cleaning up EDA Services (eda-postgres)"
-  if  docker images --format '{{.Repository}}' postgres > /dev/null 2>&1; then
-    log-debug "docker rmi -f eda-postgres"
-    docker rmi -f eda-postgres > /dev/null 2>&1
+  log-info "Cleaning up EDA Services (postgres)"
+  if docker images --format '{{.Repository}}' postgres| grep postgres > /dev/null 2>&1; then
+    log-debug "docker rmi -f postgres:13"
+    docker rmi -f postgres:13 > /dev/null 2>&1
   fi
-  if docker volume inspect -f '{{.Name}}' ansible-events_postgres_data > /dev/null 2>&1; then
+  if docker volume inspect -f '{{.Name}}' ansible-events_postgres_data| grep ansible-events_postgres_data > /dev/null 2>&1; then
     log-debug "docker volume rm ansible-events_postgres_data"
     docker volume rm ansible-events_postgres_data > /dev/null 2>&1
   fi

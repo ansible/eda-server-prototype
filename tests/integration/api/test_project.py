@@ -98,7 +98,7 @@ async def test_create_delete_project(client: AsyncClient, db: AsyncSession):
     playbooks = (await db.execute(sa.select(models.playbooks))).all()
     assert len(playbooks) == 1
 
-    response = await client.delete("/api/projects/1")
+    response = await client.delete(f"/api/projects/{projects[0].id}")
     assert response.status_code == status_codes.HTTP_204_NO_CONTENT
 
     projects = (await db.execute(sa.select(models.projects))).all()
@@ -174,6 +174,35 @@ async def test_create_project_bad_entity(
 
 
 @pytest.mark.asyncio
+@mock.patch("ansible_events_ui.api.project.clone_project")
+async def test_create_project_unique_name(
+    clone_project: mock.Mock,
+    client: AsyncClient,
+    db: AsyncSession,
+):
+    query = sa.insert(models.projects).values(
+        url=TEST_PROJECT["url"],
+        name=TEST_PROJECT["name"],
+        description=TEST_PROJECT["description"],
+    )
+    await db.execute(query)
+
+    found_hash = hashlib.sha1(b"test").hexdigest()
+    clone_project.return_value = found_hash, "/tmp/test-create-project"
+
+    response = await client.post(
+        "/api/projects/",
+        json=TEST_PROJECT,
+    )
+    assert response.status_code == status_codes.HTTP_409_CONFLICT
+    data = response.json()
+    assert (
+        data["detail"]
+        == f"Project with name '{TEST_PROJECT['name']}' already exists"
+    )
+
+
+@pytest.mark.asyncio
 async def test_get_project(client: AsyncClient, db: AsyncSession):
 
     query = sa.insert(models.projects).values(
@@ -238,6 +267,34 @@ async def test_edit_project(client: AsyncClient, db: AsyncSession):
     data = response.json()
     assert data["name"] == "new test name"
     assert data["url"] == TEST_PROJECT["url"]
+
+
+@pytest.mark.asyncio
+async def test_edit_project_unique_name(client: AsyncClient, db: AsyncSession):
+
+    query = sa.insert(models.projects).values(
+        url=TEST_PROJECT["url"],
+        name=TEST_PROJECT["name"],
+        description=TEST_PROJECT["description"],
+    )
+
+    await db.execute(query)
+
+    projects = (await db.execute(sa.select(models.projects))).all()
+    assert len(projects) == 1
+    project = projects[0]
+
+    response = await client.patch(
+        f"/api/projects/{project['id']}",
+        json={"name": TEST_PROJECT["name"]},
+    )
+
+    assert response.status_code == status_codes.HTTP_409_CONFLICT
+    data = response.json()
+    assert (
+        data["detail"]
+        == f"Project with name '{TEST_PROJECT['name']}' already exists"
+    )
 
 
 @pytest.mark.asyncio

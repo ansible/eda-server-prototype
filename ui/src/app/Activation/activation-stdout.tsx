@@ -25,10 +25,7 @@ const ActivationStdout: React.FunctionComponent<{activation: ActivationType}> = 
       headers: {
         'Content-Type': 'application/json',
       },
-    }).then(response => response.json())
-      .then(data => {
-                setStdout(data.map((item) => item.log));
-            });
+    });
   }, []);
 
   const [update_client, setUpdateClient] = useState<WebSocket|unknown>({});
