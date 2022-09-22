@@ -17,10 +17,7 @@ depends_on = None
 
 
 def upgrade() -> None:
-    comment = (
-        "OID of large object containing log(s). "
-        "This value will be created by a trigger if not supplied."
-    )
+    comment = "OID of large object containing log(s)."
     op.add_column(
         "activation_instance",
         sa.Column(
