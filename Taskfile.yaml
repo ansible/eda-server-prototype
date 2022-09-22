@@ -196,6 +196,7 @@ tasks:
 
   minikube:build:
     desc: "Build docker image and push to minikube"
+    deps: [minikube:clean]
     cmds:
       - task: minikube
         vars:
@@ -203,7 +204,6 @@ tasks:
 
   minikube:deploy:
     desc: "Build deployment and deploy to minikube"
-    deps: [minikube:clean]
     cmds:
       - task: minikube
         vars:
@@ -214,7 +214,7 @@ tasks:
     cmds:
       - task: minikube
         vars:
-          CLI_ARGS: clean
+          CLI_ARGS: clean {{.CLI_ARGS}}
 
   minikube:fp:ui:
     desc: "forward local port to ui instance port in minikube"

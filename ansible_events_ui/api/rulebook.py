@@ -51,9 +51,9 @@ async def list_rules(db: AsyncSession = Depends(get_db_session)):
 @router.get(
     "/api/rules/{rule_id}/",
     response_model=schema.Rule,
-    operation_id="show_rule",
+    operation_id="read_rule",
 )
-async def show_rule(rule_id: int, db: AsyncSession = Depends(get_db_session)):
+async def read_rule(rule_id: int, db: AsyncSession = Depends(get_db_session)):
     query = (
         sa.select(
             models.rules.c.id,
@@ -78,7 +78,7 @@ async def show_rule(rule_id: int, db: AsyncSession = Depends(get_db_session)):
     }
 
 
-@router.post("/api/rulebooks/")
+@router.post("/api/rulebooks/", operation_id="create_rulebook")
 async def create_rulebook(
     rulebook: schema.Rulebook, db: AsyncSession = Depends(get_db_session)
 ):
@@ -95,14 +95,14 @@ async def create_rulebook(
     return {**rulebook.dict(), "id": id_}
 
 
-@router.get("/api/rulebooks/")
+@router.get("/api/rulebooks/", operation_id="list_rulebooks")
 async def list_rulebooks(db: AsyncSession = Depends(get_db_session)):
     query = sa.select(models.rulebooks)
     result = await db.execute(query)
     return result.all()
 
 
-@router.get("/api/rulebooks/{rulebook_id}")
+@router.get("/api/rulebooks/{rulebook_id}", operation_id="read_rulebook")
 async def read_rulebook(
     rulebook_id: int, db: AsyncSession = Depends(get_db_session)
 ):
@@ -118,7 +118,9 @@ async def read_rulebook(
     return result
 
 
-@router.get("/api/rulebook_json/{rulebook_id}")
+@router.get(
+    "/api/rulebook_json/{rulebook_id}", operation_id="read_rulebook_json"
+)
 async def read_rulebook_json(
     rulebook_id: int, db: AsyncSession = Depends(get_db_session)
 ):

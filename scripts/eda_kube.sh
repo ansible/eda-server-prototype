@@ -48,8 +48,9 @@ build-deployment() {
   local _ui_image="eda-frontend:${1}"
   local _api_image="eda-server:${1}"
 
-  log-info "Deployment Directory: ${DEPLOY_DIR}/temp"
+  log-info "Using Deployment Directory: ${DEPLOY_DIR}/temp"
 
+  remove-deployment-tempdir
   [ -d "${DEPLOY_DIR}"/temp ] || mkdir "${DEPLOY_DIR}"/temp
 
   log-debug "kustomize edit set image eda-server=${_api_image}"
@@ -82,23 +83,46 @@ build-server() {
 build-all() {
   build-frontend "${1}"
   build-server "${1}"
+  build-deployment "${1}"
+}
+
+remove-image() {
+  local _image_name="${1}"
+
+  if minikube image ls | grep "${_image_name}" &> /dev/null; then
+    log-info "Removing image ${_image_name} from minikube registry"
+    log-debug "minikube image rm ${_image_name}"
+    minikube image rm "${_image_name}"
+  fi
+}
+
+remove-deployment-tempdir() {
+  if [ -d "${DEPLOY_DIR}"/temp ]; then
+    log-debug "rm -rf ${DEPLOY_DIR}/temp"
+    rm -rf "${DEPLOY_DIR}"/temp
+  else
+    log-debug "${DEPLOY_DIR}/temp does not exist"
+  fi
 }
 
 deploy() {
   local _image="${1}"
 
-  if ! kubectl get ns -o jsonpath='{..name}'| grep "${NAMESPACE}" &> /dev/null; then
-    log-debug "kubectl create namespace ${NAMESPACE}"
-    kubectl create namespace "${NAMESPACE}"
+  if [ -d "${DEPLOY_DIR}"/temp ]; then
+    if ! kubectl get ns -o jsonpath='{..name}'| grep "${NAMESPACE}" &> /dev/null; then
+      log-debug "kubectl create namespace ${NAMESPACE}"
+      kubectl create namespace "${NAMESPACE}"
+    fi
+
+    kubectl config set-context --current --namespace="${NAMESPACE}"
+
+    log-info "deploying eda to ${NAMESPACE}"
+    log-debug "kubectl apply -f ${DEPLOY_DIR}/temp"
+    kubectl apply -f "${DEPLOY_DIR}"/temp
+
+  else
+    log-info "You must run 'minikube:build' before running minikube:deploy"
   fi
-
-  kubectl config set-context --current --namespace="${NAMESPACE}"
-
-  build-deployment "${_image}"
-
-  log-info "deploying eda to ${NAMESPACE}"
-  log-debug "kubectl apply -f ${DEPLOY_DIR}/temp"
-  kubectl apply -f "${DEPLOY_DIR}"/temp
 }
 
 clean-deployment() {
@@ -106,16 +130,20 @@ clean-deployment() {
   if kubectl get ns -o jsonpath='{..name}'| grep "${NAMESPACE}" &> /dev/null; then
     log-debug "kubectl delete all -l 'app in (eda-server, eda-frontend, eda-postgres)' -n ${NAMESPACE}"
     kubectl delete all -l 'app in (eda-server, eda-frontend, eda-postgres)' -n "${NAMESPACE}"
+    log-debug "kubectl delete pvc --all --grace-period=0 --force -n ${NAMESPACE}"
+    kubectl delete pvc --all --grace-period=0 --force -n "${NAMESPACE}"
+    log-debug "kubectl delete pv --all --grace-period=0 --force -n ${NAMESPACE}"
+    kubectl delete pv --all --grace-period=0 --force -n "${NAMESPACE}"
   else
-    log-warn "${NAMESPACE} does not exist"
+    log-debug "${NAMESPACE} does not exist"
   fi
 
-  if [ -d "${DEPLOY_DIR}"/temp ]; then
-    log-debug "rm -rf ${DEPLOY_DIR}/temp"
-    rm -rf "${DEPLOY_DIR}"/temp
-  else
-    log-warn "${DEPLOY_DIR}/temp does not exist"
-  fi
+  remove-deployment-tempdir
+
+  remove-image postgres:13
+  remove-image nginx:"${VERSION}"
+  remove-image eda-server:"${VERSION}"
+  remove-image eda-frontend:"${VERSION}"
 }
 
 # forward localhost port to pod
@@ -145,7 +173,7 @@ port-forward-ui() {
 #
 case ${CMD} in
   "build") build-all "${VERSION}" ;;
-  "clean") clean-deployment ;;
+  "clean") clean-deployment "${VERSION}";;
   "deploy") deploy "${VERSION}" ;;
   "port-forward-ui") port-forward-ui "${UI_LOCAL_PORT}" ;;
   "help") usage ;;
