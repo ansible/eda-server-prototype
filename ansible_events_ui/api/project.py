@@ -148,10 +148,17 @@ async def update_project(
             status_code=status.HTTP_404_NOT_FOUND, detail="Project Not Found."
         )
 
+    query = sa.select(sa.exists().where(projects.c.name == project.name))
+    project_exists = await db.scalar(query)
+    if project_exists:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=f"Project with name '{project.name}' already exists",
+        )
+
+    values = project.dict(exclude_unset=True)
     query = (
-        sa.update(projects)
-        .where(projects.c.id == project_id)
-        .values(name=project.name, description=project.description)
+        sa.update(projects).where(projects.c.id == project_id).values(**values)
     )
 
     try:
