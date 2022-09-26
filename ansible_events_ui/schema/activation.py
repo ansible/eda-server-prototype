@@ -23,7 +23,7 @@ class ActivationCreate(BaseModel):
     extra_var_id: Optional[int]
     execution_environment: Optional[
         ExecutionEnvironment
-    ] = ExecutionEnvironment.DOCKER_PODMAN
+    ] = ExecutionEnvironment.DOCKER
     working_directory: Optional[StrictStr]
 
 
