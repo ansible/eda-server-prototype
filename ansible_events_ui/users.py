@@ -81,7 +81,7 @@ cookie_backend = AuthenticationBackend(
 )
 bearer_backend = AuthenticationBackend(
     name="bearer",
-    transport=BearerTransport(tokenUrl="api/auth/bearer/login"),
+    transport=BearerTransport(tokenUrl="auth/bearer/login"),
     get_strategy=get_jwt_strategy,
 )
 
