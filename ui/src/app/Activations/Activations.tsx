@@ -268,24 +268,7 @@ const Activations: React.FunctionComponent = () => {
           </Button>
         </Link>
       </ToolbarItem>
-      <ToolbarItem>
-        <Link
-          id="remove-multiple-activations"
-          className={anyActivationsSelected ? '' : 'disabled-link'}
-          to={{pathname: '/remove-activations'}}
-        >
-          <Button
-            variant="secondary"
-            isDisabled={!anyActivationsSelected}
-            aria-label={intl.formatMessage(
-              sharedMessages.deleteActivationTitle
-            )}
-          >
-            {intl.formatMessage(sharedMessages.delete)}
-          </Button>
-        </Link>
-      </ToolbarItem>
-    </ToolbarGroup>
+     </ToolbarGroup>
   );
 
   return (
