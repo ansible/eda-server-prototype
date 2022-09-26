@@ -7,6 +7,7 @@ __all__ = (
     "jobs",
     "job_instances",
     "job_instance_events",
+    "job_instance_hosts",
     "activation_instance_job_instances",
 )
 
@@ -67,4 +68,22 @@ job_instance_events = sa.Table(
     sa.Column("stdout", sa.String),
     sa.Column("type", sa.String),
     sa.Column("created_at", sa.DateTime(timezone=True)),
+)
+
+
+job_instance_hosts = sa.Table(
+    "job_instance_host",
+    metadata,
+    sa.Column(
+        "id",
+        sa.Integer,
+        sa.Identity(always=True),
+        primary_key=True,
+    ),
+    sa.Column("host", sa.String),
+    sa.Column("job_uuid", postgresql.UUID),
+    sa.Column("playbook", sa.String),
+    sa.Column("play", sa.String),
+    sa.Column("task", sa.String),
+    sa.Column("status", sa.String),
 )
