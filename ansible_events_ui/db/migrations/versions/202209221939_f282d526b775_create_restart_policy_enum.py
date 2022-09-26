@@ -44,7 +44,7 @@ def upgrade() -> None:
     op.alter_column(
         "activation", "extra_var_id", existing_type=sa.INTEGER(), nullable=True
     )
-    op.alter_column("activation", "is_enabled", server_default="t")
+    op.alter_column("activation", "is_enabled", server_default=sa.true())
     op.drop_constraint(
         "fk_activation_playbook_id", "activation", type_="foreignkey"
     )
@@ -122,3 +122,5 @@ def downgrade() -> None:
         nullable=True,
     )
     op.drop_column("activation", "restart_policy")
+    op.execute(sa.text('DROP TYPE "restart_policy_enum"'))
+    op.execute(sa.text('DROP TYPE "execution_environment_enum"'))
