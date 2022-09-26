@@ -2,6 +2,7 @@ import base64
 import json
 import logging
 from datetime import datetime
+from enum import Enum
 
 from fastapi import APIRouter, Depends, WebSocket, WebSocketDisconnect
 from sqlalchemy import cast, insert, select
@@ -36,6 +37,39 @@ router.include_router(activation_router)
 router.include_router(job_router)
 router.include_router(rulebook_router)
 router.include_router(project_router)
+
+
+# Determine host status based on event type
+# https://github.com/ansible/awx/blob/devel/awx/main/models/events.py#L164
+class Event(Enum):
+    FAILED = "runner_on_failed"
+    OK = "runner_on_ok"
+    ERROR = "runner_on_error"
+    SKIPPED = "runner_on_skipped"
+    UNREACHABLE = "runner_on_unreachable"
+    NO_HOSTS = "runner_on_no_hosts"
+    POLLING = "runner_on_async_poll"
+    ASYNC_OK = "runner_on_async_ok"
+    ASYNC_FAILURE = "runner_on_async_failed"
+    RETRY = "runner_retry"
+    NO_MATCHED = "playbook_on_no_hosts_matched"
+    NO_REMAINING = "playbook_on_no_hosts_remaining"
+
+
+host_status_map = {
+    Event.FAILED: "failed",
+    Event.OK: "ok",
+    Event.ERROR: "failed",
+    Event.SKIPPED: "skipped",
+    Event.UNREACHABLE: "unreachable",
+    Event.NO_HOSTS: "no remaining",
+    Event.POLLING: "polling",
+    Event.ASYNC_OK: "async ok",
+    Event.ASYNC_FAILURE: "async failure",
+    Event.RETRY: "retry",
+    Event.NO_MATCHED: "no matched",
+    Event.NO_REMAINING: "no remaining",
+}
 
 
 @router.websocket("/api/ws2")
@@ -195,6 +229,30 @@ async def handle_ansible_events(data: dict, db: AsyncSession):
         created_at=created,
     )
     await db.execute(query)
+
+    event = event_data.get("event")
+    if event and event in [item.value for item in host_status_map]:
+        data = event_data.get("event_data", {})
+
+        host = data.get("play_pattern")
+        playbook = data.get("playbook")
+        play = data.get("play")
+        task = data.get("task")
+        status = host_status_map[Event(event)]
+
+        if event == "runner_on_ok" and data.get("res", {}).get("changed"):
+            status = "changed"
+
+        query = insert(models.job_instance_hosts).values(
+            job_uuid=event_data.get("job_id"),
+            host=host,
+            playbook=playbook,
+            play=play,
+            task=task,
+            status=status,
+        )
+        await db.execute(query)
+
     await db.commit()
 
 
