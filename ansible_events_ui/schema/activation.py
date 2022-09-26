@@ -18,12 +18,10 @@ class ActivationCreate(BaseModel):
     description: Optional[StrictStr]
     rulebook_id: int
     inventory_id: int
-    restart_policy: Optional[RestartPolicy] = RestartPolicy.ON_FAILURE
-    is_enabled: Optional[bool] = True
+    restart_policy: RestartPolicy = RestartPolicy.ON_FAILURE
+    is_enabled: bool = True
     extra_var_id: Optional[int]
-    execution_environment: Optional[
-        ExecutionEnvironment
-    ] = ExecutionEnvironment.DOCKER
+    execution_environment: ExecutionEnvironment = ExecutionEnvironment.DOCKER
     working_directory: Optional[StrictStr]
 
 

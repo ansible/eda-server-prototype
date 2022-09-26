@@ -80,7 +80,7 @@ activations = sa.Table(
         sa.Boolean,
         nullable=False,
         default=True,
-        server_default="t",
+        server_default=sa.true(),
     ),
     sa.Column("restarted_at", sa.DateTime(timezone=True)),
     sa.Column("restart_count", sa.Integer, nullable=False, default=0),
