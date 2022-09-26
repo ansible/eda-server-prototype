@@ -14,6 +14,7 @@ import {useIntl} from "react-intl";
 import {defaultSettings} from "@app/shared/pagination";
 import {NewActivation} from "@app/NewActivation/NewActivation";
 import {createRows} from "@app/Activations/activations-table-helpers";
+import {AnyObject} from "@app/shared/types/common-types";
 
 export interface ActivationType {
   id: string;
@@ -145,7 +146,7 @@ const fetchActivations = (pagination = defaultSettings) => fetch(endpoint, {
   headers: {
     'Content-Type': 'application/json',
   },
-});
+}).then(response => response.json());
 
 const Activations: React.FunctionComponent = () => {
   const intl = useIntl();
@@ -171,20 +172,15 @@ const Activations: React.FunctionComponent = () => {
   const setSelectedActivations = (ids: string[]) =>
     stateDispatch({type: 'select', payload: ids});
 
-  const updateActivations = (pagination) => {
+  const handlePagination = (pagination) => {
     stateDispatch({type: 'setFetching', payload: true});
-    return fetchActivations(pagination)
-      .then(() => stateDispatch({type: 'setFetching', payload: false}))
+    return fetchActivations(pagination).then(data => { setActivations(data); stateDispatch({type: 'setRows', payload: createRows(activations)});})
+      .then(() => {stateDispatch({type: 'setFetching', payload: false});})
       .catch(() => stateDispatch({type: 'setFetching', payload: false}));
   };
 
   useEffect(() => {
-    fetchActivations().then(response => response.json())
-      .then(data => { setActivations(data); stateDispatch({type: 'setRows', payload: createRows(activations)});});
-  }, []);
-
-  useEffect(() => {
-    updateActivations(defaultSettings);
+    handlePagination(defaultSettings);
   }, []);
 
   useEffect(() => {
@@ -193,7 +189,7 @@ const Activations: React.FunctionComponent = () => {
 
   const clearFilters = () => {
     stateDispatch({type: 'clearFilters'});
-    return updateActivations(meta);
+    return handlePagination(meta);
   };
 
   const handleFilterChange = (value) => {
@@ -202,22 +198,32 @@ const Activations: React.FunctionComponent = () => {
       : stateDispatch({type: 'setFilterValue', payload: value});
   };
 
-  const routes = () => (
-    <Fragment>
-      <Route exact path={'/new-activation'}>
-          <NewActivation/>
-      </Route>
-    </Fragment>
-  );
+   const routes = () => <Fragment>
+    <Route
+      exact
+      path={'/activations/new-activation'}
+      render={(props: AnyObject) => (
+        <NewActivation {...props} />
+      )}
+    />
+  </Fragment>;
+
 
   const actionResolver = () => [
+    {
+      title: intl.formatMessage(sharedMessages.edit),
+      component: 'button',
+      onClick: (_event, _rowId, activation) =>
+        history.push({
+          pathname: `/edit-activation/${activation.id}`
+        })
+    },
     {
       title: intl.formatMessage(sharedMessages.delete),
       component: 'button',
       onClick: (_event, _rowId, activation) =>
         history.push({
-          pathname: '/remove-activation',
-          search: `?activation=${activation.id}`
+          pathname: `/activations/remove/${activation.id}`
         })
     }
   ];
@@ -247,7 +253,24 @@ const Activations: React.FunctionComponent = () => {
       </ToolbarItem>
       <ToolbarItem>
         <Link
-          id="remove-multiple-projects"
+          id="remove-multiple-activations"
+          className={anyActivationsSelected ? '' : 'disabled-link'}
+          to={{pathname: '/remove-activations'}}
+        >
+          <Button
+            variant="secondary"
+            isDisabled={!anyActivationsSelected}
+            aria-label={intl.formatMessage(
+              sharedMessages.deleteActivationTitle
+            )}
+          >
+            {intl.formatMessage(sharedMessages.delete)}
+          </Button>
+        </Link>
+      </ToolbarItem>
+      <ToolbarItem>
+        <Link
+          id="remove-multiple-activations"
           className={anyActivationsSelected ? '' : 'disabled-link'}
           to={{pathname: '/remove-activations'}}
         >
@@ -280,8 +303,10 @@ const Activations: React.FunctionComponent = () => {
           <TableToolbarView
             ouiaId={'activations-table'}
             rows={rows}
+            setLimit={setLimit}
+            setOffset={setOffset}
             columns={columns(intl, selectedAll, selectAllFunction)}
-            fetchData={updateActivations}
+            fetchData={handlePagination}
             routes={routes}
             actionResolver={actionResolver}
             plural={intl.formatMessage(sharedMessages.activations)}
