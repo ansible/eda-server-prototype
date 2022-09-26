@@ -19,7 +19,6 @@ export async function removeData(url = '') {
     redirect: 'follow',
     referrerPolicy: 'no-referrer'
   });
-  return response.json();
 }
 
 export async function postData(url = '', data = {}) {

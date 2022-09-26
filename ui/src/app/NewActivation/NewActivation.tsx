@@ -44,7 +44,7 @@ export interface RestartPolicyType {
 const NewActivation: React.FunctionComponent = () => {
   const history = useHistory();
   const intl = useIntl();
-  const [rules, setRules] = useState<RuleType[]>([])
+  const [rulesets, setRuleSets] = useState<RuleType[]>([{id:'', name:intl.formatMessage(sharedMessages.ruleSetPlaceholder)}]);
   const [inventories, setInventories] = useState<InventoryType[]>([{id:'', name: intl.formatMessage(sharedMessages.inventoryPlaceholder) }]);
   const [extravars, setExtraVars] = useState<ExtraVarType[]>([{id:'', name:intl.formatMessage(sharedMessages.extraVarPlaceholder), extra_var:''}]);
   const [executionEnvironments, setExecutionEnvironments] = useState<ExecutionEnvironmentType[]>([{id:'',
@@ -71,7 +71,7 @@ const NewActivation: React.FunctionComponent = () => {
          'Content-Type': 'application/json',
        },
      }).then(response => response.json())
-    .then(data => setRules([...rules, ...data]));
+    .then(data => setRuleSets([...rulesets, ...data]));
   }, []);
 
   useEffect(() => {
@@ -149,15 +149,11 @@ const NewActivation: React.FunctionComponent = () => {
   };
 
   const validateExecutionEnvironment = (value) => {
-    (!value || value.length < 1 ) ?
-      setValidatedExecutionEnvironment(ValidatedOptions.error) :
-      setValidatedExecutionEnvironment(ValidatedOptions.default)
+    setValidatedExecutionEnvironment(ValidatedOptions.default)
   }
 
   const validateWorkingDirectory = (value) => {
-    (!value || value.length < 1 ) ?
-      setValidatedWorkingDirectory(ValidatedOptions.error) :
-      setValidatedWorkingDirectory(ValidatedOptions.default)
+    setValidatedWorkingDirectory(ValidatedOptions.default)
   }
 
   const onWorkingDirectoryChange = (value) => {
@@ -182,16 +178,9 @@ const NewActivation: React.FunctionComponent = () => {
                          extra_var_id: extravar,
                          working_directory: workingDirectory,
                          execution_environment: executionEnvironment})
-      .then(data => {
-        console.log(data);
-        data?.id ? history.push("/activation/" + data.id) :
-          console.log('no activation was added')
-    });
-  };
+      .then(() =>history.push("/activations"))
+    }
 
-  console.log(rules);
-  console.log(inventories);
-  console.log(extravars);
   return (
   <React.Fragment>
     <TopToolbar
@@ -279,7 +268,6 @@ const NewActivation: React.FunctionComponent = () => {
                     id="activation-exec-env"
                     value={executionEnvironment}
                     label="Execution environment"
-                    isRequired
                     validated={validatedExecutionEnvironment}
                     onChange={onExecutionEnvironmentChange}
                     onBlur={(event) => validateExecutionEnvironment(executionEnvironment)}
@@ -316,7 +304,7 @@ const NewActivation: React.FunctionComponent = () => {
                               placeholder={ intl.formatMessage(sharedMessages.ruleSetPlaceholder) }
                               onBlur={(event) => validateRuleSet(ruleset)}
                               aria-label="FormSelect Input RuleSet">
-                    {rules.map((option, index) => (
+                    {rulesets.map((option, index) => (
                       <FormSelectOption
                         key={index}
                         value={option?.id}
@@ -352,7 +340,6 @@ const NewActivation: React.FunctionComponent = () => {
                 <FormGroup style={{paddingRight: '30px'}}
                            label={intl.formatMessage(sharedMessages.workingDirectory)}
                            fieldId={`activation-working-directory`}
-                           isRequired
                            helperTextInvalid={ intl.formatMessage(sharedMessages.enterRulebookActivationWorkingDirectory) }
                            helperTextInvalidIcon={<ExclamationCircleIcon />}
                            validated={validatedWorkingDirectory}

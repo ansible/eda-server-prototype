@@ -16,6 +16,7 @@ import {EditProject} from "@app/EditProject/EditProject";
 import {createRows} from "@app/Projects/projects-table-helpers";
 import {AnyObject} from "@app/shared/types/common-types";
 import {cellWidth} from "@patternfly/react-table";
+import {RemoveProject} from "@app/RemoveProject/RemoveProject";
 
 interface ProjectType {
   id: string;
@@ -63,6 +64,7 @@ const initialState = (filterValue = '') => ({
   isFiltering: false,
   selectedProjects: [],
   selectedAll: false,
+  removeModalOpen: false,
   rows: []
 });
 
@@ -134,7 +136,7 @@ const fetchProjects = (pagination = defaultSettings) => fetch(endpoint, {
   headers: {
     'Content-Type': 'application/json',
   },
-});
+}).then(response => response.json());
 
 const Projects: React.FunctionComponent = () => {
   const intl = useIntl();
@@ -160,20 +162,15 @@ const Projects: React.FunctionComponent = () => {
   const setSelectedProjects = (ids: string[]) =>
     stateDispatch({type: 'select', payload: ids});
 
-  const updateProjects = (pagination) => {
+  const handlePagination = (pagination) => {
     stateDispatch({type: 'setFetching', payload: true});
-    return fetchProjects(pagination)
-      .then(() => stateDispatch({type: 'setFetching', payload: false}))
+    return fetchProjects(pagination).then(data => { setProjects(data); stateDispatch({type: 'setRows', payload: createRows(projects)});})
+      .then(() => {stateDispatch({type: 'setFetching', payload: false});})
       .catch(() => stateDispatch({type: 'setFetching', payload: false}));
   };
 
   useEffect(() => {
-    fetchProjects().then(response => response.json())
-      .then(data => { setProjects(data); stateDispatch({type: 'setRows', payload: createRows(projects)});});
-  }, []);
-
-  useEffect(() => {
-    updateProjects(defaultSettings);
+    handlePagination(defaultSettings);
   }, []);
 
   useEffect(() => {
@@ -182,7 +179,7 @@ const Projects: React.FunctionComponent = () => {
 
   const clearFilters = () => {
     stateDispatch({type: 'clearFilters'});
-    return updateProjects(meta);
+    return handlePagination(meta);
   };
 
   const handleFilterChange = (value) => {
@@ -191,17 +188,26 @@ const Projects: React.FunctionComponent = () => {
       : stateDispatch({type: 'setFilterValue', payload: value});
   };
 
-  const routes = () => (
-    <Fragment>
-      <Route
-        exact
-        path={'/new-project'}
-        render={(props: AnyObject) => (
-          <NewProject {...props} />
-        )}
-      />
-    </Fragment>
-  );
+   const routes = () => <Fragment>
+    <Route
+      exact
+      path={'/projects/new-project'}
+      render={(props: AnyObject) => (
+        <NewProject {...props} />
+      )}
+    />
+    <Route exact path="/projects/edit-project/:id" render={ (props: AnyObject) => <EditProject {...props} /> }/>
+    <Route exact path="/projects/remove/:id"
+           render={ props => <RemoveProject { ...props }
+                                             fetchData={ handlePagination }
+                                             setSelectedProjects={setSelectedProjects } /> }/>
+    <Route exact path="/projects/remove"
+           render={ props => <RemoveProject { ...props }
+                                             ids={ selectedProjects }
+                                             fetchData={ handlePagination }
+                                             setSelectedProjects={ setSelectedProjects } /> }/>
+  </Fragment>;
+
 
   const actionResolver = () => [
     {
@@ -217,7 +223,7 @@ const Projects: React.FunctionComponent = () => {
       component: 'button',
       onClick: (_event, _rowId, project) =>
         history.push({
-          pathname: `/projects/remove-project/${project.id}`
+          pathname: `/projects/remove/${project.id}`
         })
     }
   ];
@@ -297,8 +303,10 @@ const Projects: React.FunctionComponent = () => {
           <TableToolbarView
             ouiaId={'projects-table'}
             rows={rows}
+            setLimit={setLimit}
+            setOffset={setOffset}
             columns={columns(intl, selectedAll, selectAllFunction)}
-            fetchData={updateProjects}
+            fetchData={handlePagination}
             routes={routes}
             actionResolver={actionResolver}
             plural={intl.formatMessage(sharedMessages.projects)}

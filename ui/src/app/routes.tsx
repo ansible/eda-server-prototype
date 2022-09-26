@@ -251,9 +251,6 @@ const AppRoutes = (): React.ReactElement => {
         ))}
         <PageNotFound title="404 Page Not Found"/>
       </Switch>
-      <div>
-        <DialogRoutes />
-      </div>
     </Fragment>
   );
 }

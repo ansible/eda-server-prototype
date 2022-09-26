@@ -33,7 +33,6 @@ const EditProject: React.FunctionComponent = () => {
       .then(data => setProject(data));
   }, []);
 
-  console.log('Debug - project: ', project);
   const setScmUrl = (url: string) =>  setProject({...project, url: url} );
   const setName = (name: string) =>  setProject({...project, name: name} );
   const setDescription = (description: string) =>  setProject({...project, description: description} );
