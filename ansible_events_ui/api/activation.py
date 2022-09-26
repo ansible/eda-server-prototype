@@ -17,6 +17,7 @@ from ansible_events_ui.db.dependency import (
     get_db_session,
     get_db_session_factory,
 )
+from ansible_events_ui.db.models.activation import ExecutionEnvironment
 from ansible_events_ui.db.utils.lostream import (
     PGLargeObject,
     decode_bytes_buff,
@@ -40,6 +41,14 @@ async def create_activation(
     activation: schema.ActivationCreate,
     db: AsyncSession = Depends(get_db_session),
 ):
+    if (
+        activation.execution_environment == ExecutionEnvironment.LOCAL
+        and activation.working_directory is None
+    ):
+        raise HTTPException(
+            status_code=400, detail="Working Directory is required."
+        )
+
     query = sa.insert(models.activations).values(
         name=activation.name,
         description=activation.description,
