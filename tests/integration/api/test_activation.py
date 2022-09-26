@@ -21,7 +21,7 @@ TEST_ACTIVATION = {
     "restart_policy": RestartPolicy.ON_FAILURE.value,
     "is_enabled": True,
     "working_directory": "/tmp",
-    "execution_environment": ExecutionEnvironment.DOCKER_PODMAN.value,
+    "execution_environment": ExecutionEnvironment.DOCKER.value,
 }
 
 TEST_EXTRA_VAR = """

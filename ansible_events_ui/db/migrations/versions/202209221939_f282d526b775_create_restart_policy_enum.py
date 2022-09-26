@@ -30,7 +30,7 @@ def upgrade() -> None:
         ),
     )
     execution_environment = sa.Enum(
-        "docker/podman", "k8s", "local", name="execution_environment_enum"
+        "docker", "podman", "k8s", "local", name="execution_environment_enum"
     )
     execution_environment.create(op.get_bind(), checkfirst=True)
     op.alter_column(
@@ -38,7 +38,7 @@ def upgrade() -> None:
         "execution_environment",
         type_=execution_environment,
         postgresql_using="execution_environment::execution_environment_enum",
-        server_default="docker/podman",
+        server_default="docker",
         nullable=False,
     )
     op.alter_column(

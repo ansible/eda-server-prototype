@@ -20,7 +20,8 @@ class RestartPolicy(Enum):
 
 
 class ExecutionEnvironment(Enum):
-    DOCKER_PODMAN = "docker/podman"
+    DOCKER = "docker"
+    PODMAN = "podman"
     K8S = "k8s"
     LOCAL = "local"
 
@@ -44,8 +45,8 @@ activations = sa.Table(
             name="execution_environment_enum",
             values_callable=lambda x: [e.value for e in x],
         ),
-        default=ExecutionEnvironment.DOCKER_PODMAN,
-        server_default=ExecutionEnvironment.DOCKER_PODMAN.value,
+        default=ExecutionEnvironment.DOCKER,
+        server_default=ExecutionEnvironment.DOCKER.value,
         nullable=False,
     ),
     sa.Column(
