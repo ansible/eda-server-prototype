@@ -161,6 +161,8 @@ const Rules: React.FunctionComponent = () => {
         <TableToolbarView
           ouiaId={'rules-table'}
           rows={rows}
+          setLimit={setLimit}
+          setOffset={setOffset}
           columns={columns(intl)}
           fetchData={updateRules}
           plural={intl.formatMessage(sharedMessages.rules)}
