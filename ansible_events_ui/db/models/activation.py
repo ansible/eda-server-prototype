@@ -1,3 +1,5 @@
+from enum import Enum
+
 import sqlalchemy as sa
 from sqlalchemy import func
 from sqlalchemy.dialects import postgresql
@@ -8,8 +10,21 @@ __all__ = (
     "activations",
     "activation_instances",
     "activation_instance_logs",
-    "restart_policies",
 )
+
+
+class RestartPolicy(Enum):
+    ALWAYS = "always"
+    ON_FAILURE = "on-failure"
+    NEVER = "never"
+
+
+class ExecutionEnvironment(Enum):
+    DOCKER = "docker"
+    PODMAN = "podman"
+    K8S = "k8s"
+    LOCAL = "local"
+
 
 activations = sa.Table(
     "activation",
@@ -23,7 +38,17 @@ activations = sa.Table(
     sa.Column("name", sa.String, nullable=False),
     sa.Column("description", sa.String),
     sa.Column("working_directory", sa.String),
-    sa.Column("execution_environment", sa.String),
+    sa.Column(
+        "execution_environment",
+        sa.Enum(
+            ExecutionEnvironment,
+            name="execution_environment_enum",
+            values_callable=lambda x: [e.value for e in x],
+        ),
+        default=ExecutionEnvironment.DOCKER,
+        server_default=ExecutionEnvironment.DOCKER.value,
+        nullable=False,
+    ),
     sa.Column(
         "rulebook_id",
         sa.ForeignKey("rulebook.id", ondelete="CASCADE"),
@@ -37,20 +62,26 @@ activations = sa.Table(
     sa.Column(
         "extra_var_id",
         sa.ForeignKey("extra_var.id", ondelete="CASCADE"),
-        nullable=False,
     ),
     sa.Column(
-        "restart_policy_id",
-        sa.ForeignKey("restart_policy.id"),
-        nullable=False,
-    ),
-    sa.Column(
-        "playbook_id",
-        sa.ForeignKey("playbook.id", ondelete="CASCADE"),
+        "restart_policy",
+        sa.Enum(
+            RestartPolicy,
+            name="restart_policy_enum",
+            values_callable=lambda x: [e.value for e in x],
+        ),
+        default=RestartPolicy.ON_FAILURE,
+        server_default=RestartPolicy.ON_FAILURE.value,
         nullable=False,
     ),
     sa.Column("status", sa.String),
-    sa.Column("is_enabled", sa.Boolean, nullable=False),
+    sa.Column(
+        "is_enabled",
+        sa.Boolean,
+        nullable=False,
+        default=True,
+        server_default=sa.true(),
+    ),
     sa.Column("restarted_at", sa.DateTime(timezone=True)),
     sa.Column("restart_count", sa.Integer, nullable=False, default=0),
     sa.Column(
@@ -66,18 +97,6 @@ activations = sa.Table(
         server_default=func.now(),
         onupdate=func.now(),
     ),
-)
-
-restart_policies = sa.Table(
-    "restart_policy",
-    metadata,
-    sa.Column(
-        "id",
-        sa.Integer,
-        sa.Identity(always=True),
-        primary_key=True,
-    ),
-    sa.Column("name", sa.String),
 )
 
 
