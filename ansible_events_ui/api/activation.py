@@ -46,7 +46,7 @@ async def create_activation(
         and activation.working_directory is None
     ):
         raise HTTPException(
-            status_code=422,
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail=(
                 "If Execution Environment is 'local', "
                 "Working Directory is required."
@@ -67,7 +67,10 @@ async def create_activation(
     try:
         result = await db.execute(query)
     except sa.exc.IntegrityError:
-        raise HTTPException(status_code=422, detail="Unprocessable Entity.")
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Unprocessable Entity.",
+        )
     await db.commit()
     (id_,) = result.inserted_primary_key
 
