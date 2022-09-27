@@ -94,27 +94,19 @@ async def _create_rules(db: AsyncSession):
 async def test_list_rules(client: AsyncClient, db: AsyncSession):
     _, _, ruleset, rules = await _create_rules(db)
 
-    response = await client.get("/api/rules/")
+    response = await client.get("/api/rules")
     assert response.status_code == status_codes.HTTP_200_OK
     assert response.json() == [
         {
-            "id": rules[0].id,
-            "name": rules[0].name,
-            "action": rules[0].action,
+            "id": rule.id,
+            "name": rule.name,
+            "action": rule.action,
             "ruleset": {
                 "id": ruleset.id,
                 "name": ruleset.name,
             },
-        },
-        {
-            "id": rules[1].id,
-            "name": rules[1].name,
-            "action": rules[1].action,
-            "ruleset": {
-                "id": ruleset.id,
-                "name": ruleset.name,
-            },
-        },
+        }
+        for rule in rules
     ]
 
 
@@ -122,7 +114,7 @@ async def test_list_rules(client: AsyncClient, db: AsyncSession):
 async def test_read_rule(client: AsyncClient, db: AsyncSession):
     _, _, ruleset, rules = await _create_rules(db)
 
-    response = await client.get(f"/api/rules/{rules[0].id}/")
+    response = await client.get(f"/api/rules/{rules[0].id}")
     assert response.status_code == status_codes.HTTP_200_OK
     assert response.json() == {
         "id": rules[0].id,
@@ -139,7 +131,7 @@ async def test_read_rule(client: AsyncClient, db: AsyncSession):
 async def test_list_rulesets(client: AsyncClient, db: AsyncSession):
     _, rulebook, ruleset, rules = await _create_rules(db)
 
-    response = await client.get("/api/rulesets/")
+    response = await client.get("/api/rulesets")
     assert response.status_code == status_codes.HTTP_200_OK
     assert response.json() == [
         {
@@ -153,7 +145,7 @@ async def test_list_rulesets(client: AsyncClient, db: AsyncSession):
 @pytest.mark.asyncio
 async def test_read_ruleset(client: AsyncClient, db: AsyncSession):
     project, rulebook, ruleset, rules = await _create_rules(db)
-    response = await client.get(f"/api/rulesets/{ruleset.id}/")
+    response = await client.get(f"/api/rulesets/{ruleset.id}")
     assert response.status_code == status_codes.HTTP_200_OK
     assert response.json() == {
         "id": ruleset.id,
@@ -174,5 +166,5 @@ async def test_read_ruleset(client: AsyncClient, db: AsyncSession):
 
 @pytest.mark.asyncio
 async def test_read_ruleset_not_found(client: AsyncClient, db: AsyncSession):
-    response = await client.get("/api/rulesets/-1/")
+    response = await client.get("/api/rulesets/-1")
     assert response.status_code == status_codes.HTTP_404_NOT_FOUND

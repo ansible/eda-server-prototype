@@ -17,7 +17,7 @@ class RulebookRef(BaseModel):
 
 class RulesetProjectRef(BaseModel):
     id: int
-    name: Optional[str]
+    name: str
 
 
 class Ruleset(BaseModel):
@@ -33,7 +33,7 @@ class RulesetDetail(BaseModel):
     created_at: datetime
     modified_at: datetime
     rulebook: RulebookRef
-    project: RulesetProjectRef
+    project: Optional[RulesetProjectRef]
 
 
 class RuleRulesetRef(BaseModel):
