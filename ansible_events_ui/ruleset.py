@@ -121,8 +121,7 @@ async def activate_rulesets(
 
         docker = aiodocker.Docker()
 
-        if deployment_type == "docker":
-            host = "host.docker.internal"
+        host = "eda-server"
 
         container = await docker.containers.create(
             {
@@ -138,6 +137,9 @@ async def activate_rulesets(
                 "Image": execution_environment,
                 "Env": ["ANSIBLE_FORCE_COLOR=True"],
                 "ExtraHosts": ["host.docker.internal:host-gateway"],
+                "HostConfig": {
+                    "NetworkMode": "eda-network"
+                }
             }
         )
         try:
@@ -145,6 +147,7 @@ async def activate_rulesets(
         except aiodocker.exceptions.DockerError as e:
             logger.error("Failed to start container: %s", e)
             await container.delete()
+            await docker.close()
             raise
 
         activated_rulesets[activation_id] = container
