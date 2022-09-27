@@ -111,7 +111,7 @@ async def websocket_activation_endpoint(
         updatemanager.disconnect(page, websocket)
 
 
-@router.websocket("/api/ws-jobs/")
+@router.websocket("/api/ws-jobs")
 async def websocket_jobs_endpoint(websocket: WebSocket):
     page = "/jobs"
     await updatemanager.connect(page, websocket)

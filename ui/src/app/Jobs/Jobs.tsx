@@ -165,7 +165,7 @@ const Jobs: React.FunctionComponent = () => {
 
   const [update_client, setUpdateClient] = useState<WebSocket|unknown>({});
   useEffect(() => {
-    const uc = new WebSocket('ws://' + getServer() + '/api/ws-jobs/');
+    const uc = new WebSocket('ws://' + getServer() + '/api/ws-jobs');
     setUpdateClient(uc);
     uc.onopen = () => {
       console.log('Update client connected');
