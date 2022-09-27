@@ -17,6 +17,7 @@ from ansible_events_ui.db.dependency import (
     get_db_session,
     get_db_session_factory,
 )
+from ansible_events_ui.db.models.activation import ExecutionEnvironment
 from ansible_events_ui.db.utils.lostream import (
     PGLargeObject,
     decode_bytes_buff,
@@ -40,6 +41,18 @@ async def create_activation(
     activation: schema.ActivationCreate,
     db: AsyncSession = Depends(get_db_session),
 ):
+    if (
+        activation.execution_environment == ExecutionEnvironment.LOCAL
+        and activation.working_directory is None
+    ):
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=(
+                "If Execution Environment is 'local', "
+                "Working Directory is required."
+            ),
+        )
+
     query = sa.insert(models.activations).values(
         name=activation.name,
         description=activation.description,
@@ -47,15 +60,17 @@ async def create_activation(
         inventory_id=activation.inventory_id,
         execution_environment=activation.execution_environment,
         working_directory=activation.working_directory,
-        restart_policy_id=activation.restart_policy_id,
-        playbook_id=activation.playbook_id,
+        restart_policy=activation.restart_policy,
         is_enabled=activation.is_enabled,
         extra_var_id=activation.extra_var_id,
     )
     try:
         result = await db.execute(query)
     except sa.exc.IntegrityError:
-        raise HTTPException(status_code=422, detail="Unprocessable Entity.")
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Unprocessable Entity.",
+        )
     await db.commit()
     (id_,) = result.inserted_primary_key
 
@@ -79,6 +94,7 @@ async def read_activation(
             models.activations.c.status,
             models.activations.c.working_directory,
             models.activations.c.execution_environment,
+            models.activations.c.restart_policy,
             models.activations.c.restarted_at,
             models.activations.c.restart_count,
             models.activations.c.created_at,
@@ -89,17 +105,11 @@ async def read_activation(
             models.inventories.c.name.label("inventory_name"),
             models.extra_vars.c.id.label("extra_var_id"),
             models.extra_vars.c.name.label("extra_var_name"),
-            models.playbooks.c.id.label("playbook_id"),
-            models.playbooks.c.name.label("playbook_name"),
-            models.restart_policies.c.id.label("restart_policy_id"),
-            models.restart_policies.c.name.label("restart_policy_name"),
         )
         .select_from(models.activations)
         .join(models.rulebooks)
         .join(models.inventories)
         .join(models.extra_vars)
-        .join(models.playbooks)
-        .join(models.restart_policies)
         .where(models.activations.c.id == activation_id)
     )
     activation = (await db.execute(query)).one_or_none()
@@ -114,6 +124,7 @@ async def read_activation(
         "status": activation["status"],
         "working_directory": activation["working_directory"],
         "execution_environment": activation["execution_environment"],
+        "restart_policy": activation["restart_policy"],
         "restarted_at": activation["restarted_at"],
         "restart_count": activation["restart_count"],
         "created_at": activation["created_at"],
@@ -125,14 +136,6 @@ async def read_activation(
         "inventory": {
             "id": activation["inventory_id"],
             "name": activation["inventory_name"],
-        },
-        "playbook": {
-            "id": activation["playbook_id"],
-            "name": activation["playbook_name"],
-        },
-        "restart_policy": {
-            "id": activation["restart_policy_id"],
-            "name": activation["restart_policy_name"],
         },
         "extra_var": {
             "id": activation["extra_var_id"],

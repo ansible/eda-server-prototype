@@ -3,15 +3,14 @@ from typing import Optional
 
 from pydantic import BaseModel, StrictStr
 
+from ansible_events_ui.db.models.activation import (
+    ExecutionEnvironment,
+    RestartPolicy,
+)
+
 from .extra_vars import ExtravarsRef
 from .inventory import InventoryRef
-from .playbook import PlaybookRef
 from .rulebook import RulebookRef
-
-
-class RestartPolicy(BaseModel):
-    id: int
-    name: StrictStr
 
 
 class ActivationCreate(BaseModel):
@@ -19,12 +18,11 @@ class ActivationCreate(BaseModel):
     description: Optional[StrictStr]
     rulebook_id: int
     inventory_id: int
-    restart_policy_id: int
-    playbook_id: int
-    is_enabled: bool
-    extra_var_id: int
-    working_directory: StrictStr
-    execution_environment: StrictStr
+    restart_policy: RestartPolicy = RestartPolicy.ON_FAILURE
+    is_enabled: bool = True
+    extra_var_id: Optional[int]
+    execution_environment: ExecutionEnvironment = ExecutionEnvironment.DOCKER
+    working_directory: Optional[StrictStr]
 
 
 class ActivationBaseRead(ActivationCreate):
@@ -37,12 +35,11 @@ class ActivationRead(BaseModel):
     description: Optional[StrictStr]
     status: Optional[StrictStr]
     is_enabled: bool
-    working_directory: StrictStr
-    execution_environment: StrictStr
+    working_directory: Optional[StrictStr]
+    execution_environment: ExecutionEnvironment
     rulebook: RulebookRef
     inventory: InventoryRef
-    extra_var: ExtravarsRef
-    playbook: PlaybookRef
+    extra_var: Optional[ExtravarsRef]
     restart_policy: RestartPolicy
     restarted_at: Optional[datetime]
     restart_count: int

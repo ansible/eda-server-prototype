@@ -6,6 +6,10 @@ from sqlalchemy import func
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ansible_events_ui.db import models
+from ansible_events_ui.db.models.activation import (
+    ExecutionEnvironment,
+    RestartPolicy,
+)
 from ansible_events_ui.db.utils.lostream import PGLargeObject
 
 TEST_ACTIVATION = {
@@ -14,11 +18,10 @@ TEST_ACTIVATION = {
     "inventory_id": 1,
     "extra_var_id": 1,
     "description": "demo activation",
-    "restart_policy_id": 1,
-    "playbook_id": 1,
+    "restart_policy": RestartPolicy.ON_FAILURE.value,
     "is_enabled": True,
     "working_directory": "/tmp",
-    "execution_environment": "quay.io/ansible/eda-project",
+    "execution_environment": ExecutionEnvironment.DOCKER.value,
 }
 
 TEST_EXTRA_VAR = """
@@ -46,8 +49,6 @@ TEST_RULEBOOK = """
     - debug:
         msg: hello
 """
-
-TEST_PLAYBOOK = TEST_RULEBOOK
 
 
 async def _create_activation_dependent_objects(
@@ -77,26 +78,10 @@ async def _create_activation_dependent_objects(
         )
     ).inserted_primary_key
 
-    (playbook_id,) = (
-        await db.execute(
-            sa.insert(models.playbooks).values(
-                name="hello.yml", playbook=TEST_PLAYBOOK
-            )
-        )
-    ).inserted_primary_key
-
-    (restart_policy_id,) = (
-        await db.execute(
-            sa.insert(models.restart_policies).values(name="test_restart")
-        )
-    ).inserted_primary_key
-
     foreign_keys = {
         "extra_var_id": extra_var_id,
         "inventory_id": inventory_id,
         "rulebook_id": rulebook_id,
-        "playbook_id": playbook_id,
-        "restart_policy_id": restart_policy_id,
     }
 
     return foreign_keys
@@ -114,8 +99,7 @@ async def _create_activation(
                 inventory_id=foreign_keys["inventory_id"],
                 execution_environment=TEST_ACTIVATION["execution_environment"],
                 working_directory=TEST_ACTIVATION["working_directory"],
-                restart_policy_id=foreign_keys["restart_policy_id"],
-                playbook_id=foreign_keys["playbook_id"],
+                restart_policy=TEST_ACTIVATION["restart_policy"],
                 is_enabled=TEST_ACTIVATION["is_enabled"],
                 extra_var_id=foreign_keys["extra_var_id"],
             )
@@ -254,7 +238,10 @@ async def test_read_activation(client: AsyncClient, db: AsyncSession):
     assert activation["name"] == TEST_ACTIVATION["name"]
     assert activation["id"] == activation_id
     assert activation["is_enabled"] == TEST_ACTIVATION["is_enabled"]
-    assert activation["working_directory"] == "/tmp"
+    assert (
+        activation["working_directory"] == TEST_ACTIVATION["working_directory"]
+    )
+    assert activation["restart_policy"] == TEST_ACTIVATION["restart_policy"]
     assert (
         activation["execution_environment"]
         == TEST_ACTIVATION["execution_environment"]
@@ -271,11 +258,6 @@ async def test_read_activation(client: AsyncClient, db: AsyncSession):
         "id": foreign_keys["extra_var_id"],
         "name": "vars.yml",
     }
-    assert activation["playbook"] == {
-        "id": foreign_keys["playbook_id"],
-        "name": "hello.yml",
-    }
-    assert activation["restart_policy"]["name"] == "test_restart"
 
 
 @pytest.mark.asyncio
