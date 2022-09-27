@@ -211,6 +211,8 @@ exports[`Rules should render the Rules component 1`] = `
                       },
                     ]
                   }
+                  setLimit={[Function]}
+                  setOffset={[Function]}
                   singular="Rule"
                 >
                   <PrimaryToolbar

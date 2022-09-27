@@ -180,6 +180,8 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                       },
                     ]
                   }
+                  setLimit={[Function]}
+                  setOffset={[Function]}
                   singular="Rule set"
                 >
                   <Route
