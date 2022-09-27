@@ -97,7 +97,7 @@ const RemoveActivation: React.ComponentType<IRemoveActivation> = ( {ids = [],
       <StackItem>
         <TextContent>
           <Text component={TextVariants.p}>
-            { activation?.name }
+            <strong>{ activation?.name }</strong>
           </Text>
         </TextContent>
       </StackItem>
