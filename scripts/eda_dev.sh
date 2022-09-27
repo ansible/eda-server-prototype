@@ -60,6 +60,8 @@ handle_errors() {
   exit 1
 }
 
+check_bash_version
+
 check_uvicorn_status() {
   local _url=http://localhost:"${EDA_PI_PORT}"/api/docs
   local _timeout=10
@@ -182,6 +184,7 @@ stop-events-api() {
 
 start-events-all() {
   start-events-services
+  db-migrations
   start-events-api
   start-events-ui
 }

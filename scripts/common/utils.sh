@@ -16,3 +16,13 @@ check_vars() {
         fi
     done
 }
+
+check_bash_version() {
+  local _version="${1:-5}"
+
+  if [ ! "${BASH_VERSINFO:-0}" -ge "${_version}" ]; then
+    log-err "bash version must be 5 or above"
+    log-err "Current bash version: ${BASH_VERSION}"
+    exit 1
+  fi
+}
