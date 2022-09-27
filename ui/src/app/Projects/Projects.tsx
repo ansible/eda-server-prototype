@@ -262,23 +262,6 @@ const Projects: React.FunctionComponent = () => {
           </Button>
         </Link>
       </ToolbarItem>
-      <ToolbarItem>
-        <Link
-          id="remove-multiple-projects"
-          className={anyProjectsSelected ? '' : 'disabled-link'}
-          to={{pathname: '/remove-projects'}}
-        >
-          <Button
-            variant="secondary"
-            isDisabled={!anyProjectsSelected}
-            aria-label={intl.formatMessage(
-              sharedMessages.deleteProjectTitle
-            )}
-          >
-            {intl.formatMessage(sharedMessages.delete)}
-          </Button>
-        </Link>
-      </ToolbarItem>
     </ToolbarGroup>
   );
 
