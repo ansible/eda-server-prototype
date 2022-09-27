@@ -97,7 +97,7 @@ const RemoveProject: React.ComponentType<IRemoveProject> = ( {ids = [],
       <StackItem>
         <TextContent>
           <Text component={TextVariants.p}>
-            { project?.name }
+            <strong> { project?.name } </strong>
           </Text>
         </TextContent>
       </StackItem>
