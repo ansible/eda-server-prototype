@@ -1,7 +1,7 @@
 """Create enum tables for restart policy and execution environment.
 
 Revision ID: f282d526b775
-Revises: 1285eea03d23
+Revises: d4df045eb3ce
 Create Date: 2022-09-22 19:39:23.365448+00:00
 
 """
@@ -10,7 +10,7 @@ from alembic import op
 
 # revision identifiers, used by Alembic.
 revision = "f282d526b775"
-down_revision = "1285eea03d23"
+down_revision = "d4df045eb3ce"
 branch_labels = None
 depends_on = None
 

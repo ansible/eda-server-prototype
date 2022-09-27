@@ -46,7 +46,11 @@ async def create_activation(
         and activation.working_directory is None
     ):
         raise HTTPException(
-            status_code=400, detail="Working Directory is required."
+            status_code=422,
+            detail=(
+                "If Execution Environment is 'local', "
+                "Working Directory is required."
+            ),
         )
 
     query = sa.insert(models.activations).values(
