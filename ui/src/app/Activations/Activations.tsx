@@ -15,6 +15,7 @@ import {defaultSettings} from "@app/shared/pagination";
 import {NewActivation} from "@app/NewActivation/NewActivation";
 import {createRows} from "@app/Activations/activations-table-helpers";
 import {AnyObject} from "@app/shared/types/common-types";
+import {RemoveActivation} from "@app/RemoveActivation/RemoveActivation";
 
 export interface ActivationType {
   id: string;
@@ -206,6 +207,15 @@ const Activations: React.FunctionComponent = () => {
         <NewActivation {...props} />
       )}
     />
+    <Route exact path="/activations/remove/:id"
+           render={ props => <RemoveActivation { ...props }
+                                             fetchData={ handlePagination }
+                                             setSelectedActivations={setSelectedActivations } /> }/>
+    <Route exact path="/activations/remove"
+           render={ props => <RemoveActivation { ...props }
+                                             ids={ selectedActivations }
+                                             fetchData={ handlePagination }
+                                             setSelectedActivations={ setSelectedActivations } /> }/>
   </Fragment>;
 
 
@@ -215,7 +225,7 @@ const Activations: React.FunctionComponent = () => {
       component: 'button',
       onClick: (_event, _rowId, activation) =>
         history.push({
-          pathname: `/edit-activation/${activation.id}`
+          pathname: `/activations/edit-activation/${activation.id}`
         })
     },
     {
@@ -255,7 +265,7 @@ const Activations: React.FunctionComponent = () => {
         <Link
           id="remove-multiple-activations"
           className={anyActivationsSelected ? '' : 'disabled-link'}
-          to={{pathname: '/remove-activations'}}
+          to={{pathname: '/activations/remove'}}
         >
           <Button
             variant="secondary"
@@ -268,7 +278,24 @@ const Activations: React.FunctionComponent = () => {
           </Button>
         </Link>
       </ToolbarItem>
-     </ToolbarGroup>
+      <ToolbarItem>
+        <Link
+          id="remove-multiple-projects"
+          className={anyActivationsSelected ? '' : 'disabled-link'}
+          to={{pathname: '/activations/remove'}}
+        >
+          <Button
+            variant="secondary"
+            isDisabled={!anyActivationsSelected}
+            aria-label={intl.formatMessage(
+              sharedMessages.deleteActivationTitle
+            )}
+          >
+            {intl.formatMessage(sharedMessages.delete)}
+          </Button>
+        </Link>
+      </ToolbarItem>
+    </ToolbarGroup>
   );
 
   return (
