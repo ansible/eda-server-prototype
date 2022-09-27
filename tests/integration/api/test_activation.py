@@ -267,6 +267,37 @@ async def test_read_activation_not_found(client: AsyncClient):
 
 
 @pytest.mark.asyncio
+async def test_read_activations(client: AsyncClient, db: AsyncSession):
+    foreign_keys = await _create_activation_dependent_objects(client, db)
+    activation_id = await _create_activation(client, db, foreign_keys)
+
+    response = await client.get(
+        "/api/activations/",
+    )
+    assert response.status_code == status_codes.HTTP_200_OK
+    activations = response.json()
+    assert type(activations) is list
+    assert len(activations) > 0
+
+    activation = activations[0]
+    assert activation["id"] == activation_id
+    assert activation["name"] == TEST_ACTIVATION["name"]
+    assert activation["description"] == TEST_ACTIVATION["description"]
+
+
+@pytest.mark.asyncio
+async def test_read_activations_empty_response(
+    client: AsyncClient, db: AsyncSession
+):
+    response = await client.get(
+        "/api/activations/",
+    )
+    assert response.status_code == status_codes.HTTP_200_OK
+    activations = response.json()
+    assert activations == []
+
+
+@pytest.mark.asyncio
 async def test_update_activation(client: AsyncClient, db: AsyncSession):
     foreign_keys = await _create_activation_dependent_objects(client, db)
     activation_id = await _create_activation(client, db, foreign_keys)

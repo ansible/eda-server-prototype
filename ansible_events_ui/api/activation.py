@@ -114,7 +114,10 @@ async def read_activation(
     )
     activation = (await db.execute(query)).one_or_none()
     if activation is None:
-        raise HTTPException(status_code=404, detail="Activation Not Found.")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Activation Not Found.",
+        )
 
     response = {
         "id": activation["id"],
@@ -145,6 +148,25 @@ async def read_activation(
     return response
 
 
+@router.get(
+    "/api/activations/",
+    response_model=List[schema.ActivationRead],
+    operation_id="list_activations",
+)
+async def list_activations(
+    db: AsyncSession = Depends(get_db_session),
+):
+    activations = await db.execute(sa.select(models.activations.c.id))
+
+    extended_activations = []
+    for activation in activations:
+        extended_activations.append(
+            await read_activation(activation["id"], db)
+        )
+
+    return extended_activations
+
+
 @router.patch(
     "/api/activation/{activation_id}",
     response_model=schema.ActivationBaseRead,
@@ -163,7 +185,10 @@ async def update_activation(
         )
     ).one_or_none()
     if stored_activation is None:
-        raise HTTPException(status_code=404, detail="Activation Not Found.")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Activation Not Found.",
+        )
 
     await db.execute(
         sa.update(models.activations)
