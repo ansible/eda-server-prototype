@@ -114,7 +114,7 @@ async def test_create_activation(client: AsyncClient, db: AsyncSession):
     await _create_activation_dependent_objects(client, db)
 
     response = await client.post(
-        "/api/activations/",
+        "/api/activations",
         json=TEST_ACTIVATION,
     )
     assert response.status_code == status_codes.HTTP_200_OK
@@ -211,7 +211,7 @@ async def test_create_activation_bad_entity(
     client: AsyncClient, db: AsyncSession
 ):
     response = await client.post(
-        "/api/activations/",
+        "/api/activations",
         json=TEST_ACTIVATION,
     )
     assert response.status_code == status_codes.HTTP_422_UNPROCESSABLE_ENTITY
@@ -272,7 +272,7 @@ async def test_read_activations(client: AsyncClient, db: AsyncSession):
     activation_id = await _create_activation(client, db, foreign_keys)
 
     response = await client.get(
-        "/api/activations/",
+        "/api/activations",
     )
     assert response.status_code == status_codes.HTTP_200_OK
     activations = response.json()
@@ -290,7 +290,7 @@ async def test_read_activations_empty_response(
     client: AsyncClient, db: AsyncSession
 ):
     response = await client.get(
-        "/api/activations/",
+        "/api/activations",
     )
     assert response.status_code == status_codes.HTTP_200_OK
     activations = response.json()
