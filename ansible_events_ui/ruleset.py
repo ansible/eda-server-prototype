@@ -138,7 +138,7 @@ async def activate_rulesets(
                 "Env": ["ANSIBLE_FORCE_COLOR=True"],
                 "ExtraHosts": ["host.docker.internal:host-gateway"],
                 "HostConfig": {
-                    "NetworkMode": "eda-network"
+                    "NetworkMode": "eda-network",
                 }
             }
         )
