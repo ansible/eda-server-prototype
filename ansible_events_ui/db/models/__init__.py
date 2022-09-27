@@ -7,6 +7,7 @@ from .base import Base, metadata
 from .job import (
     activation_instance_job_instances,
     job_instance_events,
+    job_instance_hosts,
     job_instances,
     jobs,
 )
@@ -27,6 +28,7 @@ __all__ = (
     # job
     "activation_instance_job_instances",
     "job_instance_events",
+    "job_instance_hosts",
     "job_instances",
     "jobs",
     # project
