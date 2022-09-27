@@ -23,6 +23,8 @@ handle_errors() {
   exit 1
 }
 
+check_bash_version
+
 # deployment dir
 DEPLOY_DIR="${PROJECT_DIR}"/tools/deploy
 
