@@ -114,7 +114,6 @@ const routes: AppRouteConfig[] = [
   },
   {
     component: Jobs,
-    exact: true,
     label: 'Jobs',
     path: '/jobs',
     title: 'Jobs',
