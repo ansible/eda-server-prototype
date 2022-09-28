@@ -33,7 +33,7 @@ router = APIRouter(tags=["activations"])
 
 
 @router.post(
-    "/api/activations/",
+    "/api/activations",
     response_model=schema.ActivationBaseRead,
     operation_id="create_activation",
 )
@@ -78,7 +78,7 @@ async def create_activation(
 
 
 @router.get(
-    "/api/activation/{activation_id}",
+    "/api/activations/{activation_id}",
     response_model=schema.ActivationRead,
     operation_id="show_activation",
 )
@@ -114,7 +114,10 @@ async def read_activation(
     )
     activation = (await db.execute(query)).one_or_none()
     if activation is None:
-        raise HTTPException(status_code=404, detail="Activation Not Found.")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Activation Not Found.",
+        )
 
     response = {
         "id": activation["id"],
@@ -145,8 +148,27 @@ async def read_activation(
     return response
 
 
+@router.get(
+    "/api/activations",
+    response_model=List[schema.ActivationRead],
+    operation_id="list_activations",
+)
+async def list_activations(
+    db: AsyncSession = Depends(get_db_session),
+):
+    activations = await db.execute(sa.select(models.activations.c.id))
+
+    extended_activations = []
+    for activation in activations:
+        extended_activations.append(
+            await read_activation(activation["id"], db)
+        )
+
+    return extended_activations
+
+
 @router.patch(
-    "/api/activation/{activation_id}",
+    "/api/activations/{activation_id}",
     response_model=schema.ActivationBaseRead,
     operation_id="update_activation",
 )
@@ -163,7 +185,10 @@ async def update_activation(
         )
     ).one_or_none()
     if stored_activation is None:
-        raise HTTPException(status_code=404, detail="Activation Not Found.")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Activation Not Found.",
+        )
 
     await db.execute(
         sa.update(models.activations)
@@ -214,7 +239,7 @@ async def read_output(proc, activation_instance_id, db_session_factory):
 
 
 @router.post(
-    "/api/activation_instance/", operation_id="create_activation_instance"
+    "/api/activation_instance", operation_id="create_activation_instance"
 )
 async def create_activation_instance(
     a: schema.ActivationInstance,
@@ -288,14 +313,14 @@ async def create_activation_instance(
     return {**a.dict(), "id": id_}
 
 
-@router.post("/api/deactivate/", operation_id="deactivate_activation_instance")
+@router.post("/api/deactivate", operation_id="deactivate_activation_instance")
 async def deactivate(activation_instance_id: int):
     await inactivate_rulesets(activation_instance_id)
     return
 
 
 @router.get(
-    "/api/activation_instances/", operation_id="list_activation_instances"
+    "/api/activation_instances", operation_id="list_activation_instances"
 )
 async def list_activation_instances(
     db: AsyncSession = Depends(get_db_session),
@@ -353,7 +378,7 @@ async def delete_activation_instance(
 
 
 @router.get(
-    "/api/activation_instance_logs/",
+    "/api/activation_instance_logs",
     operation_id="list_activation_instance_logs",
     response_model=List[schema.ActivationLog],
 )

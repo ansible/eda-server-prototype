@@ -19,7 +19,14 @@ from .project import (
     ProjectRead,
     ProjectUpdate,
 )
-from .rulebook import Rule, Rulebook, RulebookRef, RuleRulesetRef
+from .rulebook import (
+    Rule,
+    Rulebook,
+    RulebookRef,
+    RuleRulesetRef,
+    Ruleset,
+    RulesetDetail,
+)
 from .user import UserCreate, UserRead, UserUpdate
 
 __all__ = [
@@ -47,6 +54,8 @@ __all__ = [
     "Rule",
     "Rulebook",
     "RulebookRef",
+    "Ruleset",
+    "RulesetDetail",
     "RuleRulesetRef",
     "UserCreate",
     "UserRead",
