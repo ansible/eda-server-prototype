@@ -105,12 +105,6 @@ rule_count_lateral = (
 )
 ruls_ct = sa.orm.aliased(rule_count_lateral)
 
-# There is a possibility that this may generate a SQLAlchemy warning,
-# but all of the reference links are safe and the database does not
-# throw an error or warning.
-# Thre is a reported fix, but it may not be released at the time of this
-# coding.
-# See: https://github.com/sqlalchemy/sqlalchemy/issues/7507
 BASE_RULESET_SELECT = (
     sa.select(
         ruleset.c.id,
@@ -157,7 +151,7 @@ async def list_rulesets(db: AsyncSession = Depends(get_db_session)):
 async def get_ruleset(
     ruleset_id: int, db: AsyncSession = Depends(get_db_session)
 ):
-    query = BASE_RULESET_SELECT.filter(models.rulesets.c.id == ruleset_id)
+    query = BASE_RULESET_SELECT.filter(ruleset.c.id == ruleset_id)
     rec = (await db.execute(query)).first()
     if not rec:
         raise HTTPException(
