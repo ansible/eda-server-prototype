@@ -10,15 +10,15 @@ import {
 } from '@patternfly/react-core';
 import {Link, useParams} from 'react-router-dom';
 import React from 'react';
-import {renderRuleSetFileTabs, RuleSetType} from "@app/RuleSetFile/ruleset";
+import {renderRuleBookTabs, RuleBookType} from "@app/RuleBook/rulebook";
 import {useIntl} from "react-intl";
 import sharedMessages from "../messages/shared.messages";
 
-const RulesetDetails: React.FunctionComponent<{ruleset: RuleSetType}> = ({ ruleset }) => {
+const RulebookDetails: React.FunctionComponent<{rulebook: RuleBookType}> = ({ rulebook }) => {
   const intl = useIntl();
   const {id} = useParams<{id: string}>();
 
-  const renderFlexRulesetDetails: React.FunctionComponent<RuleSetType> = (ruleset) => (
+  const renderFlexRulebookDetails: React.FunctionComponent<RuleBookType> = (ruleset) => (
     <Stack hasGutter={true}>
       <StackItem>
         <Flex>
@@ -27,23 +27,15 @@ const RulesetDetails: React.FunctionComponent<{ruleset: RuleSetType}> = ({ rules
               <Stack>
                 <StackItem><Title headingLevel="h3">{intl.formatMessage(sharedMessages.name)}</Title></StackItem>
                 <StackItem>
-                  {ruleset?.name}
+                  {rulebook?.name}
                 </StackItem>
               </Stack>
             </FlexItem>
             <FlexItem>
               <Stack>
-                <StackItem><Title headingLevel="h3">{intl.formatMessage(sharedMessages.scmCredentials)}</Title></StackItem>
+                <StackItem><Title headingLevel="h3">{intl.formatMessage(sharedMessages.fire_count)}</Title></StackItem>
                 <StackItem>
-                  {ruleset?.scm_credentials}
-                </StackItem>
-              </Stack>
-            </FlexItem>
-            <FlexItem>
-              <Stack>
-                <StackItem><Title headingLevel="h3">{intl.formatMessage(sharedMessages.project_link)}</Title></StackItem>
-                <StackItem>
-                  <Link to={"/project/" + ruleset?.project_id}>{ruleset?.project_name || `Project ${ruleset?.project_id}`}</Link>
+                  {rulebook?.fire_count}
                 </StackItem>
               </Stack>
             </FlexItem>
@@ -53,15 +45,7 @@ const RulesetDetails: React.FunctionComponent<{ruleset: RuleSetType}> = ({ rules
               <Stack>
                 <StackItem><Title headingLevel="h3">{intl.formatMessage(sharedMessages.description)}</Title></StackItem>
                 <StackItem>
-                  {ruleset?.description}
-                </StackItem>
-              </Stack>
-            </FlexItem>
-            <FlexItem>
-              <Stack>
-                <StackItem><Title headingLevel="h3">{intl.formatMessage(sharedMessages.number_of_rules)}</Title></StackItem>
-                <StackItem>
-                  { ruleset?.number_of_rules }
+                  {rulebook?.description}
                 </StackItem>
               </Stack>
             </FlexItem>
@@ -69,7 +53,7 @@ const RulesetDetails: React.FunctionComponent<{ruleset: RuleSetType}> = ({ rules
               <Stack>
                 <StackItem><Title headingLevel="h3">{intl.formatMessage(sharedMessages.created)}</Title></StackItem>
                 <StackItem>
-                  {ruleset?.created_at}
+                  {rulebook?.created_at}
                 </StackItem>
               </Stack>
             </FlexItem>
@@ -77,17 +61,9 @@ const RulesetDetails: React.FunctionComponent<{ruleset: RuleSetType}> = ({ rules
           <Flex direction={{ default: 'column' }} flex={{ default: 'flex_1' }}>
             <FlexItem>
               <Stack>
-                <StackItem><Title headingLevel="h3">{intl.formatMessage(sharedMessages.scmUrl)}</Title></StackItem>
+                <StackItem><Title headingLevel="h3">{intl.formatMessage(sharedMessages.number_of_rulesets)}</Title></StackItem>
                 <StackItem>
-                  {ruleset?.scm_url}
-                </StackItem>
-              </Stack>
-            </FlexItem>
-            <FlexItem>
-              <Stack>
-                <StackItem><Title headingLevel="h3">{intl.formatMessage(sharedMessages.fire_count)}</Title></StackItem>
-                <StackItem>
-                  {ruleset?.fire_count}
+                  { rulebook?.number_of_rulesets }
                 </StackItem>
               </Stack>
             </FlexItem>
@@ -95,7 +71,7 @@ const RulesetDetails: React.FunctionComponent<{ruleset: RuleSetType}> = ({ rules
               <Stack>
                 <StackItem><Title headingLevel="h3">{intl.formatMessage(sharedMessages.lastModified)}</Title></StackItem>
                 <StackItem>
-                  {ruleset?.last_modified}
+                  {rulebook?.last_modified}
                 </StackItem>
               </Stack>
             </FlexItem>
@@ -107,12 +83,12 @@ const RulesetDetails: React.FunctionComponent<{ruleset: RuleSetType}> = ({ rules
 
   return (
   <PageSection page-type={'ruleset-details'} id={'ruleset-details'}>
-    { renderRuleSetFileTabs(id, intl) }
+    { renderRuleBookTabs(id, intl) }
     <Stack>
       <StackItem>
         <Card>
           <CardBody>
-            {renderFlexRulesetDetails(ruleset)}
+            {renderFlexRulebookDetails(rulebook)}
           </CardBody>
         </Card>
       </StackItem>
@@ -121,4 +97,4 @@ const RulesetDetails: React.FunctionComponent<{ruleset: RuleSetType}> = ({ rules
 )
 }
 
-export { RulesetDetails };
+export { RulebookDetails };

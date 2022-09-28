@@ -387,6 +387,30 @@ const sharedMessages = defineMessages({
     id: 'activation.enterRulebookActivationWorkingDirectory',
     defaultMessage: 'Enter a rulebook working directory'
   },
+  backToRuleBooks: {
+    id: 'rulebook.backToRuleBooks',
+    defaultMessage: 'Back to Rulebooks'
+  },
+  rulebooks: {
+    id: 'rulebook.rulebooks',
+    defaultMessage: 'Rulebooks'
+  },
+  rulebook: {
+    id: 'rulebook.rulebook',
+    defaultMessage: 'Rulebook'
+  },
+  norulebooks: {
+    id: 'rulebook.norulebooks',
+    defaultMessage: 'There are currently no rulebooks for your organization'
+  },
+  norulebookrulesets: {
+    id: 'rulebook.norulebookrulesets',
+    defaultMessage: 'No rule sets for this rulebook'
+  },
+  number_of_rulesets: {
+    id: 'rulebook.number_of_ruesets',
+    defaultMessage: 'Number of rulesets'
+  },
   jobRemoveTitle: {
     id: 'job.removeJob',
     defaultMessage: 'Delete job'

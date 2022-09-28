@@ -12,7 +12,7 @@ import TableEmptyState from "@app/shared/table-empty-state";
 import {useIntl} from "react-intl";
 import {defaultSettings} from "@app/shared/pagination";
 import {NewRuleSet} from "@app/NewRuleSet/NewRuleSet";
-import {createRows} from "@app/RuleSetFiles/rule-sets-table-helpers";
+import {createRows} from "@app/RuleSets/rule-sets-table-helpers";
 import {AnyObject} from "@app/shared/types/common-types";
 
 export interface SourceType {
