@@ -13,8 +13,10 @@ import { NewActivation } from '@app/NewActivation/NewActivation';
 import { Jobs } from '@app/Jobs/Jobs';
 import { Job } from '@app/Job/Job';
 import { NewJob } from '@app/NewJob/NewJob';
-import { RuleSets } from '@app/RuleSetFiles/RuleSetFiles';
-import { RuleSet } from '@app/RuleSetFile/ruleset';
+import { RuleSets } from '@app/RuleSets/RuleSets';
+import { RuleSet } from '@app/RuleSet/ruleset';
+import { RuleBooks } from '@app/RuleBooks/RuleBooks';
+import { RuleBook } from '@app/RuleBook/rulebook';
 import { Inventories } from '@app/Inventories/Inventories';
 import { Inventory } from '@app/Inventory/Inventory';
 import { Vars } from '@app/Vars/Vars';
@@ -24,9 +26,9 @@ import { Playbook } from '@app/Playbook/Playbook';
 import { NotFound } from '@app/NotFound/NotFound';
 import { useDocumentTitle } from '@app/utils/useDocumentTitle';
 import {ActivationStdout} from "@app/Activation/activation-stdout";
-import {RulesetSources} from "@app/RuleSetFile/ruleset-sources";
-import {RulesetDetails} from "@app/RuleSetFile/ruleset-details";
-import {RulesetRules} from "@app/RuleSetFile/ruleset-rules";
+import {RulesetSources} from "@app/RuleSet/ruleset-sources";
+import {RulesetDetails} from "@app/RuleSet/ruleset-details";
+import {RulesetRules} from "@app/RuleSet/ruleset-rules";
 import { Rules } from '@app/Rules/Rules';
 import { Rule } from '@app/Rule/Rule';
 import {Fragment} from "react";
@@ -128,6 +130,18 @@ const routes: AppRouteConfig[] = [
     component: NewJob,
     path: '/new-job/',
     title: 'NewJob',
+  },
+  {
+    component: RuleBooks,
+    exact: true,
+    label: 'Rule books',
+    path: '/rulebooks',
+    title: 'Rule Books',
+  },
+  {
+    component: RuleBook,
+    path: '/rulebook/:id',
+    title: 'RuleBook',
   },
   {
     component: RuleSets,

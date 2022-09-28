@@ -1,4 +1,4 @@
-import {Button, PageSection} from '@patternfly/react-core';
+import {Button, PageSection, SimpleListItem} from '@patternfly/react-core';
 import {useHistory, useParams} from 'react-router-dom';
 import React, {useEffect, useReducer, useState} from 'react';
 import {TableToolbarView} from "@app/shared/table-toolbar-view";
@@ -7,20 +7,20 @@ import {cellWidth} from "@patternfly/react-table";
 import TableEmptyState from "@app/shared/table-empty-state";
 import {useIntl} from "react-intl";
 import {defaultSettings} from "@app/shared/pagination";
-import {createRows} from "./sources-table-helpers";
+import {createRows} from "./rulesets-table-helpers";
 import {CubesIcon} from "@patternfly/react-icons";
-import {renderRuleSetFileTabs,
-        RuleSetType,
-        SourceType} from "@app/RuleSetFile/ruleset";
+import {renderRuleBookTabs, RuleBookType, RuleSetType} from "@app/RuleBook/rulebook";
 import {getServer} from "@app/utils/utils";
 
 const columns = (intl) => [
   {
-    title: (intl.formatMessage(sharedMessages.name)),
-    transforms: [cellWidth(40 )]
+    title: (intl.formatMessage(sharedMessages.name))
   },
   {
-    title: (intl.formatMessage(sharedMessages.type))
+    title: (intl.formatMessage(sharedMessages.number_of_rules))
+  },
+  {
+    title: (intl.formatMessage(sharedMessages.fire_count))
   }
 ];
 
@@ -43,7 +43,7 @@ const initialState = (filterValue = '') => ({
 });
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-export const sourcesListState = (state, action) => {
+export const rulesetsListState = (state, action) => {
   switch (action.type) {
     case 'setRows':
       return {
@@ -68,26 +68,26 @@ export const sourcesListState = (state, action) => {
       return state;
   }
 };
-const endpoint_sources = 'http://' + getServer() + '/api/rulebook_json/';
-const fetchRulesetSources = (id, pagination=defaultSettings) =>
+const endpoint_rulesets = 'http://' + getServer() + '/api/rulebook_json/';
+const fetchRulebookRuleSets = (id, pagination=defaultSettings) =>
 {
-  return fetch(`${endpoint_sources}${id}`, {
+  return fetch(`${endpoint_rulesets}${id}`, {
     headers: {
       'Content-Type': 'application/json',
     },
-  }).then(response => response.json()).then(data => ( data && data.rulesets && data.rulesets.length > 0 ? data.rulesets[0].sources : []))
+  }).then(response => response.json()).then(data => ( data ? data.rulesets : []))
 }
 
-const RulesetSources: React.FunctionComponent<{ruleset: RuleSetType}> = ({ruleset}) => {
+const RulebookRulesets: React.FunctionComponent<{rulebook: RuleBookType}> = ({rulebook}) => {
   const history = useHistory();
   const [limit, setLimit] = useState(defaultSettings.limit);
   const [offset, setOffset] = useState(1);
-  const [sources, setSources] = useState<SourceType[]>([]);
+  const [rulesets, setRuleSets] = useState<RuleSetType[]>([]);
 
-  const rulesetId = ruleset?.id;
+  const rulebookId = rulebook?.id;
   const {id} = useParams<{id: string}>();
 
-  const meta = {count: sources?.length || 0, limit, offset};
+  const meta = {count: rulesets?.length || 0, limit, offset};
   const [
     {
       filterValue,
@@ -96,28 +96,28 @@ const RulesetSources: React.FunctionComponent<{ruleset: RuleSetType}> = ({rulese
       rows
     },
     stateDispatch
-  ] = useReducer(sourcesListState, initialState());
+  ] = useReducer(rulesetsListState, initialState());
 
   const intl = useIntl();
-  const updateSources = (pagination) => {
+  const updateRuleSets = (pagination) => {
     stateDispatch({type: 'setFetching', payload: true});
-    return fetchRulesetSources(id, pagination).then( data => setSources(data))
+    return fetchRulebookRuleSets(id, pagination).then( data => setRuleSets(data))
       .then(() => stateDispatch({type: 'setFetching', payload: false}))
       .catch(() => stateDispatch({type: 'setFetching', payload: false}));
   };
 
   useEffect(() => {
-    fetchRulesetSources(id)
+    fetchRulebookRuleSets(id)
       .then(data => { stateDispatch({type: 'setRows', payload: createRows(data)});});
   }, []);
 
   useEffect(() => {
-    updateSources(defaultSettings);
+    updateRuleSets(defaultSettings);
   }, []);
 
   const clearFilters = () => {
     stateDispatch({type: 'clearFilters'});
-    return updateSources(meta);
+    return updateRuleSets(meta);
   };
 
   const handleFilterChange = (value) => {
@@ -125,24 +125,21 @@ const RulesetSources: React.FunctionComponent<{ruleset: RuleSetType}> = ({rulese
       ? clearFilters()
       : stateDispatch({type: 'setFilterValue', payload: value});
   };
-
   return (
-    <PageSection page-type={'ruleset-sources'} id={'ruleset-sources'}>
-      { renderRuleSetFileTabs(id, intl) }
+    <PageSection page-type={'rulebook-rulesets'} id={'rulebook-rulesets'}>
+      { renderRuleBookTabs(id, intl) }
       <TableToolbarView
-        ouiaId={'ruleset-sources-table'}
+        ouiaId={'rulebook-rulesets-table'}
         rows={rows}
-        setLimit={setLimit}
-        setOffset={setOffset}
         columns={columns(intl)}
-        fetchData={updateSources}
-        plural={intl.formatMessage(sharedMessages.sources)}
-        singular={intl.formatMessage(sharedMessages.sources)}
+        fetchData={updateRuleSets}
+        plural={intl.formatMessage(sharedMessages.rulesets)}
+        singular={intl.formatMessage(sharedMessages.ruleset)}
         isLoading={isFetching || isFiltering}
         onFilterChange={handleFilterChange}
         renderEmptyState={() => (
           <TableEmptyState
-            title={intl.formatMessage(sharedMessages.norulesetsources)}
+            title={intl.formatMessage(sharedMessages.norulebookrulesets)}
             Icon={CubesIcon}
             PrimaryAction={() =>
               filterValue !== '' ? (
@@ -153,7 +150,7 @@ const RulesetSources: React.FunctionComponent<{ruleset: RuleSetType}> = ({rulese
             }
             description={
               filterValue === ''
-                ? intl.formatMessage(sharedMessages.norulesetsources)
+                ? intl.formatMessage(sharedMessages.norulebookrulesets)
                 : intl.formatMessage(
                   sharedMessages.clearAllFiltersDescription
                 )
@@ -165,4 +162,4 @@ const RulesetSources: React.FunctionComponent<{ruleset: RuleSetType}> = ({rulese
   );
 }
 
-export { RulesetSources };
+export { RulebookRulesets };
