@@ -225,7 +225,10 @@ async def delete_activation(
     )
     results = await db.execute(query)
     if results.rowcount == 0:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Activation Not Found.",
+        )
     await db.commit()
 
 
