@@ -25,7 +25,7 @@ TEST_RULESET_SIMPLE = """
 @pytest.mark.asyncio
 async def test_create_rulebook(client: AsyncClient, db: AsyncSession):
     response = await client.post(
-        "/api/rulebooks/",
+        "/api/rulebooks",
         json={
             "name": "test-ruleset-1.yml",
             "rulesets": TEST_RULESET_SIMPLE,

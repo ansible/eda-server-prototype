@@ -45,6 +45,19 @@ rulesets = sa.Table(
         nullable=False,
     ),
     sa.Column("name", sa.String),
+    sa.Column(
+        "created_at",
+        sa.DateTime(timezone=True),
+        nullable=False,
+        server_default=func.now(),
+    ),
+    sa.Column(
+        "modified_at",
+        sa.DateTime(timezone=True),
+        nullable=False,
+        server_default=func.now(),
+        onupdate=func.now(),
+    ),
 )
 
 rules = sa.Table(
