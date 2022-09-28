@@ -76,7 +76,7 @@ export const renderRuleSetFileTabs = (rulesetId: string, intl) => {
   return <AppTabs tabItems={ruleset_tabs}/>
 };
 
-const endpoint_rulebook = 'http://' + getServer() + '/api/rulebooks/';
+const endpoint_rulebook = 'http://' + getServer() + '/api/rulebooks';
 const endpoint_rulebook_json = 'http://' + getServer() + '/api/rulebook_json/';
 
 export const getTabFromPath = (tabs:TabItemType[], path:string):string | undefined => {
@@ -90,7 +90,7 @@ const RuleSet: React.FunctionComponent = () => {
   const intl = useIntl();
 
   useEffect(() => {
-    fetch(`${endpoint_rulebook}${id}`, {
+    fetch(`${endpoint_rulebook}/${id}`, {
       headers: {
         'Content-Type': 'application/json',
       },

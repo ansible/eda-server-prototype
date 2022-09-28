@@ -25,7 +25,7 @@ const SimpleList = styled(PFSimpleList)`
   white-space: pre-wrap;
 `
 
-const endpoint = 'http://' + getServer() + '/api/rulebooks/';
+const endpoint = 'http://' + getServer() + '/api/rulebooks';
 const endpoint2 = 'http://' + getServer() + '/api/rulebook_json/';
 
 const RuleSetFile: React.FunctionComponent = () => {
@@ -37,7 +37,7 @@ const RuleSetFile: React.FunctionComponent = () => {
   console.log(id);
 
   useEffect(() => {
-     fetch(endpoint + id, {
+     fetch(endpoint + '/' + id, {
        headers: {
          'Content-Type': 'application/json',
        },
