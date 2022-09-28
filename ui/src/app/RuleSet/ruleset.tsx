@@ -6,9 +6,9 @@ import AppTabs from "@app/shared/app-tabs";
 import {CaretLeftIcon} from "@patternfly/react-icons";
 import {getServer} from "@app/utils/utils";
 import {TopToolbar} from "@app/shared/top-toolbar";
-import {RulesetRules} from "@app/RuleSetFile/ruleset-rules";
-import {RulesetDetails} from "@app/RuleSetFile/ruleset-details";
-import {RulesetSources} from "@app/RuleSetFile/ruleset-sources";
+import {RulesetRules} from "@app/RuleSet/ruleset-rules";
+import {RulesetDetails} from "@app/RuleSet/ruleset-details";
+import {RulesetSources} from "@app/RuleSet/ruleset-sources";
 import sharedMessages from "../messages/shared.messages";
 import {AnyObject} from "@app/shared/types/common-types";
 
@@ -37,12 +37,6 @@ export interface RuleType {
   name: string,
   fire_count: number,
   list_fired_date: string
-}
-
-export interface SourceType {
-  id: string,
-  name: string,
-  type: string
 }
 
 const buildRuleSetFileTabs = (rulesetId: string, intl: AnyObject) : TabItemType[] => ( [
