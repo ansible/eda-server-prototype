@@ -8,10 +8,11 @@ from fastapi import APIRouter, Depends, WebSocket, WebSocketDisconnect
 from sqlalchemy import cast, insert, select
 from sqlalchemy.dialects import postgresql
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import sessionmaker
 
 from ansible_events_ui import schema
 from ansible_events_ui.db import models
-from ansible_events_ui.db.dependency import get_db_session
+from ansible_events_ui.db.dependency import get_db_session_factory
 from ansible_events_ui.key import generate_ssh_keys
 from ansible_events_ui.managers import (
     secretsmanager,
@@ -76,7 +77,8 @@ host_status_map = {
 
 @router.websocket("/api/ws2")
 async def websocket_endpoint2(
-    websocket: WebSocket, db: AsyncSession = Depends(get_db_session)
+    websocket: WebSocket,
+    db_session_factory: sessionmaker = Depends(get_db_session_factory),
 ):
     logger.debug("starting ws2")
     await websocket.accept()
@@ -86,15 +88,15 @@ async def websocket_endpoint2(
             data = json.loads(data)
             # TODO(cutwater): Some data validation is needed
             data_type = data.get("type")
-            if data_type == "Worker":
-                await handle_workers(websocket, data, db)
-            elif data_type == "Job":
-                await handle_jobs(data, db)
-            elif data_type == "AnsibleEvent":
-                await handle_ansible_events(data, db)
-            elif data_type == "Action":
-                await handle_actions(data, db)
-
+            with db_session_factory() as db:
+                if data_type == "Worker":
+                    await handle_workers(websocket, data, db)
+                elif data_type == "Job":
+                    await handle_jobs(data, db)
+                elif data_type == "AnsibleEvent":
+                    await handle_ansible_events(data, db)
+                elif data_type == "Action":
+                    await handle_actions(data, db)
     except WebSocketDisconnect:
         pass
 

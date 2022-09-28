@@ -5,7 +5,6 @@ from typing import List
 
 import aiodocker.exceptions
 import sqlalchemy as sa
-import sqlalchemy.orm
 from fastapi import APIRouter, Depends, Response, status
 from fastapi.exceptions import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -13,10 +12,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from ansible_events_ui import schema
 from ansible_events_ui.config import Settings, get_settings
 from ansible_events_ui.db import models
-from ansible_events_ui.db.dependency import (
-    get_db_session,
-    get_db_session_factory,
-)
+from ansible_events_ui.db.dependency import get_db_session
 from ansible_events_ui.db.models.activation import ExecutionEnvironment
 from ansible_events_ui.db.utils.lostream import (
     PGLargeObject,
@@ -264,9 +260,6 @@ async def read_output(proc, activation_instance_id, db_session_factory):
 async def create_activation_instance(
     a: schema.ActivationInstance,
     db: AsyncSession = Depends(get_db_session),
-    db_session_factory: sqlalchemy.orm.sessionmaker = Depends(
-        get_db_session_factory
-    ),
     settings: Settings = Depends(get_settings),
 ):
 
