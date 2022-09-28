@@ -280,6 +280,7 @@ async def handle_jobs(data: dict, db: AsyncSession):
 
 async def handle_actions(data: dict, db: AsyncSession):
     logger.info(f"Start to handle actions: {data}")
+    print(data)
     activation_id = int(data.get("activation_id"))
 
     if activation_id:

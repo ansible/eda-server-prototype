@@ -16,7 +16,7 @@ class Settings(BaseSettings):
         "postgresql+asyncpg://postgres:secret@localhost:5432/ansible_events"
     )
 
-    deployment_type: str = "docker"
+    deployment_type: str = "k8s"
     server_name: str = "localhost"
 
     class Config:

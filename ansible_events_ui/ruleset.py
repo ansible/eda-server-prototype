@@ -26,10 +26,13 @@ import logging
 import os
 import shutil
 import tempfile
+import uuid
 from functools import partial
 
 import aiodocker
 import ansible_runner
+import kubernetes_asyncio as k8s
+import yaml
 from sqlalchemy import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -157,7 +160,50 @@ async def activate_rulesets(
 
     elif deployment_type == "k8s":
         # Calls to the k8s apis.
-        logger.error("k8s deployment not implemented yet")
+        logger.info("Connecting to the k8s API")
+        await k8s.config.load_kube_config()
+        async with k8s.client.ApiClient() as k8s_client:
+            v1 = k8s.client.BatchV1Api(k8s_client)
+            try:
+                result = await k8s.utils.create_from_dict(
+                    k8s_client,
+                    yaml.safe_load(
+                        f"""
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: activation-{activation_id}-{uuid.uuid4()}
+spec:
+  template:
+    spec:
+      containers:
+      - name: ansible-events
+        image: quay.io/bthomass/eda-project
+        command: ['ansible-events', '--websocket-address=ws://host.docker.internal:8080/api/ws2', '--id', '{activation_id}', '--worker', '--debug']
+      restartPolicy: Never
+  backoffLimit: 4
+"""
+                    ),
+                )
+                print(result)
+                print(await v1.list_namespaced_job("default"))
+            except k8s.utils.FailToCreateError as e:
+                print(f"Already exists: {e}", )
+
+    elif deployment_type == "saas":
+        # Calls to the k8s apis.
+        logger.info("Waiting for client to connect")
+        line = "Remote worker logs are stored local to the worker"
+        query = insert(activation_instance_logs).values(
+            line_number=1,
+            log=line,
+            activation_instance_id=activation_id,
+        )
+        await db.execute(query)
+        await db.commit()
+
+    elif deployment_type == "aap":
+        logger.error("Not yet implemented")
     else:
         raise Exception("Unsupported deployment_type")
 
