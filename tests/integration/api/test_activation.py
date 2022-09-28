@@ -114,7 +114,7 @@ async def test_create_activation(client: AsyncClient, db: AsyncSession):
     await _create_activation_dependent_objects(client, db)
 
     response = await client.post(
-        "/api/activations/",
+        "/api/activations",
         json=TEST_ACTIVATION,
     )
     assert response.status_code == status_codes.HTTP_200_OK
@@ -211,7 +211,7 @@ async def test_create_activation_bad_entity(
     client: AsyncClient, db: AsyncSession
 ):
     response = await client.post(
-        "/api/activations/",
+        "/api/activations",
         json=TEST_ACTIVATION,
     )
     assert response.status_code == status_codes.HTTP_422_UNPROCESSABLE_ENTITY
@@ -229,7 +229,7 @@ async def test_read_activation(client: AsyncClient, db: AsyncSession):
     activation_id = await _create_activation(client, db, foreign_keys)
 
     response = await client.get(
-        f"/api/activation/{activation_id}",
+        f"/api/activations/{activation_id}",
     )
     assert response.status_code == status_codes.HTTP_200_OK
     activation = response.json()
@@ -262,8 +262,39 @@ async def test_read_activation(client: AsyncClient, db: AsyncSession):
 
 @pytest.mark.asyncio
 async def test_read_activation_not_found(client: AsyncClient):
-    response = await client.get("/api/activation/1")
+    response = await client.get("/api/activations/1")
     assert response.status_code == status_codes.HTTP_404_NOT_FOUND
+
+
+@pytest.mark.asyncio
+async def test_read_activations(client: AsyncClient, db: AsyncSession):
+    foreign_keys = await _create_activation_dependent_objects(client, db)
+    activation_id = await _create_activation(client, db, foreign_keys)
+
+    response = await client.get(
+        "/api/activations",
+    )
+    assert response.status_code == status_codes.HTTP_200_OK
+    activations = response.json()
+    assert type(activations) is list
+    assert len(activations) > 0
+
+    activation = activations[0]
+    assert activation["id"] == activation_id
+    assert activation["name"] == TEST_ACTIVATION["name"]
+    assert activation["description"] == TEST_ACTIVATION["description"]
+
+
+@pytest.mark.asyncio
+async def test_read_activations_empty_response(
+    client: AsyncClient, db: AsyncSession
+):
+    response = await client.get(
+        "/api/activations",
+    )
+    assert response.status_code == status_codes.HTTP_200_OK
+    activations = response.json()
+    assert activations == []
 
 
 @pytest.mark.asyncio
@@ -278,7 +309,7 @@ async def test_update_activation(client: AsyncClient, db: AsyncSession):
     }
 
     response = await client.patch(
-        f"/api/activation/{activation_id}",
+        f"/api/activations/{activation_id}",
         json=new_activation,
     )
     assert response.status_code == status_codes.HTTP_200_OK
@@ -299,7 +330,7 @@ async def test_update_activation_bad_entity(
     }
 
     response = await client.patch(
-        "/api/activation/1",
+        "/api/activations/1",
         json=new_activation,
     )
     assert response.status_code == status_codes.HTTP_422_UNPROCESSABLE_ENTITY
@@ -314,7 +345,7 @@ async def test_update_activation_not_found(client: AsyncClient):
     }
 
     response = await client.patch(
-        "/api/activation/1",
+        "/api/activations/1",
         json=new_activation,
     )
     assert response.status_code == status_codes.HTTP_404_NOT_FOUND
