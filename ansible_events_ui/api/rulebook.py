@@ -13,8 +13,13 @@ from ansible_events_ui.project import insert_rulebook_related_data
 router = APIRouter(tags=["rulebooks"])
 
 
+# ------------------------------------
+#   rules endpoints
+# ------------------------------------
+
+
 @router.get(
-    "/api/rules/",
+    "/api/rules",
     response_model=List[schema.Rule],
     operation_id="list_rules",
 )
@@ -49,7 +54,7 @@ async def list_rules(db: AsyncSession = Depends(get_db_session)):
 
 
 @router.get(
-    "/api/rules/{rule_id}/",
+    "/api/rules/{rule_id}",
     response_model=schema.Rule,
     operation_id="read_rule",
 )
@@ -78,7 +83,96 @@ async def read_rule(rule_id: int, db: AsyncSession = Depends(get_db_session)):
     }
 
 
-@router.post("/api/rulebooks/", operation_id="create_rulebook")
+# ------------------------------------
+#   rulesets endpoints
+# ------------------------------------
+
+# This query will leverage a left outer join lateral
+# in order to get the rule counts.
+ruleset = sa.orm.aliased(models.rulesets)
+rules_lat = sa.orm.aliased(models.rules)
+rulebook = sa.orm.aliased(models.rulebooks)
+project = sa.orm.aliased(models.projects)
+
+rule_count_lateral = (
+    (
+        sa.select(sa.func.count(rules_lat.c.id).label("rule_count"))
+        .select_from(rules_lat)
+        .filter(rules_lat.c.ruleset_id == ruleset.c.id)
+    )
+    .subquery()
+    .lateral()
+)
+ruls_ct = sa.orm.aliased(rule_count_lateral)
+
+# There is a possibility that this may generate a SQLAlchemy warning,
+# but all of the reference links are safe and the database does not
+# throw an error or warning.
+# Thre is a reported fix, but it may not be released at the time of this
+# coding.
+# See: https://github.com/sqlalchemy/sqlalchemy/issues/7507
+BASE_RULESET_SELECT = (
+    sa.select(
+        ruleset.c.id,
+        ruleset.c.name,
+        ruleset.c.created_at,
+        ruleset.c.modified_at,
+        sa.func.coalesce(ruls_ct.c.rule_count, 0).label("rule_count"),
+        sa.func.coalesce(
+            sa.func.jsonb_build_object(
+                "id", rulebook.c.id, "name", rulebook.c.name
+            ),
+            sa.func.jsonb_build_object("id", None, "name", None),
+        ).label("rulebook"),
+        sa.func.coalesce(
+            sa.func.jsonb_build_object(
+                "id", project.c.id, "name", project.c.name
+            ),
+            sa.func.jsonb_build_object("id", None, "name", None),
+        ).label("project"),
+    )
+    .select_from(ruleset)
+    .outerjoin(rulebook, rulebook.c.id == ruleset.c.rulebook_id)
+    .outerjoin(project, project.c.id == rulebook.c.project_id)
+    .outerjoin(ruls_ct, sa.true())
+)
+
+
+@router.get(
+    "/api/rulesets",
+    response_model=List[schema.Ruleset],
+    operation_id="list_rulesets",
+)
+async def list_rulesets(db: AsyncSession = Depends(get_db_session)):
+    cur = await db.execute(BASE_RULESET_SELECT)
+    response = [rec._asdict() for rec in cur]
+    return response
+
+
+@router.get(
+    "/api/rulesets/{ruleset_id}",
+    response_model=schema.RulesetDetail,
+    operation_id="read_ruleset",
+)
+async def get_ruleset(
+    ruleset_id: int, db: AsyncSession = Depends(get_db_session)
+):
+    query = BASE_RULESET_SELECT.filter(models.rulesets.c.id == ruleset_id)
+    rec = (await db.execute(query)).first()
+    if not rec:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Ruleset not found"
+        )
+
+    return rec._asdict()
+
+
+# ------------------------------------
+#   rulebooks endpoints
+# ------------------------------------
+
+
+@router.post("/api/rulebooks", operation_id="create_rulebook")
 async def create_rulebook(
     rulebook: schema.Rulebook, db: AsyncSession = Depends(get_db_session)
 ):
@@ -95,7 +189,7 @@ async def create_rulebook(
     return {**rulebook.dict(), "id": id_}
 
 
-@router.get("/api/rulebooks/", operation_id="list_rulebooks")
+@router.get("/api/rulebooks", operation_id="list_rulebooks")
 async def list_rulebooks(db: AsyncSession = Depends(get_db_session)):
     query = sa.select(models.rulebooks)
     result = await db.execute(query)

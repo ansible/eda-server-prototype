@@ -100,15 +100,10 @@ def yield_files(project_dir):
 async def insert_rulebook_related_data(
     rulebook_id: int, rulebook_data: dict, db: AsyncSession
 ):
-    ruleset_values = []
-    for ruleset_data in rulebook_data:
-        ruleset_values.append(
-            {
-                "name": ruleset_data["name"],
-                "rulebook_id": rulebook_id,
-            }
-        )
-
+    ruleset_values = [
+        {"name": ruleset_data["name"], "rulebook_id": rulebook_id}
+        for ruleset_data in rulebook_data
+    ]
     query = (
         insert(models.rulesets)
         .returning(models.rulesets.c.id)
@@ -116,17 +111,11 @@ async def insert_rulebook_related_data(
     )
     ruleset_ids = (await db.scalars(query)).all()
 
-    rule_values = []
-    for ruleset_id, ruleset_data in zip(ruleset_ids, rulebook_data):
-        for rule_data in ruleset_data["rules"]:
-            rule_values.append(
-                {
-                    "name": rule_data["name"],
-                    "action": rule_data["action"],
-                    "ruleset_id": ruleset_id,
-                }
-            )
-
+    rule_values = [
+        {"name": rule["name"], "action": rule["action"], "ruleset_id": rsid}
+        for rsid, rsdata in zip(ruleset_ids, rulebook_data)
+        for rule in rsdata["rules"]
+    ]
     query = insert(models.rules).values(rule_values)
     await db.execute(query)
 
