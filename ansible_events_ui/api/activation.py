@@ -78,7 +78,7 @@ async def create_activation(
 
 
 @router.get(
-    "/api/activation/{activation_id}",
+    "/api/activations/{activation_id}",
     response_model=schema.ActivationRead,
     operation_id="show_activation",
 )
@@ -168,7 +168,7 @@ async def list_activations(
 
 
 @router.patch(
-    "/api/activation/{activation_id}",
+    "/api/activations/{activation_id}",
     response_model=schema.ActivationBaseRead,
     operation_id="update_activation",
 )
