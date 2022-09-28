@@ -227,7 +227,6 @@ async def delete_activation(
     if results.rowcount == 0:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     await db.commit()
-    return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
 async def read_output(proc, activation_instance_id, db_session_factory):
