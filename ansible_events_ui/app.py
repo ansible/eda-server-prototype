@@ -18,7 +18,7 @@ ALLOWED_ORIGINS = [
 root_router = APIRouter()
 
 
-@root_router.get("/ping")
+@root_router.get("/api/ping")
 def ping():
     return {"ping": "pong!"}
 
