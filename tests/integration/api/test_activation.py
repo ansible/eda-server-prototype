@@ -218,7 +218,7 @@ async def test_create_activation_bad_entity(
 
 
 @pytest.mark.asyncio
-async def test_delete_activation_not_found(client: AsyncClient):
+async def test_delete_activation_instance_not_found(client: AsyncClient):
     response = await client.delete("/api/activation_instance/1")
     assert response.status_code == status_codes.HTTP_404_NOT_FOUND
 
@@ -348,4 +348,29 @@ async def test_update_activation_not_found(client: AsyncClient):
         "/api/activations/1",
         json=new_activation,
     )
+    assert response.status_code == status_codes.HTTP_404_NOT_FOUND
+
+
+@pytest.mark.asyncio
+async def test_delete_activation(client: AsyncClient, db: AsyncSession):
+    foreign_keys = await _create_activation_dependent_objects(client, db)
+    activation_id = await _create_activation(client, db, foreign_keys)
+
+    num_activations = await db.scalar(
+        sa.select(func.count()).select_from(models.activations)
+    )
+    assert num_activations == 1
+
+    response = await client.delete(f"/api/activations/{activation_id}")
+    assert response.status_code == status_codes.HTTP_204_NO_CONTENT
+
+    num_activations = await db.scalar(
+        sa.select(func.count()).select_from(models.activation_instances)
+    )
+    assert num_activations == 0
+
+
+@pytest.mark.asyncio
+async def test_delete_activation_not_found(client: AsyncClient):
+    response = await client.delete("/api/activations/1")
     assert response.status_code == status_codes.HTTP_404_NOT_FOUND
