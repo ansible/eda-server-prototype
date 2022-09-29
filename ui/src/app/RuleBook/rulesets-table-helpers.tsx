@@ -1,21 +1,21 @@
 import React, { Fragment } from 'react';
 import {Link} from "react-router-dom";
 
+//TODO - replace the link to the ruleset when the endpoint is updated with that data
 export const createRows = (data) => {
-    return data.map(({id, name, condition, action, fire_count, last_fired_at}) => ({
+  console.log('Debug - create rulebook ruleset rows - data', data);
+    return data.map(({id, name, fire_count, last_fired_at}) => ({
     id,
     cells: [
-      <Fragment key={`[rule-${id}`}>
+      <Fragment key={`[ruleset-${id}`}>
         <Link
           to={{
-            pathname: `/rule/${id}`
+            pathname: `/rulesets`
           }}
         >
           {name || id}
         </Link>
       </Fragment>,
-      condition,
-      `${(Object.keys(action))}`,
       fire_count,
       last_fired_at
     ]

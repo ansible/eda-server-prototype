@@ -138,14 +138,14 @@ const routes: AppRouteConfig[] = [
   },
   {
     component: RuleBooks,
-    label: 'Rule books',
+    label: 'Rulebooks',
     path: '/rulebooks',
-    title: 'Rule Books',
+    title: 'Rulebooks',
   },
   {
     component: RuleSets,
     exact: true,
-    label: 'Rule sets',
+    label: 'Rule Sets',
     path: '/rulesets',
     title: 'Rule Sets',
   },
