@@ -10,5 +10,5 @@ class Extravars(BaseModel):
 
 
 class ExtravarsRef(BaseModel):
-    name: StrictStr
+    name: Optional[StrictStr]
     id: Optional[int]
