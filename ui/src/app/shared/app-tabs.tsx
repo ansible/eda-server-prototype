@@ -13,7 +13,7 @@ export interface AppTabsProps {
 const AppTabs: React.ComponentType<AppTabsProps> = ({ tabItems }) => {
   const { push } = useHistory();
   const { pathname, search } = useLocation();
-  const activeTab = tabItems.find(({ name }) => pathname.includes(name));
+  const activeTab = tabItems.find(({ name }) => name.split('/').pop() === pathname.split('/').pop());
   const handleTabClick = (
     _event: React.MouseEvent<HTMLElement, MouseEvent>,
     tabIndex: number | string

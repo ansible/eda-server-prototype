@@ -43,21 +43,21 @@ const buildRuleBookTabs = (rulebookId: string, intl: AnyObject) : TabItemType[] 
           {intl.formatMessage(sharedMessages.backToRuleBooks)}
         </div>
       ),
-      name: `/rulesets`
+      name: `/rulebooks`
     },
     { eventKey: 1,
       title: 'Details',
-      name: `/rulebook/${rulebookId}/details` },
+      name: `/rulebooks/rulebook/${rulebookId}/details` },
     {
       eventKey: 2,
       title: intl.formatMessage(sharedMessages.rulesets),
-      name: `/rulebook/${rulebookId}/rulesets`
+      name: `/rulebooks/rulebook/${rulebookId}/rulesets`
     }
   ]);
 
-export const renderRuleBookTabs = (rulesetId: string, intl) => {
-  const ruleset_tabs = buildRuleBookTabs(rulesetId, intl);
-  return <AppTabs tabItems={ruleset_tabs}/>
+export const renderRuleBookTabs = (rulebookId: string, intl) => {
+  const rulebook_tabs = buildRuleBookTabs(rulebookId, intl);
+  return <AppTabs tabItems={rulebook_tabs}/>
 };
 
 const endpoint_rulebook = 'http://' + getServer() + '/api/rulebooks/';
@@ -82,6 +82,7 @@ const RuleBook: React.FunctionComponent = () => {
   }, []);
 
   const location = useLocation();
+  console.log('Debug - getting current tab for rulebook, from location: ', rulebook, location);
   const currentTab = rulebook?.id ?
     getTabFromPath(buildRuleBookTabs(rulebook.id,intl), location.pathname) :
     intl.formatMessage(sharedMessages.details);
@@ -96,7 +97,7 @@ const RuleBook: React.FunctionComponent = () => {
         {
           title: rulebook?.name,
           key: 'details',
-          to: `/rulebook/${rulebook?.id}/details`
+          to: `/rulebooks/rulebook/${rulebook?.id}/details`
         },
         {
           title: currentTab || intl.formatMessage(sharedMessages.details),
@@ -108,12 +109,12 @@ const RuleBook: React.FunctionComponent = () => {
       </TopToolbar>
       { rulebook &&
         <Switch>
-          <Route exact path="/rulebook/:id/rulesets">
+          <Route exact path="/rulebooks/rulebook/:id/rulesets">
             <RulebookRulesets
               rulebook={rulebook}
             />
           </Route>
-          <Route path="/rulebook/:id">
+          <Route path="/rulebooks/rulebook/:id">
             <RulebookDetails
               rulebook={rulebook}
             />

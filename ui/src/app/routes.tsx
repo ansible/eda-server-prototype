@@ -132,16 +132,15 @@ const routes: AppRouteConfig[] = [
     title: 'NewJob',
   },
   {
+    component: RuleBook,
+    path: '/rulebooks/rulebook/:id',
+    title: 'RuleBook',
+  },
+  {
     component: RuleBooks,
-    exact: true,
     label: 'Rule books',
     path: '/rulebooks',
     title: 'Rule Books',
-  },
-  {
-    component: RuleBook,
-    path: '/rulebook/:id',
-    title: 'RuleBook',
   },
   {
     component: RuleSets,
