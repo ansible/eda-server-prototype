@@ -9,14 +9,14 @@ from .playbook import PlaybookRef
 from .rulebook import RuleRulesetRef
 
 
-def strict_mot_empty_str():
+def strict_not_empty_str():
     return constr(strict=True, strip_whitespace=True, min_length=1)
 
 
 class ProjectCreate(BaseModel):
     git_hash: Optional[StrictStr]
     url: StrictStr
-    name: strict_mot_empty_str()
+    name: strict_not_empty_str()
     description: Optional[StrictStr] = ""
 
 
@@ -40,5 +40,5 @@ class ProjectList(BaseModel):
 
 
 class ProjectUpdate(BaseModel):
-    name: Optional[strict_mot_empty_str()]
+    name: Optional[strict_not_empty_str()]
     description: Optional[StrictStr]

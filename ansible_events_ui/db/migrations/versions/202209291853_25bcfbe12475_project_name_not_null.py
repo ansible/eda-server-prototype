@@ -20,14 +20,10 @@ def upgrade() -> None:
         "project", "name", existing_type=sa.VARCHAR(), nullable=False
     )
 
-    op.execute(
-        sa.text(
-            """
-alter table project
-        add constraint "ck_project_name_not_empty" check (name != '')
-;
-"""
-        )
+    op.create_check_constraint(
+        "ck_project_name_not_empty",
+        "project",
+        sa.sql.column("name") != "",
     )
 
 
@@ -36,12 +32,4 @@ def downgrade() -> None:
         "project", "name", existing_type=sa.VARCHAR(), nullable=True
     )
 
-    op.execute(
-        sa.text(
-            """
-alter table project
-        drop constraint "ck_project_name_not_empty"
-;
-"""
-        )
-    )
+    op.drop_constraint("ck_project_name_not_empty")

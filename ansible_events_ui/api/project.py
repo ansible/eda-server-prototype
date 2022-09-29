@@ -147,7 +147,11 @@ async def update_project(
         .filter(projects.c.id == project_id)
         .label("project_id_count"),
         sa.func.count()
-        .filter(projects.c.name == project.name)
+        .filter(
+            sa.and_(
+                projects.c.name == project.name, projects.c.id != project_id
+            )
+        )
         .label("project_name_count"),
     ).select_from(projects)
     exists_check = (await (db.execute(query))).one_or_none()
@@ -168,7 +172,7 @@ async def update_project(
         sa.update(projects)
         .where(projects.c.id == project_id)
         .values(**values)
-        .returning(*projects.c)
+        .returning(projects)
     )
 
     try:
