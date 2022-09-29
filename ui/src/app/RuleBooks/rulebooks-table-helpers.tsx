@@ -8,7 +8,7 @@ export const createRows = (data) =>
       <Fragment key={`[rule-book-${id}`}>
         <Link
           to={{
-            pathname: `/rulebook/${id}`
+            pathname: `/rulebooks/rulebook/${id}`
           }}
         >
           {name}

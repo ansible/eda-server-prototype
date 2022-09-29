@@ -13,6 +13,7 @@ import {useIntl} from "react-intl";
 import {defaultSettings} from "@app/shared/pagination";
 import {createRows} from "@app/RuleBooks/rulebooks-table-helpers";
 import {RuleSetType} from "@app/RuleSet/ruleset";
+import {RuleBookType} from "@app/RuleBook/rulebook";
 
 const endpoint = 'http://' + getServer() + '/api/rulebooks/';
 
@@ -91,12 +92,12 @@ const fetchRuleBooks = (pagination = defaultSettings) => fetch(endpoint, {
 const RuleBooks: React.FunctionComponent = () => {
   const intl = useIntl();
   const history = useHistory();
-  const [RuleBooks, setRuleBooks] = useState<RuleSetType[]>([]);
+  const [ruleBooks, setRuleBooks] = useState<RuleBookType[]>([]);
   const [limit, setLimit] = useState(defaultSettings.limit);
   const [offset, setOffset] = useState(1);
 
-  const data = RuleBooks;
-  const meta = {count: RuleBooks?.length || 0, limit, offset};
+  const data = ruleBooks;
+  const meta = {count: ruleBooks?.length || 0, limit, offset};
   const [
     {
       filterValue,
@@ -122,16 +123,16 @@ const RuleBooks: React.FunctionComponent = () => {
   useEffect(() => {
     fetchRuleBooks().then(response => response.json())
       .then(data => { setRuleBooks(data); console.log( 'Debug - rulebooks data: ', data);
-        stateDispatch({type: 'setRows', payload: createRows(RuleBooks)});});
+        stateDispatch({type: 'setRows', payload: createRows(ruleBooks)});});
   }, []);
-
+``
   useEffect(() => {
     updateRuleBooks(defaultSettings);
   }, []);
 
   useEffect(() => {
-    stateDispatch({type: 'setRows', payload: createRows(RuleBooks)});
-  }, [RuleBooks]);
+    stateDispatch({type: 'setRows', payload: createRows(ruleBooks)});
+  }, [ruleBooks]);
 
   const clearFilters = () => {
     stateDispatch({type: 'clearFilters'});
