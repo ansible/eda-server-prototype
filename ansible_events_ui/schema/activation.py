@@ -15,14 +15,14 @@ from .rulebook import RulebookRef
 
 class ActivationCreate(BaseModel):
     name: StrictStr
-    description: Optional[StrictStr] = Field("", nullable=True)
+    description: Optional[StrictStr] = ""
     rulebook_id: int
     inventory_id: int
     restart_policy: RestartPolicy = RestartPolicy.ON_FAILURE
     is_enabled: bool = True
     extra_var_id: Optional[int] = Field(None, nullable=True)
     execution_environment: ExecutionEnvironment = ExecutionEnvironment.DOCKER
-    working_directory: Optional[StrictStr] = Field("", nullable=True)
+    working_directory: Optional[StrictStr] = ""
 
 
 class ActivationBaseRead(ActivationCreate):
