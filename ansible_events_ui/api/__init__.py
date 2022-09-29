@@ -26,6 +26,7 @@ from ansible_events_ui.users import (
 )
 
 from .activation import router as activation_router
+from .audit_rule import router as audit_rule_router
 from .job import router as job_router
 from .project import router as project_router
 from .rulebook import router as rulebook_router
@@ -37,6 +38,7 @@ router.include_router(activation_router)
 router.include_router(job_router)
 router.include_router(rulebook_router)
 router.include_router(project_router)
+router.include_router(audit_rule_router)
 
 
 # Determine host status based on event type

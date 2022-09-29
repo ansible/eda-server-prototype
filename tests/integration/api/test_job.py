@@ -43,13 +43,16 @@ async def test_create_delete_job(client: AsyncClient, db: AsyncSession):
     await db.execute(query)
 
     jobs = (await db.execute(sa.select(models.job_instances))).all()
-    assert len(jobs) == 1
+    jobs_len = len(jobs)
 
-    response = await client.delete("/api/job_instance/1")
+    job_to_delete = (await db.execute(sa.select(models.job_instances))).first()
+    job_id = job_to_delete.id
+
+    response = await client.delete(f"/api/job_instance/{job_id}")
     assert response.status_code == status_codes.HTTP_204_NO_CONTENT
 
     jobs = (await db.execute(sa.select(models.job_instances))).all()
-    assert len(jobs) == 0
+    assert len(jobs) == (jobs_len - 1)
 
 
 @pytest.mark.asyncio
