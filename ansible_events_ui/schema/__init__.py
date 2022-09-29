@@ -7,6 +7,12 @@ from .activation import (
     ActivationUpdate,
     RestartPolicy,
 )
+from .audit_rule import (
+    AuditRule,
+    AuditRuleHost,
+    AuditRuleJobInstance,
+    AuditRuleJobInstanceEvent,
+)
 from .extra_vars import Extravars, ExtravarsRef
 from .inventory import Inventory, InventoryRef
 from .job import JobInstance
@@ -37,6 +43,10 @@ __all__ = [
     "ActivationRead",
     "ActivationBaseRead",
     "ActivationCreate",
+    "AuditRule",
+    "AuditRuleJobInstance",
+    "AuditRuleJobInstanceEvent",
+    "AuditRuleHost",
     "Extravars",
     "ExtravarsRef",
     "Inventory",
