@@ -18,7 +18,7 @@ const RulebookDetails: React.FunctionComponent<{rulebook: RuleBookType}> = ({ ru
   const intl = useIntl();
   const {id} = useParams<{id: string}>();
 
-  const renderFlexRulebookDetails: React.FunctionComponent<RuleBookType> = (ruleset) => (
+  const renderFlexRulebookDetails: React.FunctionComponent<RuleBookType> = (rulebook) => (
     <Stack hasGutter={true}>
       <StackItem>
         <Flex>
