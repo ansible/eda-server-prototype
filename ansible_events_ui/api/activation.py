@@ -96,19 +96,32 @@ async def read_activation(
             models.activations.c.restart_count,
             models.activations.c.created_at,
             models.activations.c.modified_at,
-            models.rulebooks.c.id.label("rulebook_id"),
-            models.rulebooks.c.name.label("rulebook_name"),
-            models.inventories.c.id.label("inventory_id"),
-            models.inventories.c.name.label("inventory_name"),
-            models.extra_vars.c.id.label("extra_var_id"),
-            models.extra_vars.c.name.label("extra_var_name"),
+            sa.func.jsonb_build_object(
+                "id",
+                models.rulebooks.c.id,
+                "name",
+                models.rulebooks.c.name,
+            ).label("rulebook"),
+            sa.func.jsonb_build_object(
+                "id",
+                models.inventories.c.id,
+                "name",
+                models.inventories.c.name,
+            ).label("inventory"),
+            sa.func.jsonb_build_object(
+                "id",
+                models.extra_vars.c.id,
+                "name",
+                models.extra_vars.c.name,
+            ).label("extra_var"),
         )
         .select_from(models.activations)
         .join(models.rulebooks)
         .join(models.inventories)
-        .join(models.extra_vars)
+        .outerjoin(models.extra_vars)
         .where(models.activations.c.id == activation_id)
     )
+    print(query)
     activation = (await db.execute(query)).one_or_none()
     if activation is None:
         raise HTTPException(
@@ -116,33 +129,7 @@ async def read_activation(
             detail="Activation Not Found.",
         )
 
-    response = {
-        "id": activation["id"],
-        "name": activation["name"],
-        "description": activation["description"],
-        "is_enabled": activation["is_enabled"],
-        "status": activation["status"],
-        "working_directory": activation["working_directory"],
-        "execution_environment": activation["execution_environment"],
-        "restart_policy": activation["restart_policy"],
-        "restarted_at": activation["restarted_at"],
-        "restart_count": activation["restart_count"],
-        "created_at": activation["created_at"],
-        "modified_at": activation["modified_at"],
-        "rulebook": {
-            "id": activation["rulebook_id"],
-            "name": activation["rulebook_name"],
-        },
-        "inventory": {
-            "id": activation["inventory_id"],
-            "name": activation["inventory_name"],
-        },
-        "extra_var": {
-            "id": activation["extra_var_id"],
-            "name": activation["extra_var_name"],
-        },
-    }
-    return response
+    return activation
 
 
 @router.get(
