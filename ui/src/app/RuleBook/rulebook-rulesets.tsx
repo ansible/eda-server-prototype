@@ -14,7 +14,8 @@ import {getServer} from "@app/utils/utils";
 
 const columns = (intl) => [
   {
-    title: (intl.formatMessage(sharedMessages.name))
+    title: (intl.formatMessage(sharedMessages.name)),
+    transforms: [cellWidth(40)]
   },
   {
     title: (intl.formatMessage(sharedMessages.number_of_rules))
@@ -101,15 +102,12 @@ const RulebookRulesets: React.FunctionComponent<{rulebook: RuleBookType}> = ({ru
   const intl = useIntl();
   const updateRuleSets = (pagination) => {
     stateDispatch({type: 'setFetching', payload: true});
-    return fetchRulebookRuleSets(id, pagination).then( data => setRuleSets(data))
+    return fetchRulebookRuleSets(id, pagination)
+      .then(data => { setRuleSets(data); console.log( 'Debug - rulesets data: ', data);
+        stateDispatch({type: 'setRows', payload: createRows(data)});})
       .then(() => stateDispatch({type: 'setFetching', payload: false}))
       .catch(() => stateDispatch({type: 'setFetching', payload: false}));
   };
-
-  useEffect(() => {
-    fetchRulebookRuleSets(id)
-      .then(data => { stateDispatch({type: 'setRows', payload: createRows(data)});});
-  }, []);
 
   useEffect(() => {
     updateRuleSets(defaultSettings);
