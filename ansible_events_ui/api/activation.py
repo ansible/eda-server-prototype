@@ -212,6 +212,26 @@ async def update_activation(
     return updated_activation
 
 
+@router.delete(
+    "/api/activations/{activation_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    operation_id="delete_activation",
+)
+async def delete_activation(
+    activation_id: int, db: AsyncSession = Depends(get_db_session)
+):
+    query = sa.delete(models.activations).where(
+        models.activations.c.id == activation_id
+    )
+    results = await db.execute(query)
+    if results.rowcount == 0:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Activation Not Found.",
+        )
+    await db.commit()
+
+
 async def read_output(proc, activation_instance_id, db_session_factory):
     # TODO(cutwater): Replace with FastAPI dependency injections,
     #   that is available in BackgroundTasks
