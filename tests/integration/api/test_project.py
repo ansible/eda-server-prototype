@@ -3,8 +3,10 @@ from unittest import mock
 
 import pytest
 import sqlalchemy as sa
+from fastapi import HTTPException
 from fastapi import status as status_codes
 from httpx import AsyncClient
+from pydantic import ValidationError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ansible_events_ui.db import models
@@ -203,6 +205,26 @@ async def test_create_project_unique_name(
 
 
 @pytest.mark.asyncio
+async def test_create_project_bad_name(client: AsyncClient, db: AsyncSession):
+    test_project_bad = TEST_PROJECT.copy()
+    test_project_bad["name"] = "     "
+    response = await client.post("/api/projects/", json=test_project_bad)
+    assert response.status_code == status_codes.HTTP_422_UNPROCESSABLE_ENTITY
+
+    test_project_bad["name"] = ""
+    response = await client.post("/api/projects/", json=test_project_bad)
+    assert response.status_code == status_codes.HTTP_422_UNPROCESSABLE_ENTITY
+
+
+@pytest.mark.asyncio
+async def test_create_project_missing_name(client: AsyncClient, db: AsyncSession):
+    test_project_bad = TEST_PROJECT.copy()
+    del test_project_bad["name"]
+    response = await client.post("/api/projects/", json=test_project_bad)
+    assert response.status_code == status_codes.HTTP_422_UNPROCESSABLE_ENTITY
+
+
+@pytest.mark.asyncio
 async def test_get_project(client: AsyncClient, db: AsyncSession):
 
     query = sa.insert(models.projects).values(
@@ -267,6 +289,28 @@ async def test_edit_project(client: AsyncClient, db: AsyncSession):
     data = response.json()
     assert data["name"] == "new test name"
     assert data["url"] == TEST_PROJECT["url"]
+
+
+@pytest.mark.asyncio
+async def test_edit_project_missing(client: AsyncClient, db: AsyncSession):
+
+    response = await client.patch(
+        "/api/projects/-1",
+        json={"name": "new test name"},
+    )
+
+    assert response.status_code == status_codes.HTTP_404_NOT_FOUND
+
+
+@pytest.mark.asyncio
+async def test_edit_project_bad_name(client: AsyncClient, db: AsyncSession):
+
+    response = await client.patch(
+        "/api/projects/1",
+        json={"name": ""},
+    )
+
+    assert response.status_code == status_codes.HTTP_422_UNPROCESSABLE_ENTITY
 
 
 @pytest.mark.asyncio
