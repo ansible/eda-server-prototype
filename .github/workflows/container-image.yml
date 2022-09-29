@@ -1,0 +1,58 @@
+name: Build container images
+
+on:
+  push:
+    branches:
+      - "main"
+
+jobs:
+  build-eda-server-image:
+    runs-on: ubuntu-latest
+    env:
+      EDA_TOKEN: ${{ secrets.EDA_SERVER_TOKEN }}
+      QUAY_PASSWORD: ${{ secrets.EDA_AIZQUIERDO_QUAY_PW }}
+      QUAY_USERNAME: "aizquier+edaci"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Build image
+        run: |
+          export GITHUB_TOKEN=$EDA_TOKEN
+          docker build -t eda-server:latest -f tools/docker/Dockerfile . \
+          --no-cache --build-arg GITHUB_TOKEN=$GITHUB_TOKEN
+
+      - name: Tag image
+        run: >
+          docker image tag eda-server:latest
+          quay.io/aizquier/eda-server:latest
+
+      - name: Push image
+        run: |
+          docker login -u=$QUAY_USERNAME -p=$QUAY_PASSWORD quay.io
+          docker image push quay.io/aizquier/eda-server:latest
+
+  build-eda-server-ui-image:
+    runs-on: ubuntu-latest
+    env:
+      QUAY_PASSWORD: ${{ secrets.EDA_AIZQUIERDO_QUAY_PW }}
+      QUAY_USERNAME: "aizquier+edaci"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Build image
+        run: >
+          docker build -t eda-server-ui:latest 
+          -f tools/docker/nginx/Dockerfile
+          --no-cache .
+
+      - name: Tag image
+        run: >
+          docker image tag eda-server-ui:latest
+          quay.io/aizquier/eda-server-ui:latest
+
+      - name: Push image
+        run: |
+          docker login -u=$QUAY_USERNAME -p=$QUAY_PASSWORD quay.io
+          docker image push quay.io/aizquier/eda-server-ui:latest
