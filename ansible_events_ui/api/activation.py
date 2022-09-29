@@ -124,7 +124,7 @@ async def read_activation(
         .outerjoin(models.extra_vars)
         .where(models.activations.c.id == activation_id)
     )
-    print(query)
+
     activation = (await db.execute(query)).one_or_none()
     if activation is None:
         raise HTTPException(
