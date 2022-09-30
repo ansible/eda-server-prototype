@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import React, { Fragment, ReactNode } from 'react';
+import React, {Fragment, ReactNode, SetStateAction} from 'react';
 import {
   Table,
   TableHeader,
@@ -26,6 +26,8 @@ export interface TableToolbarViewProps {
   columns: ICell[];
   toolbarButtons?: () => ReactNode;
   fetchData: (pagination: PaginationConfiguration) => Promise<any | void>;
+  setLimit: any,
+  setOffset: any,
   pagination?: PaginationConfiguration;
   plural?: string;
   singular?: string;
@@ -46,6 +48,8 @@ export const TableToolbarView: React.ComponentType<TableToolbarViewProps> = ({
   toolbarButtons,
   actionResolver,
   routes = () => null,
+  setLimit,
+  setOffset,
   plural,
   pagination = defaultSettings,
   filterValue,
@@ -61,12 +65,16 @@ export const TableToolbarView: React.ComponentType<TableToolbarViewProps> = ({
 
   const paginationConfig = {
     itemCount: pagination.count,
-    page: getCurrentPage(pagination.limit, pagination.offset),
+    page: pagination.offset || 1,
     perPage: pagination.limit,
-    onSetPage: (_e: React.MouseEvent, page: number) =>
-      fetchData({ ...pagination, offset: getNewPage(page, pagination.limit) }),
-    onPerPageSelect: (_e: React.MouseEvent, size: number) =>
-      fetchData({ ...pagination, limit: size }),
+    onSetPage: (_e, page) => {
+      setOffset(page || 1);
+      return fetchData({ ...pagination, offset: page });
+    },
+    onPerPageSelect: (_e, size) => {
+      setLimit(size);
+      return fetchData({ ...pagination, limit: size });
+    },
     isDisabled: isLoading
   };
 
@@ -107,14 +115,15 @@ export const TableToolbarView: React.ComponentType<TableToolbarViewProps> = ({
       }}
     />
   );
-
+  console.log('Debug tableToolbarView - rows: ', rows);
+  console.log('Debug tableToolbarView - routes: ', routes());
   return (
     <Fragment>
-      {routes()}
       {!isLoading && rows.length === 0 ? (
         renderEmptyState()
       ) : (
         <Fragment>
+          {routes()}
           {renderToolbar()}
           {!isLoading && (
             <Table

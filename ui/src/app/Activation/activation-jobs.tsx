@@ -120,6 +120,8 @@ const ActivationJobs: React.FunctionComponent<{activation: ActivationType, jobs:
       <TableToolbarView
         ouiaId={'activations-table'}
         rows={rows}
+        setLimit={setLimit}
+        setOffset={setOffset}
         columns={columns(intl)}
         fetchData={updateJobs}
         plural={intl.formatMessage(sharedMessages.jobs)}

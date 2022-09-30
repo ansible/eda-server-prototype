@@ -222,6 +222,8 @@ const RuleSets: React.FunctionComponent = () => {
           columns={columns(intl)}
           fetchData={updateRuleSets}
           routes={routes}
+          setLimit={setLimit}
+          setOffset={setOffset}
           actionResolver={actionResolver}
           plural={intl.formatMessage(sharedMessages.rulesets)}
           singular={intl.formatMessage(sharedMessages.ruleset)}
