@@ -21,7 +21,7 @@ import AceEditor from "react-ace";
 import "ace-builds/src-noconflict/mode-yaml";
 import "ace-builds/src-noconflict/theme-xcode";
 import styled from 'styled-components';
-import {RuleType} from "@app/RuleSetFiles/RuleSetFiles";
+import {RuleType} from "@app/RuleSets/RuleSets";
 import {ExtraVarType} from "@app/Vars/Vars";
 import {useIntl} from "react-intl";
 

@@ -21,7 +21,7 @@ import {ExclamationCircleIcon} from "@patternfly/react-icons";
 import {useIntl} from "react-intl";
 import sharedMessages from "../messages/shared.messages";
 import {ExtraVarType} from "@app/Vars/Vars";
-import {InventoryType, RuleType} from "@app/RuleSetFiles/RuleSetFiles";
+import {InventoryType, RuleType} from "@app/RuleSets/RuleSets";
 
 const CardBody = styled(PFCardBody)`
   white-space: pre-wrap;

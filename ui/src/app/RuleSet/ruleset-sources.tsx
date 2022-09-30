@@ -10,8 +10,8 @@ import {defaultSettings} from "@app/shared/pagination";
 import {createRows} from "./sources-table-helpers";
 import {CubesIcon} from "@patternfly/react-icons";
 import {renderRuleSetFileTabs,
-        RuleSetType,
-        SourceType} from "@app/RuleSet/ruleset";
+        RuleSetType } from "@app/RuleSet/ruleset";
+import {SourceType} from "@app/RuleSets/RuleSets";
 import {getServer} from "@app/utils/utils";
 
 const columns = (intl) => [
