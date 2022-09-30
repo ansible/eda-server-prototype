@@ -1,0 +1,32 @@
+---
+version: 1
+disable_existing_loggers: False
+formatters:
+  default:
+    '()': 'uvicorn.logging.DefaultFormatter'
+    fmt: '[%(process)d] %(asctime)s %(levelname)-8s %(message)s'
+  access:
+    '()': 'uvicorn.logging.AccessFormatter'
+    fmt: '[%(process)d] %(asctime)s %(levelname)-8s %(client_addr)s - "%(request_line)s" %(status_code)s'
+handlers:
+  default:
+    formatter: 'default'
+    class: 'logging.StreamHandler'
+    stream: 'ext://sys.stderr'
+  access:
+    formatter: 'access'
+    class: 'logging.StreamHandler'
+    stream: 'ext://sys.stdout'
+root:
+  handlers: ['default']
+loggers:
+  eda_server:
+    level: 'DEBUG'
+  uvicorn:
+    level: 'DEBUG'
+  uvicorn.error:
+    level: 'DEBUG'
+  uvicorn.access:
+    level: 'DEBUG'
+    handlers: ['access']
+    propagate: false

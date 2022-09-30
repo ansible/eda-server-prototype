@@ -1,6 +1,6 @@
 import uvicorn
 
-from .config import load_settings
+from .config import default_log_config, load_settings
 
 
 def main():
@@ -10,5 +10,6 @@ def main():
         factory=True,
         host=settings.host,
         port=settings.port,
+        log_config=default_log_config(),
         log_level=settings.log_level.lower(),
     )

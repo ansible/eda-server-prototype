@@ -1,3 +1,5 @@
+import logging
+
 from fastapi import APIRouter, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -47,12 +49,18 @@ def setup_database(app: FastAPI) -> None:
     ] = lambda: provider.session_factory
 
 
+def configure_logging(app):
+    settings = app.state.settings
+    log_level = settings.log_level.upper()
+    # The nested loggers will inherit parent logger log level.
+    logging.getLogger("ansible_events_ui").setLevel(log_level)
+
+
 # TODO(cutwater): Use dependency overrides.
 # TODO(cutwater): Implement customizable ApplicationBuilder for testing.
 def create_app() -> FastAPI:
     """Initialize FastAPI application."""
     settings = load_settings()
-
     app = FastAPI(
         title="Ansible Events API",
         description="API for Event Driven Automation",
@@ -60,9 +68,9 @@ def create_app() -> FastAPI:
         redoc_url="/api/redoc",
         openapi_url="/api/openapi.json",
     )
-
     app.state.settings = settings
 
+    configure_logging(app)
     setup_cors(app)
     setup_routes(app)
 

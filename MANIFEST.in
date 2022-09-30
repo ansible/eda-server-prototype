@@ -1,2 +1,3 @@
+include src/eda_server/config/*.yaml
 include src/eda_server/db/migrations/*
 include src/eda_server/db/migrations/versions/*.py
