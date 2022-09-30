@@ -1,4 +1,4 @@
-# A UI for ansible-events
+# Event Driven Ansible Server
 
 ## Setting up a development environment
 
@@ -219,4 +219,28 @@ Or call `pytest` directly:
 
 ```shell
 python -m pytest 
+```
+
+## Logging
+
+When you start server using the binary `eda-server`, it will use default project
+logging settings. You can change the logging level by setting the environment variable
+`AE_LOG_LEVEL`. Example:
+
+```shell
+export AE_LOG_LEVEL=debug
+```
+
+This will change log level for uvicorn and project loggers, but will not affect 3rd party libraries.
+
+If you need to update the default project logging configuration, you should edit the
+`src/eda_server/config/logging.yaml` file.
+
+When starting server with `uvicorn` binary directly, you should specify logging configuration
+file path in `--log-config` parameter. Note that in this case `--log-level` parameter only
+affects `uvicorn` loggers, but not application ones. To change the application loggers levels
+you should set `AE_LOG_LEVEL` environment variable. Example:
+
+```shell
+uvicorn --log-config src/eda_server/config/logging.yaml ...
 ```

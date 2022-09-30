@@ -1,5 +1,7 @@
+from importlib import resources
 from typing import Optional
 
+import yaml
 from fastapi.requests import Request
 from pydantic import BaseSettings
 
@@ -9,7 +11,7 @@ class Settings(BaseSettings):
 
     secret: str = "secret"
 
-    log_level: str = "INFO"
+    log_level: str = "info"
 
     host: str = "127.0.0.1"
     port: int = 9000
@@ -33,7 +35,12 @@ def load_settings() -> Settings:
     return Settings()
 
 
-# TODO(cutwater): Move dependencies into standalone package
+def default_log_config():
+    with resources.open_text(__name__, "logging.yaml") as fp:
+        return yaml.safe_load(fp)
+
+
+# TODO(cutwater): Drop in favor of dependency_overrides
 def get_settings(request: Request) -> Settings:
     """Application settings dependency."""
     return request.app.state.settings
