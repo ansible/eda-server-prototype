@@ -11,7 +11,10 @@ from ansible_events_ui.db import models
 from ansible_events_ui.db.dependency import get_db_session
 from ansible_events_ui.users import current_active_user, fastapi_users
 
-router = APIRouter(prefix="/api/users", tags=["users"])
+router = APIRouter(
+    prefix="/users",
+    tags=["users"],
+)
 router.include_router(
     fastapi_users.get_users_router(schema.UserRead, schema.UserUpdate)
 )

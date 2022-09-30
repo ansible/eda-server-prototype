@@ -10,26 +10,26 @@ from ansible_events_ui.users import (
 router = APIRouter()
 router.include_router(
     fastapi_users.get_auth_router(cookie_backend),
-    prefix="/api/auth/jwt",
+    prefix="/auth/jwt",
     tags=["auth"],
 )
 router.include_router(
     fastapi_users.get_auth_router(bearer_backend),
-    prefix="/api/auth/bearer",
+    prefix="/auth/bearer",
     tags=["auth"],
 )
 router.include_router(
     fastapi_users.get_register_router(schema.UserRead, schema.UserCreate),
-    prefix="/api/auth",
+    prefix="/auth",
     tags=["auth"],
 )
 router.include_router(
     fastapi_users.get_reset_password_router(),
-    prefix="/api/auth",
+    prefix="/auth",
     tags=["auth"],
 )
 router.include_router(
     fastapi_users.get_verify_router(schema.UserRead),
-    prefix="/api/auth",
+    prefix="/auth",
     tags=["auth"],
 )

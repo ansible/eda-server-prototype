@@ -20,7 +20,7 @@ router = APIRouter()
 
 
 @router.get(
-    "/api/projects/",
+    "/projects/",
     response_model=List[schema.ProjectList],
     operation_id="list_projects",
     tags=["projects"],
@@ -32,7 +32,7 @@ async def list_projects(db: AsyncSession = Depends(get_db_session)):
 
 
 @router.post(
-    "/api/projects/",
+    "/projects/",
     response_model=schema.ProjectRead,
     operation_id="create_project",
     status_code=status.HTTP_201_CREATED,
@@ -77,7 +77,7 @@ async def create_project(
 
 
 @router.get(
-    "/api/projects/{project_id}",
+    "/projects/{project_id}",
     response_model=schema.ProjectDetail,
     operation_id="read_project",
     tags=["projects"],
@@ -132,7 +132,7 @@ async def read_project(
 
 
 @router.patch(
-    "/api/projects/{project_id}",
+    "/projects/{project_id}",
     response_model=schema.ProjectRead,
     operation_id="update_project",
     tags=["projects"],
@@ -179,7 +179,7 @@ async def update_project(
 
 
 @router.delete(
-    "/api/projects/{project_id}",
+    "/projects/{project_id}",
     status_code=status.HTTP_204_NO_CONTENT,
     operation_id="delete_project",
     tags=["projects"],
@@ -196,7 +196,7 @@ async def delete_project(
 
 
 @router.get(
-    "/api/playbooks/",
+    "/playbooks/",
     operation_id="list_playbooks",
     tags=["playbooks"],
 )
@@ -207,7 +207,7 @@ async def list_playbooks(db: AsyncSession = Depends(get_db_session)):
 
 
 @router.get(
-    "/api/playbook/{playbook_id}",
+    "/playbook/{playbook_id}",
     operation_id="read_playbook",
     tags=["playbooks"],
 )
@@ -225,7 +225,7 @@ async def read_playbook(
 
 
 @router.get(
-    "/api/inventories/", operation_id="list_inventories", tags=["inventories"]
+    "/inventories/", operation_id="list_inventories", tags=["inventories"]
 )
 async def list_inventories(db: AsyncSession = Depends(get_db_session)):
     query = sa.select(inventories)
@@ -234,7 +234,7 @@ async def list_inventories(db: AsyncSession = Depends(get_db_session)):
 
 
 @router.get(
-    "/api/inventory/{inventory_id}",
+    "/inventory/{inventory_id}",
     operation_id="read_inventory",
     tags=["inventories"],
 )
@@ -252,7 +252,7 @@ async def read_inventory(
 
 
 @router.post(
-    "/api/inventory/", operation_id="create_inventory", tags=["inventories"]
+    "/inventory/", operation_id="create_inventory", tags=["inventories"]
 )
 async def create_inventory(
     i: schema.Inventory, db: AsyncSession = Depends(get_db_session)
@@ -265,7 +265,7 @@ async def create_inventory(
 
 
 @router.get(
-    "/api/extra_vars/", operation_id="list_extra_vars", tags=["extra vars"]
+    "/extra_vars/", operation_id="list_extra_vars", tags=["extra vars"]
 )
 async def list_extra_vars(db: AsyncSession = Depends(get_db_session)):
     query = sa.select(extra_vars)
@@ -274,7 +274,7 @@ async def list_extra_vars(db: AsyncSession = Depends(get_db_session)):
 
 
 @router.get(
-    "/api/extra_var/{extra_var_id}",
+    "/extra_var/{extra_var_id}",
     operation_id="read_extra_var",
     tags=["extra vars"],
 )
@@ -292,7 +292,7 @@ async def read_extra_var(
 
 
 @router.post(
-    "/api/extra_vars/", operation_id="create_extra_vars", tags=["extra vars"]
+    "/extra_vars/", operation_id="create_extra_vars", tags=["extra vars"]
 )
 async def create_extra_vars(
     e: schema.Extravars, db: AsyncSession = Depends(get_db_session)

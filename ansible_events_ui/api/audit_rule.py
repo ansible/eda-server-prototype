@@ -13,7 +13,7 @@ router = APIRouter(tags=["audit_rules"])
 
 
 @router.get(
-    "/api/audit/rule/{rule_id}/details",
+    "/audit/rule/{rule_id}/details",
     response_model=schema.AuditRule,
     operation_id="read_audit_rule_details",
 )
@@ -64,7 +64,7 @@ async def read_audit_rule_details(
 
 
 @router.get(
-    "/api/audit/rule/{rule_id}/jobs",
+    "/audit/rule/{rule_id}/jobs",
     response_model=List[schema.AuditRuleJobInstance],
     operation_id="list_audit_rule_jobs",
 )
@@ -97,7 +97,7 @@ async def list_audit_rule_jobs(
 
 
 @router.get(
-    "/api/audit/rule/{rule_id}/hosts",
+    "/audit/rule/{rule_id}/hosts",
     response_model=List[schema.AuditRuleHost],
     operation_id="list_audit_rule_hosts",
 )
@@ -142,7 +142,7 @@ async def list_audit_rule_hosts(
 
 
 @router.get(
-    "/api/audit/rule/{rule_id}/events",
+    "/audit/rule/{rule_id}/events",
     response_model=List[schema.AuditRuleJobInstanceEvent],
     operation_id="list_audit_rule_events",
 )

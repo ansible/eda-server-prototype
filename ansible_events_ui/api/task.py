@@ -2,7 +2,7 @@ from fastapi import APIRouter
 
 from ansible_events_ui.managers import taskmanager
 
-router = APIRouter(prefix="/api/tasks", tags=["tasks"])
+router = APIRouter(prefix="/tasks", tags=["tasks"])
 
 
 @router.get("", operation_id="list_tasks")

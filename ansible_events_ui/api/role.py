@@ -12,7 +12,7 @@ from ansible_events_ui.db import models
 from ansible_events_ui.db.dependency import get_db_session
 from ansible_events_ui.types import Action, ResourceType
 
-router = APIRouter(prefix="/api/roles", tags=["roles"])
+router = APIRouter(prefix="/roles", tags=["roles"])
 
 
 async def role_exists_or_404(role_id: uuid.UUID, db: AsyncSession):
