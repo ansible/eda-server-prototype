@@ -41,6 +41,6 @@ describe('RemoveActivation', () => {
 
     expect(wrapper.find(Modal).at(0).props().title).toEqual("Delete rulebook activation");
     expect(wrapper.find('Text').at(0).props().children).toEqual('Are you sure you want to delete the rulebook activation below?');
-    expect(wrapper.find('Text').at(1).props().children).toEqual('Activation 1');
+    expect(wrapper.find('Text').at(1).props().children.props.children).toEqual('Activation 1');
   });
 })
