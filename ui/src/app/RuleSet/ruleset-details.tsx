@@ -5,7 +5,7 @@ import {
   FlexItem,
   PageSection,
   Stack,
-  StackItem,
+  StackItem, Text, TextVariants,
   Title
 } from '@patternfly/react-core';
 import {Link, useParams} from 'react-router-dom';
@@ -33,17 +33,22 @@ const RulesetDetails: React.FunctionComponent<{ruleset: RuleSetType}> = ({ rules
             </FlexItem>
             <FlexItem>
               <Stack>
-                <StackItem><Title headingLevel="h3">{intl.formatMessage(sharedMessages.scmCredentials)}</Title></StackItem>
+                <StackItem><Title headingLevel="h3">{intl.formatMessage(sharedMessages.number_of_rules)}</Title></StackItem>
                 <StackItem>
-                  {ruleset?.scm_credentials}
+                  {ruleset?.rule_count}
                 </StackItem>
               </Stack>
             </FlexItem>
             <FlexItem>
               <Stack>
-                <StackItem><Title headingLevel="h3">{intl.formatMessage(sharedMessages.project_link)}</Title></StackItem>
                 <StackItem>
-                  <Link to={"/project/" + ruleset?.project_id}>{ruleset?.project_name || `Project ${ruleset?.project_id}`}</Link>
+                  <Title headingLevel="h3">{intl.formatMessage(sharedMessages.lastModified)}</Title>
+                </StackItem>
+                <StackItem>
+                  <Text component={TextVariants.h5}>
+                    {new Intl.DateTimeFormat('en-US',
+                      { dateStyle: 'short', timeStyle: 'long' }).format(new Date(ruleset?.modified_at || 0))}
+                  </Text>
                 </StackItem>
               </Stack>
             </FlexItem>
@@ -51,7 +56,9 @@ const RulesetDetails: React.FunctionComponent<{ruleset: RuleSetType}> = ({ rules
           <Flex direction={{ default: 'column' }} flex={{ default: 'flex_1' }}>
             <FlexItem>
               <Stack>
-                <StackItem><Title headingLevel="h3">{intl.formatMessage(sharedMessages.description)}</Title></StackItem>
+                <StackItem>
+                  <Title headingLevel="h3">{intl.formatMessage(sharedMessages.description)}</Title>
+                </StackItem>
                 <StackItem>
                   {ruleset?.description}
                 </StackItem>
@@ -59,17 +66,12 @@ const RulesetDetails: React.FunctionComponent<{ruleset: RuleSetType}> = ({ rules
             </FlexItem>
             <FlexItem>
               <Stack>
-                <StackItem><Title headingLevel="h3">{intl.formatMessage(sharedMessages.number_of_rules)}</Title></StackItem>
                 <StackItem>
-                  { ruleset?.number_of_rules }
+                  <Title headingLevel="h3">{intl.formatMessage(sharedMessages.project_link)}</Title>
                 </StackItem>
-              </Stack>
-            </FlexItem>
-            <FlexItem>
-              <Stack>
-                <StackItem><Title headingLevel="h3">{intl.formatMessage(sharedMessages.created)}</Title></StackItem>
                 <StackItem>
-                  {ruleset?.created_at}
+                  <Link to={"/project/" + ruleset?.project?.id}>{ruleset?.project?.name
+                    || `Project ${ruleset?.project?.id}`}</Link>
                 </StackItem>
               </Stack>
             </FlexItem>
@@ -77,31 +79,31 @@ const RulesetDetails: React.FunctionComponent<{ruleset: RuleSetType}> = ({ rules
           <Flex direction={{ default: 'column' }} flex={{ default: 'flex_1' }}>
             <FlexItem>
               <Stack>
-                <StackItem><Title headingLevel="h3">{intl.formatMessage(sharedMessages.scmUrl)}</Title></StackItem>
                 <StackItem>
-                  {ruleset?.scm_url}
+                  <Title headingLevel="h3">{intl.formatMessage(sharedMessages.rulebook)}</Title>
+                </StackItem>
+                <StackItem>
+                  <Link to={"/rulebooks/rulebook/" + ruleset?.rulebook?.id}>{ruleset?.rulebook?.name
+                    || `Project ${ruleset?.rulebook?.id}`}</Link>
                 </StackItem>
               </Stack>
             </FlexItem>
             <FlexItem>
               <Stack>
-                <StackItem><Title headingLevel="h3">{intl.formatMessage(sharedMessages.fire_count)}</Title></StackItem>
                 <StackItem>
-                  {ruleset?.fire_count}
+                  <Title headingLevel="h3">{intl.formatMessage(sharedMessages.created)}</Title>
                 </StackItem>
-              </Stack>
-            </FlexItem>
-            <FlexItem>
-              <Stack>
-                <StackItem><Title headingLevel="h3">{intl.formatMessage(sharedMessages.lastModified)}</Title></StackItem>
                 <StackItem>
-                  {ruleset?.last_modified}
+                  <Text component={TextVariants.h5}>
+                    {new Intl.DateTimeFormat('en-US',
+                      { dateStyle: 'short', timeStyle: 'long' }).format(new Date(ruleset?.created_at || 0))}
+                  </Text>
                 </StackItem>
               </Stack>
             </FlexItem>
           </Flex>
         </Flex>
-      </StackItem>
+        </StackItem>
      </Stack>
   );
 

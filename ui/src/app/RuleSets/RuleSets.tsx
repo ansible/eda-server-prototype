@@ -55,7 +55,7 @@ export interface RuleSetType {
   rulesets: string;
 }
 
-const endpoint = 'http://' + getServer() + '/api/rulebooks/';
+const endpoint = 'http://' + getServer() + '/api/rulesets/';
 
 const columns = (intl) => [
   {
@@ -64,9 +64,6 @@ const columns = (intl) => [
   },
   {
     title: intl.formatMessage(sharedMessages.number_of_rules)
-  },
-  {
-    title: intl.formatMessage(sharedMessages.fire_count)
   }
 ];
 

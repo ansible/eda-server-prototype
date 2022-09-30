@@ -110,9 +110,6 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                       Object {
                         "title": "Number of rules",
                       },
-                      Object {
-                        "title": "Fire count",
-                      },
                     ]
                   }
                   fetchData={[Function]}
@@ -138,7 +135,6 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                             </Link>
                           </React.Fragment>,
                           undefined,
-                          undefined,
                         ],
                         "id": "1",
                       },
@@ -156,7 +152,6 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                             </Link>
                           </React.Fragment>,
                           undefined,
-                          undefined,
                         ],
                         "id": "2",
                       },
@@ -173,7 +168,6 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                               RuleSet 3
                             </Link>
                           </React.Fragment>,
-                          undefined,
                           undefined,
                         ],
                         "id": "3",
@@ -1176,9 +1170,6 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                         Object {
                           "title": "Number of rules",
                         },
-                        Object {
-                          "title": "Fire count",
-                        },
                       ]
                     }
                     className="pf-u-pt-0"
@@ -1212,7 +1203,6 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                               </Link>
                             </React.Fragment>,
                             undefined,
-                            undefined,
                           ],
                           "id": "1",
                         },
@@ -1230,7 +1220,6 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                               </Link>
                             </React.Fragment>,
                             undefined,
-                            undefined,
                           ],
                           "id": "2",
                         },
@@ -1247,7 +1236,6 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                 RuleSet 3
                               </Link>
                             </React.Fragment>,
-                            undefined,
                             undefined,
                           ],
                           "id": "3",
@@ -1373,57 +1361,6 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                               ],
                               "transforms": Array [
                                 [Function],
-                              ],
-                            },
-                            "data": undefined,
-                            "extraParams": Object {
-                              "actionResolver": [Function],
-                              "actions": undefined,
-                              "actionsToggle": undefined,
-                              "allRowsExpanded": false,
-                              "allRowsSelected": false,
-                              "areActionsDisabled": undefined,
-                              "canCollapseAll": false,
-                              "canSelectAll": true,
-                              "canSortFavorites": true,
-                              "collapseAllAriaLabel": "",
-                              "contentId": "expanded-content",
-                              "dropdownDirection": "down",
-                              "dropdownPosition": "right",
-                              "expandId": "expandable-toggle",
-                              "firstUserColumnIndex": 0,
-                              "isHeaderSelectDisabled": false,
-                              "onCollapse": undefined,
-                              "onExpand": undefined,
-                              "onFavorite": undefined,
-                              "onRowEdit": undefined,
-                              "onSelect": undefined,
-                              "onSort": undefined,
-                              "rowLabeledBy": "simple-node",
-                              "selectVariant": "checkbox",
-                              "sortBy": undefined,
-                            },
-                            "header": Object {
-                              "formatters": Array [],
-                              "label": "Fire count",
-                              "transforms": Array [
-                                [Function],
-                                [Function],
-                              ],
-                            },
-                            "property": "fire-count",
-                            "props": Object {
-                              "data-key": 2,
-                              "data-label": "Fire count",
-                            },
-                          },
-                          Object {
-                            "cell": Object {
-                              "formatters": Array [
-                                [Function],
-                              ],
-                              "transforms": Array [
-                                [Function],
                                 [Function],
                               ],
                             },
@@ -1464,9 +1401,9 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                 [Function],
                               ],
                             },
-                            "property": "column-3",
+                            "property": "column-2",
                             "props": Object {
-                              "data-key": 3,
+                              "data-key": 2,
                               "data-label": "",
                             },
                           },
@@ -1650,57 +1587,6 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                             ],
                                             "transforms": Array [
                                               [Function],
-                                            ],
-                                          },
-                                          "data": undefined,
-                                          "extraParams": Object {
-                                            "actionResolver": [Function],
-                                            "actions": undefined,
-                                            "actionsToggle": undefined,
-                                            "allRowsExpanded": false,
-                                            "allRowsSelected": false,
-                                            "areActionsDisabled": undefined,
-                                            "canCollapseAll": false,
-                                            "canSelectAll": true,
-                                            "canSortFavorites": true,
-                                            "collapseAllAriaLabel": "",
-                                            "contentId": "expanded-content",
-                                            "dropdownDirection": "down",
-                                            "dropdownPosition": "right",
-                                            "expandId": "expandable-toggle",
-                                            "firstUserColumnIndex": 0,
-                                            "isHeaderSelectDisabled": false,
-                                            "onCollapse": undefined,
-                                            "onExpand": undefined,
-                                            "onFavorite": undefined,
-                                            "onRowEdit": undefined,
-                                            "onSelect": undefined,
-                                            "onSort": undefined,
-                                            "rowLabeledBy": "simple-node",
-                                            "selectVariant": "checkbox",
-                                            "sortBy": undefined,
-                                          },
-                                          "header": Object {
-                                            "formatters": Array [],
-                                            "label": "Fire count",
-                                            "transforms": Array [
-                                              [Function],
-                                              [Function],
-                                            ],
-                                          },
-                                          "property": "fire-count",
-                                          "props": Object {
-                                            "data-key": 2,
-                                            "data-label": "Fire count",
-                                          },
-                                        },
-                                        Object {
-                                          "cell": Object {
-                                            "formatters": Array [
-                                              [Function],
-                                            ],
-                                            "transforms": Array [
-                                              [Function],
                                               [Function],
                                             ],
                                           },
@@ -1741,9 +1627,9 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                               [Function],
                                             ],
                                           },
-                                          "property": "column-3",
+                                          "property": "column-2",
                                           "props": Object {
-                                            "data-key": 3,
+                                            "data-key": 2,
                                             "data-label": "",
                                           },
                                         },
@@ -1912,57 +1798,6 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                     ],
                                                     "transforms": Array [
                                                       [Function],
-                                                    ],
-                                                  },
-                                                  "data": undefined,
-                                                  "extraParams": Object {
-                                                    "actionResolver": [Function],
-                                                    "actions": undefined,
-                                                    "actionsToggle": undefined,
-                                                    "allRowsExpanded": false,
-                                                    "allRowsSelected": false,
-                                                    "areActionsDisabled": undefined,
-                                                    "canCollapseAll": false,
-                                                    "canSelectAll": true,
-                                                    "canSortFavorites": true,
-                                                    "collapseAllAriaLabel": "",
-                                                    "contentId": "expanded-content",
-                                                    "dropdownDirection": "down",
-                                                    "dropdownPosition": "right",
-                                                    "expandId": "expandable-toggle",
-                                                    "firstUserColumnIndex": 0,
-                                                    "isHeaderSelectDisabled": false,
-                                                    "onCollapse": undefined,
-                                                    "onExpand": undefined,
-                                                    "onFavorite": undefined,
-                                                    "onRowEdit": undefined,
-                                                    "onSelect": undefined,
-                                                    "onSort": undefined,
-                                                    "rowLabeledBy": "simple-node",
-                                                    "selectVariant": "checkbox",
-                                                    "sortBy": undefined,
-                                                  },
-                                                  "header": Object {
-                                                    "formatters": Array [],
-                                                    "label": "Fire count",
-                                                    "transforms": Array [
-                                                      [Function],
-                                                      [Function],
-                                                    ],
-                                                  },
-                                                  "property": "fire-count",
-                                                  "props": Object {
-                                                    "data-key": 2,
-                                                    "data-label": "Fire count",
-                                                  },
-                                                },
-                                                Object {
-                                                  "cell": Object {
-                                                    "formatters": Array [
-                                                      [Function],
-                                                    ],
-                                                    "transforms": Array [
-                                                      [Function],
                                                       [Function],
                                                     ],
                                                   },
@@ -2003,9 +1838,9 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                       [Function],
                                                     ],
                                                   },
-                                                  "property": "column-3",
+                                                  "property": "column-2",
                                                   "props": Object {
-                                                    "data-key": 3,
+                                                    "data-key": 2,
                                                     "data-label": "",
                                                   },
                                                 },
@@ -2104,55 +1939,16 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                     </Th>
                                                   </HeaderCell>
                                                   <HeaderCell
-                                                    data-key={2}
-                                                    data-label="Fire count"
-                                                    key="2-header"
-                                                    scope="col"
-                                                  >
-                                                    <Th
-                                                      className=""
-                                                      component="th"
-                                                      data-key={2}
-                                                      data-label="Fire count"
-                                                      onMouseEnter={[Function]}
-                                                      scope="col"
-                                                      textCenter={false}
-                                                      tooltip=""
-                                                    >
-                                                      <ThBase
-                                                        className=""
-                                                        component="th"
-                                                        data-key={2}
-                                                        data-label="Fire count"
-                                                        innerRef={null}
-                                                        onMouseEnter={[Function]}
-                                                        scope="col"
-                                                        textCenter={false}
-                                                        tooltip=""
-                                                      >
-                                                        <th
-                                                          className=""
-                                                          data-key={2}
-                                                          data-label="Fire count"
-                                                          onMouseEnter={[Function]}
-                                                          scope="col"
-                                                        >
-                                                          Fire count
-                                                        </th>
-                                                      </ThBase>
-                                                    </Th>
-                                                  </HeaderCell>
-                                                  <HeaderCell
                                                     component="td"
-                                                    data-key={3}
+                                                    data-key={2}
                                                     data-label=""
-                                                    key="3-header"
+                                                    key="2-header"
                                                     scope=""
                                                   >
                                                     <Th
                                                       className=""
                                                       component="td"
-                                                      data-key={3}
+                                                      data-key={2}
                                                       data-label=""
                                                       onMouseEnter={[Function]}
                                                       scope=""
@@ -2162,7 +1958,7 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                       <ThBase
                                                         className=""
                                                         component="td"
-                                                        data-key={3}
+                                                        data-key={2}
                                                         data-label=""
                                                         innerRef={null}
                                                         onMouseEnter={[Function]}
@@ -2172,7 +1968,7 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                       >
                                                         <td
                                                           className=""
-                                                          data-key={3}
+                                                          data-key={2}
                                                           data-label=""
                                                           onMouseEnter={[Function]}
                                                           scope={null}
@@ -2306,57 +2102,6 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                         ],
                                         "transforms": Array [
                                           [Function],
-                                        ],
-                                      },
-                                      "data": undefined,
-                                      "extraParams": Object {
-                                        "actionResolver": [Function],
-                                        "actions": undefined,
-                                        "actionsToggle": undefined,
-                                        "allRowsExpanded": false,
-                                        "allRowsSelected": false,
-                                        "areActionsDisabled": undefined,
-                                        "canCollapseAll": false,
-                                        "canSelectAll": true,
-                                        "canSortFavorites": true,
-                                        "collapseAllAriaLabel": "",
-                                        "contentId": "expanded-content",
-                                        "dropdownDirection": "down",
-                                        "dropdownPosition": "right",
-                                        "expandId": "expandable-toggle",
-                                        "firstUserColumnIndex": 0,
-                                        "isHeaderSelectDisabled": false,
-                                        "onCollapse": undefined,
-                                        "onExpand": undefined,
-                                        "onFavorite": undefined,
-                                        "onRowEdit": undefined,
-                                        "onSelect": undefined,
-                                        "onSort": undefined,
-                                        "rowLabeledBy": "simple-node",
-                                        "selectVariant": "checkbox",
-                                        "sortBy": undefined,
-                                      },
-                                      "header": Object {
-                                        "formatters": Array [],
-                                        "label": "Fire count",
-                                        "transforms": Array [
-                                          [Function],
-                                          [Function],
-                                        ],
-                                      },
-                                      "property": "fire-count",
-                                      "props": Object {
-                                        "data-key": 2,
-                                        "data-label": "Fire count",
-                                      },
-                                    },
-                                    Object {
-                                      "cell": Object {
-                                        "formatters": Array [
-                                          [Function],
-                                        ],
-                                        "transforms": Array [
-                                          [Function],
                                           [Function],
                                         ],
                                       },
@@ -2397,9 +2142,9 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                           [Function],
                                         ],
                                       },
-                                      "property": "column-3",
+                                      "property": "column-2",
                                       "props": Object {
-                                        "data-key": 3,
+                                        "data-key": 2,
                                         "data-label": "",
                                       },
                                     },
@@ -2425,7 +2170,6 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                           </Link>
                                         </React.Fragment>,
                                         undefined,
-                                        undefined,
                                       ],
                                       "id": "1",
                                     },
@@ -2443,7 +2187,6 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                           </Link>
                                         </React.Fragment>,
                                         undefined,
-                                        undefined,
                                       ],
                                       "id": "2",
                                     },
@@ -2460,7 +2203,6 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                             RuleSet 3
                                           </Link>
                                         </React.Fragment>,
-                                        undefined,
                                         undefined,
                                       ],
                                       "id": "3",
@@ -2487,15 +2229,7 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                             </Link>
                                           </React.Fragment>,
                                           undefined,
-                                          undefined,
                                         ],
-                                        "fire-count": Object {
-                                          "formatters": Array [],
-                                          "props": Object {
-                                            "isVisible": true,
-                                          },
-                                          "title": undefined,
-                                        },
                                         "id": "1",
                                         "isExpanded": undefined,
                                         "isFirst": true,
@@ -2542,15 +2276,7 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                             </Link>
                                           </React.Fragment>,
                                           undefined,
-                                          undefined,
                                         ],
-                                        "fire-count": Object {
-                                          "formatters": Array [],
-                                          "props": Object {
-                                            "isVisible": true,
-                                          },
-                                          "title": undefined,
-                                        },
                                         "id": "2",
                                         "isExpanded": undefined,
                                         "isFirst": false,
@@ -2597,15 +2323,7 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                             </Link>
                                           </React.Fragment>,
                                           undefined,
-                                          undefined,
                                         ],
-                                        "fire-count": Object {
-                                          "formatters": Array [],
-                                          "props": Object {
-                                            "isVisible": true,
-                                          },
-                                          "title": undefined,
-                                        },
                                         "id": "3",
                                         "isExpanded": undefined,
                                         "isFirst": false,
@@ -2658,15 +2376,7 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                             </Link>
                                           </React.Fragment>,
                                           undefined,
-                                          undefined,
                                         ],
-                                        "fire-count": Object {
-                                          "formatters": Array [],
-                                          "props": Object {
-                                            "isVisible": true,
-                                          },
-                                          "title": undefined,
-                                        },
                                         "id": "1",
                                         "isExpanded": undefined,
                                         "isFirst": true,
@@ -2713,15 +2423,7 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                             </Link>
                                           </React.Fragment>,
                                           undefined,
-                                          undefined,
                                         ],
-                                        "fire-count": Object {
-                                          "formatters": Array [],
-                                          "props": Object {
-                                            "isVisible": true,
-                                          },
-                                          "title": undefined,
-                                        },
                                         "id": "2",
                                         "isExpanded": undefined,
                                         "isFirst": false,
@@ -2768,15 +2470,7 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                             </Link>
                                           </React.Fragment>,
                                           undefined,
-                                          undefined,
                                         ],
-                                        "fire-count": Object {
-                                          "formatters": Array [],
-                                          "props": Object {
-                                            "isVisible": true,
-                                          },
-                                          "title": undefined,
-                                        },
                                         "id": "3",
                                         "isExpanded": undefined,
                                         "isFirst": false,
@@ -2926,57 +2620,6 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                             ],
                                             "transforms": Array [
                                               [Function],
-                                            ],
-                                          },
-                                          "data": undefined,
-                                          "extraParams": Object {
-                                            "actionResolver": [Function],
-                                            "actions": undefined,
-                                            "actionsToggle": undefined,
-                                            "allRowsExpanded": false,
-                                            "allRowsSelected": false,
-                                            "areActionsDisabled": undefined,
-                                            "canCollapseAll": false,
-                                            "canSelectAll": true,
-                                            "canSortFavorites": true,
-                                            "collapseAllAriaLabel": "",
-                                            "contentId": "expanded-content",
-                                            "dropdownDirection": "down",
-                                            "dropdownPosition": "right",
-                                            "expandId": "expandable-toggle",
-                                            "firstUserColumnIndex": 0,
-                                            "isHeaderSelectDisabled": false,
-                                            "onCollapse": undefined,
-                                            "onExpand": undefined,
-                                            "onFavorite": undefined,
-                                            "onRowEdit": undefined,
-                                            "onSelect": undefined,
-                                            "onSort": undefined,
-                                            "rowLabeledBy": "simple-node",
-                                            "selectVariant": "checkbox",
-                                            "sortBy": undefined,
-                                          },
-                                          "header": Object {
-                                            "formatters": Array [],
-                                            "label": "Fire count",
-                                            "transforms": Array [
-                                              [Function],
-                                              [Function],
-                                            ],
-                                          },
-                                          "property": "fire-count",
-                                          "props": Object {
-                                            "data-key": 2,
-                                            "data-label": "Fire count",
-                                          },
-                                        },
-                                        Object {
-                                          "cell": Object {
-                                            "formatters": Array [
-                                              [Function],
-                                            ],
-                                            "transforms": Array [
-                                              [Function],
                                               [Function],
                                             ],
                                           },
@@ -3017,9 +2660,9 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                               [Function],
                                             ],
                                           },
-                                          "property": "column-3",
+                                          "property": "column-2",
                                           "props": Object {
-                                            "data-key": 3,
+                                            "data-key": 2,
                                             "data-label": "",
                                           },
                                         },
@@ -3042,15 +2685,7 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                               </Link>
                                             </React.Fragment>,
                                             undefined,
-                                            undefined,
                                           ],
-                                          "fire-count": Object {
-                                            "formatters": Array [],
-                                            "props": Object {
-                                              "isVisible": true,
-                                            },
-                                            "title": undefined,
-                                          },
                                           "id": "1",
                                           "isExpanded": undefined,
                                           "isFirst": true,
@@ -3097,15 +2732,7 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                               </Link>
                                             </React.Fragment>,
                                             undefined,
-                                            undefined,
                                           ],
-                                          "fire-count": Object {
-                                            "formatters": Array [],
-                                            "props": Object {
-                                              "isVisible": true,
-                                            },
-                                            "title": undefined,
-                                          },
                                           "id": "2",
                                           "isExpanded": undefined,
                                           "isFirst": false,
@@ -3152,15 +2779,7 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                               </Link>
                                             </React.Fragment>,
                                             undefined,
-                                            undefined,
                                           ],
-                                          "fire-count": Object {
-                                            "formatters": Array [],
-                                            "props": Object {
-                                              "isVisible": true,
-                                            },
-                                            "title": undefined,
-                                          },
                                           "id": "3",
                                           "isExpanded": undefined,
                                           "isFirst": false,
@@ -3237,15 +2856,7 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                               </Link>
                                             </React.Fragment>,
                                             undefined,
-                                            undefined,
                                           ],
-                                          "fire-count": Object {
-                                            "formatters": Array [],
-                                            "props": Object {
-                                              "isVisible": true,
-                                            },
-                                            "title": undefined,
-                                          },
                                           "id": "1",
                                           "isExpanded": undefined,
                                           "isFirst": true,
@@ -3292,15 +2903,7 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                               </Link>
                                             </React.Fragment>,
                                             undefined,
-                                            undefined,
                                           ],
-                                          "fire-count": Object {
-                                            "formatters": Array [],
-                                            "props": Object {
-                                              "isVisible": true,
-                                            },
-                                            "title": undefined,
-                                          },
                                           "id": "2",
                                           "isExpanded": undefined,
                                           "isFirst": false,
@@ -3347,15 +2950,7 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                               </Link>
                                             </React.Fragment>,
                                             undefined,
-                                            undefined,
                                           ],
-                                          "fire-count": Object {
-                                            "formatters": Array [],
-                                            "props": Object {
-                                              "isVisible": true,
-                                            },
-                                            "title": undefined,
-                                          },
                                           "id": "3",
                                           "isExpanded": undefined,
                                           "isFirst": false,
@@ -3410,15 +3005,7 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                 </Link>
                                               </React.Fragment>,
                                               undefined,
-                                              undefined,
                                             ],
-                                            "fire-count": Object {
-                                              "formatters": Array [],
-                                              "props": Object {
-                                                "isVisible": true,
-                                              },
-                                              "title": undefined,
-                                            },
                                             "id": "1",
                                             "isExpanded": undefined,
                                             "isFirst": true,
@@ -3465,15 +3052,7 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                 </Link>
                                               </React.Fragment>,
                                               undefined,
-                                              undefined,
                                             ],
-                                            "fire-count": Object {
-                                              "formatters": Array [],
-                                              "props": Object {
-                                                "isVisible": true,
-                                              },
-                                              "title": undefined,
-                                            },
                                             "id": "2",
                                             "isExpanded": undefined,
                                             "isFirst": false,
@@ -3520,15 +3099,7 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                 </Link>
                                               </React.Fragment>,
                                               undefined,
-                                              undefined,
                                             ],
-                                            "fire-count": Object {
-                                              "formatters": Array [],
-                                              "props": Object {
-                                                "isVisible": true,
-                                              },
-                                              "title": undefined,
-                                            },
                                             "id": "3",
                                             "isExpanded": undefined,
                                             "isFirst": false,
@@ -3688,57 +3259,6 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                       ],
                                                       "transforms": Array [
                                                         [Function],
-                                                      ],
-                                                    },
-                                                    "data": undefined,
-                                                    "extraParams": Object {
-                                                      "actionResolver": [Function],
-                                                      "actions": undefined,
-                                                      "actionsToggle": undefined,
-                                                      "allRowsExpanded": false,
-                                                      "allRowsSelected": false,
-                                                      "areActionsDisabled": undefined,
-                                                      "canCollapseAll": false,
-                                                      "canSelectAll": true,
-                                                      "canSortFavorites": true,
-                                                      "collapseAllAriaLabel": "",
-                                                      "contentId": "expanded-content",
-                                                      "dropdownDirection": "down",
-                                                      "dropdownPosition": "right",
-                                                      "expandId": "expandable-toggle",
-                                                      "firstUserColumnIndex": 0,
-                                                      "isHeaderSelectDisabled": false,
-                                                      "onCollapse": undefined,
-                                                      "onExpand": undefined,
-                                                      "onFavorite": undefined,
-                                                      "onRowEdit": undefined,
-                                                      "onSelect": undefined,
-                                                      "onSort": undefined,
-                                                      "rowLabeledBy": "simple-node",
-                                                      "selectVariant": "checkbox",
-                                                      "sortBy": undefined,
-                                                    },
-                                                    "header": Object {
-                                                      "formatters": Array [],
-                                                      "label": "Fire count",
-                                                      "transforms": Array [
-                                                        [Function],
-                                                        [Function],
-                                                      ],
-                                                    },
-                                                    "property": "fire-count",
-                                                    "props": Object {
-                                                      "data-key": 2,
-                                                      "data-label": "Fire count",
-                                                    },
-                                                  },
-                                                  Object {
-                                                    "cell": Object {
-                                                      "formatters": Array [
-                                                        [Function],
-                                                      ],
-                                                      "transforms": Array [
-                                                        [Function],
                                                         [Function],
                                                       ],
                                                     },
@@ -3779,9 +3299,9 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                         [Function],
                                                       ],
                                                     },
-                                                    "property": "column-3",
+                                                    "property": "column-2",
                                                     "props": Object {
-                                                      "data-key": 3,
+                                                      "data-key": 2,
                                                       "data-label": "",
                                                     },
                                                   },
@@ -3811,15 +3331,7 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                       </Link>
                                                     </React.Fragment>,
                                                     undefined,
-                                                    undefined,
                                                   ],
-                                                  "fire-count": Object {
-                                                    "formatters": Array [],
-                                                    "props": Object {
-                                                      "isVisible": true,
-                                                    },
-                                                    "title": undefined,
-                                                  },
                                                   "id": "1",
                                                   "isExpanded": undefined,
                                                   "isFirst": true,
@@ -3875,15 +3387,7 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                         </Link>
                                                       </React.Fragment>,
                                                       undefined,
-                                                      undefined,
                                                     ],
-                                                    "fire-count": Object {
-                                                      "formatters": Array [],
-                                                      "props": Object {
-                                                        "isVisible": true,
-                                                      },
-                                                      "title": undefined,
-                                                    },
                                                     "id": "1",
                                                     "isExpanded": undefined,
                                                     "isFirst": true,
@@ -4029,43 +3533,11 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                         </Td>
                                                       </BodyCell>
                                                       <BodyCell
-                                                        data-key={2}
-                                                        data-label="Fire count"
-                                                        isVisible={true}
-                                                        key="col-2-row-0"
-                                                      >
-                                                        <Td
-                                                          className=""
-                                                          component="td"
-                                                          data-key={2}
-                                                          dataLabel="Fire count"
-                                                          onMouseEnter={[Function]}
-                                                          textCenter={false}
-                                                        >
-                                                          <TdBase
-                                                            className=""
-                                                            component="td"
-                                                            data-key={2}
-                                                            dataLabel="Fire count"
-                                                            innerRef={null}
-                                                            onMouseEnter={[Function]}
-                                                            textCenter={false}
-                                                          >
-                                                            <td
-                                                              className=""
-                                                              data-key={2}
-                                                              data-label="Fire count"
-                                                              onMouseEnter={[Function]}
-                                                            />
-                                                          </TdBase>
-                                                        </Td>
-                                                      </BodyCell>
-                                                      <BodyCell
                                                         className="pf-c-table__action"
-                                                        data-key={3}
+                                                        data-key={2}
                                                         data-label=""
                                                         isVisible={true}
-                                                        key="col-3-row-0"
+                                                        key="col-2-row-0"
                                                         style={
                                                           Object {
                                                             "paddingRight": 0,
@@ -4075,7 +3547,7 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                         <Td
                                                           className="pf-c-table__action"
                                                           component="td"
-                                                          data-key={3}
+                                                          data-key={2}
                                                           dataLabel={null}
                                                           onMouseEnter={[Function]}
                                                           style={
@@ -4088,7 +3560,7 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                           <TdBase
                                                             className="pf-c-table__action"
                                                             component="td"
-                                                            data-key={3}
+                                                            data-key={2}
                                                             dataLabel={null}
                                                             innerRef={null}
                                                             onMouseEnter={[Function]}
@@ -4101,7 +3573,7 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                           >
                                                             <td
                                                               className="pf-c-table__action"
-                                                              data-key={3}
+                                                              data-key={2}
                                                               data-label={null}
                                                               onMouseEnter={[Function]}
                                                               style={
@@ -4162,14 +3634,14 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                                           [Function],
                                                                         ],
                                                                       },
-                                                                      "property": "column-3",
+                                                                      "property": "column-2",
                                                                       "props": Object {
-                                                                        "data-key": 3,
+                                                                        "data-key": 2,
                                                                         "data-label": "",
                                                                       },
                                                                     },
-                                                                    "columnIndex": 3,
-                                                                    "property": "column-3",
+                                                                    "columnIndex": 2,
+                                                                    "property": "column-2",
                                                                     "rowIndex": 0,
                                                                   }
                                                                 }
@@ -4197,15 +3669,7 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                                         </ForwardRef(Link)>
                                                                       </React.Fragment>,
                                                                       undefined,
-                                                                      undefined,
                                                                     ],
-                                                                    "fire-count": Object {
-                                                                      "formatters": Array [],
-                                                                      "props": Object {
-                                                                        "isVisible": true,
-                                                                      },
-                                                                      "title": undefined,
-                                                                    },
                                                                     "id": "1",
                                                                     "isExpanded": undefined,
                                                                     "isFirst": true,
@@ -4555,57 +4019,6 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                       ],
                                                       "transforms": Array [
                                                         [Function],
-                                                      ],
-                                                    },
-                                                    "data": undefined,
-                                                    "extraParams": Object {
-                                                      "actionResolver": [Function],
-                                                      "actions": undefined,
-                                                      "actionsToggle": undefined,
-                                                      "allRowsExpanded": false,
-                                                      "allRowsSelected": false,
-                                                      "areActionsDisabled": undefined,
-                                                      "canCollapseAll": false,
-                                                      "canSelectAll": true,
-                                                      "canSortFavorites": true,
-                                                      "collapseAllAriaLabel": "",
-                                                      "contentId": "expanded-content",
-                                                      "dropdownDirection": "down",
-                                                      "dropdownPosition": "right",
-                                                      "expandId": "expandable-toggle",
-                                                      "firstUserColumnIndex": 0,
-                                                      "isHeaderSelectDisabled": false,
-                                                      "onCollapse": undefined,
-                                                      "onExpand": undefined,
-                                                      "onFavorite": undefined,
-                                                      "onRowEdit": undefined,
-                                                      "onSelect": undefined,
-                                                      "onSort": undefined,
-                                                      "rowLabeledBy": "simple-node",
-                                                      "selectVariant": "checkbox",
-                                                      "sortBy": undefined,
-                                                    },
-                                                    "header": Object {
-                                                      "formatters": Array [],
-                                                      "label": "Fire count",
-                                                      "transforms": Array [
-                                                        [Function],
-                                                        [Function],
-                                                      ],
-                                                    },
-                                                    "property": "fire-count",
-                                                    "props": Object {
-                                                      "data-key": 2,
-                                                      "data-label": "Fire count",
-                                                    },
-                                                  },
-                                                  Object {
-                                                    "cell": Object {
-                                                      "formatters": Array [
-                                                        [Function],
-                                                      ],
-                                                      "transforms": Array [
-                                                        [Function],
                                                         [Function],
                                                       ],
                                                     },
@@ -4646,9 +4059,9 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                         [Function],
                                                       ],
                                                     },
-                                                    "property": "column-3",
+                                                    "property": "column-2",
                                                     "props": Object {
-                                                      "data-key": 3,
+                                                      "data-key": 2,
                                                       "data-label": "",
                                                     },
                                                   },
@@ -4678,15 +4091,7 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                       </Link>
                                                     </React.Fragment>,
                                                     undefined,
-                                                    undefined,
                                                   ],
-                                                  "fire-count": Object {
-                                                    "formatters": Array [],
-                                                    "props": Object {
-                                                      "isVisible": true,
-                                                    },
-                                                    "title": undefined,
-                                                  },
                                                   "id": "2",
                                                   "isExpanded": undefined,
                                                   "isFirst": false,
@@ -4742,15 +4147,7 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                         </Link>
                                                       </React.Fragment>,
                                                       undefined,
-                                                      undefined,
                                                     ],
-                                                    "fire-count": Object {
-                                                      "formatters": Array [],
-                                                      "props": Object {
-                                                        "isVisible": true,
-                                                      },
-                                                      "title": undefined,
-                                                    },
                                                     "id": "2",
                                                     "isExpanded": undefined,
                                                     "isFirst": false,
@@ -4896,43 +4293,11 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                         </Td>
                                                       </BodyCell>
                                                       <BodyCell
-                                                        data-key={2}
-                                                        data-label="Fire count"
-                                                        isVisible={true}
-                                                        key="col-2-row-1"
-                                                      >
-                                                        <Td
-                                                          className=""
-                                                          component="td"
-                                                          data-key={2}
-                                                          dataLabel="Fire count"
-                                                          onMouseEnter={[Function]}
-                                                          textCenter={false}
-                                                        >
-                                                          <TdBase
-                                                            className=""
-                                                            component="td"
-                                                            data-key={2}
-                                                            dataLabel="Fire count"
-                                                            innerRef={null}
-                                                            onMouseEnter={[Function]}
-                                                            textCenter={false}
-                                                          >
-                                                            <td
-                                                              className=""
-                                                              data-key={2}
-                                                              data-label="Fire count"
-                                                              onMouseEnter={[Function]}
-                                                            />
-                                                          </TdBase>
-                                                        </Td>
-                                                      </BodyCell>
-                                                      <BodyCell
                                                         className="pf-c-table__action"
-                                                        data-key={3}
+                                                        data-key={2}
                                                         data-label=""
                                                         isVisible={true}
-                                                        key="col-3-row-1"
+                                                        key="col-2-row-1"
                                                         style={
                                                           Object {
                                                             "paddingRight": 0,
@@ -4942,7 +4307,7 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                         <Td
                                                           className="pf-c-table__action"
                                                           component="td"
-                                                          data-key={3}
+                                                          data-key={2}
                                                           dataLabel={null}
                                                           onMouseEnter={[Function]}
                                                           style={
@@ -4955,7 +4320,7 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                           <TdBase
                                                             className="pf-c-table__action"
                                                             component="td"
-                                                            data-key={3}
+                                                            data-key={2}
                                                             dataLabel={null}
                                                             innerRef={null}
                                                             onMouseEnter={[Function]}
@@ -4968,7 +4333,7 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                           >
                                                             <td
                                                               className="pf-c-table__action"
-                                                              data-key={3}
+                                                              data-key={2}
                                                               data-label={null}
                                                               onMouseEnter={[Function]}
                                                               style={
@@ -5029,14 +4394,14 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                                           [Function],
                                                                         ],
                                                                       },
-                                                                      "property": "column-3",
+                                                                      "property": "column-2",
                                                                       "props": Object {
-                                                                        "data-key": 3,
+                                                                        "data-key": 2,
                                                                         "data-label": "",
                                                                       },
                                                                     },
-                                                                    "columnIndex": 3,
-                                                                    "property": "column-3",
+                                                                    "columnIndex": 2,
+                                                                    "property": "column-2",
                                                                     "rowIndex": 1,
                                                                   }
                                                                 }
@@ -5064,15 +4429,7 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                                         </ForwardRef(Link)>
                                                                       </React.Fragment>,
                                                                       undefined,
-                                                                      undefined,
                                                                     ],
-                                                                    "fire-count": Object {
-                                                                      "formatters": Array [],
-                                                                      "props": Object {
-                                                                        "isVisible": true,
-                                                                      },
-                                                                      "title": undefined,
-                                                                    },
                                                                     "id": "2",
                                                                     "isExpanded": undefined,
                                                                     "isFirst": false,
@@ -5422,57 +4779,6 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                       ],
                                                       "transforms": Array [
                                                         [Function],
-                                                      ],
-                                                    },
-                                                    "data": undefined,
-                                                    "extraParams": Object {
-                                                      "actionResolver": [Function],
-                                                      "actions": undefined,
-                                                      "actionsToggle": undefined,
-                                                      "allRowsExpanded": false,
-                                                      "allRowsSelected": false,
-                                                      "areActionsDisabled": undefined,
-                                                      "canCollapseAll": false,
-                                                      "canSelectAll": true,
-                                                      "canSortFavorites": true,
-                                                      "collapseAllAriaLabel": "",
-                                                      "contentId": "expanded-content",
-                                                      "dropdownDirection": "down",
-                                                      "dropdownPosition": "right",
-                                                      "expandId": "expandable-toggle",
-                                                      "firstUserColumnIndex": 0,
-                                                      "isHeaderSelectDisabled": false,
-                                                      "onCollapse": undefined,
-                                                      "onExpand": undefined,
-                                                      "onFavorite": undefined,
-                                                      "onRowEdit": undefined,
-                                                      "onSelect": undefined,
-                                                      "onSort": undefined,
-                                                      "rowLabeledBy": "simple-node",
-                                                      "selectVariant": "checkbox",
-                                                      "sortBy": undefined,
-                                                    },
-                                                    "header": Object {
-                                                      "formatters": Array [],
-                                                      "label": "Fire count",
-                                                      "transforms": Array [
-                                                        [Function],
-                                                        [Function],
-                                                      ],
-                                                    },
-                                                    "property": "fire-count",
-                                                    "props": Object {
-                                                      "data-key": 2,
-                                                      "data-label": "Fire count",
-                                                    },
-                                                  },
-                                                  Object {
-                                                    "cell": Object {
-                                                      "formatters": Array [
-                                                        [Function],
-                                                      ],
-                                                      "transforms": Array [
-                                                        [Function],
                                                         [Function],
                                                       ],
                                                     },
@@ -5513,9 +4819,9 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                         [Function],
                                                       ],
                                                     },
-                                                    "property": "column-3",
+                                                    "property": "column-2",
                                                     "props": Object {
-                                                      "data-key": 3,
+                                                      "data-key": 2,
                                                       "data-label": "",
                                                     },
                                                   },
@@ -5545,15 +4851,7 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                       </Link>
                                                     </React.Fragment>,
                                                     undefined,
-                                                    undefined,
                                                   ],
-                                                  "fire-count": Object {
-                                                    "formatters": Array [],
-                                                    "props": Object {
-                                                      "isVisible": true,
-                                                    },
-                                                    "title": undefined,
-                                                  },
                                                   "id": "3",
                                                   "isExpanded": undefined,
                                                   "isFirst": false,
@@ -5609,15 +4907,7 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                         </Link>
                                                       </React.Fragment>,
                                                       undefined,
-                                                      undefined,
                                                     ],
-                                                    "fire-count": Object {
-                                                      "formatters": Array [],
-                                                      "props": Object {
-                                                        "isVisible": true,
-                                                      },
-                                                      "title": undefined,
-                                                    },
                                                     "id": "3",
                                                     "isExpanded": undefined,
                                                     "isFirst": false,
@@ -5763,43 +5053,11 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                         </Td>
                                                       </BodyCell>
                                                       <BodyCell
-                                                        data-key={2}
-                                                        data-label="Fire count"
-                                                        isVisible={true}
-                                                        key="col-2-row-2"
-                                                      >
-                                                        <Td
-                                                          className=""
-                                                          component="td"
-                                                          data-key={2}
-                                                          dataLabel="Fire count"
-                                                          onMouseEnter={[Function]}
-                                                          textCenter={false}
-                                                        >
-                                                          <TdBase
-                                                            className=""
-                                                            component="td"
-                                                            data-key={2}
-                                                            dataLabel="Fire count"
-                                                            innerRef={null}
-                                                            onMouseEnter={[Function]}
-                                                            textCenter={false}
-                                                          >
-                                                            <td
-                                                              className=""
-                                                              data-key={2}
-                                                              data-label="Fire count"
-                                                              onMouseEnter={[Function]}
-                                                            />
-                                                          </TdBase>
-                                                        </Td>
-                                                      </BodyCell>
-                                                      <BodyCell
                                                         className="pf-c-table__action"
-                                                        data-key={3}
+                                                        data-key={2}
                                                         data-label=""
                                                         isVisible={true}
-                                                        key="col-3-row-2"
+                                                        key="col-2-row-2"
                                                         style={
                                                           Object {
                                                             "paddingRight": 0,
@@ -5809,7 +5067,7 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                         <Td
                                                           className="pf-c-table__action"
                                                           component="td"
-                                                          data-key={3}
+                                                          data-key={2}
                                                           dataLabel={null}
                                                           onMouseEnter={[Function]}
                                                           style={
@@ -5822,7 +5080,7 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                           <TdBase
                                                             className="pf-c-table__action"
                                                             component="td"
-                                                            data-key={3}
+                                                            data-key={2}
                                                             dataLabel={null}
                                                             innerRef={null}
                                                             onMouseEnter={[Function]}
@@ -5835,7 +5093,7 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                           >
                                                             <td
                                                               className="pf-c-table__action"
-                                                              data-key={3}
+                                                              data-key={2}
                                                               data-label={null}
                                                               onMouseEnter={[Function]}
                                                               style={
@@ -5896,14 +5154,14 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                                           [Function],
                                                                         ],
                                                                       },
-                                                                      "property": "column-3",
+                                                                      "property": "column-2",
                                                                       "props": Object {
-                                                                        "data-key": 3,
+                                                                        "data-key": 2,
                                                                         "data-label": "",
                                                                       },
                                                                     },
-                                                                    "columnIndex": 3,
-                                                                    "property": "column-3",
+                                                                    "columnIndex": 2,
+                                                                    "property": "column-2",
                                                                     "rowIndex": 2,
                                                                   }
                                                                 }
@@ -5931,15 +5189,7 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                                         </ForwardRef(Link)>
                                                                       </React.Fragment>,
                                                                       undefined,
-                                                                      undefined,
                                                                     ],
-                                                                    "fire-count": Object {
-                                                                      "formatters": Array [],
-                                                                      "props": Object {
-                                                                        "isVisible": true,
-                                                                      },
-                                                                      "title": undefined,
-                                                                    },
                                                                     "id": "3",
                                                                     "isExpanded": undefined,
                                                                     "isFirst": false,
