@@ -20,5 +20,5 @@ jobs:
         run: |
           export GITHUB_TOKEN=$EDA_TOKEN
           docker-compose up -d --build
-          curl -q http://localhost:8080/ping
+          curl -q http://localhost:9000/ping
           curl -q http://localhost:8080/eda
