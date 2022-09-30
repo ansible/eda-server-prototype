@@ -42,6 +42,6 @@ describe('RemoveProject', () => {
 
     expect(wrapper.find(Modal).at(0).props().title).toEqual("Delete project");
     expect(wrapper.find('Text').at(0).props().children).toEqual('Are you sure you want to delete the project below?');
-    expect(wrapper.find('Text').at(1).props().children).toEqual('Project 1');
+    expect(wrapper.find('Text').at(1).props().children.props.children.at(1)).toEqual('Project 1');
   });
 })

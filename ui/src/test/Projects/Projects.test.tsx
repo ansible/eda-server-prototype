@@ -62,7 +62,8 @@ describe('Projects', () => {
     await act(async () => {
       wrapper.update();
     });
-    expect(wrapper.find(Button).length).toEqual(5);
+    expect(wrapper.find(Button).length).toEqual(4);
     expect(wrapper.find(Button).first().props().children).toEqual('Add project');
+    expect(wrapper.find(Button).at(1).props().children).toEqual('Delete');
   });
 });
