@@ -13,13 +13,13 @@ __all__ = (
 )
 
 
-class RestartPolicy(Enum):
+class RestartPolicy(str, Enum):
     ALWAYS = "always"
     ON_FAILURE = "on-failure"
     NEVER = "never"
 
 
-class ExecutionEnvironment(Enum):
+class ExecutionEnvironment(str, Enum):
     DOCKER = "docker"
     PODMAN = "podman"
     K8S = "k8s"
