@@ -52,6 +52,7 @@ async def create_activation(
     query = sa.insert(models.activations).values(
         name=activation.name,
         description=activation.description,
+        status=activation.status,
         rulebook_id=activation.rulebook_id,
         inventory_id=activation.inventory_id,
         execution_environment=activation.execution_environment,

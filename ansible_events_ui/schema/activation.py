@@ -15,14 +15,15 @@ from .rulebook import RulebookRef
 
 class ActivationCreate(BaseModel):
     name: StrictStr
-    description: Optional[StrictStr] = ""
+    description: StrictStr = ""
+    status: StrictStr = ""
     rulebook_id: int
     inventory_id: int
     restart_policy: RestartPolicy = RestartPolicy.ON_FAILURE
     is_enabled: bool = True
-    extra_var_id: Optional[int] = Field(None, nullable=True)
+    extra_var_id: int = Field(None, nullable=True)
     execution_environment: ExecutionEnvironment = ExecutionEnvironment.DOCKER
-    working_directory: Optional[StrictStr] = ""
+    working_directory: StrictStr = ""
 
 
 class ActivationBaseRead(ActivationCreate):
@@ -32,16 +33,16 @@ class ActivationBaseRead(ActivationCreate):
 class ActivationRead(BaseModel):
     id: int
     name: StrictStr
-    description: Optional[StrictStr] = ""
-    status: Optional[StrictStr] = ""
+    description: StrictStr
+    status: StrictStr  # TODO: will need to add enum
     is_enabled: bool
-    working_directory: Optional[StrictStr] = ""
+    working_directory: StrictStr
     execution_environment: ExecutionEnvironment
     rulebook: RulebookRef
     inventory: InventoryRef
-    extra_var: Optional[ExtravarsRef] = Field(None, nullable=True)
+    extra_var: ExtravarsRef = Field(None, nullable=True)
     restart_policy: RestartPolicy
-    restarted_at: Optional[datetime] = Field(None, nullable=True)
+    restarted_at: datetime = Field(None, nullable=True)
     restart_count: int
     created_at: datetime
     modified_at: datetime
