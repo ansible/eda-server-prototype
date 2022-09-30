@@ -15,7 +15,7 @@ import {
 import styled from 'styled-components';
 import {getServer} from '@app/utils/utils';
 import {TopToolbar} from "@app/shared/top-toolbar";
-import {PlaybookType} from "@app/RuleSetFiles/RuleSetFiles";
+import {PlaybookType} from "@app/RuleSets/RuleSets";
 
 const CardBody = styled(PFCardBody)`
   white-space: pre-wrap;

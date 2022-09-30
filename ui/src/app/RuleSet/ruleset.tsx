@@ -22,14 +22,11 @@ export interface RuleSetType {
   id: string,
   name?: string,
   description?: string,
-  scm_credentials?: string,
-  project_id?: string,
-  project_name?: string,
-  number_of_rules?: string,
+  project?: { id: string, name: string },
+  rulebook?: { id: string, name: string },
+  rule_count?: string,
   created_at?: string,
-  scm_url?: string,
-  fire_count?: string,
-  last_modified?: string
+  modified_at?: string
 }
 
 export interface RuleType {
@@ -70,7 +67,7 @@ export const renderRuleSetFileTabs = (rulesetId: string, intl) => {
   return <AppTabs tabItems={ruleset_tabs}/>
 };
 
-const endpoint_rulebook = 'http://' + getServer() + '/api/rulebooks/';
+const endpoint_ruleset = 'http://' + getServer() + '/api/rulesets/';
 const endpoint_rulebook_json = 'http://' + getServer() + '/api/rulebook_json/';
 
 export const getTabFromPath = (tabs:TabItemType[], path:string):string | undefined => {
@@ -84,7 +81,7 @@ const RuleSet: React.FunctionComponent = () => {
   const intl = useIntl();
 
   useEffect(() => {
-    fetch(`${endpoint_rulebook}${id}`, {
+    fetch(`${endpoint_ruleset}${id}`, {
       headers: {
         'Content-Type': 'application/json',
       },
