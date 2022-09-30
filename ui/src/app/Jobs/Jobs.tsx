@@ -288,6 +288,8 @@ const Jobs: React.FunctionComponent = () => {
           <TableToolbarView
             ouiaId={'jobs-table'}
             rows={rows}
+            setLimit={setLimit}
+            setOffset={setOffset}
             columns={columns(intl, selectedAll, selectAllFunction)}
             fetchData={updateJobs}
             routes={routes}

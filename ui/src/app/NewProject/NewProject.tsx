@@ -3,8 +3,7 @@ import { useHistory } from "react-router-dom";
 import React, { useState, useEffect } from 'react';
 import {
   Card,
-  CardBody as PFCardBody,
-  SimpleList as PFSimpleList,
+  CardBody as PFCardBody
 } from '@patternfly/react-core';
 import {useIntl} from "react-intl";
 import { ActionGroup, Button, Form, FormGroup, TextInput } from '@patternfly/react-core';
@@ -14,14 +13,9 @@ import styled from 'styled-components';
 import {TopToolbar} from "@app/shared/top-toolbar";
 import sharedMessages from "../messages/shared.messages";
 
-
 const CardBody = styled(PFCardBody)`
   white-space: pre-wrap;
   `
-const SimpleList = styled(PFSimpleList)`
-  white-space: pre-wrap;
-`
-
 const endpoint = 'http://' + getServer() + '/api/projects/';
 
 const NewProject: React.FunctionComponent = () => {

@@ -213,12 +213,29 @@ exports[`Projects should render the Projects component 1`] = `
                       },
                     ]
                   }
+                  setLimit={[Function]}
+                  setOffset={[Function]}
                   singular="Project"
                   toolbarButtons={[Function]}
                 >
                   <Route
                     exact={true}
-                    path="/new-project"
+                    path="/projects/new-project"
+                    render={[Function]}
+                  />
+                  <Route
+                    exact={true}
+                    path="/projects/edit-project/:id"
+                    render={[Function]}
+                  />
+                  <Route
+                    exact={true}
+                    path="/projects/remove/:id"
+                    render={[Function]}
+                  />
+                  <Route
+                    exact={true}
+                    path="/projects/remove"
                     render={[Function]}
                   />
                   <PrimaryToolbar
@@ -252,7 +269,26 @@ exports[`Projects should render the Projects component 1`] = `
                                 id="remove-multiple-projects"
                                 to={
                                   Object {
-                                    "pathname": "/remove-projects",
+                                    "pathname": "/projects/remove-projects",
+                                  }
+                                }
+                              >
+                                <Button
+                                  aria-label="Delete project"
+                                  isDisabled={true}
+                                  variant="secondary"
+                                >
+                                  Delete
+                                </Button>
+                              </Link>
+                            </ToolbarItem>
+                            <ToolbarItem>
+                              <Link
+                                className="disabled-link"
+                                id="remove-multiple-projects"
+                                to={
+                                  Object {
+                                    "pathname": "/projects/remove-projects",
                                   }
                                 }
                               >
@@ -497,7 +533,26 @@ exports[`Projects should render the Projects component 1`] = `
                                           id="remove-multiple-projects"
                                           to={
                                             Object {
-                                              "pathname": "/remove-projects",
+                                              "pathname": "/projects/remove-projects",
+                                            }
+                                          }
+                                        >
+                                          <Button
+                                            aria-label="Delete project"
+                                            isDisabled={true}
+                                            variant="secondary"
+                                          >
+                                            Delete
+                                          </Button>
+                                        </Link>
+                                      </ToolbarItem>
+                                      <ToolbarItem>
+                                        <Link
+                                          className="disabled-link"
+                                          id="remove-multiple-projects"
+                                          to={
+                                            Object {
+                                              "pathname": "/projects/remove-projects",
                                             }
                                           }
                                         >
@@ -598,19 +653,76 @@ exports[`Projects should render the Projects component 1`] = `
                                                 id="remove-multiple-projects"
                                                 to={
                                                   Object {
-                                                    "pathname": "/remove-projects",
+                                                    "pathname": "/projects/remove-projects",
                                                   }
                                                 }
                                               >
                                                 <LinkAnchor
                                                   className="disabled-link"
-                                                  href="/remove-projects"
+                                                  href="/projects/remove-projects"
                                                   id="remove-multiple-projects"
                                                   navigate={[Function]}
                                                 >
                                                   <a
                                                     className="disabled-link"
-                                                    href="/remove-projects"
+                                                    href="/projects/remove-projects"
+                                                    id="remove-multiple-projects"
+                                                    onClick={[Function]}
+                                                  >
+                                                    <Button
+                                                      aria-label="Delete project"
+                                                      isDisabled={true}
+                                                      variant="secondary"
+                                                    >
+                                                      <ButtonBase
+                                                        aria-label="Delete project"
+                                                        innerRef={null}
+                                                        isDisabled={true}
+                                                        variant="secondary"
+                                                      >
+                                                        <button
+                                                          aria-disabled={true}
+                                                          aria-label="Delete project"
+                                                          className="pf-c-button pf-m-secondary pf-m-disabled"
+                                                          data-ouia-component-id="OUIA-Generated-Button-secondary-1"
+                                                          data-ouia-component-type="PF4/Button"
+                                                          data-ouia-safe={true}
+                                                          disabled={true}
+                                                          role={null}
+                                                          tabIndex={null}
+                                                          type="button"
+                                                        >
+                                                          Delete
+                                                        </button>
+                                                      </ButtonBase>
+                                                    </Button>
+                                                  </a>
+                                                </LinkAnchor>
+                                              </Link>
+                                            </div>
+                                          </ToolbarItem>
+                                          <ToolbarItem>
+                                            <div
+                                              className="pf-c-toolbar__item"
+                                            >
+                                              <Link
+                                                className="disabled-link"
+                                                id="remove-multiple-projects"
+                                                to={
+                                                  Object {
+                                                    "pathname": "/projects/remove-projects",
+                                                  }
+                                                }
+                                              >
+                                                <LinkAnchor
+                                                  className="disabled-link"
+                                                  href="/projects/remove-projects"
+                                                  id="remove-multiple-projects"
+                                                  navigate={[Function]}
+                                                >
+                                                  <a
+                                                    className="disabled-link"
+                                                    href="/projects/remove-projects"
                                                     id="remove-multiple-projects"
                                                     onClick={[Function]}
                                                   >
@@ -712,7 +824,7 @@ exports[`Projects should render the Projects component 1`] = `
                                           <KebabToggle
                                             aria-haspopup={true}
                                             getMenuRef={[Function]}
-                                            id="pf-dropdown-toggle-id-4"
+                                            id="pf-dropdown-toggle-id-8"
                                             isOpen={false}
                                             isPlain={true}
                                             isText={false}
@@ -732,7 +844,7 @@ exports[`Projects should render the Projects component 1`] = `
                                                     aria-haspopup="true"
                                                     aria-label="Actions"
                                                     class="pf-c-dropdown__toggle pf-m-plain"
-                                                    id="pf-dropdown-toggle-id-4"
+                                                    id="pf-dropdown-toggle-id-8"
                                                     type="button"
                                                   >
                                                     <svg
@@ -759,7 +871,7 @@ exports[`Projects should render the Projects component 1`] = `
                                               bubbleEvent={false}
                                               className=""
                                               getMenuRef={[Function]}
-                                              id="pf-dropdown-toggle-id-4"
+                                              id="pf-dropdown-toggle-id-8"
                                               isActive={false}
                                               isDisabled={false}
                                               isOpen={false}
@@ -782,7 +894,7 @@ exports[`Projects should render the Projects component 1`] = `
                                                       aria-haspopup="true"
                                                       aria-label="Actions"
                                                       class="pf-c-dropdown__toggle pf-m-plain"
-                                                      id="pf-dropdown-toggle-id-4"
+                                                      id="pf-dropdown-toggle-id-8"
                                                       type="button"
                                                     >
                                                       <svg
@@ -809,7 +921,7 @@ exports[`Projects should render the Projects component 1`] = `
                                                 aria-label="Actions"
                                                 className="pf-c-dropdown__toggle pf-m-plain"
                                                 disabled={false}
-                                                id="pf-dropdown-toggle-id-4"
+                                                id="pf-dropdown-toggle-id-8"
                                                 onClick={[Function]}
                                                 onKeyDown={[Function]}
                                                 type="button"
@@ -921,7 +1033,7 @@ exports[`Projects should render the Projects component 1`] = `
                                       data-ouia-component-id="CompactPagination"
                                       data-ouia-component-type="PF4/Pagination"
                                       data-ouia-safe={true}
-                                      id="pagination-options-menu-2"
+                                      id="pagination-options-menu-4"
                                     >
                                       <div
                                         className="pf-c-pagination__total-items"
@@ -1078,7 +1190,7 @@ exports[`Projects should render the Projects component 1`] = `
                                               aria-haspopup={true}
                                               firstIndex={0}
                                               getMenuRef={[Function]}
-                                              id="pf-dropdown-toggle-id-5"
+                                              id="pf-dropdown-toggle-id-9"
                                               isDisabled={false}
                                               isOpen={false}
                                               isPlain={true}
@@ -1124,10 +1236,10 @@ exports[`Projects should render the Projects component 1`] = `
                                                         aria-haspopup="listbox"
                                                         aria-label="Items per page"
                                                         class="  pf-c-options-menu__toggle-button"
-                                                        data-ouia-component-id="OUIA-Generated-DropdownToggle-2"
+                                                        data-ouia-component-id="OUIA-Generated-DropdownToggle-1"
                                                         data-ouia-component-type="PF4/DropdownToggle"
                                                         data-ouia-safe="true"
-                                                        id="pagination-options-menu-toggle-2"
+                                                        id="pagination-options-menu-toggle-4"
                                                         type="button"
                                                       >
                                                         <span
@@ -1188,7 +1300,7 @@ exports[`Projects should render the Projects component 1`] = `
                                                   aria-haspopup="listbox"
                                                   aria-label="Items per page"
                                                   className="pf-c-options-menu__toggle-button"
-                                                  id="pagination-options-menu-toggle-2"
+                                                  id="pagination-options-menu-toggle-4"
                                                   isDisabled={0}
                                                   isOpen={false}
                                                   onEnter={[Function]}
@@ -1225,10 +1337,10 @@ exports[`Projects should render the Projects component 1`] = `
                                                             aria-haspopup="listbox"
                                                             aria-label="Items per page"
                                                             class="  pf-c-options-menu__toggle-button"
-                                                            data-ouia-component-id="OUIA-Generated-DropdownToggle-2"
+                                                            data-ouia-component-id="OUIA-Generated-DropdownToggle-1"
                                                             data-ouia-component-type="PF4/DropdownToggle"
                                                             data-ouia-safe="true"
-                                                            id="pagination-options-menu-toggle-2"
+                                                            id="pagination-options-menu-toggle-4"
                                                             type="button"
                                                           >
                                                             <span
@@ -1259,11 +1371,11 @@ exports[`Projects should render the Projects component 1`] = `
                                                     aria-label="Items per page"
                                                     bubbleEvent={false}
                                                     className="pf-c-options-menu__toggle-button"
-                                                    data-ouia-component-id="OUIA-Generated-DropdownToggle-2"
+                                                    data-ouia-component-id="OUIA-Generated-DropdownToggle-1"
                                                     data-ouia-component-type="PF4/DropdownToggle"
                                                     data-ouia-safe={true}
                                                     getMenuRef={null}
-                                                    id="pagination-options-menu-toggle-2"
+                                                    id="pagination-options-menu-toggle-4"
                                                     isActive={false}
                                                     isDisabled={0}
                                                     isOpen={false}
@@ -1305,10 +1417,10 @@ exports[`Projects should render the Projects component 1`] = `
                                                               aria-haspopup="listbox"
                                                               aria-label="Items per page"
                                                               class="  pf-c-options-menu__toggle-button"
-                                                              data-ouia-component-id="OUIA-Generated-DropdownToggle-2"
+                                                              data-ouia-component-id="OUIA-Generated-DropdownToggle-1"
                                                               data-ouia-component-type="PF4/DropdownToggle"
                                                               data-ouia-safe="true"
-                                                              id="pagination-options-menu-toggle-2"
+                                                              id="pagination-options-menu-toggle-4"
                                                               type="button"
                                                             >
                                                               <span
@@ -1340,11 +1452,11 @@ exports[`Projects should render the Projects component 1`] = `
                                                       aria-haspopup="listbox"
                                                       aria-label="Items per page"
                                                       className="  pf-c-options-menu__toggle-button"
-                                                      data-ouia-component-id="OUIA-Generated-DropdownToggle-2"
+                                                      data-ouia-component-id="OUIA-Generated-DropdownToggle-1"
                                                       data-ouia-component-type="PF4/DropdownToggle"
                                                       data-ouia-safe={true}
                                                       disabled={0}
-                                                      id="pagination-options-menu-toggle-2"
+                                                      id="pagination-options-menu-toggle-4"
                                                       onClick={[Function]}
                                                       onKeyDown={[Function]}
                                                       type="button"
@@ -1437,7 +1549,7 @@ exports[`Projects should render the Projects component 1`] = `
                                                   aria-label="Go to previous page"
                                                   className="pf-c-button pf-m-plain pf-m-disabled"
                                                   data-action="previous"
-                                                  data-ouia-component-id="OUIA-Generated-Button-plain-3"
+                                                  data-ouia-component-id="OUIA-Generated-Button-plain-1"
                                                   data-ouia-component-type="PF4/Button"
                                                   data-ouia-safe={true}
                                                   disabled={true}
@@ -1497,7 +1609,7 @@ exports[`Projects should render the Projects component 1`] = `
                                                   aria-label="Go to next page"
                                                   className="pf-c-button pf-m-plain pf-m-disabled"
                                                   data-action="next"
-                                                  data-ouia-component-id="OUIA-Generated-Button-plain-4"
+                                                  data-ouia-component-id="OUIA-Generated-Button-plain-2"
                                                   data-ouia-component-type="PF4/Button"
                                                   data-ouia-safe={true}
                                                   disabled={true}
@@ -1552,7 +1664,7 @@ exports[`Projects should render the Projects component 1`] = `
                                 Object {
                                   "current": <div
                                     class="pf-c-toolbar__expandable-content"
-                                    id="ins-primary-data-toolbar-expandable-content-2"
+                                    id="ins-primary-data-toolbar-expandable-content-4"
                                   >
                                     <div
                                       class="pf-c-toolbar__group"
@@ -1560,13 +1672,13 @@ exports[`Projects should render the Projects component 1`] = `
                                   </div>,
                                 }
                               }
-                              id="ins-primary-data-toolbar-expandable-content-2"
+                              id="ins-primary-data-toolbar-expandable-content-4"
                               isExpanded={false}
                               showClearFiltersButton={false}
                             >
                               <div
                                 className="pf-c-toolbar__expandable-content"
-                                id="ins-primary-data-toolbar-expandable-content-2"
+                                id="ins-primary-data-toolbar-expandable-content-4"
                               >
                                 <ForwardRef>
                                   <ToolbarGroupWithRef
@@ -6108,14 +6220,14 @@ exports[`Projects should render the Projects component 1`] = `
                                                                   >
                                                                     <div
                                                                       className="pf-c-dropdown pf-m-align-right"
-                                                                      data-ouia-component-id="OUIA-Generated-Dropdown-3"
+                                                                      data-ouia-component-id="OUIA-Generated-Dropdown-2"
                                                                       data-ouia-component-type="PF4/Dropdown"
                                                                       data-ouia-safe={true}
                                                                     >
                                                                       <KebabToggle
                                                                         aria-haspopup={true}
                                                                         getMenuRef={[Function]}
-                                                                        id="pf-dropdown-toggle-id-6"
+                                                                        id="pf-dropdown-toggle-id-10"
                                                                         isOpen={false}
                                                                         isPlain={true}
                                                                         isText={false}
@@ -6126,7 +6238,7 @@ exports[`Projects should render the Projects component 1`] = `
                                                                           Object {
                                                                             "current": <div
                                                                               class="pf-c-dropdown pf-m-align-right"
-                                                                              data-ouia-component-id="OUIA-Generated-Dropdown-3"
+                                                                              data-ouia-component-id="OUIA-Generated-Dropdown-2"
                                                                               data-ouia-component-type="PF4/Dropdown"
                                                                               data-ouia-safe="true"
                                                                             >
@@ -6135,7 +6247,7 @@ exports[`Projects should render the Projects component 1`] = `
                                                                                 aria-haspopup="true"
                                                                                 aria-label="Actions"
                                                                                 class="pf-c-dropdown__toggle pf-m-plain"
-                                                                                id="pf-dropdown-toggle-id-6"
+                                                                                id="pf-dropdown-toggle-id-10"
                                                                                 type="button"
                                                                               >
                                                                                 <svg
@@ -6162,7 +6274,7 @@ exports[`Projects should render the Projects component 1`] = `
                                                                           bubbleEvent={false}
                                                                           className=""
                                                                           getMenuRef={[Function]}
-                                                                          id="pf-dropdown-toggle-id-6"
+                                                                          id="pf-dropdown-toggle-id-10"
                                                                           isActive={false}
                                                                           isDisabled={false}
                                                                           isOpen={false}
@@ -6176,7 +6288,7 @@ exports[`Projects should render the Projects component 1`] = `
                                                                             Object {
                                                                               "current": <div
                                                                                 class="pf-c-dropdown pf-m-align-right"
-                                                                                data-ouia-component-id="OUIA-Generated-Dropdown-3"
+                                                                                data-ouia-component-id="OUIA-Generated-Dropdown-2"
                                                                                 data-ouia-component-type="PF4/Dropdown"
                                                                                 data-ouia-safe="true"
                                                                               >
@@ -6185,7 +6297,7 @@ exports[`Projects should render the Projects component 1`] = `
                                                                                   aria-haspopup="true"
                                                                                   aria-label="Actions"
                                                                                   class="pf-c-dropdown__toggle pf-m-plain"
-                                                                                  id="pf-dropdown-toggle-id-6"
+                                                                                  id="pf-dropdown-toggle-id-10"
                                                                                   type="button"
                                                                                 >
                                                                                   <svg
@@ -6212,7 +6324,7 @@ exports[`Projects should render the Projects component 1`] = `
                                                                             aria-label="Actions"
                                                                             className="pf-c-dropdown__toggle pf-m-plain"
                                                                             disabled={false}
-                                                                            id="pf-dropdown-toggle-id-6"
+                                                                            id="pf-dropdown-toggle-id-10"
                                                                             onClick={[Function]}
                                                                             onKeyDown={[Function]}
                                                                             type="button"
@@ -7272,14 +7384,14 @@ exports[`Projects should render the Projects component 1`] = `
                                                                   >
                                                                     <div
                                                                       className="pf-c-dropdown pf-m-align-right"
-                                                                      data-ouia-component-id="OUIA-Generated-Dropdown-4"
+                                                                      data-ouia-component-id="OUIA-Generated-Dropdown-3"
                                                                       data-ouia-component-type="PF4/Dropdown"
                                                                       data-ouia-safe={true}
                                                                     >
                                                                       <KebabToggle
                                                                         aria-haspopup={true}
                                                                         getMenuRef={[Function]}
-                                                                        id="pf-dropdown-toggle-id-7"
+                                                                        id="pf-dropdown-toggle-id-11"
                                                                         isOpen={false}
                                                                         isPlain={true}
                                                                         isText={false}
@@ -7290,7 +7402,7 @@ exports[`Projects should render the Projects component 1`] = `
                                                                           Object {
                                                                             "current": <div
                                                                               class="pf-c-dropdown pf-m-align-right"
-                                                                              data-ouia-component-id="OUIA-Generated-Dropdown-4"
+                                                                              data-ouia-component-id="OUIA-Generated-Dropdown-3"
                                                                               data-ouia-component-type="PF4/Dropdown"
                                                                               data-ouia-safe="true"
                                                                             >
@@ -7299,7 +7411,7 @@ exports[`Projects should render the Projects component 1`] = `
                                                                                 aria-haspopup="true"
                                                                                 aria-label="Actions"
                                                                                 class="pf-c-dropdown__toggle pf-m-plain"
-                                                                                id="pf-dropdown-toggle-id-7"
+                                                                                id="pf-dropdown-toggle-id-11"
                                                                                 type="button"
                                                                               >
                                                                                 <svg
@@ -7326,7 +7438,7 @@ exports[`Projects should render the Projects component 1`] = `
                                                                           bubbleEvent={false}
                                                                           className=""
                                                                           getMenuRef={[Function]}
-                                                                          id="pf-dropdown-toggle-id-7"
+                                                                          id="pf-dropdown-toggle-id-11"
                                                                           isActive={false}
                                                                           isDisabled={false}
                                                                           isOpen={false}
@@ -7340,7 +7452,7 @@ exports[`Projects should render the Projects component 1`] = `
                                                                             Object {
                                                                               "current": <div
                                                                                 class="pf-c-dropdown pf-m-align-right"
-                                                                                data-ouia-component-id="OUIA-Generated-Dropdown-4"
+                                                                                data-ouia-component-id="OUIA-Generated-Dropdown-3"
                                                                                 data-ouia-component-type="PF4/Dropdown"
                                                                                 data-ouia-safe="true"
                                                                               >
@@ -7349,7 +7461,7 @@ exports[`Projects should render the Projects component 1`] = `
                                                                                   aria-haspopup="true"
                                                                                   aria-label="Actions"
                                                                                   class="pf-c-dropdown__toggle pf-m-plain"
-                                                                                  id="pf-dropdown-toggle-id-7"
+                                                                                  id="pf-dropdown-toggle-id-11"
                                                                                   type="button"
                                                                                 >
                                                                                   <svg
@@ -7376,7 +7488,7 @@ exports[`Projects should render the Projects component 1`] = `
                                                                             aria-label="Actions"
                                                                             className="pf-c-dropdown__toggle pf-m-plain"
                                                                             disabled={false}
-                                                                            id="pf-dropdown-toggle-id-7"
+                                                                            id="pf-dropdown-toggle-id-11"
                                                                             onClick={[Function]}
                                                                             onKeyDown={[Function]}
                                                                             type="button"
@@ -8436,14 +8548,14 @@ exports[`Projects should render the Projects component 1`] = `
                                                                   >
                                                                     <div
                                                                       className="pf-c-dropdown pf-m-align-right"
-                                                                      data-ouia-component-id="OUIA-Generated-Dropdown-5"
+                                                                      data-ouia-component-id="OUIA-Generated-Dropdown-4"
                                                                       data-ouia-component-type="PF4/Dropdown"
                                                                       data-ouia-safe={true}
                                                                     >
                                                                       <KebabToggle
                                                                         aria-haspopup={true}
                                                                         getMenuRef={[Function]}
-                                                                        id="pf-dropdown-toggle-id-8"
+                                                                        id="pf-dropdown-toggle-id-12"
                                                                         isOpen={false}
                                                                         isPlain={true}
                                                                         isText={false}
@@ -8454,7 +8566,7 @@ exports[`Projects should render the Projects component 1`] = `
                                                                           Object {
                                                                             "current": <div
                                                                               class="pf-c-dropdown pf-m-align-right"
-                                                                              data-ouia-component-id="OUIA-Generated-Dropdown-5"
+                                                                              data-ouia-component-id="OUIA-Generated-Dropdown-4"
                                                                               data-ouia-component-type="PF4/Dropdown"
                                                                               data-ouia-safe="true"
                                                                             >
@@ -8463,7 +8575,7 @@ exports[`Projects should render the Projects component 1`] = `
                                                                                 aria-haspopup="true"
                                                                                 aria-label="Actions"
                                                                                 class="pf-c-dropdown__toggle pf-m-plain"
-                                                                                id="pf-dropdown-toggle-id-8"
+                                                                                id="pf-dropdown-toggle-id-12"
                                                                                 type="button"
                                                                               >
                                                                                 <svg
@@ -8490,7 +8602,7 @@ exports[`Projects should render the Projects component 1`] = `
                                                                           bubbleEvent={false}
                                                                           className=""
                                                                           getMenuRef={[Function]}
-                                                                          id="pf-dropdown-toggle-id-8"
+                                                                          id="pf-dropdown-toggle-id-12"
                                                                           isActive={false}
                                                                           isDisabled={false}
                                                                           isOpen={false}
@@ -8504,7 +8616,7 @@ exports[`Projects should render the Projects component 1`] = `
                                                                             Object {
                                                                               "current": <div
                                                                                 class="pf-c-dropdown pf-m-align-right"
-                                                                                data-ouia-component-id="OUIA-Generated-Dropdown-5"
+                                                                                data-ouia-component-id="OUIA-Generated-Dropdown-4"
                                                                                 data-ouia-component-type="PF4/Dropdown"
                                                                                 data-ouia-safe="true"
                                                                               >
@@ -8513,7 +8625,7 @@ exports[`Projects should render the Projects component 1`] = `
                                                                                   aria-haspopup="true"
                                                                                   aria-label="Actions"
                                                                                   class="pf-c-dropdown__toggle pf-m-plain"
-                                                                                  id="pf-dropdown-toggle-id-8"
+                                                                                  id="pf-dropdown-toggle-id-12"
                                                                                   type="button"
                                                                                 >
                                                                                   <svg
@@ -8540,7 +8652,7 @@ exports[`Projects should render the Projects component 1`] = `
                                                                             aria-label="Actions"
                                                                             className="pf-c-dropdown__toggle pf-m-plain"
                                                                             disabled={false}
-                                                                            id="pf-dropdown-toggle-id-8"
+                                                                            id="pf-dropdown-toggle-id-12"
                                                                             onClick={[Function]}
                                                                             onKeyDown={[Function]}
                                                                             type="button"

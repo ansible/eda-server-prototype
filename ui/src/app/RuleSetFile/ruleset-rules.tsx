@@ -138,6 +138,8 @@ const RulesetRules: React.FunctionComponent<{ruleset: RuleSetType}> = ({ruleset}
       <TableToolbarView
         ouiaId={'ruleset-rules-table'}
         rows={rows}
+        setLimit={setLimit}
+        setOffset={setOffset}
         columns={columns(intl)}
         fetchData={updateRules}
         plural={intl.formatMessage(sharedMessages.rules)}

@@ -86,6 +86,10 @@ const sharedMessages = defineMessages({
     id: 'shared.status',
     defaultMessage: 'Status'
   },
+  cancel: {
+    id: 'shared.cancel',
+    defaultMessage: 'Cancel'
+  },
   rule: {
     id: 'shared.rule',
     defaultMessage: 'Rule'
@@ -154,6 +158,14 @@ const sharedMessages = defineMessages({
   add_new_project: {
     id: 'project.addNewProject',
     defaultMessage: 'Add new project'
+  },
+  projectRemoveTitle: {
+    id: 'project.removeProject',
+    defaultMessage: 'Delete project'
+  },
+  projectRemoveDescription: {
+    id: 'project.removeProjectDescription',
+    defaultMessage: 'Are you sure you want to delete the project below?'
   },
   addProject: {
     id: 'project.addProject',
