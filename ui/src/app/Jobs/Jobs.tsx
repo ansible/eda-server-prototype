@@ -14,6 +14,7 @@ import {useIntl} from "react-intl";
 import {defaultSettings} from "@app/shared/pagination";
 import {NewJob} from "@app/NewJob/NewJob";
 import {createRows} from "@app/Jobs/jobs-table-helpers";
+import {RemoveJob} from "@app/RemoveJob/RemoveJob";
 
 interface JobType {
   id: string;
@@ -129,7 +130,7 @@ const fetchJobs = (pagination = defaultSettings) => fetch(endpoint, {
   headers: {
     'Content-Type': 'application/json',
   },
-});
+}).then(response => response.json());
 
 const Jobs: React.FunctionComponent = () => {
   const intl = useIntl();
@@ -156,12 +157,21 @@ const Jobs: React.FunctionComponent = () => {
   const setSelectedJobs = (id: string) =>
     stateDispatch({type: 'select', payload: id});
 
-  const updateJobs = (pagination) => {
+  const handlePagination = (pagination) => {
     stateDispatch({type: 'setFetching', payload: true});
-    return fetchJobs(pagination)
-      .then(() => stateDispatch({type: 'setFetching', payload: false}))
+    return fetchJobs(pagination).then(data => { setJobs(data); stateDispatch({type: 'setRows', payload: createRows(jobs)});})
+      .then(() => {stateDispatch({type: 'setFetching', payload: false});})
       .catch(() => stateDispatch({type: 'setFetching', payload: false}));
   };
+
+  useEffect(() => {
+    handlePagination(defaultSettings);
+  }, []);
+
+  useEffect(() => {
+    stateDispatch({type: 'setRows', payload: createRows(jobs)});
+  }, [jobs]);
+
 
   const [update_client, setUpdateClient] = useState<WebSocket|unknown>({});
   useEffect(() => {
@@ -179,27 +189,9 @@ const Jobs: React.FunctionComponent = () => {
     }
   }, []);
 
-  useEffect(() => {
-    setJobs([...jobs, newJob]);
-  }, [newJob]);
-
-
-  useEffect(() => {
-    fetchJobs().then(response => response.json())
-      .then(data => { setJobs(data); stateDispatch({type: 'setRows', payload: createRows(jobs)});});
-  }, []);
-
-  useEffect(() => {
-    updateJobs(defaultSettings);
-  }, []);
-
-  useEffect(() => {
-    stateDispatch({type: 'setRows', payload: createRows(jobs)});
-  }, [jobs]);
-
   const clearFilters = () => {
     stateDispatch({type: 'clearFilters'});
-    return updateJobs(meta);
+    return handlePagination(meta);
   };
 
   const handleFilterChange = (value) => {
@@ -215,6 +207,15 @@ const Jobs: React.FunctionComponent = () => {
         path={'/new-job'}>
         <NewJob/>
       </Route>
+      <Route exact path="/jobs/remove/:id"
+             render={ props => <RemoveJob { ...props }
+                                                 fetchData={ handlePagination }
+                                                 setSelectedJobs={setSelectedJobs } /> }/>
+      <Route exact path="/activations/remove"
+             render={ props => <RemoveJob { ...props }
+                                                 ids={ selectedJobs }
+                                                 fetchData={ handlePagination }
+                                                 setSelectedJobs={ setSelectedJobs } /> }/>
     </Fragment>
   );
 
@@ -224,8 +225,7 @@ const Jobs: React.FunctionComponent = () => {
       component: 'button',
       onClick: (_event, _rowId, job) =>
         history.push({
-          pathname: '/remove-job',
-          search: `?job=${job.id}`
+          pathname: `/jobs/remove/${job.id}`
         })
     }
   ];
@@ -291,7 +291,7 @@ const Jobs: React.FunctionComponent = () => {
             setLimit={setLimit}
             setOffset={setOffset}
             columns={columns(intl, selectedAll, selectAllFunction)}
-            fetchData={updateJobs}
+            fetchData={handlePagination}
             routes={routes}
             actionResolver={actionResolver}
             plural={intl.formatMessage(sharedMessages.jobs)}

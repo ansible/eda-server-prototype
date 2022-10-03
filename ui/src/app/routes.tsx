@@ -30,7 +30,6 @@ import {RulesetRules} from "@app/RuleSetFile/ruleset-rules";
 import { Rules } from '@app/Rules/Rules';
 import { Rule } from '@app/Rule/Rule';
 import {Fragment} from "react";
-import DialogRoutes from "@app/dialog-routes";
 
 export interface IAppRoute {
   label?: string; // Excluding the label will exclude the route from the nav sidebar in AppLayout
@@ -81,7 +80,6 @@ const routes: AppRouteConfig[] = [
   },
   {
     component: Activations,
-    exact: true,
     label: 'Rulebook activations',
     path: '/activations',
     title: 'Rulebook Activations',
@@ -116,7 +114,6 @@ const routes: AppRouteConfig[] = [
   },
   {
     component: Jobs,
-    exact: true,
     label: 'Jobs',
     path: '/jobs',
     title: 'Jobs',

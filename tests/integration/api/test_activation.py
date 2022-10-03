@@ -18,6 +18,7 @@ TEST_ACTIVATION = {
     "inventory_id": 1,
     "extra_var_id": 1,
     "description": "demo activation",
+    "status": "",
     "restart_policy": RestartPolicy.ON_FAILURE.value,
     "is_enabled": True,
     "working_directory": "/tmp",
@@ -95,6 +96,7 @@ async def _create_activation(
             sa.insert(models.activations).values(
                 name=TEST_ACTIVATION["name"],
                 description=TEST_ACTIVATION["description"],
+                status=TEST_ACTIVATION["status"],
                 rulebook_id=foreign_keys["rulebook_id"],
                 inventory_id=foreign_keys["inventory_id"],
                 execution_environment=TEST_ACTIVATION["execution_environment"],
