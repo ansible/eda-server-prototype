@@ -25,6 +25,12 @@ from .project import (
     ProjectRead,
     ProjectUpdate,
 )
+from .role import (
+    RoleCreate,
+    RolePermissionCreate,
+    RolePermissionRead,
+    RoleRead,
+)
 from .rulebook import (
     Rule,
     Rulebook,
@@ -36,7 +42,6 @@ from .rulebook import (
 from .user import UserCreate, UserRead, UserUpdate
 
 __all__ = [
-    "Activation",
     "ActivationInstance",
     "ActivationLog",
     "ActivationUpdate",
@@ -61,6 +66,10 @@ __all__ = [
     "ProjectRead",
     "ProjectUpdate",
     "RestartPolicy",
+    "RoleCreate",
+    "RolePermissionCreate",
+    "RolePermissionRead",
+    "RoleRead",
     "Rule",
     "Rulebook",
     "RulebookRef",

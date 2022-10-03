@@ -5,11 +5,11 @@ This module contains custom operation directives for alembic.
 """
 from typing import Optional
 
-from alembic.operations import Operations
+from alembic.operations import MigrateOperation, Operations
 
 
 @Operations.register_operation("rename_constraint")
-class RenameConstraintOp:
+class RenameConstraintOp(MigrateOperation):
     """
     Rename constraint operation.
 
@@ -56,4 +56,37 @@ def rename_constraint(operations, operation: RenameConstraintOp):
         f"ALTER TABLE {table_name} "
         f"RENAME CONSTRAINT {operation.old_name} TO {operation.new_name}"
     )
+    operations.execute(query)
+
+
+@Operations.register_operation("drop_type")
+class DropTypeOp(MigrateOperation):
+    """
+    Drop type operation.
+
+    Example::
+
+        def downgrade() -> None:
+            op.drop_type("type_name")
+    """
+
+    def __init__(
+        self,
+        name: str,
+        schema: Optional[str] = None,
+    ):
+        self.name = name
+        self.schema = schema
+
+    @classmethod
+    def drop_type(cls, operations, *args, **kwargs):
+        return operations.invoke(cls(*args, **kwargs))
+
+
+@Operations.implementation_for(DropTypeOp)
+def drop_type(operations, operation: DropTypeOp):
+    name = operation.name
+    if operation.schema is not None:
+        name = f"{operation.schema}.{name}"
+    query = f"DROP TYPE {name}"
     operations.execute(query)
