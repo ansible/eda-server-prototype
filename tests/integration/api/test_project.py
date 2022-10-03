@@ -203,6 +203,28 @@ async def test_create_project_unique_name(
 
 
 @pytest.mark.asyncio
+async def test_create_project_bad_name(client: AsyncClient, db: AsyncSession):
+    test_project_bad = TEST_PROJECT.copy()
+    test_project_bad["name"] = "     "
+    response = await client.post("/api/projects/", json=test_project_bad)
+    assert response.status_code == status_codes.HTTP_422_UNPROCESSABLE_ENTITY
+
+    test_project_bad["name"] = ""
+    response = await client.post("/api/projects/", json=test_project_bad)
+    assert response.status_code == status_codes.HTTP_422_UNPROCESSABLE_ENTITY
+
+
+@pytest.mark.asyncio
+async def test_create_project_missing_name(
+    client: AsyncClient, db: AsyncSession
+):
+    test_project_bad = TEST_PROJECT.copy()
+    del test_project_bad["name"]
+    response = await client.post("/api/projects/", json=test_project_bad)
+    assert response.status_code == status_codes.HTTP_422_UNPROCESSABLE_ENTITY
+
+
+@pytest.mark.asyncio
 async def test_get_project(client: AsyncClient, db: AsyncSession):
 
     query = sa.insert(models.projects).values(
@@ -270,31 +292,89 @@ async def test_edit_project(client: AsyncClient, db: AsyncSession):
 
 
 @pytest.mark.asyncio
-async def test_edit_project_unique_name(client: AsyncClient, db: AsyncSession):
-
-    query = sa.insert(models.projects).values(
-        url=TEST_PROJECT["url"],
-        name=TEST_PROJECT["name"],
-        description=TEST_PROJECT["description"],
-    )
-
-    await db.execute(query)
-
-    projects = (await db.execute(sa.select(models.projects))).all()
-    assert len(projects) == 1
-    project = projects[0]
+async def test_edit_project_missing(client: AsyncClient, db: AsyncSession):
 
     response = await client.patch(
-        f"/api/projects/{project['id']}",
-        json={"name": TEST_PROJECT["name"]},
+        "/api/projects/-1",
+        json={"name": "new test name"},
     )
 
+    assert response.status_code == status_codes.HTTP_404_NOT_FOUND
+
+
+@pytest.mark.asyncio
+async def test_edit_project_bad_name(client: AsyncClient, db: AsyncSession):
+
+    response = await client.patch(
+        "/api/projects/1",
+        json={"name": ""},
+    )
+
+    assert response.status_code == status_codes.HTTP_422_UNPROCESSABLE_ENTITY
+
+
+@pytest.mark.asyncio
+async def test_edit_project_unique_name(client: AsyncClient, db: AsyncSession):
+
+    test_projects_values = [
+        {
+            "url": TEST_PROJECT["url"],
+            "name": TEST_PROJECT["name"],
+            "description": TEST_PROJECT["description"],
+        },
+        {
+            "url": TEST_PROJECT["url"] + "/",
+            "name": TEST_PROJECT["name"] + " 2",
+            "description": TEST_PROJECT["description"] + " 2",
+        },
+    ]
+    query = (
+        sa.insert(models.projects)
+        .values(test_projects_values)
+        .returning(models.projects)
+    )
+    test_projects = (await db.execute(query)).all()
+    assert len(test_projects) == 2
+
+    # Including same name as already in DB passes
+    test_project = {
+        k: v.isoformat() if k.endswith("_at") else v
+        for k, v in test_projects[0]._asdict().items()
+    }
+    test_project["description"] = "updated-1"
+    updated_values = {
+        "name": test_project["name"],
+        "description": test_project["description"],
+    }
+    response = await client.patch(
+        f"/api/projects/{test_project['id']}",
+        json=updated_values,
+    )
+    assert response.status_code == status_codes.HTTP_200_OK
+    data = response.json()
+    assert data == test_project
+
+    # Rename project.name to same name as a different project will conflict
+    test_project = {
+        k: v.isoformat() if k.endswith("_at") else v
+        for k, v in test_projects[1]._asdict().items()
+    }
+    test_project["name"] = test_projects[0].name
+    test_project["description"] = "updated-2"
+    updated_values = {
+        "name": test_project["name"],
+        "description": test_project["description"],
+    }
+    response = await client.patch(
+        f"/api/projects/{test_project['id']}",
+        json=updated_values,
+    )
     assert response.status_code == status_codes.HTTP_409_CONFLICT
     data = response.json()
-    assert (
-        data["detail"]
-        == f"Project with name '{TEST_PROJECT['name']}' already exists"
+    expected_msg = "Project with name '{0}' already exists".format(
+        test_project["name"]
     )
+    assert data["detail"] == expected_msg
 
 
 @pytest.mark.asyncio

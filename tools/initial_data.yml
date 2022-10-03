@@ -1,0 +1,60 @@
+---
+roles:
+  - name: 'admin'
+    description: 'Has full access to all resources'
+    permissions:
+      - resources:
+          - 'project'
+          - 'inventory'
+          - 'extra_var'
+          - 'playbook'
+          - 'rulebook'
+          - 'execution_env'
+          - 'role'
+        actions:
+          - 'create'
+          - 'read'
+          - 'update'
+          - 'delete'
+
+  - name: 'manager'
+    description: 'Can read and update any resources'
+    permissions:
+      - resources:
+          - 'project'
+          - 'inventory'
+          - 'extra_var'
+          - 'playbook'
+          - 'rulebook'
+          - 'execution_env'
+        actions:
+          - 'read'
+          - 'update'
+
+  - name: 'default'
+    description: 'Default role, that is applied to all users'
+    permissions:
+      - resources:
+          - 'project'
+          - 'inventory'
+          - 'extra_var'
+          - 'playbook'
+          - 'rulebook'
+          - 'execution_env'
+        actions:
+          - 'read'
+users:
+  - email: 'root@example.com'
+    password: 'secret'
+    is_superuser: true
+
+  - email: 'admin@example.com'
+    password: 'secret'
+    roles: ['admin']
+
+  - email: 'manager@example.com'
+    password: 'secret'
+    roles: ['manager']
+
+  - email: 'bob@example.com'
+    password: 'secret'

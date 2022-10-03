@@ -142,16 +142,26 @@ async def update_project(
     project: schema.ProjectUpdate,
     db: AsyncSession = Depends(get_db_session),
 ):
-    query = sa.select(projects).where(projects.c.id == project_id)
-    stored_project = (await db.execute(query)).first()
-    if not stored_project:
+    query = sa.select(
+        sa.func.count()
+        .filter(projects.c.id == project_id)
+        .label("project_id_count"),
+        sa.func.count()
+        .filter(
+            sa.and_(
+                projects.c.name == project.name, projects.c.id != project_id
+            )
+        )
+        .label("project_name_count"),
+    ).select_from(projects)
+    exists_check = (await (db.execute(query))).one_or_none()
+
+    if exists_check.project_id_count == 0:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Project Not Found."
         )
 
-    query = sa.select(sa.exists().where(projects.c.name == project.name))
-    project_exists = await db.scalar(query)
-    if project_exists:
+    if exists_check.project_name_count > 0:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
             detail=f"Project with name '{project.name}' already exists",
@@ -159,11 +169,14 @@ async def update_project(
 
     values = project.dict(exclude_unset=True)
     query = (
-        sa.update(projects).where(projects.c.id == project_id).values(**values)
+        sa.update(projects)
+        .where(projects.c.id == project_id)
+        .values(**values)
+        .returning(projects)
     )
 
     try:
-        await db.execute(query)
+        updated_project = (await db.execute(query)).one_or_none()
     except sa.exc.IntegrityError:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
@@ -171,9 +184,6 @@ async def update_project(
         )
 
     await db.commit()
-
-    query = sa.select(projects).where(projects.c.id == project_id)
-    updated_project = (await db.execute(query)).first()
 
     return updated_project
 
