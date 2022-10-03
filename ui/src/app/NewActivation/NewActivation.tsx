@@ -178,7 +178,8 @@ const NewActivation: React.FunctionComponent = () => {
                          extra_var_id: extravar,
                          working_directory: workingDirectory,
                          execution_environment: executionEnvironment})
-      .then(() =>history.push("/activations"))
+      .then(() => history.push("/activations"))
+      .catch(() => history.push("/activations"));
     }
 
   return (
