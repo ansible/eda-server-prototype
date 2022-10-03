@@ -167,6 +167,10 @@ const sharedMessages = defineMessages({
     id: 'project.removeProjectDescription',
     defaultMessage: 'Are you sure you want to delete the project below?'
   },
+  projectPlaceholder: {
+    id: 'activation.projectPlaceholder',
+    defaultMessage: 'Select project'
+  },
   addProject: {
     id: 'project.addProject',
     defaultMessage: 'Add project'
@@ -282,6 +286,10 @@ const sharedMessages = defineMessages({
   selectExtraVar: {
     id: 'activation.selectExtraVar',
     defaultMessage: 'Select extra variables'
+  },
+  selectProject: {
+    id: 'activation.selectProject',
+    defaultMessage: 'Select project'
   },
   ruleset: {
     id: 'rulesets.ruleset',

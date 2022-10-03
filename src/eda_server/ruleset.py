@@ -7,7 +7,7 @@ Functions:
 * activate_rulesets
     Arguments:
         - activation_id
-        - activation_instance_log_id
+        - activation_instance_large_data_id
         - execution_environment
         - rulesets
         - inventory
@@ -67,7 +67,7 @@ def ensure_directory(directory):
 async def activate_rulesets(
     deployment_type,
     activation_id,
-    log_id,
+    large_data_id,
     execution_environment,
     rulesets,
     inventory,
@@ -112,7 +112,7 @@ async def activate_rulesets(
         activated_rulesets[activation_id] = proc
 
         task = asyncio.create_task(
-            read_output(proc, activation_id, log_id, db),
+            read_output(proc, activation_id, large_data_id, db),
             name=f"read_output {proc.pid}",
         )
         taskmanager.tasks.append(task)
@@ -150,7 +150,7 @@ async def activate_rulesets(
         activated_rulesets[activation_id] = container
 
         task = asyncio.create_task(
-            read_log(docker, container, activation_id, log_id, db),
+            read_log(docker, container, activation_id, large_data_id, db),
             name=f"read_log {container}",
         )
         taskmanager.tasks.append(task)
@@ -170,12 +170,12 @@ async def inactivate_rulesets(activation_id):
 
 
 async def read_output(
-    proc, activation_instance_id, activation_instance_log_id, db
+    proc, activation_instance_id, activation_instance_large_data_id, db
 ):
     # TODO(cutwater): Replace with FastAPI dependency injections,
     #   that is available in BackgroundTasks
     async with PGLargeObject(
-        db, oid=activation_instance_log_id, mode="w"
+        db, oid=activation_instance_large_data_id, mode="w"
     ) as lobject:
         leftover = b""
         for buff in iter(lambda: proc.stdout.read(CHUNK_SIZE), b""):
@@ -192,11 +192,11 @@ async def read_log(
     docker,
     container,
     activation_instance_id,
-    activation_instance_log_id,
+    activation_instance_large_data_id,
     db,
 ):
     async with PGLargeObject(
-        db, oid=activation_instance_log_id, mode="w"
+        db, oid=activation_instance_large_data_id, mode="w"
     ) as lobject:
         async for chunk in container.log(
             stdout=True, stderr=True, follow=True

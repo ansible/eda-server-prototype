@@ -52,11 +52,15 @@ async def create_project(
             detail=f"Project with name '{project.name}' already exists",
         )
 
-    query = sa.insert(projects).values(
-        url=project.url,
-        git_hash=project.git_hash,
-        name=project.name,
-        description=project.description,
+    query = (
+        sa.insert(projects)
+        .values(
+            url=project.url,
+            git_hash=project.git_hash,
+            name=project.name,
+            description=project.description,
+        )
+        .returning(projects.c.id, projects.c.large_data_id)
     )
     try:
         result = await db.execute(query)
@@ -66,8 +70,8 @@ async def create_project(
             detail="Unprocessable Entity.",
         )
 
-    (project_id,) = result.inserted_primary_key
-    await sync_project(project_id, tempdir, db)
+    project_id, large_data_id = result.first()
+    await sync_project(project_id, large_data_id, tempdir, db)
     await db.commit()
 
     query = sa.select(projects).where(projects.c.id == project_id)
