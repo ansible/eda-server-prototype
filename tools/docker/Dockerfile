@@ -16,7 +16,7 @@ COPY . $WORKDIR
 RUN chown -R $USER_ID ./
 
 USER $USER_ID
-RUN pip install .
+RUN pip install -e .
 
 RUN bash -c "if [ $DEVEL_AE_LIBRARY -ne 0 ]; then \
     pip uninstall ansible-events -y && \
