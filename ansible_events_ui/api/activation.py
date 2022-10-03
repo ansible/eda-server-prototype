@@ -39,7 +39,7 @@ async def create_activation(
 ):
     if (
         activation.execution_environment == ExecutionEnvironment.LOCAL
-        and activation.working_directory is None
+        and activation.working_directory == ""
     ):
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
@@ -108,11 +108,14 @@ async def read_activation(
                 "name",
                 models.inventories.c.name,
             ).label("inventory"),
-            sa.func.jsonb_build_object(
-                "id",
-                models.extra_vars.c.id,
-                "name",
-                models.extra_vars.c.name,
+            sa.case(
+                (models.extra_vars.c.id.is_(None), None),
+                else_=sa.func.jsonb_build_object(
+                    "id",
+                    models.extra_vars.c.id,
+                    "name",
+                    models.extra_vars.c.name,
+                ),
             ).label("extra_var"),
         )
         .select_from(models.activations)
