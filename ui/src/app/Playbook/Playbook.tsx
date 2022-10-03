@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { CodeBlock, CodeBlockCode  } from '@patternfly/react-core';
 import {getServer} from '@app/utils/utils';
 import {TopToolbar} from "@app/shared/top-toolbar";
-import {PlaybookType} from "@app/RuleSetFiles/RuleSetFiles";
+import {PlaybookType} from "@app/RuleSets/RuleSets";
 
 const endpoint = 'http://' + getServer() + '/api/playbook/';
 

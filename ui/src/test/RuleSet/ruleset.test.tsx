@@ -1,6 +1,6 @@
 import * as React from 'react';
 import {mount, shallow} from 'enzyme';
-import {RuleSet} from "@app/RuleSetFile/ruleset";
+import {RuleSet} from "@app/RuleSet/ruleset";
 import {MemoryRouter} from "react-router";
 import fetchMock from "jest-fetch-mock";
 import {act} from "react-dom/test-utils";
