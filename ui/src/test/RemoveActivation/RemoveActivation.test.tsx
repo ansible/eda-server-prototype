@@ -4,8 +4,8 @@ import {MemoryRouter} from "react-router";
 import fetchMock from "jest-fetch-mock";
 import {act} from "react-dom/test-utils";
 import {IntlProvider} from "react-intl";
-import {Modal, Tab} from "@patternfly/react-core";
-import {RemoveProject} from "@app/RemoveProject/RemoveProject";
+import {Modal} from "@patternfly/react-core";
+import {RemoveActivation} from "@app/RemoveActivation/RemoveActivation";
 import {defaultSettings} from "@app/shared/pagination";
 
 const ComponentWrapper = ({ children, initialEntries=['/dashboard']}) => (
@@ -16,23 +16,22 @@ const ComponentWrapper = ({ children, initialEntries=['/dashboard']}) => (
   </IntlProvider>
 );
 
-describe('RemoveProject', () => {
+describe('RemoveActivation', () => {
   afterEach(() => {
     jest.restoreAllMocks();
   });
 
-  it('should render the Remove Project modal', async () => {
+  it('should render the Remove Activation modal', async () => {
     fetchMock.mockResponse(JSON.stringify({
-          name: 'Project 1',
-          id: 1,
-          url: 'Project 1 Url'
+          name: 'Activation 1',
+          id: 1
        })
     )
     let wrapper;
     await act(async () => {
       wrapper = mount(
-        <ComponentWrapper initialEntries={['/projects/remove/1']}>
-            <RemoveProject fetchData={()=>[]} pagination={defaultSettings} setSelectedProjects={()=>[]}/>
+        <ComponentWrapper initialEntries={['/activations/remove/1']}>
+            <RemoveActivation fetchData={()=>[]} pagination={defaultSettings} setSelectedActivations={()=>[]}/>
         </ComponentWrapper>
       );
     });
@@ -40,8 +39,8 @@ describe('RemoveProject', () => {
       wrapper.update();
     });
 
-    expect(wrapper.find(Modal).at(0).props().title).toEqual("Delete project");
-    expect(wrapper.find('Text').at(0).props().children).toEqual('Are you sure you want to delete the project below?');
-    expect(wrapper.find('Text').at(1).props().children.props.children.at(1)).toEqual('Project 1');
+    expect(wrapper.find(Modal).at(0).props().title).toEqual("Delete rulebook activation");
+    expect(wrapper.find('Text').at(0).props().children).toEqual('Are you sure you want to delete the rulebook activation below?');
+    expect(wrapper.find('Text').at(1).props().children.props.children).toEqual('Activation 1');
   });
 })

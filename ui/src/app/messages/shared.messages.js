@@ -219,6 +219,14 @@ const sharedMessages = defineMessages({
     id: 'activation.activation',
     defaultMessage: 'Activation'
   },
+  activationRemoveTitle: {
+    id: 'activation.removeActivation',
+    defaultMessage: 'Delete rulebook activation'
+  },
+  activationRemoveDescription: {
+    id: 'activation.removeActivationDescription',
+    defaultMessage: 'Are you sure you want to delete the rulebook activation below?'
+  },
   activations: {
     id: 'activation.activations',
     defaultMessage: 'Rulebook activations'
@@ -378,7 +386,15 @@ const sharedMessages = defineMessages({
   enterRulebookActivationWorkingDirectory: {
     id: 'activation.enterRulebookActivationWorkingDirectory',
     defaultMessage: 'Enter a rulebook working directory'
-  }
+  },
+  jobRemoveTitle: {
+    id: 'job.removeJob',
+    defaultMessage: 'Delete job'
+  },
+  jobRemoveDescription: {
+    id: 'job.removeJobDescription',
+    defaultMessage: 'Are you sure you want to delete the job below?'
+  },
 });
 
 export default sharedMessages;

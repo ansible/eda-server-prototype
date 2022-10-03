@@ -5,7 +5,7 @@ import fetchMock from "jest-fetch-mock";
 import {act} from "react-dom/test-utils";
 import {IntlProvider} from "react-intl";
 import {Modal, Tab} from "@patternfly/react-core";
-import {RemoveProject} from "@app/RemoveProject/RemoveProject";
+import {RemoveJob} from "@app/RemoveJob/RemoveJob";
 import {defaultSettings} from "@app/shared/pagination";
 
 const ComponentWrapper = ({ children, initialEntries=['/dashboard']}) => (
@@ -16,23 +16,23 @@ const ComponentWrapper = ({ children, initialEntries=['/dashboard']}) => (
   </IntlProvider>
 );
 
-describe('RemoveProject', () => {
+describe('RemoveJob', () => {
   afterEach(() => {
     jest.restoreAllMocks();
   });
 
-  it('should render the Remove Project modal', async () => {
+  it('should render the Remove Job modal', async () => {
     fetchMock.mockResponse(JSON.stringify({
-          name: 'Project 1',
+          name: 'Job 1',
           id: 1,
-          url: 'Project 1 Url'
+          url: 'Job 1 Url'
        })
     )
     let wrapper;
     await act(async () => {
       wrapper = mount(
-        <ComponentWrapper initialEntries={['/projects/remove/1']}>
-            <RemoveProject fetchData={()=>[]} pagination={defaultSettings} setSelectedProjects={()=>[]}/>
+        <ComponentWrapper initialEntries={['/jobs/remove/1']}>
+            <RemoveJob fetchData={()=>[]} pagination={defaultSettings} setSelectedJobs={()=>[]}/>
         </ComponentWrapper>
       );
     });
@@ -40,8 +40,8 @@ describe('RemoveProject', () => {
       wrapper.update();
     });
 
-    expect(wrapper.find(Modal).at(0).props().title).toEqual("Delete project");
-    expect(wrapper.find('Text').at(0).props().children).toEqual('Are you sure you want to delete the project below?');
-    expect(wrapper.find('Text').at(1).props().children.props.children.at(1)).toEqual('Project 1');
+    expect(wrapper.find(Modal).at(0).props().title).toEqual("Delete job");
+    expect(wrapper.find('Text').at(0).props().children).toEqual('Are you sure you want to delete the job below?');
+    expect(wrapper.find('Text').at(1).props().children.props.children).toEqual('Job 1');
   });
 })

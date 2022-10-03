@@ -282,25 +282,6 @@ exports[`Projects should render the Projects component 1`] = `
                                 </Button>
                               </Link>
                             </ToolbarItem>
-                            <ToolbarItem>
-                              <Link
-                                className="disabled-link"
-                                id="remove-multiple-projects"
-                                to={
-                                  Object {
-                                    "pathname": "/projects/remove-projects",
-                                  }
-                                }
-                              >
-                                <Button
-                                  aria-label="Delete project"
-                                  isDisabled={true}
-                                  variant="secondary"
-                                >
-                                  Delete
-                                </Button>
-                              </Link>
-                            </ToolbarItem>
                           </ForwardRef>,
                         ],
                         "dropdownProps": Object {
@@ -546,25 +527,6 @@ exports[`Projects should render the Projects component 1`] = `
                                           </Button>
                                         </Link>
                                       </ToolbarItem>
-                                      <ToolbarItem>
-                                        <Link
-                                          className="disabled-link"
-                                          id="remove-multiple-projects"
-                                          to={
-                                            Object {
-                                              "pathname": "/projects/remove-projects",
-                                            }
-                                          }
-                                        >
-                                          <Button
-                                            aria-label="Delete project"
-                                            isDisabled={true}
-                                            variant="secondary"
-                                          >
-                                            Delete
-                                          </Button>
-                                        </Link>
-                                      </ToolbarItem>
                                     </ForwardRef>,
                                   ]
                                 }
@@ -685,63 +647,6 @@ exports[`Projects should render the Projects component 1`] = `
                                                           aria-label="Delete project"
                                                           className="pf-c-button pf-m-secondary pf-m-disabled"
                                                           data-ouia-component-id="OUIA-Generated-Button-secondary-1"
-                                                          data-ouia-component-type="PF4/Button"
-                                                          data-ouia-safe={true}
-                                                          disabled={true}
-                                                          role={null}
-                                                          tabIndex={null}
-                                                          type="button"
-                                                        >
-                                                          Delete
-                                                        </button>
-                                                      </ButtonBase>
-                                                    </Button>
-                                                  </a>
-                                                </LinkAnchor>
-                                              </Link>
-                                            </div>
-                                          </ToolbarItem>
-                                          <ToolbarItem>
-                                            <div
-                                              className="pf-c-toolbar__item"
-                                            >
-                                              <Link
-                                                className="disabled-link"
-                                                id="remove-multiple-projects"
-                                                to={
-                                                  Object {
-                                                    "pathname": "/projects/remove-projects",
-                                                  }
-                                                }
-                                              >
-                                                <LinkAnchor
-                                                  className="disabled-link"
-                                                  href="/projects/remove-projects"
-                                                  id="remove-multiple-projects"
-                                                  navigate={[Function]}
-                                                >
-                                                  <a
-                                                    className="disabled-link"
-                                                    href="/projects/remove-projects"
-                                                    id="remove-multiple-projects"
-                                                    onClick={[Function]}
-                                                  >
-                                                    <Button
-                                                      aria-label="Delete project"
-                                                      isDisabled={true}
-                                                      variant="secondary"
-                                                    >
-                                                      <ButtonBase
-                                                        aria-label="Delete project"
-                                                        innerRef={null}
-                                                        isDisabled={true}
-                                                        variant="secondary"
-                                                      >
-                                                        <button
-                                                          aria-disabled={true}
-                                                          aria-label="Delete project"
-                                                          className="pf-c-button pf-m-secondary pf-m-disabled"
-                                                          data-ouia-component-id="OUIA-Generated-Button-secondary-2"
                                                           data-ouia-component-type="PF4/Button"
                                                           data-ouia-safe={true}
                                                           disabled={true}
