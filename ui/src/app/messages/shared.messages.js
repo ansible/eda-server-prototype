@@ -419,6 +419,50 @@ const sharedMessages = defineMessages({
     id: 'job.removeJobDescription',
     defaultMessage: 'Are you sure you want to delete the job below?'
   },
+  inventory: {
+    id: 'inventory.inventory',
+    defaultMessage: 'Inventory'
+  },
+  inventories: {
+    id: 'inventory.inventories',
+    defaultMessage: 'Inventories'
+  },
+  noinventories_action: {
+    id: 'inventory.noinventories_action',
+    defaultMessage: 'Please add an inventory by using the button below.'
+  },
+  noinventories_description: {
+    id: 'inventory.noinventories_description',
+    defaultMessage: 'There are currently no inventories added for your organization.'
+  },
+  add_new_inventory: {
+    id: 'inventory.addNewInventory',
+    defaultMessage: 'Add new inventory'
+  },
+  inventoryRemoveTitle: {
+    id: 'inventory.removeInventory',
+    defaultMessage: 'Delete inventory'
+  },
+  inventoryRemoveDescription: {
+    id: 'inventory.removeInventoryDescription',
+    defaultMessage: 'Are you sure you want to delete the inventory below?'
+  },
+  addInventory: {
+    id: 'inventory.addInventory',
+    defaultMessage: 'Add inventory'
+  },
+  deleteInventoryTitle: {
+    id: 'inventory.deleteInventory',
+    defaultMessage: 'Delete inventory'
+  },
+  backToInventories: {
+    id: 'project.backToInventories',
+    defaultMessage: 'Back to inventories'
+  },
+  source_of_inventory: {
+    id: 'inventory.source_of_inventory',
+    defaultMessage: 'Source of inventory'
+  }
 });
 
 export default sharedMessages;
