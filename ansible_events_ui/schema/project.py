@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import List, Optional
 
-from pydantic import BaseModel, StrictStr
+from pydantic import BaseModel, StrictStr, constr
 
 from .extra_vars import ExtravarsRef
 from .inventory import InventoryRef
@@ -9,10 +9,14 @@ from .playbook import PlaybookRef
 from .rulebook import RuleRulesetRef
 
 
+def strict_not_empty_str():
+    return constr(strict=True, strip_whitespace=True, min_length=1)
+
+
 class ProjectCreate(BaseModel):
     git_hash: Optional[StrictStr]
     url: StrictStr
-    name: StrictStr
+    name: strict_not_empty_str()
     description: Optional[StrictStr] = ""
 
 
@@ -36,5 +40,5 @@ class ProjectList(BaseModel):
 
 
 class ProjectUpdate(BaseModel):
-    name: Optional[StrictStr]
+    name: Optional[strict_not_empty_str()]
     description: Optional[StrictStr]
