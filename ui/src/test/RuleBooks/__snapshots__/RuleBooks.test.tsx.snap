@@ -1,10 +1,10 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`RuleSets should render the RuleSets component 1`] = `
+exports[`RuleBooks should render the RuleBooks component 1`] = `
 <ComponentWrapper
   initialEntries={
     Array [
-      "/rulesets",
+      "/rulebooks",
     ]
   }
 >
@@ -22,7 +22,7 @@ exports[`RuleSets should render the RuleSets component 1`] = `
     <MemoryRouter
       initialEntries={
         Array [
-          "/rulesets",
+          "/rulebooks",
         ]
       }
       key="test"
@@ -38,7 +38,7 @@ exports[`RuleSets should render the RuleSets component 1`] = `
             "entries": Array [
               Object {
                 "hash": "",
-                "pathname": "/rulesets",
+                "pathname": "/rulebooks",
                 "search": "",
                 "state": undefined,
               },
@@ -51,7 +51,7 @@ exports[`RuleSets should render the RuleSets component 1`] = `
             "listen": [Function],
             "location": Object {
               "hash": "",
-              "pathname": "/rulesets",
+              "pathname": "/rulebooks",
               "search": "",
               "state": undefined,
             },
@@ -61,9 +61,9 @@ exports[`RuleSets should render the RuleSets component 1`] = `
         }
       >
         <Route
-          path="/rulesets"
+          path="/rulebooks"
         >
-          <RuleSets>
+          <RuleBooks>
             <TopToolbar
               paddingBottom={false}
             >
@@ -82,20 +82,20 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                       data-ouia-component-type="PF4/Title"
                       data-ouia-safe={true}
                     >
-                      Rule Sets
+                      Rulebooks
                     </h2>
                   </Title>
                 </section>
               </PageSection>
             </TopToolbar>
             <PageSection
-              id="ruleset_list"
-              page-type="ruleset-list"
+              id="rulebooks_list"
+              page-type="rulebooks-list"
             >
               <section
                 className="pf-c-page__main-section"
-                id="ruleset_list"
-                page-type="ruleset-list"
+                id="rulebooks_list"
+                page-type="rulebooks-list"
               >
                 <TableToolbarView
                   actionResolver={[Function]}
@@ -108,17 +108,19 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                         ],
                       },
                       Object {
-                        "title": "Number of rules",
+                        "title": "Number of rulesets",
+                      },
+                      Object {
+                        "title": "Fire count",
                       },
                     ]
                   }
                   fetchData={[Function]}
                   isLoading={false}
                   onFilterChange={[Function]}
-                  ouiaId="RuleSets-table"
-                  plural="Rule sets"
+                  ouiaId="RuleBooks-table"
+                  plural="Rulebooks"
                   renderEmptyState={[Function]}
-                  routes={[Function]}
                   rows={
                     Array [
                       Object {
@@ -127,13 +129,14 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                             <Link
                               to={
                                 Object {
-                                  "pathname": "/ruleset/1",
+                                  "pathname": "/rulebooks/rulebook/1",
                                 }
                               }
                             >
-                              RuleSet 1
+                              RuleBook 1
                             </Link>
                           </React.Fragment>,
+                          undefined,
                           undefined,
                         ],
                         "id": "1",
@@ -144,13 +147,14 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                             <Link
                               to={
                                 Object {
-                                  "pathname": "/ruleset/2",
+                                  "pathname": "/rulebooks/rulebook/2",
                                 }
                               }
                             >
-                              RuleSet 2
+                              RuleBook 2
                             </Link>
                           </React.Fragment>,
+                          undefined,
                           undefined,
                         ],
                         "id": "2",
@@ -161,13 +165,14 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                             <Link
                               to={
                                 Object {
-                                  "pathname": "/ruleset/3",
+                                  "pathname": "/rulebooks/rulebook/3",
                                 }
                               }
                             >
-                              RuleSet 3
+                              RuleBook 3
                             </Link>
                           </React.Fragment>,
+                          undefined,
                           undefined,
                         ],
                         "id": "3",
@@ -176,12 +181,8 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                   }
                   setLimit={[Function]}
                   setOffset={[Function]}
-                  singular="Rule set"
+                  singular="Rulebook"
                 >
-                  <Route
-                    exact={true}
-                    path="/new-rule-set"
-                  />
                   <PrimaryToolbar
                     filterConfig={
                       Object {
@@ -1154,7 +1155,7 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                   </PrimaryToolbar>
                   <Table
                     actionResolver={[Function]}
-                    aria-label="Rule sets table"
+                    aria-label="Rulebooks table"
                     borders={true}
                     canCollapseAll={false}
                     canSelectAll={true}
@@ -1168,7 +1169,10 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                           ],
                         },
                         Object {
-                          "title": "Number of rules",
+                          "title": "Number of rulesets",
+                        },
+                        Object {
+                          "title": "Fire count",
                         },
                       ]
                     }
@@ -1183,7 +1187,7 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                     isNested={false}
                     isStickyHeader={false}
                     isTreeTable={false}
-                    ouiaId="RuleSets-table"
+                    ouiaId="RuleBooks-table"
                     ouiaSafe={true}
                     role="grid"
                     rowLabeledBy="simple-node"
@@ -1195,13 +1199,14 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                               <Link
                                 to={
                                   Object {
-                                    "pathname": "/ruleset/1",
+                                    "pathname": "/rulebooks/rulebook/1",
                                   }
                                 }
                               >
-                                RuleSet 1
+                                RuleBook 1
                               </Link>
                             </React.Fragment>,
+                            undefined,
                             undefined,
                           ],
                           "id": "1",
@@ -1212,13 +1217,14 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                               <Link
                                 to={
                                   Object {
-                                    "pathname": "/ruleset/2",
+                                    "pathname": "/rulebooks/rulebook/2",
                                   }
                                 }
                               >
-                                RuleSet 2
+                                RuleBook 2
                               </Link>
                             </React.Fragment>,
+                            undefined,
                             undefined,
                           ],
                           "id": "2",
@@ -1229,13 +1235,14 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                               <Link
                                 to={
                                   Object {
-                                    "pathname": "/ruleset/3",
+                                    "pathname": "/rulebooks/rulebook/3",
                                   }
                                 }
                               >
-                                RuleSet 3
+                                RuleBook 3
                               </Link>
                             </React.Fragment>,
+                            undefined,
                             undefined,
                           ],
                           "id": "3",
@@ -1246,7 +1253,7 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                     variant={null}
                   >
                     <Provider
-                      aria-label="Rule sets table"
+                      aria-label="Rulebooks table"
                       borders={true}
                       className="pf-u-pt-0"
                       columns={
@@ -1342,16 +1349,67 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                             },
                             "header": Object {
                               "formatters": Array [],
-                              "label": "Number of rules",
+                              "label": "Number of rulesets",
                               "transforms": Array [
                                 [Function],
                                 [Function],
                               ],
                             },
-                            "property": "number-of-rules",
+                            "property": "number-of-rulesets",
                             "props": Object {
                               "data-key": 1,
-                              "data-label": "Number of rules",
+                              "data-label": "Number of rulesets",
+                            },
+                          },
+                          Object {
+                            "cell": Object {
+                              "formatters": Array [
+                                [Function],
+                              ],
+                              "transforms": Array [
+                                [Function],
+                              ],
+                            },
+                            "data": undefined,
+                            "extraParams": Object {
+                              "actionResolver": [Function],
+                              "actions": undefined,
+                              "actionsToggle": undefined,
+                              "allRowsExpanded": false,
+                              "allRowsSelected": false,
+                              "areActionsDisabled": undefined,
+                              "canCollapseAll": false,
+                              "canSelectAll": true,
+                              "canSortFavorites": true,
+                              "collapseAllAriaLabel": "",
+                              "contentId": "expanded-content",
+                              "dropdownDirection": "down",
+                              "dropdownPosition": "right",
+                              "expandId": "expandable-toggle",
+                              "firstUserColumnIndex": 0,
+                              "isHeaderSelectDisabled": false,
+                              "onCollapse": undefined,
+                              "onExpand": undefined,
+                              "onFavorite": undefined,
+                              "onRowEdit": undefined,
+                              "onSelect": undefined,
+                              "onSort": undefined,
+                              "rowLabeledBy": "simple-node",
+                              "selectVariant": "checkbox",
+                              "sortBy": undefined,
+                            },
+                            "header": Object {
+                              "formatters": Array [],
+                              "label": "Fire count",
+                              "transforms": Array [
+                                [Function],
+                                [Function],
+                              ],
+                            },
+                            "property": "fire-count",
+                            "props": Object {
+                              "data-key": 2,
+                              "data-label": "Fire count",
                             },
                           },
                           Object {
@@ -1401,9 +1459,9 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                 [Function],
                               ],
                             },
-                            "property": "column-2",
+                            "property": "column-3",
                             "props": Object {
-                              "data-key": 2,
+                              "data-key": 3,
                               "data-label": "",
                             },
                           },
@@ -1413,7 +1471,7 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                       isNested={false}
                       isStickyHeader={false}
                       isTreeTable={false}
-                      ouiaId="RuleSets-table"
+                      ouiaId="RuleBooks-table"
                       ouiaSafe={true}
                       renderers={
                         Object {
@@ -1431,20 +1489,20 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                       variant={null}
                     >
                       <TableComposable
-                        aria-label="Rule sets table"
+                        aria-label="Rulebooks table"
                         borders={true}
                         className="pf-u-pt-0"
                         gridBreakPoint="grid-md"
                         isNested={false}
                         isStickyHeader={false}
                         isTreeTable={false}
-                        ouiaId="RuleSets-table"
+                        ouiaId="RuleBooks-table"
                         ouiaSafe={true}
                         role="grid"
                         variant={null}
                       >
                         <TableComposableBase
-                          aria-label="Rule sets table"
+                          aria-label="Rulebooks table"
                           borders={true}
                           className="pf-u-pt-0"
                           gridBreakPoint="grid-md"
@@ -1452,15 +1510,15 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                           isNested={false}
                           isStickyHeader={false}
                           isTreeTable={false}
-                          ouiaId="RuleSets-table"
+                          ouiaId="RuleBooks-table"
                           ouiaSafe={true}
                           role="grid"
                           variant={null}
                         >
                           <table
-                            aria-label="Rule sets table"
+                            aria-label="Rulebooks table"
                             className="pf-u-pt-0 pf-c-table pf-m-grid-md"
-                            data-ouia-component-id="RuleSets-table"
+                            data-ouia-component-id="RuleBooks-table"
                             data-ouia-component-type="PF4/Table"
                             data-ouia-safe={true}
                             role="grid"
@@ -1568,16 +1626,67 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                           },
                                           "header": Object {
                                             "formatters": Array [],
-                                            "label": "Number of rules",
+                                            "label": "Number of rulesets",
                                             "transforms": Array [
                                               [Function],
                                               [Function],
                                             ],
                                           },
-                                          "property": "number-of-rules",
+                                          "property": "number-of-rulesets",
                                           "props": Object {
                                             "data-key": 1,
-                                            "data-label": "Number of rules",
+                                            "data-label": "Number of rulesets",
+                                          },
+                                        },
+                                        Object {
+                                          "cell": Object {
+                                            "formatters": Array [
+                                              [Function],
+                                            ],
+                                            "transforms": Array [
+                                              [Function],
+                                            ],
+                                          },
+                                          "data": undefined,
+                                          "extraParams": Object {
+                                            "actionResolver": [Function],
+                                            "actions": undefined,
+                                            "actionsToggle": undefined,
+                                            "allRowsExpanded": false,
+                                            "allRowsSelected": false,
+                                            "areActionsDisabled": undefined,
+                                            "canCollapseAll": false,
+                                            "canSelectAll": true,
+                                            "canSortFavorites": true,
+                                            "collapseAllAriaLabel": "",
+                                            "contentId": "expanded-content",
+                                            "dropdownDirection": "down",
+                                            "dropdownPosition": "right",
+                                            "expandId": "expandable-toggle",
+                                            "firstUserColumnIndex": 0,
+                                            "isHeaderSelectDisabled": false,
+                                            "onCollapse": undefined,
+                                            "onExpand": undefined,
+                                            "onFavorite": undefined,
+                                            "onRowEdit": undefined,
+                                            "onSelect": undefined,
+                                            "onSort": undefined,
+                                            "rowLabeledBy": "simple-node",
+                                            "selectVariant": "checkbox",
+                                            "sortBy": undefined,
+                                          },
+                                          "header": Object {
+                                            "formatters": Array [],
+                                            "label": "Fire count",
+                                            "transforms": Array [
+                                              [Function],
+                                              [Function],
+                                            ],
+                                          },
+                                          "property": "fire-count",
+                                          "props": Object {
+                                            "data-key": 2,
+                                            "data-label": "Fire count",
                                           },
                                         },
                                         Object {
@@ -1627,9 +1736,9 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                               [Function],
                                             ],
                                           },
-                                          "property": "column-2",
+                                          "property": "column-3",
                                           "props": Object {
-                                            "data-key": 2,
+                                            "data-key": 3,
                                             "data-label": "",
                                           },
                                         },
@@ -1779,16 +1888,67 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                   },
                                                   "header": Object {
                                                     "formatters": Array [],
-                                                    "label": "Number of rules",
+                                                    "label": "Number of rulesets",
                                                     "transforms": Array [
                                                       [Function],
                                                       [Function],
                                                     ],
                                                   },
-                                                  "property": "number-of-rules",
+                                                  "property": "number-of-rulesets",
                                                   "props": Object {
                                                     "data-key": 1,
-                                                    "data-label": "Number of rules",
+                                                    "data-label": "Number of rulesets",
+                                                  },
+                                                },
+                                                Object {
+                                                  "cell": Object {
+                                                    "formatters": Array [
+                                                      [Function],
+                                                    ],
+                                                    "transforms": Array [
+                                                      [Function],
+                                                    ],
+                                                  },
+                                                  "data": undefined,
+                                                  "extraParams": Object {
+                                                    "actionResolver": [Function],
+                                                    "actions": undefined,
+                                                    "actionsToggle": undefined,
+                                                    "allRowsExpanded": false,
+                                                    "allRowsSelected": false,
+                                                    "areActionsDisabled": undefined,
+                                                    "canCollapseAll": false,
+                                                    "canSelectAll": true,
+                                                    "canSortFavorites": true,
+                                                    "collapseAllAriaLabel": "",
+                                                    "contentId": "expanded-content",
+                                                    "dropdownDirection": "down",
+                                                    "dropdownPosition": "right",
+                                                    "expandId": "expandable-toggle",
+                                                    "firstUserColumnIndex": 0,
+                                                    "isHeaderSelectDisabled": false,
+                                                    "onCollapse": undefined,
+                                                    "onExpand": undefined,
+                                                    "onFavorite": undefined,
+                                                    "onRowEdit": undefined,
+                                                    "onSelect": undefined,
+                                                    "onSort": undefined,
+                                                    "rowLabeledBy": "simple-node",
+                                                    "selectVariant": "checkbox",
+                                                    "sortBy": undefined,
+                                                  },
+                                                  "header": Object {
+                                                    "formatters": Array [],
+                                                    "label": "Fire count",
+                                                    "transforms": Array [
+                                                      [Function],
+                                                      [Function],
+                                                    ],
+                                                  },
+                                                  "property": "fire-count",
+                                                  "props": Object {
+                                                    "data-key": 2,
+                                                    "data-label": "Fire count",
                                                   },
                                                 },
                                                 Object {
@@ -1838,9 +1998,9 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                       [Function],
                                                     ],
                                                   },
-                                                  "property": "column-2",
+                                                  "property": "column-3",
                                                   "props": Object {
-                                                    "data-key": 2,
+                                                    "data-key": 3,
                                                     "data-label": "",
                                                   },
                                                 },
@@ -1901,7 +2061,7 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                   </HeaderCell>
                                                   <HeaderCell
                                                     data-key={1}
-                                                    data-label="Number of rules"
+                                                    data-label="Number of rulesets"
                                                     key="1-header"
                                                     scope="col"
                                                   >
@@ -1909,7 +2069,7 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                       className=""
                                                       component="th"
                                                       data-key={1}
-                                                      data-label="Number of rules"
+                                                      data-label="Number of rulesets"
                                                       onMouseEnter={[Function]}
                                                       scope="col"
                                                       textCenter={false}
@@ -1919,7 +2079,7 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                         className=""
                                                         component="th"
                                                         data-key={1}
-                                                        data-label="Number of rules"
+                                                        data-label="Number of rulesets"
                                                         innerRef={null}
                                                         onMouseEnter={[Function]}
                                                         scope="col"
@@ -1929,26 +2089,65 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                         <th
                                                           className=""
                                                           data-key={1}
-                                                          data-label="Number of rules"
+                                                          data-label="Number of rulesets"
                                                           onMouseEnter={[Function]}
                                                           scope="col"
                                                         >
-                                                          Number of rules
+                                                          Number of rulesets
+                                                        </th>
+                                                      </ThBase>
+                                                    </Th>
+                                                  </HeaderCell>
+                                                  <HeaderCell
+                                                    data-key={2}
+                                                    data-label="Fire count"
+                                                    key="2-header"
+                                                    scope="col"
+                                                  >
+                                                    <Th
+                                                      className=""
+                                                      component="th"
+                                                      data-key={2}
+                                                      data-label="Fire count"
+                                                      onMouseEnter={[Function]}
+                                                      scope="col"
+                                                      textCenter={false}
+                                                      tooltip=""
+                                                    >
+                                                      <ThBase
+                                                        className=""
+                                                        component="th"
+                                                        data-key={2}
+                                                        data-label="Fire count"
+                                                        innerRef={null}
+                                                        onMouseEnter={[Function]}
+                                                        scope="col"
+                                                        textCenter={false}
+                                                        tooltip=""
+                                                      >
+                                                        <th
+                                                          className=""
+                                                          data-key={2}
+                                                          data-label="Fire count"
+                                                          onMouseEnter={[Function]}
+                                                          scope="col"
+                                                        >
+                                                          Fire count
                                                         </th>
                                                       </ThBase>
                                                     </Th>
                                                   </HeaderCell>
                                                   <HeaderCell
                                                     component="td"
-                                                    data-key={2}
+                                                    data-key={3}
                                                     data-label=""
-                                                    key="2-header"
+                                                    key="3-header"
                                                     scope=""
                                                   >
                                                     <Th
                                                       className=""
                                                       component="td"
-                                                      data-key={2}
+                                                      data-key={3}
                                                       data-label=""
                                                       onMouseEnter={[Function]}
                                                       scope=""
@@ -1958,7 +2157,7 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                       <ThBase
                                                         className=""
                                                         component="td"
-                                                        data-key={2}
+                                                        data-key={3}
                                                         data-label=""
                                                         innerRef={null}
                                                         onMouseEnter={[Function]}
@@ -1968,7 +2167,7 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                       >
                                                         <td
                                                           className=""
-                                                          data-key={2}
+                                                          data-key={3}
                                                           data-label=""
                                                           onMouseEnter={[Function]}
                                                           scope={null}
@@ -2083,16 +2282,67 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                       },
                                       "header": Object {
                                         "formatters": Array [],
-                                        "label": "Number of rules",
+                                        "label": "Number of rulesets",
                                         "transforms": Array [
                                           [Function],
                                           [Function],
                                         ],
                                       },
-                                      "property": "number-of-rules",
+                                      "property": "number-of-rulesets",
                                       "props": Object {
                                         "data-key": 1,
-                                        "data-label": "Number of rules",
+                                        "data-label": "Number of rulesets",
+                                      },
+                                    },
+                                    Object {
+                                      "cell": Object {
+                                        "formatters": Array [
+                                          [Function],
+                                        ],
+                                        "transforms": Array [
+                                          [Function],
+                                        ],
+                                      },
+                                      "data": undefined,
+                                      "extraParams": Object {
+                                        "actionResolver": [Function],
+                                        "actions": undefined,
+                                        "actionsToggle": undefined,
+                                        "allRowsExpanded": false,
+                                        "allRowsSelected": false,
+                                        "areActionsDisabled": undefined,
+                                        "canCollapseAll": false,
+                                        "canSelectAll": true,
+                                        "canSortFavorites": true,
+                                        "collapseAllAriaLabel": "",
+                                        "contentId": "expanded-content",
+                                        "dropdownDirection": "down",
+                                        "dropdownPosition": "right",
+                                        "expandId": "expandable-toggle",
+                                        "firstUserColumnIndex": 0,
+                                        "isHeaderSelectDisabled": false,
+                                        "onCollapse": undefined,
+                                        "onExpand": undefined,
+                                        "onFavorite": undefined,
+                                        "onRowEdit": undefined,
+                                        "onSelect": undefined,
+                                        "onSort": undefined,
+                                        "rowLabeledBy": "simple-node",
+                                        "selectVariant": "checkbox",
+                                        "sortBy": undefined,
+                                      },
+                                      "header": Object {
+                                        "formatters": Array [],
+                                        "label": "Fire count",
+                                        "transforms": Array [
+                                          [Function],
+                                          [Function],
+                                        ],
+                                      },
+                                      "property": "fire-count",
+                                      "props": Object {
+                                        "data-key": 2,
+                                        "data-label": "Fire count",
                                       },
                                     },
                                     Object {
@@ -2142,9 +2392,9 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                           [Function],
                                         ],
                                       },
-                                      "property": "column-2",
+                                      "property": "column-3",
                                       "props": Object {
-                                        "data-key": 2,
+                                        "data-key": 3,
                                         "data-label": "",
                                       },
                                     },
@@ -2162,13 +2412,14 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                           <Link
                                             to={
                                               Object {
-                                                "pathname": "/ruleset/1",
+                                                "pathname": "/rulebooks/rulebook/1",
                                               }
                                             }
                                           >
-                                            RuleSet 1
+                                            RuleBook 1
                                           </Link>
                                         </React.Fragment>,
+                                        undefined,
                                         undefined,
                                       ],
                                       "id": "1",
@@ -2179,13 +2430,14 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                           <Link
                                             to={
                                               Object {
-                                                "pathname": "/ruleset/2",
+                                                "pathname": "/rulebooks/rulebook/2",
                                               }
                                             }
                                           >
-                                            RuleSet 2
+                                            RuleBook 2
                                           </Link>
                                         </React.Fragment>,
+                                        undefined,
                                         undefined,
                                       ],
                                       "id": "2",
@@ -2196,13 +2448,14 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                           <Link
                                             to={
                                               Object {
-                                                "pathname": "/ruleset/3",
+                                                "pathname": "/rulebooks/rulebook/3",
                                               }
                                             }
                                           >
-                                            RuleSet 3
+                                            RuleBook 3
                                           </Link>
                                         </React.Fragment>,
+                                        undefined,
                                         undefined,
                                       ],
                                       "id": "3",
@@ -2221,15 +2474,23 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                             <Link
                                               to={
                                                 Object {
-                                                  "pathname": "/ruleset/1",
+                                                  "pathname": "/rulebooks/rulebook/1",
                                                 }
                                               }
                                             >
-                                              RuleSet 1
+                                              RuleBook 1
                                             </Link>
                                           </React.Fragment>,
                                           undefined,
+                                          undefined,
                                         ],
+                                        "fire-count": Object {
+                                          "formatters": Array [],
+                                          "props": Object {
+                                            "isVisible": true,
+                                          },
+                                          "title": undefined,
+                                        },
                                         "id": "1",
                                         "isExpanded": undefined,
                                         "isFirst": true,
@@ -2243,17 +2504,17 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                             "children": <Link
                                               to={
                                                 Object {
-                                                  "pathname": "/ruleset/1",
+                                                  "pathname": "/rulebooks/rulebook/1",
                                                 }
                                               }
                                             >
-                                              RuleSet 1
+                                              RuleBook 1
                                             </Link>,
                                             "isVisible": true,
                                           },
                                           "title": undefined,
                                         },
-                                        "number-of-rules": Object {
+                                        "number-of-rulesets": Object {
                                           "formatters": Array [],
                                           "props": Object {
                                             "isVisible": true,
@@ -2268,15 +2529,23 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                             <Link
                                               to={
                                                 Object {
-                                                  "pathname": "/ruleset/2",
+                                                  "pathname": "/rulebooks/rulebook/2",
                                                 }
                                               }
                                             >
-                                              RuleSet 2
+                                              RuleBook 2
                                             </Link>
                                           </React.Fragment>,
                                           undefined,
+                                          undefined,
                                         ],
+                                        "fire-count": Object {
+                                          "formatters": Array [],
+                                          "props": Object {
+                                            "isVisible": true,
+                                          },
+                                          "title": undefined,
+                                        },
                                         "id": "2",
                                         "isExpanded": undefined,
                                         "isFirst": false,
@@ -2290,17 +2559,17 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                             "children": <Link
                                               to={
                                                 Object {
-                                                  "pathname": "/ruleset/2",
+                                                  "pathname": "/rulebooks/rulebook/2",
                                                 }
                                               }
                                             >
-                                              RuleSet 2
+                                              RuleBook 2
                                             </Link>,
                                             "isVisible": true,
                                           },
                                           "title": undefined,
                                         },
-                                        "number-of-rules": Object {
+                                        "number-of-rulesets": Object {
                                           "formatters": Array [],
                                           "props": Object {
                                             "isVisible": true,
@@ -2315,15 +2584,23 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                             <Link
                                               to={
                                                 Object {
-                                                  "pathname": "/ruleset/3",
+                                                  "pathname": "/rulebooks/rulebook/3",
                                                 }
                                               }
                                             >
-                                              RuleSet 3
+                                              RuleBook 3
                                             </Link>
                                           </React.Fragment>,
                                           undefined,
+                                          undefined,
                                         ],
+                                        "fire-count": Object {
+                                          "formatters": Array [],
+                                          "props": Object {
+                                            "isVisible": true,
+                                          },
+                                          "title": undefined,
+                                        },
                                         "id": "3",
                                         "isExpanded": undefined,
                                         "isFirst": false,
@@ -2337,17 +2614,17 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                             "children": <Link
                                               to={
                                                 Object {
-                                                  "pathname": "/ruleset/3",
+                                                  "pathname": "/rulebooks/rulebook/3",
                                                 }
                                               }
                                             >
-                                              RuleSet 3
+                                              RuleBook 3
                                             </Link>,
                                             "isVisible": true,
                                           },
                                           "title": undefined,
                                         },
-                                        "number-of-rules": Object {
+                                        "number-of-rulesets": Object {
                                           "formatters": Array [],
                                           "props": Object {
                                             "isVisible": true,
@@ -2368,15 +2645,23 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                             <Link
                                               to={
                                                 Object {
-                                                  "pathname": "/ruleset/1",
+                                                  "pathname": "/rulebooks/rulebook/1",
                                                 }
                                               }
                                             >
-                                              RuleSet 1
+                                              RuleBook 1
                                             </Link>
                                           </React.Fragment>,
                                           undefined,
+                                          undefined,
                                         ],
+                                        "fire-count": Object {
+                                          "formatters": Array [],
+                                          "props": Object {
+                                            "isVisible": true,
+                                          },
+                                          "title": undefined,
+                                        },
                                         "id": "1",
                                         "isExpanded": undefined,
                                         "isFirst": true,
@@ -2390,17 +2675,17 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                             "children": <Link
                                               to={
                                                 Object {
-                                                  "pathname": "/ruleset/1",
+                                                  "pathname": "/rulebooks/rulebook/1",
                                                 }
                                               }
                                             >
-                                              RuleSet 1
+                                              RuleBook 1
                                             </Link>,
                                             "isVisible": true,
                                           },
                                           "title": undefined,
                                         },
-                                        "number-of-rules": Object {
+                                        "number-of-rulesets": Object {
                                           "formatters": Array [],
                                           "props": Object {
                                             "isVisible": true,
@@ -2415,15 +2700,23 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                             <Link
                                               to={
                                                 Object {
-                                                  "pathname": "/ruleset/2",
+                                                  "pathname": "/rulebooks/rulebook/2",
                                                 }
                                               }
                                             >
-                                              RuleSet 2
+                                              RuleBook 2
                                             </Link>
                                           </React.Fragment>,
                                           undefined,
+                                          undefined,
                                         ],
+                                        "fire-count": Object {
+                                          "formatters": Array [],
+                                          "props": Object {
+                                            "isVisible": true,
+                                          },
+                                          "title": undefined,
+                                        },
                                         "id": "2",
                                         "isExpanded": undefined,
                                         "isFirst": false,
@@ -2437,17 +2730,17 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                             "children": <Link
                                               to={
                                                 Object {
-                                                  "pathname": "/ruleset/2",
+                                                  "pathname": "/rulebooks/rulebook/2",
                                                 }
                                               }
                                             >
-                                              RuleSet 2
+                                              RuleBook 2
                                             </Link>,
                                             "isVisible": true,
                                           },
                                           "title": undefined,
                                         },
-                                        "number-of-rules": Object {
+                                        "number-of-rulesets": Object {
                                           "formatters": Array [],
                                           "props": Object {
                                             "isVisible": true,
@@ -2462,15 +2755,23 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                             <Link
                                               to={
                                                 Object {
-                                                  "pathname": "/ruleset/3",
+                                                  "pathname": "/rulebooks/rulebook/3",
                                                 }
                                               }
                                             >
-                                              RuleSet 3
+                                              RuleBook 3
                                             </Link>
                                           </React.Fragment>,
                                           undefined,
+                                          undefined,
                                         ],
+                                        "fire-count": Object {
+                                          "formatters": Array [],
+                                          "props": Object {
+                                            "isVisible": true,
+                                          },
+                                          "title": undefined,
+                                        },
                                         "id": "3",
                                         "isExpanded": undefined,
                                         "isFirst": false,
@@ -2484,17 +2785,17 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                             "children": <Link
                                               to={
                                                 Object {
-                                                  "pathname": "/ruleset/3",
+                                                  "pathname": "/rulebooks/rulebook/3",
                                                 }
                                               }
                                             >
-                                              RuleSet 3
+                                              RuleBook 3
                                             </Link>,
                                             "isVisible": true,
                                           },
                                           "title": undefined,
                                         },
-                                        "number-of-rules": Object {
+                                        "number-of-rulesets": Object {
                                           "formatters": Array [],
                                           "props": Object {
                                             "isVisible": true,
@@ -2601,16 +2902,67 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                           },
                                           "header": Object {
                                             "formatters": Array [],
-                                            "label": "Number of rules",
+                                            "label": "Number of rulesets",
                                             "transforms": Array [
                                               [Function],
                                               [Function],
                                             ],
                                           },
-                                          "property": "number-of-rules",
+                                          "property": "number-of-rulesets",
                                           "props": Object {
                                             "data-key": 1,
-                                            "data-label": "Number of rules",
+                                            "data-label": "Number of rulesets",
+                                          },
+                                        },
+                                        Object {
+                                          "cell": Object {
+                                            "formatters": Array [
+                                              [Function],
+                                            ],
+                                            "transforms": Array [
+                                              [Function],
+                                            ],
+                                          },
+                                          "data": undefined,
+                                          "extraParams": Object {
+                                            "actionResolver": [Function],
+                                            "actions": undefined,
+                                            "actionsToggle": undefined,
+                                            "allRowsExpanded": false,
+                                            "allRowsSelected": false,
+                                            "areActionsDisabled": undefined,
+                                            "canCollapseAll": false,
+                                            "canSelectAll": true,
+                                            "canSortFavorites": true,
+                                            "collapseAllAriaLabel": "",
+                                            "contentId": "expanded-content",
+                                            "dropdownDirection": "down",
+                                            "dropdownPosition": "right",
+                                            "expandId": "expandable-toggle",
+                                            "firstUserColumnIndex": 0,
+                                            "isHeaderSelectDisabled": false,
+                                            "onCollapse": undefined,
+                                            "onExpand": undefined,
+                                            "onFavorite": undefined,
+                                            "onRowEdit": undefined,
+                                            "onSelect": undefined,
+                                            "onSort": undefined,
+                                            "rowLabeledBy": "simple-node",
+                                            "selectVariant": "checkbox",
+                                            "sortBy": undefined,
+                                          },
+                                          "header": Object {
+                                            "formatters": Array [],
+                                            "label": "Fire count",
+                                            "transforms": Array [
+                                              [Function],
+                                              [Function],
+                                            ],
+                                          },
+                                          "property": "fire-count",
+                                          "props": Object {
+                                            "data-key": 2,
+                                            "data-label": "Fire count",
                                           },
                                         },
                                         Object {
@@ -2660,9 +3012,9 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                               [Function],
                                             ],
                                           },
-                                          "property": "column-2",
+                                          "property": "column-3",
                                           "props": Object {
-                                            "data-key": 2,
+                                            "data-key": 3,
                                             "data-label": "",
                                           },
                                         },
@@ -2677,15 +3029,23 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                               <Link
                                                 to={
                                                   Object {
-                                                    "pathname": "/ruleset/1",
+                                                    "pathname": "/rulebooks/rulebook/1",
                                                   }
                                                 }
                                               >
-                                                RuleSet 1
+                                                RuleBook 1
                                               </Link>
                                             </React.Fragment>,
                                             undefined,
+                                            undefined,
                                           ],
+                                          "fire-count": Object {
+                                            "formatters": Array [],
+                                            "props": Object {
+                                              "isVisible": true,
+                                            },
+                                            "title": undefined,
+                                          },
                                           "id": "1",
                                           "isExpanded": undefined,
                                           "isFirst": true,
@@ -2699,17 +3059,17 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                               "children": <Link
                                                 to={
                                                   Object {
-                                                    "pathname": "/ruleset/1",
+                                                    "pathname": "/rulebooks/rulebook/1",
                                                   }
                                                 }
                                               >
-                                                RuleSet 1
+                                                RuleBook 1
                                               </Link>,
                                               "isVisible": true,
                                             },
                                             "title": undefined,
                                           },
-                                          "number-of-rules": Object {
+                                          "number-of-rulesets": Object {
                                             "formatters": Array [],
                                             "props": Object {
                                               "isVisible": true,
@@ -2724,15 +3084,23 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                               <Link
                                                 to={
                                                   Object {
-                                                    "pathname": "/ruleset/2",
+                                                    "pathname": "/rulebooks/rulebook/2",
                                                   }
                                                 }
                                               >
-                                                RuleSet 2
+                                                RuleBook 2
                                               </Link>
                                             </React.Fragment>,
                                             undefined,
+                                            undefined,
                                           ],
+                                          "fire-count": Object {
+                                            "formatters": Array [],
+                                            "props": Object {
+                                              "isVisible": true,
+                                            },
+                                            "title": undefined,
+                                          },
                                           "id": "2",
                                           "isExpanded": undefined,
                                           "isFirst": false,
@@ -2746,17 +3114,17 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                               "children": <Link
                                                 to={
                                                   Object {
-                                                    "pathname": "/ruleset/2",
+                                                    "pathname": "/rulebooks/rulebook/2",
                                                   }
                                                 }
                                               >
-                                                RuleSet 2
+                                                RuleBook 2
                                               </Link>,
                                               "isVisible": true,
                                             },
                                             "title": undefined,
                                           },
-                                          "number-of-rules": Object {
+                                          "number-of-rulesets": Object {
                                             "formatters": Array [],
                                             "props": Object {
                                               "isVisible": true,
@@ -2771,15 +3139,23 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                               <Link
                                                 to={
                                                   Object {
-                                                    "pathname": "/ruleset/3",
+                                                    "pathname": "/rulebooks/rulebook/3",
                                                   }
                                                 }
                                               >
-                                                RuleSet 3
+                                                RuleBook 3
                                               </Link>
                                             </React.Fragment>,
                                             undefined,
+                                            undefined,
                                           ],
+                                          "fire-count": Object {
+                                            "formatters": Array [],
+                                            "props": Object {
+                                              "isVisible": true,
+                                            },
+                                            "title": undefined,
+                                          },
                                           "id": "3",
                                           "isExpanded": undefined,
                                           "isFirst": false,
@@ -2793,17 +3169,17 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                               "children": <Link
                                                 to={
                                                   Object {
-                                                    "pathname": "/ruleset/3",
+                                                    "pathname": "/rulebooks/rulebook/3",
                                                   }
                                                 }
                                               >
-                                                RuleSet 3
+                                                RuleBook 3
                                               </Link>,
                                               "isVisible": true,
                                             },
                                             "title": undefined,
                                           },
-                                          "number-of-rules": Object {
+                                          "number-of-rulesets": Object {
                                             "formatters": Array [],
                                             "props": Object {
                                               "isVisible": true,
@@ -2848,15 +3224,23 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                               <Link
                                                 to={
                                                   Object {
-                                                    "pathname": "/ruleset/1",
+                                                    "pathname": "/rulebooks/rulebook/1",
                                                   }
                                                 }
                                               >
-                                                RuleSet 1
+                                                RuleBook 1
                                               </Link>
                                             </React.Fragment>,
                                             undefined,
+                                            undefined,
                                           ],
+                                          "fire-count": Object {
+                                            "formatters": Array [],
+                                            "props": Object {
+                                              "isVisible": true,
+                                            },
+                                            "title": undefined,
+                                          },
                                           "id": "1",
                                           "isExpanded": undefined,
                                           "isFirst": true,
@@ -2870,17 +3254,17 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                               "children": <Link
                                                 to={
                                                   Object {
-                                                    "pathname": "/ruleset/1",
+                                                    "pathname": "/rulebooks/rulebook/1",
                                                   }
                                                 }
                                               >
-                                                RuleSet 1
+                                                RuleBook 1
                                               </Link>,
                                               "isVisible": true,
                                             },
                                             "title": undefined,
                                           },
-                                          "number-of-rules": Object {
+                                          "number-of-rulesets": Object {
                                             "formatters": Array [],
                                             "props": Object {
                                               "isVisible": true,
@@ -2895,15 +3279,23 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                               <Link
                                                 to={
                                                   Object {
-                                                    "pathname": "/ruleset/2",
+                                                    "pathname": "/rulebooks/rulebook/2",
                                                   }
                                                 }
                                               >
-                                                RuleSet 2
+                                                RuleBook 2
                                               </Link>
                                             </React.Fragment>,
                                             undefined,
+                                            undefined,
                                           ],
+                                          "fire-count": Object {
+                                            "formatters": Array [],
+                                            "props": Object {
+                                              "isVisible": true,
+                                            },
+                                            "title": undefined,
+                                          },
                                           "id": "2",
                                           "isExpanded": undefined,
                                           "isFirst": false,
@@ -2917,17 +3309,17 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                               "children": <Link
                                                 to={
                                                   Object {
-                                                    "pathname": "/ruleset/2",
+                                                    "pathname": "/rulebooks/rulebook/2",
                                                   }
                                                 }
                                               >
-                                                RuleSet 2
+                                                RuleBook 2
                                               </Link>,
                                               "isVisible": true,
                                             },
                                             "title": undefined,
                                           },
-                                          "number-of-rules": Object {
+                                          "number-of-rulesets": Object {
                                             "formatters": Array [],
                                             "props": Object {
                                               "isVisible": true,
@@ -2942,15 +3334,23 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                               <Link
                                                 to={
                                                   Object {
-                                                    "pathname": "/ruleset/3",
+                                                    "pathname": "/rulebooks/rulebook/3",
                                                   }
                                                 }
                                               >
-                                                RuleSet 3
+                                                RuleBook 3
                                               </Link>
                                             </React.Fragment>,
                                             undefined,
+                                            undefined,
                                           ],
+                                          "fire-count": Object {
+                                            "formatters": Array [],
+                                            "props": Object {
+                                              "isVisible": true,
+                                            },
+                                            "title": undefined,
+                                          },
                                           "id": "3",
                                           "isExpanded": undefined,
                                           "isFirst": false,
@@ -2964,17 +3364,17 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                               "children": <Link
                                                 to={
                                                   Object {
-                                                    "pathname": "/ruleset/3",
+                                                    "pathname": "/rulebooks/rulebook/3",
                                                   }
                                                 }
                                               >
-                                                RuleSet 3
+                                                RuleBook 3
                                               </Link>,
                                               "isVisible": true,
                                             },
                                             "title": undefined,
                                           },
-                                          "number-of-rules": Object {
+                                          "number-of-rulesets": Object {
                                             "formatters": Array [],
                                             "props": Object {
                                               "isVisible": true,
@@ -2997,15 +3397,23 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                 <Link
                                                   to={
                                                     Object {
-                                                      "pathname": "/ruleset/1",
+                                                      "pathname": "/rulebooks/rulebook/1",
                                                     }
                                                   }
                                                 >
-                                                  RuleSet 1
+                                                  RuleBook 1
                                                 </Link>
                                               </React.Fragment>,
                                               undefined,
+                                              undefined,
                                             ],
+                                            "fire-count": Object {
+                                              "formatters": Array [],
+                                              "props": Object {
+                                                "isVisible": true,
+                                              },
+                                              "title": undefined,
+                                            },
                                             "id": "1",
                                             "isExpanded": undefined,
                                             "isFirst": true,
@@ -3019,17 +3427,17 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                 "children": <Link
                                                   to={
                                                     Object {
-                                                      "pathname": "/ruleset/1",
+                                                      "pathname": "/rulebooks/rulebook/1",
                                                     }
                                                   }
                                                 >
-                                                  RuleSet 1
+                                                  RuleBook 1
                                                 </Link>,
                                                 "isVisible": true,
                                               },
                                               "title": undefined,
                                             },
-                                            "number-of-rules": Object {
+                                            "number-of-rulesets": Object {
                                               "formatters": Array [],
                                               "props": Object {
                                                 "isVisible": true,
@@ -3044,15 +3452,23 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                 <Link
                                                   to={
                                                     Object {
-                                                      "pathname": "/ruleset/2",
+                                                      "pathname": "/rulebooks/rulebook/2",
                                                     }
                                                   }
                                                 >
-                                                  RuleSet 2
+                                                  RuleBook 2
                                                 </Link>
                                               </React.Fragment>,
                                               undefined,
+                                              undefined,
                                             ],
+                                            "fire-count": Object {
+                                              "formatters": Array [],
+                                              "props": Object {
+                                                "isVisible": true,
+                                              },
+                                              "title": undefined,
+                                            },
                                             "id": "2",
                                             "isExpanded": undefined,
                                             "isFirst": false,
@@ -3066,17 +3482,17 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                 "children": <Link
                                                   to={
                                                     Object {
-                                                      "pathname": "/ruleset/2",
+                                                      "pathname": "/rulebooks/rulebook/2",
                                                     }
                                                   }
                                                 >
-                                                  RuleSet 2
+                                                  RuleBook 2
                                                 </Link>,
                                                 "isVisible": true,
                                               },
                                               "title": undefined,
                                             },
-                                            "number-of-rules": Object {
+                                            "number-of-rulesets": Object {
                                               "formatters": Array [],
                                               "props": Object {
                                                 "isVisible": true,
@@ -3091,15 +3507,23 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                 <Link
                                                   to={
                                                     Object {
-                                                      "pathname": "/ruleset/3",
+                                                      "pathname": "/rulebooks/rulebook/3",
                                                     }
                                                   }
                                                 >
-                                                  RuleSet 3
+                                                  RuleBook 3
                                                 </Link>
                                               </React.Fragment>,
                                               undefined,
+                                              undefined,
                                             ],
+                                            "fire-count": Object {
+                                              "formatters": Array [],
+                                              "props": Object {
+                                                "isVisible": true,
+                                              },
+                                              "title": undefined,
+                                            },
                                             "id": "3",
                                             "isExpanded": undefined,
                                             "isFirst": false,
@@ -3113,17 +3537,17 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                 "children": <Link
                                                   to={
                                                     Object {
-                                                      "pathname": "/ruleset/3",
+                                                      "pathname": "/rulebooks/rulebook/3",
                                                     }
                                                   }
                                                 >
-                                                  RuleSet 3
+                                                  RuleBook 3
                                                 </Link>,
                                                 "isVisible": true,
                                               },
                                               "title": undefined,
                                             },
-                                            "number-of-rules": Object {
+                                            "number-of-rulesets": Object {
                                               "formatters": Array [],
                                               "props": Object {
                                                 "isVisible": true,
@@ -3240,16 +3664,67 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                     },
                                                     "header": Object {
                                                       "formatters": Array [],
-                                                      "label": "Number of rules",
+                                                      "label": "Number of rulesets",
                                                       "transforms": Array [
                                                         [Function],
                                                         [Function],
                                                       ],
                                                     },
-                                                    "property": "number-of-rules",
+                                                    "property": "number-of-rulesets",
                                                     "props": Object {
                                                       "data-key": 1,
-                                                      "data-label": "Number of rules",
+                                                      "data-label": "Number of rulesets",
+                                                    },
+                                                  },
+                                                  Object {
+                                                    "cell": Object {
+                                                      "formatters": Array [
+                                                        [Function],
+                                                      ],
+                                                      "transforms": Array [
+                                                        [Function],
+                                                      ],
+                                                    },
+                                                    "data": undefined,
+                                                    "extraParams": Object {
+                                                      "actionResolver": [Function],
+                                                      "actions": undefined,
+                                                      "actionsToggle": undefined,
+                                                      "allRowsExpanded": false,
+                                                      "allRowsSelected": false,
+                                                      "areActionsDisabled": undefined,
+                                                      "canCollapseAll": false,
+                                                      "canSelectAll": true,
+                                                      "canSortFavorites": true,
+                                                      "collapseAllAriaLabel": "",
+                                                      "contentId": "expanded-content",
+                                                      "dropdownDirection": "down",
+                                                      "dropdownPosition": "right",
+                                                      "expandId": "expandable-toggle",
+                                                      "firstUserColumnIndex": 0,
+                                                      "isHeaderSelectDisabled": false,
+                                                      "onCollapse": undefined,
+                                                      "onExpand": undefined,
+                                                      "onFavorite": undefined,
+                                                      "onRowEdit": undefined,
+                                                      "onSelect": undefined,
+                                                      "onSort": undefined,
+                                                      "rowLabeledBy": "simple-node",
+                                                      "selectVariant": "checkbox",
+                                                      "sortBy": undefined,
+                                                    },
+                                                    "header": Object {
+                                                      "formatters": Array [],
+                                                      "label": "Fire count",
+                                                      "transforms": Array [
+                                                        [Function],
+                                                        [Function],
+                                                      ],
+                                                    },
+                                                    "property": "fire-count",
+                                                    "props": Object {
+                                                      "data-key": 2,
+                                                      "data-label": "Fire count",
                                                     },
                                                   },
                                                   Object {
@@ -3299,9 +3774,9 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                         [Function],
                                                       ],
                                                     },
-                                                    "property": "column-2",
+                                                    "property": "column-3",
                                                     "props": Object {
-                                                      "data-key": 2,
+                                                      "data-key": 3,
                                                       "data-label": "",
                                                     },
                                                   },
@@ -3323,15 +3798,23 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                       <Link
                                                         to={
                                                           Object {
-                                                            "pathname": "/ruleset/1",
+                                                            "pathname": "/rulebooks/rulebook/1",
                                                           }
                                                         }
                                                       >
-                                                        RuleSet 1
+                                                        RuleBook 1
                                                       </Link>
                                                     </React.Fragment>,
                                                     undefined,
+                                                    undefined,
                                                   ],
+                                                  "fire-count": Object {
+                                                    "formatters": Array [],
+                                                    "props": Object {
+                                                      "isVisible": true,
+                                                    },
+                                                    "title": undefined,
+                                                  },
                                                   "id": "1",
                                                   "isExpanded": undefined,
                                                   "isFirst": true,
@@ -3345,17 +3828,17 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                       "children": <Link
                                                         to={
                                                           Object {
-                                                            "pathname": "/ruleset/1",
+                                                            "pathname": "/rulebooks/rulebook/1",
                                                           }
                                                         }
                                                       >
-                                                        RuleSet 1
+                                                        RuleBook 1
                                                       </Link>,
                                                       "isVisible": true,
                                                     },
                                                     "title": undefined,
                                                   },
-                                                  "number-of-rules": Object {
+                                                  "number-of-rulesets": Object {
                                                     "formatters": Array [],
                                                     "props": Object {
                                                       "isVisible": true,
@@ -3379,15 +3862,23 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                         <Link
                                                           to={
                                                             Object {
-                                                              "pathname": "/ruleset/1",
+                                                              "pathname": "/rulebooks/rulebook/1",
                                                             }
                                                           }
                                                         >
-                                                          RuleSet 1
+                                                          RuleBook 1
                                                         </Link>
                                                       </React.Fragment>,
                                                       undefined,
+                                                      undefined,
                                                     ],
+                                                    "fire-count": Object {
+                                                      "formatters": Array [],
+                                                      "props": Object {
+                                                        "isVisible": true,
+                                                      },
+                                                      "title": undefined,
+                                                    },
                                                     "id": "1",
                                                     "isExpanded": undefined,
                                                     "isFirst": true,
@@ -3401,17 +3892,17 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                         "children": <Link
                                                           to={
                                                             Object {
-                                                              "pathname": "/ruleset/1",
+                                                              "pathname": "/rulebooks/rulebook/1",
                                                             }
                                                           }
                                                         >
-                                                          RuleSet 1
+                                                          RuleBook 1
                                                         </Link>,
                                                         "isVisible": true,
                                                       },
                                                       "title": undefined,
                                                     },
-                                                    "number-of-rules": Object {
+                                                    "number-of-rulesets": Object {
                                                       "formatters": Array [],
                                                       "props": Object {
                                                         "isVisible": true,
@@ -3480,19 +3971,19 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                               <ForwardRef(Link)
                                                                 to={
                                                                   Object {
-                                                                    "pathname": "/ruleset/1",
+                                                                    "pathname": "/rulebooks/rulebook/1",
                                                                   }
                                                                 }
                                                               >
                                                                 <LinkAnchor
-                                                                  href="/ruleset/1"
+                                                                  href="/rulebooks/rulebook/1"
                                                                   navigate={[Function]}
                                                                 >
                                                                   <a
-                                                                    href="/ruleset/1"
+                                                                    href="/rulebooks/rulebook/1"
                                                                     onClick={[Function]}
                                                                   >
-                                                                    RuleSet 1
+                                                                    RuleBook 1
                                                                   </a>
                                                                 </LinkAnchor>
                                                               </ForwardRef(Link)>
@@ -3502,7 +3993,7 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                       </BodyCell>
                                                       <BodyCell
                                                         data-key={1}
-                                                        data-label="Number of rules"
+                                                        data-label="Number of rulesets"
                                                         isVisible={true}
                                                         key="col-1-row-0"
                                                       >
@@ -3510,7 +4001,7 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                           className=""
                                                           component="td"
                                                           data-key={1}
-                                                          dataLabel="Number of rules"
+                                                          dataLabel="Number of rulesets"
                                                           onMouseEnter={[Function]}
                                                           textCenter={false}
                                                         >
@@ -3518,7 +4009,7 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                             className=""
                                                             component="td"
                                                             data-key={1}
-                                                            dataLabel="Number of rules"
+                                                            dataLabel="Number of rulesets"
                                                             innerRef={null}
                                                             onMouseEnter={[Function]}
                                                             textCenter={false}
@@ -3526,7 +4017,39 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                             <td
                                                               className=""
                                                               data-key={1}
-                                                              data-label="Number of rules"
+                                                              data-label="Number of rulesets"
+                                                              onMouseEnter={[Function]}
+                                                            />
+                                                          </TdBase>
+                                                        </Td>
+                                                      </BodyCell>
+                                                      <BodyCell
+                                                        data-key={2}
+                                                        data-label="Fire count"
+                                                        isVisible={true}
+                                                        key="col-2-row-0"
+                                                      >
+                                                        <Td
+                                                          className=""
+                                                          component="td"
+                                                          data-key={2}
+                                                          dataLabel="Fire count"
+                                                          onMouseEnter={[Function]}
+                                                          textCenter={false}
+                                                        >
+                                                          <TdBase
+                                                            className=""
+                                                            component="td"
+                                                            data-key={2}
+                                                            dataLabel="Fire count"
+                                                            innerRef={null}
+                                                            onMouseEnter={[Function]}
+                                                            textCenter={false}
+                                                          >
+                                                            <td
+                                                              className=""
+                                                              data-key={2}
+                                                              data-label="Fire count"
                                                               onMouseEnter={[Function]}
                                                             />
                                                           </TdBase>
@@ -3534,10 +4057,10 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                       </BodyCell>
                                                       <BodyCell
                                                         className="pf-c-table__action"
-                                                        data-key={2}
+                                                        data-key={3}
                                                         data-label=""
                                                         isVisible={true}
-                                                        key="col-2-row-0"
+                                                        key="col-3-row-0"
                                                         style={
                                                           Object {
                                                             "paddingRight": 0,
@@ -3547,7 +4070,7 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                         <Td
                                                           className="pf-c-table__action"
                                                           component="td"
-                                                          data-key={2}
+                                                          data-key={3}
                                                           dataLabel={null}
                                                           onMouseEnter={[Function]}
                                                           style={
@@ -3560,7 +4083,7 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                           <TdBase
                                                             className="pf-c-table__action"
                                                             component="td"
-                                                            data-key={2}
+                                                            data-key={3}
                                                             dataLabel={null}
                                                             innerRef={null}
                                                             onMouseEnter={[Function]}
@@ -3573,7 +4096,7 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                           >
                                                             <td
                                                               className="pf-c-table__action"
-                                                              data-key={2}
+                                                              data-key={3}
                                                               data-label={null}
                                                               onMouseEnter={[Function]}
                                                               style={
@@ -3634,14 +4157,14 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                                           [Function],
                                                                         ],
                                                                       },
-                                                                      "property": "column-2",
+                                                                      "property": "column-3",
                                                                       "props": Object {
-                                                                        "data-key": 2,
+                                                                        "data-key": 3,
                                                                         "data-label": "",
                                                                       },
                                                                     },
-                                                                    "columnIndex": 2,
-                                                                    "property": "column-2",
+                                                                    "columnIndex": 3,
+                                                                    "property": "column-3",
                                                                     "rowIndex": 0,
                                                                   }
                                                                 }
@@ -3661,15 +4184,23 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                                         <ForwardRef(Link)
                                                                           to={
                                                                             Object {
-                                                                              "pathname": "/ruleset/1",
+                                                                              "pathname": "/rulebooks/rulebook/1",
                                                                             }
                                                                           }
                                                                         >
-                                                                          RuleSet 1
+                                                                          RuleBook 1
                                                                         </ForwardRef(Link)>
                                                                       </React.Fragment>,
                                                                       undefined,
+                                                                      undefined,
                                                                     ],
+                                                                    "fire-count": Object {
+                                                                      "formatters": Array [],
+                                                                      "props": Object {
+                                                                        "isVisible": true,
+                                                                      },
+                                                                      "title": undefined,
+                                                                    },
                                                                     "id": "1",
                                                                     "isExpanded": undefined,
                                                                     "isFirst": true,
@@ -3683,17 +4214,17 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                                         "children": <ForwardRef(Link)
                                                                           to={
                                                                             Object {
-                                                                              "pathname": "/ruleset/1",
+                                                                              "pathname": "/rulebooks/rulebook/1",
                                                                             }
                                                                           }
                                                                         >
-                                                                          RuleSet 1
+                                                                          RuleBook 1
                                                                         </ForwardRef(Link)>,
                                                                         "isVisible": true,
                                                                       },
                                                                       "title": undefined,
                                                                     },
-                                                                    "number-of-rules": Object {
+                                                                    "number-of-rulesets": Object {
                                                                       "formatters": Array [],
                                                                       "props": Object {
                                                                         "isVisible": true,
@@ -4000,16 +4531,67 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                     },
                                                     "header": Object {
                                                       "formatters": Array [],
-                                                      "label": "Number of rules",
+                                                      "label": "Number of rulesets",
                                                       "transforms": Array [
                                                         [Function],
                                                         [Function],
                                                       ],
                                                     },
-                                                    "property": "number-of-rules",
+                                                    "property": "number-of-rulesets",
                                                     "props": Object {
                                                       "data-key": 1,
-                                                      "data-label": "Number of rules",
+                                                      "data-label": "Number of rulesets",
+                                                    },
+                                                  },
+                                                  Object {
+                                                    "cell": Object {
+                                                      "formatters": Array [
+                                                        [Function],
+                                                      ],
+                                                      "transforms": Array [
+                                                        [Function],
+                                                      ],
+                                                    },
+                                                    "data": undefined,
+                                                    "extraParams": Object {
+                                                      "actionResolver": [Function],
+                                                      "actions": undefined,
+                                                      "actionsToggle": undefined,
+                                                      "allRowsExpanded": false,
+                                                      "allRowsSelected": false,
+                                                      "areActionsDisabled": undefined,
+                                                      "canCollapseAll": false,
+                                                      "canSelectAll": true,
+                                                      "canSortFavorites": true,
+                                                      "collapseAllAriaLabel": "",
+                                                      "contentId": "expanded-content",
+                                                      "dropdownDirection": "down",
+                                                      "dropdownPosition": "right",
+                                                      "expandId": "expandable-toggle",
+                                                      "firstUserColumnIndex": 0,
+                                                      "isHeaderSelectDisabled": false,
+                                                      "onCollapse": undefined,
+                                                      "onExpand": undefined,
+                                                      "onFavorite": undefined,
+                                                      "onRowEdit": undefined,
+                                                      "onSelect": undefined,
+                                                      "onSort": undefined,
+                                                      "rowLabeledBy": "simple-node",
+                                                      "selectVariant": "checkbox",
+                                                      "sortBy": undefined,
+                                                    },
+                                                    "header": Object {
+                                                      "formatters": Array [],
+                                                      "label": "Fire count",
+                                                      "transforms": Array [
+                                                        [Function],
+                                                        [Function],
+                                                      ],
+                                                    },
+                                                    "property": "fire-count",
+                                                    "props": Object {
+                                                      "data-key": 2,
+                                                      "data-label": "Fire count",
                                                     },
                                                   },
                                                   Object {
@@ -4059,9 +4641,9 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                         [Function],
                                                       ],
                                                     },
-                                                    "property": "column-2",
+                                                    "property": "column-3",
                                                     "props": Object {
-                                                      "data-key": 2,
+                                                      "data-key": 3,
                                                       "data-label": "",
                                                     },
                                                   },
@@ -4083,15 +4665,23 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                       <Link
                                                         to={
                                                           Object {
-                                                            "pathname": "/ruleset/2",
+                                                            "pathname": "/rulebooks/rulebook/2",
                                                           }
                                                         }
                                                       >
-                                                        RuleSet 2
+                                                        RuleBook 2
                                                       </Link>
                                                     </React.Fragment>,
                                                     undefined,
+                                                    undefined,
                                                   ],
+                                                  "fire-count": Object {
+                                                    "formatters": Array [],
+                                                    "props": Object {
+                                                      "isVisible": true,
+                                                    },
+                                                    "title": undefined,
+                                                  },
                                                   "id": "2",
                                                   "isExpanded": undefined,
                                                   "isFirst": false,
@@ -4105,17 +4695,17 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                       "children": <Link
                                                         to={
                                                           Object {
-                                                            "pathname": "/ruleset/2",
+                                                            "pathname": "/rulebooks/rulebook/2",
                                                           }
                                                         }
                                                       >
-                                                        RuleSet 2
+                                                        RuleBook 2
                                                       </Link>,
                                                       "isVisible": true,
                                                     },
                                                     "title": undefined,
                                                   },
-                                                  "number-of-rules": Object {
+                                                  "number-of-rulesets": Object {
                                                     "formatters": Array [],
                                                     "props": Object {
                                                       "isVisible": true,
@@ -4139,15 +4729,23 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                         <Link
                                                           to={
                                                             Object {
-                                                              "pathname": "/ruleset/2",
+                                                              "pathname": "/rulebooks/rulebook/2",
                                                             }
                                                           }
                                                         >
-                                                          RuleSet 2
+                                                          RuleBook 2
                                                         </Link>
                                                       </React.Fragment>,
                                                       undefined,
+                                                      undefined,
                                                     ],
+                                                    "fire-count": Object {
+                                                      "formatters": Array [],
+                                                      "props": Object {
+                                                        "isVisible": true,
+                                                      },
+                                                      "title": undefined,
+                                                    },
                                                     "id": "2",
                                                     "isExpanded": undefined,
                                                     "isFirst": false,
@@ -4161,17 +4759,17 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                         "children": <Link
                                                           to={
                                                             Object {
-                                                              "pathname": "/ruleset/2",
+                                                              "pathname": "/rulebooks/rulebook/2",
                                                             }
                                                           }
                                                         >
-                                                          RuleSet 2
+                                                          RuleBook 2
                                                         </Link>,
                                                         "isVisible": true,
                                                       },
                                                       "title": undefined,
                                                     },
-                                                    "number-of-rules": Object {
+                                                    "number-of-rulesets": Object {
                                                       "formatters": Array [],
                                                       "props": Object {
                                                         "isVisible": true,
@@ -4240,19 +4838,19 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                               <ForwardRef(Link)
                                                                 to={
                                                                   Object {
-                                                                    "pathname": "/ruleset/2",
+                                                                    "pathname": "/rulebooks/rulebook/2",
                                                                   }
                                                                 }
                                                               >
                                                                 <LinkAnchor
-                                                                  href="/ruleset/2"
+                                                                  href="/rulebooks/rulebook/2"
                                                                   navigate={[Function]}
                                                                 >
                                                                   <a
-                                                                    href="/ruleset/2"
+                                                                    href="/rulebooks/rulebook/2"
                                                                     onClick={[Function]}
                                                                   >
-                                                                    RuleSet 2
+                                                                    RuleBook 2
                                                                   </a>
                                                                 </LinkAnchor>
                                                               </ForwardRef(Link)>
@@ -4262,7 +4860,7 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                       </BodyCell>
                                                       <BodyCell
                                                         data-key={1}
-                                                        data-label="Number of rules"
+                                                        data-label="Number of rulesets"
                                                         isVisible={true}
                                                         key="col-1-row-1"
                                                       >
@@ -4270,7 +4868,7 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                           className=""
                                                           component="td"
                                                           data-key={1}
-                                                          dataLabel="Number of rules"
+                                                          dataLabel="Number of rulesets"
                                                           onMouseEnter={[Function]}
                                                           textCenter={false}
                                                         >
@@ -4278,7 +4876,7 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                             className=""
                                                             component="td"
                                                             data-key={1}
-                                                            dataLabel="Number of rules"
+                                                            dataLabel="Number of rulesets"
                                                             innerRef={null}
                                                             onMouseEnter={[Function]}
                                                             textCenter={false}
@@ -4286,7 +4884,39 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                             <td
                                                               className=""
                                                               data-key={1}
-                                                              data-label="Number of rules"
+                                                              data-label="Number of rulesets"
+                                                              onMouseEnter={[Function]}
+                                                            />
+                                                          </TdBase>
+                                                        </Td>
+                                                      </BodyCell>
+                                                      <BodyCell
+                                                        data-key={2}
+                                                        data-label="Fire count"
+                                                        isVisible={true}
+                                                        key="col-2-row-1"
+                                                      >
+                                                        <Td
+                                                          className=""
+                                                          component="td"
+                                                          data-key={2}
+                                                          dataLabel="Fire count"
+                                                          onMouseEnter={[Function]}
+                                                          textCenter={false}
+                                                        >
+                                                          <TdBase
+                                                            className=""
+                                                            component="td"
+                                                            data-key={2}
+                                                            dataLabel="Fire count"
+                                                            innerRef={null}
+                                                            onMouseEnter={[Function]}
+                                                            textCenter={false}
+                                                          >
+                                                            <td
+                                                              className=""
+                                                              data-key={2}
+                                                              data-label="Fire count"
                                                               onMouseEnter={[Function]}
                                                             />
                                                           </TdBase>
@@ -4294,10 +4924,10 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                       </BodyCell>
                                                       <BodyCell
                                                         className="pf-c-table__action"
-                                                        data-key={2}
+                                                        data-key={3}
                                                         data-label=""
                                                         isVisible={true}
-                                                        key="col-2-row-1"
+                                                        key="col-3-row-1"
                                                         style={
                                                           Object {
                                                             "paddingRight": 0,
@@ -4307,7 +4937,7 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                         <Td
                                                           className="pf-c-table__action"
                                                           component="td"
-                                                          data-key={2}
+                                                          data-key={3}
                                                           dataLabel={null}
                                                           onMouseEnter={[Function]}
                                                           style={
@@ -4320,7 +4950,7 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                           <TdBase
                                                             className="pf-c-table__action"
                                                             component="td"
-                                                            data-key={2}
+                                                            data-key={3}
                                                             dataLabel={null}
                                                             innerRef={null}
                                                             onMouseEnter={[Function]}
@@ -4333,7 +4963,7 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                           >
                                                             <td
                                                               className="pf-c-table__action"
-                                                              data-key={2}
+                                                              data-key={3}
                                                               data-label={null}
                                                               onMouseEnter={[Function]}
                                                               style={
@@ -4394,14 +5024,14 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                                           [Function],
                                                                         ],
                                                                       },
-                                                                      "property": "column-2",
+                                                                      "property": "column-3",
                                                                       "props": Object {
-                                                                        "data-key": 2,
+                                                                        "data-key": 3,
                                                                         "data-label": "",
                                                                       },
                                                                     },
-                                                                    "columnIndex": 2,
-                                                                    "property": "column-2",
+                                                                    "columnIndex": 3,
+                                                                    "property": "column-3",
                                                                     "rowIndex": 1,
                                                                   }
                                                                 }
@@ -4421,15 +5051,23 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                                         <ForwardRef(Link)
                                                                           to={
                                                                             Object {
-                                                                              "pathname": "/ruleset/2",
+                                                                              "pathname": "/rulebooks/rulebook/2",
                                                                             }
                                                                           }
                                                                         >
-                                                                          RuleSet 2
+                                                                          RuleBook 2
                                                                         </ForwardRef(Link)>
                                                                       </React.Fragment>,
                                                                       undefined,
+                                                                      undefined,
                                                                     ],
+                                                                    "fire-count": Object {
+                                                                      "formatters": Array [],
+                                                                      "props": Object {
+                                                                        "isVisible": true,
+                                                                      },
+                                                                      "title": undefined,
+                                                                    },
                                                                     "id": "2",
                                                                     "isExpanded": undefined,
                                                                     "isFirst": false,
@@ -4443,17 +5081,17 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                                         "children": <ForwardRef(Link)
                                                                           to={
                                                                             Object {
-                                                                              "pathname": "/ruleset/2",
+                                                                              "pathname": "/rulebooks/rulebook/2",
                                                                             }
                                                                           }
                                                                         >
-                                                                          RuleSet 2
+                                                                          RuleBook 2
                                                                         </ForwardRef(Link)>,
                                                                         "isVisible": true,
                                                                       },
                                                                       "title": undefined,
                                                                     },
-                                                                    "number-of-rules": Object {
+                                                                    "number-of-rulesets": Object {
                                                                       "formatters": Array [],
                                                                       "props": Object {
                                                                         "isVisible": true,
@@ -4760,16 +5398,67 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                     },
                                                     "header": Object {
                                                       "formatters": Array [],
-                                                      "label": "Number of rules",
+                                                      "label": "Number of rulesets",
                                                       "transforms": Array [
                                                         [Function],
                                                         [Function],
                                                       ],
                                                     },
-                                                    "property": "number-of-rules",
+                                                    "property": "number-of-rulesets",
                                                     "props": Object {
                                                       "data-key": 1,
-                                                      "data-label": "Number of rules",
+                                                      "data-label": "Number of rulesets",
+                                                    },
+                                                  },
+                                                  Object {
+                                                    "cell": Object {
+                                                      "formatters": Array [
+                                                        [Function],
+                                                      ],
+                                                      "transforms": Array [
+                                                        [Function],
+                                                      ],
+                                                    },
+                                                    "data": undefined,
+                                                    "extraParams": Object {
+                                                      "actionResolver": [Function],
+                                                      "actions": undefined,
+                                                      "actionsToggle": undefined,
+                                                      "allRowsExpanded": false,
+                                                      "allRowsSelected": false,
+                                                      "areActionsDisabled": undefined,
+                                                      "canCollapseAll": false,
+                                                      "canSelectAll": true,
+                                                      "canSortFavorites": true,
+                                                      "collapseAllAriaLabel": "",
+                                                      "contentId": "expanded-content",
+                                                      "dropdownDirection": "down",
+                                                      "dropdownPosition": "right",
+                                                      "expandId": "expandable-toggle",
+                                                      "firstUserColumnIndex": 0,
+                                                      "isHeaderSelectDisabled": false,
+                                                      "onCollapse": undefined,
+                                                      "onExpand": undefined,
+                                                      "onFavorite": undefined,
+                                                      "onRowEdit": undefined,
+                                                      "onSelect": undefined,
+                                                      "onSort": undefined,
+                                                      "rowLabeledBy": "simple-node",
+                                                      "selectVariant": "checkbox",
+                                                      "sortBy": undefined,
+                                                    },
+                                                    "header": Object {
+                                                      "formatters": Array [],
+                                                      "label": "Fire count",
+                                                      "transforms": Array [
+                                                        [Function],
+                                                        [Function],
+                                                      ],
+                                                    },
+                                                    "property": "fire-count",
+                                                    "props": Object {
+                                                      "data-key": 2,
+                                                      "data-label": "Fire count",
                                                     },
                                                   },
                                                   Object {
@@ -4819,9 +5508,9 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                         [Function],
                                                       ],
                                                     },
-                                                    "property": "column-2",
+                                                    "property": "column-3",
                                                     "props": Object {
-                                                      "data-key": 2,
+                                                      "data-key": 3,
                                                       "data-label": "",
                                                     },
                                                   },
@@ -4843,15 +5532,23 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                       <Link
                                                         to={
                                                           Object {
-                                                            "pathname": "/ruleset/3",
+                                                            "pathname": "/rulebooks/rulebook/3",
                                                           }
                                                         }
                                                       >
-                                                        RuleSet 3
+                                                        RuleBook 3
                                                       </Link>
                                                     </React.Fragment>,
                                                     undefined,
+                                                    undefined,
                                                   ],
+                                                  "fire-count": Object {
+                                                    "formatters": Array [],
+                                                    "props": Object {
+                                                      "isVisible": true,
+                                                    },
+                                                    "title": undefined,
+                                                  },
                                                   "id": "3",
                                                   "isExpanded": undefined,
                                                   "isFirst": false,
@@ -4865,17 +5562,17 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                       "children": <Link
                                                         to={
                                                           Object {
-                                                            "pathname": "/ruleset/3",
+                                                            "pathname": "/rulebooks/rulebook/3",
                                                           }
                                                         }
                                                       >
-                                                        RuleSet 3
+                                                        RuleBook 3
                                                       </Link>,
                                                       "isVisible": true,
                                                     },
                                                     "title": undefined,
                                                   },
-                                                  "number-of-rules": Object {
+                                                  "number-of-rulesets": Object {
                                                     "formatters": Array [],
                                                     "props": Object {
                                                       "isVisible": true,
@@ -4899,15 +5596,23 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                         <Link
                                                           to={
                                                             Object {
-                                                              "pathname": "/ruleset/3",
+                                                              "pathname": "/rulebooks/rulebook/3",
                                                             }
                                                           }
                                                         >
-                                                          RuleSet 3
+                                                          RuleBook 3
                                                         </Link>
                                                       </React.Fragment>,
                                                       undefined,
+                                                      undefined,
                                                     ],
+                                                    "fire-count": Object {
+                                                      "formatters": Array [],
+                                                      "props": Object {
+                                                        "isVisible": true,
+                                                      },
+                                                      "title": undefined,
+                                                    },
                                                     "id": "3",
                                                     "isExpanded": undefined,
                                                     "isFirst": false,
@@ -4921,17 +5626,17 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                         "children": <Link
                                                           to={
                                                             Object {
-                                                              "pathname": "/ruleset/3",
+                                                              "pathname": "/rulebooks/rulebook/3",
                                                             }
                                                           }
                                                         >
-                                                          RuleSet 3
+                                                          RuleBook 3
                                                         </Link>,
                                                         "isVisible": true,
                                                       },
                                                       "title": undefined,
                                                     },
-                                                    "number-of-rules": Object {
+                                                    "number-of-rulesets": Object {
                                                       "formatters": Array [],
                                                       "props": Object {
                                                         "isVisible": true,
@@ -5000,19 +5705,19 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                               <ForwardRef(Link)
                                                                 to={
                                                                   Object {
-                                                                    "pathname": "/ruleset/3",
+                                                                    "pathname": "/rulebooks/rulebook/3",
                                                                   }
                                                                 }
                                                               >
                                                                 <LinkAnchor
-                                                                  href="/ruleset/3"
+                                                                  href="/rulebooks/rulebook/3"
                                                                   navigate={[Function]}
                                                                 >
                                                                   <a
-                                                                    href="/ruleset/3"
+                                                                    href="/rulebooks/rulebook/3"
                                                                     onClick={[Function]}
                                                                   >
-                                                                    RuleSet 3
+                                                                    RuleBook 3
                                                                   </a>
                                                                 </LinkAnchor>
                                                               </ForwardRef(Link)>
@@ -5022,7 +5727,7 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                       </BodyCell>
                                                       <BodyCell
                                                         data-key={1}
-                                                        data-label="Number of rules"
+                                                        data-label="Number of rulesets"
                                                         isVisible={true}
                                                         key="col-1-row-2"
                                                       >
@@ -5030,7 +5735,7 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                           className=""
                                                           component="td"
                                                           data-key={1}
-                                                          dataLabel="Number of rules"
+                                                          dataLabel="Number of rulesets"
                                                           onMouseEnter={[Function]}
                                                           textCenter={false}
                                                         >
@@ -5038,7 +5743,7 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                             className=""
                                                             component="td"
                                                             data-key={1}
-                                                            dataLabel="Number of rules"
+                                                            dataLabel="Number of rulesets"
                                                             innerRef={null}
                                                             onMouseEnter={[Function]}
                                                             textCenter={false}
@@ -5046,7 +5751,39 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                             <td
                                                               className=""
                                                               data-key={1}
-                                                              data-label="Number of rules"
+                                                              data-label="Number of rulesets"
+                                                              onMouseEnter={[Function]}
+                                                            />
+                                                          </TdBase>
+                                                        </Td>
+                                                      </BodyCell>
+                                                      <BodyCell
+                                                        data-key={2}
+                                                        data-label="Fire count"
+                                                        isVisible={true}
+                                                        key="col-2-row-2"
+                                                      >
+                                                        <Td
+                                                          className=""
+                                                          component="td"
+                                                          data-key={2}
+                                                          dataLabel="Fire count"
+                                                          onMouseEnter={[Function]}
+                                                          textCenter={false}
+                                                        >
+                                                          <TdBase
+                                                            className=""
+                                                            component="td"
+                                                            data-key={2}
+                                                            dataLabel="Fire count"
+                                                            innerRef={null}
+                                                            onMouseEnter={[Function]}
+                                                            textCenter={false}
+                                                          >
+                                                            <td
+                                                              className=""
+                                                              data-key={2}
+                                                              data-label="Fire count"
                                                               onMouseEnter={[Function]}
                                                             />
                                                           </TdBase>
@@ -5054,10 +5791,10 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                       </BodyCell>
                                                       <BodyCell
                                                         className="pf-c-table__action"
-                                                        data-key={2}
+                                                        data-key={3}
                                                         data-label=""
                                                         isVisible={true}
-                                                        key="col-2-row-2"
+                                                        key="col-3-row-2"
                                                         style={
                                                           Object {
                                                             "paddingRight": 0,
@@ -5067,7 +5804,7 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                         <Td
                                                           className="pf-c-table__action"
                                                           component="td"
-                                                          data-key={2}
+                                                          data-key={3}
                                                           dataLabel={null}
                                                           onMouseEnter={[Function]}
                                                           style={
@@ -5080,7 +5817,7 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                           <TdBase
                                                             className="pf-c-table__action"
                                                             component="td"
-                                                            data-key={2}
+                                                            data-key={3}
                                                             dataLabel={null}
                                                             innerRef={null}
                                                             onMouseEnter={[Function]}
@@ -5093,7 +5830,7 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                           >
                                                             <td
                                                               className="pf-c-table__action"
-                                                              data-key={2}
+                                                              data-key={3}
                                                               data-label={null}
                                                               onMouseEnter={[Function]}
                                                               style={
@@ -5154,14 +5891,14 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                                           [Function],
                                                                         ],
                                                                       },
-                                                                      "property": "column-2",
+                                                                      "property": "column-3",
                                                                       "props": Object {
-                                                                        "data-key": 2,
+                                                                        "data-key": 3,
                                                                         "data-label": "",
                                                                       },
                                                                     },
-                                                                    "columnIndex": 2,
-                                                                    "property": "column-2",
+                                                                    "columnIndex": 3,
+                                                                    "property": "column-3",
                                                                     "rowIndex": 2,
                                                                   }
                                                                 }
@@ -5181,15 +5918,23 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                                         <ForwardRef(Link)
                                                                           to={
                                                                             Object {
-                                                                              "pathname": "/ruleset/3",
+                                                                              "pathname": "/rulebooks/rulebook/3",
                                                                             }
                                                                           }
                                                                         >
-                                                                          RuleSet 3
+                                                                          RuleBook 3
                                                                         </ForwardRef(Link)>
                                                                       </React.Fragment>,
                                                                       undefined,
+                                                                      undefined,
                                                                     ],
+                                                                    "fire-count": Object {
+                                                                      "formatters": Array [],
+                                                                      "props": Object {
+                                                                        "isVisible": true,
+                                                                      },
+                                                                      "title": undefined,
+                                                                    },
                                                                     "id": "3",
                                                                     "isExpanded": undefined,
                                                                     "isFirst": false,
@@ -5203,17 +5948,17 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                                                                         "children": <ForwardRef(Link)
                                                                           to={
                                                                             Object {
-                                                                              "pathname": "/ruleset/3",
+                                                                              "pathname": "/rulebooks/rulebook/3",
                                                                             }
                                                                           }
                                                                         >
-                                                                          RuleSet 3
+                                                                          RuleBook 3
                                                                         </ForwardRef(Link)>,
                                                                         "isVisible": true,
                                                                       },
                                                                       "title": undefined,
                                                                     },
-                                                                    "number-of-rules": Object {
+                                                                    "number-of-rulesets": Object {
                                                                       "formatters": Array [],
                                                                       "props": Object {
                                                                         "isVisible": true,
@@ -5442,7 +6187,7 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                 </TableToolbarView>
               </section>
             </PageSection>
-          </RuleSets>
+          </RuleBooks>
         </Route>
       </Router>
     </MemoryRouter>

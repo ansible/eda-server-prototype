@@ -172,6 +172,8 @@ const RuleBooks: React.FunctionComponent = () => {
           rows={rows}
           columns={columns(intl)}
           fetchData={updateRuleBooks}
+          setLimit={setLimit}
+          setOffset={setOffset}
           actionResolver={actionResolver}
           plural={intl.formatMessage(sharedMessages.rulebooks)}
           singular={intl.formatMessage(sharedMessages.rulebook)}
