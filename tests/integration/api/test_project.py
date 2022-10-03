@@ -153,7 +153,7 @@ async def test_create_project(
 
     clone_project.assert_called_once_with(TEST_PROJECT["url"], None)
     sync_project.assert_called_once_with(
-        project["id"], "/tmp/test-create-project", db
+        project["id"], project["large_data_id"], "/tmp/test-create-project", db
     )
 
 
@@ -352,6 +352,7 @@ async def test_edit_project_unique_name(client: AsyncClient, db: AsyncSession):
     )
     assert response.status_code == status_codes.HTTP_200_OK
     data = response.json()
+    del test_project["large_data_id"]
     assert data == test_project
 
     # Rename project.name to same name as a different project will conflict

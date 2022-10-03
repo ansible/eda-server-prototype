@@ -21,6 +21,7 @@ class ActivationCreate(BaseModel):
     extra_var_id: int = Field(None, nullable=True)
     execution_environment: ExecutionEnvironment = ExecutionEnvironment.DOCKER
     working_directory: StrictStr = ""
+    project_id: Optional[int]
 
 
 class ActivationBaseRead(ActivationCreate):
@@ -59,6 +60,7 @@ class ActivationInstance(BaseModel):
     extra_var_id: int
     working_directory: StrictStr
     execution_environment: StrictStr
+    project_id: Optional[int]
 
 
 class ActivationLog(BaseModel):

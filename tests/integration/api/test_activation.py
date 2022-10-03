@@ -20,6 +20,7 @@ TEST_ACTIVATION = {
     "is_enabled": True,
     "working_directory": "/tmp",
     "execution_environment": ExecutionEnvironment.DOCKER.value,
+    "project_id": 1,
 }
 
 TEST_EXTRA_VAR = """
@@ -179,17 +180,17 @@ async def test_ins_del_activation_instance_manages_log_lob(
         )
         .returning(
             models.activation_instances.c.id,
-            models.activation_instances.c.log_id,
+            models.activation_instances.c.large_data_id,
         )
     )
     cur = await db.execute(query)
     inserted_rows = cur.rowcount
-    inserted_id, log_id = cur.first()
+    inserted_id, large_data_id = cur.first()
 
     total_ct += inserted_rows
     assert total_ct == existing_ct + 1
-    assert log_id is not None
-    exists, _ = await PGLargeObject.verify_large_object(db, log_id)
+    assert large_data_id is not None
+    exists, _ = await PGLargeObject.verify_large_object(db, large_data_id)
     assert exists
 
     query = sa.delete(models.activation_instances).where(
@@ -197,7 +198,7 @@ async def test_ins_del_activation_instance_manages_log_lob(
     )
     cur = await db.execute(query)
     assert cur.rowcount == inserted_rows
-    exists, _ = await PGLargeObject.verify_large_object(db, log_id)
+    exists, _ = await PGLargeObject.verify_large_object(db, large_data_id)
     assert not exists
 
     query = sa.delete(models.activations).where(

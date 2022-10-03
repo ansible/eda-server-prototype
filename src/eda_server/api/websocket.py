@@ -13,6 +13,7 @@ from starlette.websockets import WebSocket, WebSocketDisconnect
 
 from eda_server.db import models
 from eda_server.db.dependency import get_db_session_factory
+from eda_server.db.utils.lostream import PGLargeObject
 from eda_server.managers import secretsmanager, updatemanager
 
 logger = logging.getLogger("eda_server")
@@ -66,7 +67,7 @@ async def websocket_endpoint2(
             data = json.loads(data)
             # TODO(cutwater): Some data validation is needed
             data_type = data.get("type")
-            with db_session_factory() as db:
+            async with db_session_factory() as db:
                 if data_type == "Worker":
                     await handle_workers(websocket, data, db)
                 elif data_type == "Job":
@@ -117,12 +118,41 @@ async def websocket_job_endpoint(websocket: WebSocket, job_instance_id):
         updatemanager.disconnect(page, websocket)
 
 
+async def send_project_data(
+    large_data_id, websocket: WebSocket, db: AsyncSession
+):
+
+    async with PGLargeObject(db, oid=large_data_id, mode="r") as lobject:
+        async for buff in lobject:
+            await websocket.send_text(
+                json.dumps(
+                    {
+                        "type": "ProjectData",
+                        "data": base64.b64encode(buff).decode("utf-8"),
+                        "more": True,
+                    }
+                ),
+            )
+
+        await websocket.send_text(
+            json.dumps({"type": "ProjectData", "data": None, "more": False}),
+        )
+
+
 async def handle_workers(websocket: WebSocket, data: dict, db: AsyncSession):
     await websocket.send_text(json.dumps({"type": "Hello"}))
     query = select(models.activation_instances).where(
         models.activation_instances.c.id == data.get("activation_id")
     )
     activation = (await db.execute(query)).first()
+
+    query = select(models.projects).where(
+        models.projects.c.id == activation.project_id
+    )
+    project_row = (await db.execute(query)).first()
+    if project_row:
+        if project_row.large_data_id:
+            await send_project_data(project_row.large_data_id, websocket, db)
 
     query = select(models.rulebooks).where(
         models.rulebooks.c.id == activation.rulebook_id
