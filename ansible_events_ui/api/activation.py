@@ -39,7 +39,7 @@ async def create_activation(
 ):
     if (
         activation.execution_environment == ExecutionEnvironment.LOCAL
-        and activation.working_directory == ""
+        and not activation.working_directory
     ):
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
