@@ -33,6 +33,11 @@ job_instances = sa.Table(
         primary_key=True,
     ),
     sa.Column("uuid", postgresql.UUID),
+    sa.Column("action", sa.String),
+    sa.Column("name", sa.String),
+    sa.Column("ruleset", sa.String),
+    sa.Column("rule", sa.String),
+    sa.Column("hosts", sa.String),
 )
 
 activation_instance_job_instances = sa.Table(

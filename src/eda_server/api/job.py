@@ -61,7 +61,10 @@ async def create_job_instance(
 
     job_uuid = str(uuid.uuid4())
 
-    query = sa.insert(models.job_instances).values(uuid=job_uuid)
+    query = sa.insert(models.job_instances).values(
+        uuid=job_uuid,
+        name=playbook_row.name,
+    )
     result = await db.execute(query)
     await db.commit()
     (job_instance_id,) = result.inserted_primary_key
