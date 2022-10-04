@@ -11,8 +11,8 @@ from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 
 from eda_server.config import load_settings
-from tests.integration.utils.app import create_test_app
-from tests.integration.utils.db import (
+from tests.utils.app import create_test_app
+from tests.utils.db import (
     create_database,
     drop_database,
     upgrade_database,

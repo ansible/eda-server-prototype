@@ -330,7 +330,6 @@ async def test_empty_responses(client: AsyncClient, db: AsyncSession):
     assert fired_rules_response.json() == []
     assert fired_hosts_response.json() == []
 
-
 async def test_audit_rule_404(client: AsyncClient, db: AsyncSession):
     audit_rule_id = 100
     details_response = await client.get(

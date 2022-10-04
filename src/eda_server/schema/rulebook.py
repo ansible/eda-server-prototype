@@ -1,5 +1,6 @@
-from datetime import datetime
-from typing import Optional
+from datetime import date, datetime
+from decimal import Decimal
+from typing import List, Optional
 
 from pydantic import BaseModel, StrictStr
 
@@ -15,7 +16,6 @@ class RulebookRead(BaseModel):
     name: StrictStr
     description: StrictStr
     ruleset_count: int
-    fire_count: int
     created_at: datetime
     modified_at: datetime
 
@@ -24,14 +24,12 @@ class RulebookRulesetList(BaseModel):
     id: int
     name: StrictStr
     rule_count: int
-    fire_count: int
 
 
 class RulebookList(BaseModel):
     id: int
     name: StrictStr
     ruleset_count: int
-    fire_count: int
 
 
 class RulebookRef(BaseModel):
@@ -44,20 +42,72 @@ class RulesetProjectRef(BaseModel):
     name: str
 
 
-class Ruleset(BaseModel):
+class FireCountsListRef(BaseModel):
+    total_type: str
+    status: str
+    status_total: int
+    object_total: int
+    pct_object_total: Decimal
+    window_total: int
+    pct_window_total: Decimal
+
+
+class FireCountsDetailRef(BaseModel):
+    total_type: str
+    fired_date: date
+    object_status: str
+    object_status_total: int
+    pct_date_status_total: Decimal
+    window_total: int
+    pct_window_total: Decimal
+
+
+class RulesetList(BaseModel):
     id: int
     name: Optional[str]
     rule_count: int
+    source_types: Optional[List[str]]
+    created_at: datetime
+    modified_at: datetime
+    fired_stats: Optional[List[FireCountsListRef]]
+
+
+class RulesetSourceRef(BaseModel):
+    name: str
+    type: str
+    source: str
+    config: dict
+
+
+class RulesetSource(BaseModel):
+    id: int
+    name: str
+    rulebook: Optional[RulebookRef]
+    project: Optional[RulesetProjectRef]
+    sources: Optional[List[RulesetSourceRef]]
 
 
 class RulesetDetail(BaseModel):
     id: int
-    name: Optional[str]
+    name: str
     rule_count: int
     created_at: datetime
     modified_at: datetime
-    rulebook: RulebookRef
+    sources: Optional[List[RulesetSourceRef]]
+    rulebook: Optional[RulebookRef]
     project: Optional[RulesetProjectRef]
+    fired_stats: Optional[List[FireCountsDetailRef]]
+
+
+class RuleRef(BaseModel):
+    id: int
+    name: str
+
+
+class RulesetRules(BaseModel):
+    id: int
+    name: str
+    rules: List[RuleRef]
 
 
 class RuleRulesetRef(BaseModel):
@@ -65,8 +115,20 @@ class RuleRulesetRef(BaseModel):
     name: Optional[str]
 
 
-class Rule(BaseModel):
+class RuleList(BaseModel):
+    id: int
+    name: Optional[str]
+    ruleset: RuleRulesetRef
+    rulebook: Optional[RulebookRef]
+    project: Optional[RulesetProjectRef]
+    fired_stats: Optional[List[FireCountsListRef]]
+
+
+class RuleDetail(BaseModel):
     id: int
     name: Optional[str]
     action: dict
     ruleset: RuleRulesetRef
+    rulebook: Optional[RulebookRef]
+    project: Optional[RulesetProjectRef]
+    fired_stats: Optional[List[FireCountsDetailRef]]

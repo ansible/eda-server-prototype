@@ -1,6 +1,6 @@
-from typing import List
+from decimal import Decimal
+from typing import Dict, List
 
-import sqlalchemy as sa
 import yaml
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -8,152 +8,200 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from eda_server import schema
 from eda_server.db import models
 from eda_server.db.dependency import get_db_session
+
+# Rule, Ruleset, Rulebook query builder, enums, etc
+# Common (simplified) object getters
+from eda_server.db.sql import base as bsql, rulebook as rsql
 from eda_server.project import insert_rulebook_related_data
 
 router = APIRouter(tags=["rulebooks"])
 
 
 # ------------------------------------
+#   Stat result builders (rule, ruleset)
+# ------------------------------------
+
+# Builds a list of object details with a rule fire summary by status for a
+# specified object.
+async def build_object_list_totals(
+    record_index: dict, object_id: int
+) -> List[Dict]:
+    if object_id not in record_index.get(rsql.OBJECT_TOTAL, {}):
+        return []
+
+    one_hundred_dec = Decimal(100)
+    grand_total_int = record_index[rsql.WINDOW_TOTAL]["fired_count"]
+    grand_total_dec = Decimal(grand_total_int)
+    object_total_int = record_index[rsql.OBJECT_TOTAL][object_id][
+        "fired_count"
+    ]
+    object_total_dec = Decimal(object_total_int)
+    status_object_record_index = record_index[rsql.STATUS_OBJECT_TOTAL]
+    object_totals = []
+
+    for key in (
+        key for key in status_object_record_index if key[1] == object_id
+    ):
+        data = status_object_record_index[key]
+        status = key[0]
+        status_object_count = data["fired_count"]
+        object_totals.append(
+            {
+                "total_type": "status",
+                "status": status,
+                "status_total": status_object_count,
+                "object_total": object_total_int,
+                "pct_object_total": (
+                    Decimal(status_object_count)
+                    / object_total_dec
+                    * one_hundred_dec
+                ),
+                "window_total": grand_total_int,
+                "pct_window_total": (
+                    Decimal(status_object_count)
+                    / grand_total_dec
+                    * one_hundred_dec
+                ),
+            }
+        )
+
+    return object_totals
+
+
+# Builds a list of object details with a rule fire summary by
+# date and status for a specified object.
+async def build_detail_object_totals(
+    record_index: dict, object_id: int
+) -> List[Dict]:
+    if object_id not in record_index.get(rsql.OBJECT_TOTAL, {}):
+        return []
+
+    one_hundred_dec = Decimal(100)
+    grand_total_int = record_index[rsql.WINDOW_TOTAL]["fired_count"]
+    grand_total_dec = Decimal(grand_total_int)
+    date_status_object_record_index = record_index[
+        rsql.DATE_STATUS_OBJECT_TOTAL
+    ]
+    object_totals = []
+
+    last_date = date_status_total = None
+    for key in (
+        key for key in date_status_object_record_index if key[2] == object_id
+    ):
+        rec = date_status_object_record_index[key]
+        date_status_key = key[:2]
+        fire_date = key[0]
+        if fire_date != last_date:
+            last_date = fire_date
+            date_status_total = Decimal(
+                record_index[rsql.DATE_STATUS_TOTAL][date_status_key][
+                    "fired_count"
+                ]
+            )
+        object_totals.append(
+            {
+                "total_type": "date_status_object",
+                "fired_date": rec["fired_date"],
+                "object_status": rec["status"],
+                "object_status_total": rec["fired_count"],
+                "pct_date_status_total": (
+                    Decimal(rec["fired_count"])
+                    / date_status_total
+                    * one_hundred_dec
+                ),
+                "window_total": grand_total_int,
+                "pct_window_total": (
+                    Decimal(rec["fired_count"])
+                    / grand_total_dec
+                    * one_hundred_dec
+                ),
+            }
+        )
+
+    return object_totals
+
+
+# ------------------------------------
 #   rules endpoints
 # ------------------------------------
 
-
 @router.get(
     "/api/rules",
-    response_model=List[schema.Rule],
+    response_model=List[schema.RuleList],
     operation_id="list_rules",
 )
 async def list_rules(db: AsyncSession = Depends(get_db_session)):
-    query = (
-        sa.select(
-            models.rules.c.id,
-            models.rules.c.name,
-            models.rules.c.action,
-            models.rulesets.c.id.label("ruleset_id"),
-            models.rulesets.c.name.label("ruleset_name"),
+    rules = await rsql.list_rules(db)
+    if rules.rowcount == 0:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="No rules found.",
         )
-        .select_from(models.rules)
-        .join(models.rulesets)
-    )
-    rows = (await db.execute(query)).all()
+
+    rule_counts = await rsql.get_rule_counts(db)
 
     response = []
-    for row in rows:
-        response.append(
-            {
-                "id": row["id"],
-                "name": row["name"],
-                "action": row["action"],
-                "ruleset": {
-                    "id": row["ruleset_id"],
-                    "name": row["ruleset_name"],
-                },
-            }
+    for rule in rules:
+        resp_obj = rule._asdict()
+        resp_obj["fired_stats"] = await build_object_list_totals(
+            rule_counts, rule.id
         )
+        response.append(resp_obj)
+
     return response
 
 
 @router.get(
     "/api/rules/{rule_id}",
-    response_model=schema.Rule,
+    response_model=schema.RuleDetail,
     operation_id="read_rule",
 )
 async def read_rule(rule_id: int, db: AsyncSession = Depends(get_db_session)):
-    query = (
-        sa.select(
-            models.rules.c.id,
-            models.rules.c.name,
-            models.rules.c.action,
-            models.rulesets.c.id.label("ruleset_id"),
-            models.rulesets.c.name.label("ruleset_name"),
+    rule = await rsql.get_rule(db, rule_id)
+    if not rule:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Rule not found.",
         )
-        .select_from(models.rules)
-        .join(models.rulesets)
-        .filter(models.rules.c.id == rule_id)
+
+    rule_counts = await rsql.get_rule_counts(db, rule_id)
+    response = rule._asdict()
+    response["fired_stats"] = await build_detail_object_totals(
+        rule_counts, rule.id
     )
-    row = (await db.execute(query)).first()
-    return {
-        "id": row["id"],
-        "name": row["name"],
-        "action": row["action"],
-        "ruleset": {
-            "id": row["ruleset_id"],
-            "name": row["ruleset_name"],
-        },
-    }
+    return response
 
 
 # ------------------------------------
 #   rulesets endpoints
 # ------------------------------------
 
-# This query will leverage a left outer join lateral
-# in order to get the rule counts.
-# TODO(sdonahue): Refactor to minimize aliasing tables
-ruleset = sa.orm.aliased(models.rulesets)
-rule = sa.orm.aliased(models.rules)
-rulebook = sa.orm.aliased(models.rulebooks)
-project = sa.orm.aliased(models.projects)
-audit_rule = sa.orm.aliased(models.audit_rules)
-
-rule_count_lateral = (
-    (
-        sa.select(sa.func.count(rule.c.id).label("rule_count"))
-        .select_from(rule)
-        .filter(rule.c.ruleset_id == ruleset.c.id)
-    )
-    .subquery()
-    .lateral()
-)
-ruls_ct = sa.orm.aliased(rule_count_lateral)
-
-ruleset_fire_count = (
-    sa.select(
-        ruleset.c.rulebook_id,
-        audit_rule.c.ruleset_id,
-        sa.func.count(audit_rule.c.id).label("fire_count"),
-    )
-    .select_from(ruleset)
-    .group_by(ruleset.c.rulebook_id)
-    .group_by(audit_rule.c.ruleset_id)
-    .outerjoin(audit_rule, audit_rule.c.ruleset_id == ruleset.c.id)
-).cte("ruleset_fire_count")
-
-BASE_RULESET_SELECT = (
-    sa.select(
-        ruleset.c.id,
-        ruleset.c.name,
-        ruleset.c.created_at,
-        ruleset.c.modified_at,
-        sa.func.coalesce(ruls_ct.c.rule_count, 0).label("rule_count"),
-        sa.func.coalesce(
-            sa.func.jsonb_build_object(
-                "id", rulebook.c.id, "name", rulebook.c.name
-            ),
-            sa.func.jsonb_build_object("id", None, "name", None),
-        ).label("rulebook"),
-        sa.func.coalesce(
-            sa.func.jsonb_build_object(
-                "id", project.c.id, "name", project.c.name
-            ),
-            sa.func.jsonb_build_object("id", None, "name", None),
-        ).label("project"),
-    )
-    .select_from(ruleset)
-    .outerjoin(rulebook, rulebook.c.id == ruleset.c.rulebook_id)
-    .outerjoin(project, project.c.id == rulebook.c.project_id)
-    .outerjoin(ruls_ct, sa.true())
-)
-
-
 @router.get(
     "/api/rulesets",
-    response_model=List[schema.Ruleset],
+    response_model=List[schema.RulesetList],
     operation_id="list_rulesets",
 )
 async def list_rulesets(db: AsyncSession = Depends(get_db_session)):
-    cur = await db.execute(BASE_RULESET_SELECT)
-    response = [rec._asdict() for rec in cur]
+    rulesets = await rsql.list_rulesets(db)
+    if rulesets.rowcount == 0:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="No rulesets found.",
+        )
+
+    ruleset_counts = await rsql.get_ruleset_counts(db)
+
+    response = []
+    for ruleset in rulesets:
+        resp_obj = ruleset._asdict()
+        resp_obj["source_types"] = [
+            src["type"] for src in (resp_obj["sources"] or [])
+        ]
+        resp_obj["fired_stats"] = await build_object_list_totals(
+            ruleset_counts, ruleset.id
+        )
+        response.append(resp_obj)
+
     return response
 
 
@@ -165,59 +213,98 @@ async def list_rulesets(db: AsyncSession = Depends(get_db_session)):
 async def get_ruleset(
     ruleset_id: int, db: AsyncSession = Depends(get_db_session)
 ):
-    query = BASE_RULESET_SELECT.filter(ruleset.c.id == ruleset_id)
-    rec = (await db.execute(query)).first()
-    if not rec:
+    ruleset = await rsql.get_ruleset(db, ruleset_id)
+    if not ruleset:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Ruleset not found.",
+        )
+
+    ruleset_counts = await rsql.get_ruleset_counts(db, ruleset_id)
+    response = ruleset._asdict()
+    response["fired_stats"] = await build_detail_object_totals(
+        ruleset_counts, ruleset.id
+    )
+    return response
+
+
+@router.get(
+    "/api/rulesets/{ruleset_id}/rules",
+    response_model=List[schema.RuleList],
+    operation_id="read_ruleset",
+)
+async def list_ruleset_rules(
+    ruleset_id: int, db: AsyncSession = Depends(get_db_session)
+):
+    ruleset_rules = await rsql.list_ruleset_rules(db, ruleset_id)
+    if ruleset_rules.rowcount == 0:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Ruleset not found"
+        )
+    response = [rsrl._asdict() for rsrl in ruleset_rules]
+    return response
+
+
+@router.get(
+    "/api/rulesets/sources",
+    response_model=List[schema.RulesetSource],
+    operation_id="read_ruleset",
+)
+async def list_ruleset_sources(
+    ruleset_id: int, db: AsyncSession = Depends(get_db_session)
+):
+    ruleset_sources = await rsql.list_ruleset_sources(db, ruleset_id)
+    if ruleset_sources.rowcount == 0:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Ruleset not found"
         )
 
-    return rec._asdict()
+    results = [rec._asdict() for rec in cur]
+    return results
+
+
+# There used to be a separate query for rulesets/<id>/sources, but that data
+# is being returned as part of the `get_ruleset` endpoint, so the separate
+# endpoint is no longer needed.
 
 
 # ------------------------------------
 #   rulebooks endpoints
 # ------------------------------------
 
-rulebook_ruleset_count = (
-    sa.select(
-        ruleset.c.rulebook_id,
-        sa.func.count(ruleset.c.id).label("ruleset_count"),
-    )
-    .select_from(ruleset)
-    .group_by(ruleset.c.rulebook_id)
-    .outerjoin(rulebook, rulebook.c.id == ruleset.c.rulebook_id)
-).cte("rulebook_ruleset_count")
-
-
-rulebook_fire_count = (
-    sa.select(
-        ruleset_fire_count.c.rulebook_id,
-        sa.func.sum(ruleset_fire_count.c.fire_count).label("fire_count"),
-    )
-    .select_from(ruleset_fire_count)
-    .group_by(ruleset_fire_count.c.rulebook_id)
-    .outerjoin(rulebook, rulebook.c.id == ruleset_fire_count.c.rulebook_id)
-).cte("rulebook_fire_count")
-
-
-@router.post("/api/rulebooks", operation_id="create_rulebook")
+@router.post(
+    "/api/rulebooks",
+    operation_id="create_rulebook",
+)
 async def create_rulebook(
     rulebook: schema.RulebookCreate, db: AsyncSession = Depends(get_db_session)
 ):
-    query = sa.insert(models.rulebooks).values(
-        name=rulebook.name,
-        rulesets=rulebook.rulesets,
-        description=rulebook.description,
-    )
-    result = await db.execute(query)
-    (id_,) = result.inserted_primary_key
+    try:
+        new_rulebook = await rsql.create_rulebook(
+            db,
+            {
+                "name": rulebook.name,
+                "rulesets": rulebook.rulesets,
+                "description": rulebook.description,
+            }
+        )
+    except rsql.IntegrityError:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Unprocessable Entity.",
+        )
+    else:
+        if new_rulebook is None:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail="Unprocessable Entity.",
+            )
 
-    rulebook_data = yaml.safe_load(rulebook.rulesets)
-    await insert_rulebook_related_data(db, id_, rulebook_data)
+    rulebook_data = yaml.safe_load(new_rulebook.rulesets)
+    await insert_rulebook_related_data(db, new_rulebook.id, rulebook_data)
     await db.commit()
 
-    return {**rulebook.dict(), "id": id_}
+    return new_rulebook._asdict()
 
 
 @router.get(
@@ -226,29 +313,8 @@ async def create_rulebook(
     response_model=List[schema.RulebookList],
 )
 async def list_rulebooks(db: AsyncSession = Depends(get_db_session)):
-    query = (
-        sa.select(
-            rulebook.c.id,
-            rulebook.c.name,
-            sa.func.coalesce(rulebook_ruleset_count.c.ruleset_count, 0).label(
-                "ruleset_count"
-            ),
-            sa.func.coalesce(rulebook_fire_count.c.fire_count, 0).label(
-                "fire_count"
-            ),
-        )
-        .select_from(rulebook)
-        .outerjoin(
-            rulebook_ruleset_count,
-            rulebook_ruleset_count.c.rulebook_id == rulebook.c.id,
-        )
-        .outerjoin(
-            rulebook_fire_count,
-            rulebook_fire_count.c.rulebook_id == rulebook.c.id,
-        )
-    )
-    result = await db.execute(query)
-    return result.all()
+    rulebooks = rsql.list_rulebooks(db)
+    return [rb._asdict() for rb in rulebooks]
 
 
 @router.get(
@@ -259,32 +325,7 @@ async def list_rulebooks(db: AsyncSession = Depends(get_db_session)):
 async def read_rulebook(
     rulebook_id: int, db: AsyncSession = Depends(get_db_session)
 ):
-    query = (
-        sa.select(
-            rulebook.c.id,
-            rulebook.c.name,
-            sa.func.coalesce(rulebook.c.description, "").label("description"),
-            rulebook.c.created_at,
-            rulebook.c.modified_at,
-            sa.func.coalesce(rulebook_ruleset_count.c.ruleset_count, 0).label(
-                "ruleset_count"
-            ),
-            sa.func.coalesce(rulebook_fire_count.c.fire_count, 0).label(
-                "fire_count"
-            ),
-        )
-        .select_from(rulebook)
-        .outerjoin(
-            rulebook_ruleset_count,
-            rulebook_ruleset_count.c.rulebook_id == rulebook.c.id,
-        )
-        .outerjoin(
-            rulebook_fire_count,
-            rulebook_fire_count.c.rulebook_id == rulebook.c.id,
-        )
-    ).filter(rulebook.c.id == rulebook_id)
-
-    result = (await db.execute(query)).first()
+    result = await rsql.get_rulebook(db, rulebook_id)
     if not result:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -299,35 +340,8 @@ async def read_rulebook(
 async def read_rulebook_json(
     rulebook_id: int, db: AsyncSession = Depends(get_db_session)
 ):
-    query = (
-        sa.select(
-            rulebook.c.id,
-            rulebook.c.name,
-            rulebook.c.description,
-            rulebook.c.rulesets,
-            sa.func.coalesce(rulebook_ruleset_count.c.ruleset_count, 0).label(
-                "ruleset_count"
-            ),
-            sa.func.coalesce(rulebook_fire_count.c.fire_count, 0).label(
-                "fire_count"
-            ),
-            rulebook.c.created_at,
-            rulebook.c.modified_at,
-        )
-        .select_from(rulebook)
-        .outerjoin(
-            rulebook_ruleset_count,
-            rulebook_ruleset_count.c.rulebook_id == rulebook.c.id,
-        )
-        .outerjoin(
-            rulebook_fire_count,
-            rulebook_fire_count.c.rulebook_id == rulebook.c.id,
-        )
-    ).filter(rulebook.c.id == rulebook_id)
-
-    result = await db.execute(query)
-
-    response = dict(result.first())
+    ruleset = await rsql.get_ruleset(db, ruleset_id)
+    response = ruleset._asdict()
     response["rulesets"] = yaml.safe_load(response["rulesets"])
     return response
 
@@ -335,36 +349,17 @@ async def read_rulebook_json(
 @router.get(
     "/api/rulebooks/{rulebook_id}/rulesets",
     operation_id="list_rulebook_rulesets",
-    response_model=List[schema.RulebookRulesetList],
+    response_model=List[schema.RulesetList],
 )
 async def list_rulebook_rulesets(
     rulebook_id: int, db: AsyncSession = Depends(get_db_session)
 ):
-    query = (
-        sa.select(
-            ruleset.c.id,
-            ruleset.c.name,
-            sa.func.coalesce(ruls_ct.c.rule_count, 0).label("rule_count"),
-            sa.func.coalesce(ruleset_fire_count.c.fire_count, 0).label(
-                "fire_count"
-            ),
-        )
-        .select_from(ruleset)
-        .outerjoin(
-            ruls_ct,
-            ruls_ct.c.rule_count == ruleset.c.id,
-        )
-        .outerjoin(
-            ruleset_fire_count,
-            ruleset_fire_count.c.fire_count == ruleset.c.id,
-        )
-        .outerjoin(rulebook, rulebook.c.id == ruleset.c.rulebook_id)
-    ).filter(rulebook.c.id == rulebook_id)
-
-    result = (await db.execute(query)).all()
-    if not result:
+    rulebook_rulesets = await rsql.list_rulebook_rulesets(db, rulebook_id)
+    if rulebook_rulesets.rowcount == 0:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Rulebook Not Found.",
+            detail="Rulebook Rulesets Not Found.",
         )
+
+    result = [rbrs._asdict() for rbrs in rulebook_rulesets]
     return result

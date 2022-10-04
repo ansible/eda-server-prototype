@@ -7,6 +7,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from eda_server.db import models
 from eda_server.db.models.activation import RestartPolicy
 from eda_server.db.utils.lostream import PGLargeObject
+from eda_server.db.sql import base as bsql
+
 
 TEST_ACTIVATION = {
     "name": "test-activation",
@@ -49,30 +51,28 @@ TEST_RULEBOOK = """
 """
 
 
-async def _create_activation_dependent_objects(
-    client: AsyncClient, db: AsyncSession
-):
+async def _create_activation_dependent_objects(db: AsyncSession):
     (extra_var_id,) = (
-        await db.execute(
-            sa.insert(models.extra_vars).values(
-                name="vars.yml", extra_var=TEST_EXTRA_VAR
-            )
+        await bsql.insert_object(
+            db,
+            models.extra_vars,
+            values={"name": "vars.yml", "extra_var": TEST_EXTRA_VAR}
         )
     ).inserted_primary_key
 
     (inventory_id,) = (
-        await db.execute(
-            sa.insert(models.inventories).values(
-                name="inventory.yml", inventory=TEST_INVENTORY
-            )
+        await bsql.insert_object(
+            db,
+            models.inventories,
+            values={"name": "inventory.yml", "inventory": TEST_INVENTORY}
         )
     ).inserted_primary_key
 
     (rulebook_id,) = (
-        await db.execute(
-            sa.insert(models.rulebooks).values(
-                name="ruleset.yml", rulesets=TEST_RULEBOOK
-            )
+        await bsql.insert_object(
+            db,
+            models.rulebooks,
+            values={"name": "ruleset.yml", "rulesets": TEST_RULEBOOK}
         )
     ).inserted_primary_key
 
@@ -85,23 +85,23 @@ async def _create_activation_dependent_objects(
     return foreign_keys
 
 
-async def _create_activation(
-    client: AsyncClient, db: AsyncSession, foreign_keys
-):
+async def _create_activation(db: AsyncSession, foreign_keys: dict):
     (activation_id,) = (
-        await db.execute(
-            sa.insert(models.activations).values(
-                name=TEST_ACTIVATION["name"],
-                description=TEST_ACTIVATION["description"],
-                status=TEST_ACTIVATION["status"],
-                rulebook_id=foreign_keys["rulebook_id"],
-                inventory_id=foreign_keys["inventory_id"],
-                execution_environment=TEST_ACTIVATION["execution_environment"],
-                working_directory=TEST_ACTIVATION["working_directory"],
-                restart_policy=TEST_ACTIVATION["restart_policy"],
-                is_enabled=TEST_ACTIVATION["is_enabled"],
-                extra_var_id=foreign_keys["extra_var_id"],
-            )
+        await bsql.insert_object(
+            db,
+            models.activations,
+            values={
+                "name": TEST_ACTIVATION["name"],
+                "description": TEST_ACTIVATION["description"],
+                "status": TEST_ACTIVATION["status"],
+                "rulebook_id": foreign_keys["rulebook_id"],
+                "inventory_id": foreign_keys["inventory_id"],
+                "execution_environment": TEST_ACTIVATION["execution_environment"],
+                "working_directory": TEST_ACTIVATION["working_directory"],
+                "restart_policy": TEST_ACTIVATION["restart_policy"],
+                "is_enabled": TEST_ACTIVATION["is_enabled"],
+                "extra_var_id": foreign_keys["extra_var_id"],
+            }
         )
     ).inserted_primary_key
 
@@ -109,11 +109,16 @@ async def _create_activation(
 
 
 async def test_create_activation(client: AsyncClient, db: AsyncSession):
-    await _create_activation_dependent_objects(client, db)
+    fks = await _create_activation_dependent_objects(db)
+
+    my_test_activation = TEST_ACTIVATION.copy()
+    my_test_activation["rulebook_id"] = fks["rulebook_id"]
+    my_test_activation["extra_var_id"] = fks["extra_var_id"]
+    my_test_activation["inventory_id"] = fks["inventory_id"]
 
     response = await client.post(
         "/api/activations",
-        json=TEST_ACTIVATION,
+        json=my_test_activation,
     )
     assert response.status_code == status_codes.HTTP_200_OK
     data = response.json()
@@ -129,7 +134,7 @@ async def test_create_activation(client: AsyncClient, db: AsyncSession):
 async def test_delete_activation_instance(
     client: AsyncClient, db: AsyncSession
 ):
-    foreign_keys = await _create_activation_dependent_objects(client, db)
+    foreign_keys = await _create_activation_dependent_objects(db)
 
     (inserted_id,) = (
         await db.execute(
@@ -159,8 +164,8 @@ async def test_delete_activation_instance(
 async def test_ins_del_activation_instance_manages_log_lob(
     client: AsyncClient, db: AsyncSession
 ):
-    foreign_keys = await _create_activation_dependent_objects(client, db)
-    activation_id = await _create_activation(client, db, foreign_keys)
+    foreign_keys = await _create_activation_dependent_objects(db)
+    activation_id = await _create_activation(db, foreign_keys)
 
     total_ct = existing_ct = await db.scalar(
         sa.select(func.count()).select_from(models.activation_instances)
@@ -218,8 +223,8 @@ async def test_delete_activation_instance_not_found(client: AsyncClient):
 
 
 async def test_read_activation(client: AsyncClient, db: AsyncSession):
-    foreign_keys = await _create_activation_dependent_objects(client, db)
-    activation_id = await _create_activation(client, db, foreign_keys)
+    foreign_keys = await _create_activation_dependent_objects(db)
+    activation_id = await _create_activation(db, foreign_keys)
 
     response = await client.get(
         f"/api/activations/{activation_id}",
@@ -259,8 +264,8 @@ async def test_read_activation_not_found(client: AsyncClient):
 
 
 async def test_read_activations(client: AsyncClient, db: AsyncSession):
-    foreign_keys = await _create_activation_dependent_objects(client, db)
-    activation_id = await _create_activation(client, db, foreign_keys)
+    foreign_keys = await _create_activation_dependent_objects(db)
+    activation_id = await _create_activation(db, foreign_keys)
 
     response = await client.get(
         "/api/activations",
@@ -288,8 +293,8 @@ async def test_read_activations_empty_response(
 
 
 async def test_update_activation(client: AsyncClient, db: AsyncSession):
-    foreign_keys = await _create_activation_dependent_objects(client, db)
-    activation_id = await _create_activation(client, db, foreign_keys)
+    foreign_keys = await _create_activation_dependent_objects(db)
+    activation_id = await _create_activation(db, foreign_keys)
 
     new_activation = {
         "name": "new demo",
@@ -339,8 +344,8 @@ async def test_update_activation_not_found(client: AsyncClient):
 
 
 async def test_delete_activation(client: AsyncClient, db: AsyncSession):
-    foreign_keys = await _create_activation_dependent_objects(client, db)
-    activation_id = await _create_activation(client, db, foreign_keys)
+    foreign_keys = await _create_activation_dependent_objects(db)
+    activation_id = await _create_activation(db, foreign_keys)
 
     num_activations = await db.scalar(
         sa.select(func.count()).select_from(models.activations)

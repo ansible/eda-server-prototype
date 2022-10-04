@@ -1,9 +1,14 @@
 import sqlalchemy as sa
+from collections import namedtuple
+from datetime import datetime, timedelta, timezone
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status as status_codes
+from typing import Tuple
 
 from eda_server.db import models
+from eda_server.db.sql import base as bsql
+
 
 TEST_RULESET_SIMPLE = """
 ---
@@ -21,99 +26,205 @@ TEST_RULESET_SIMPLE = """
 """
 
 
-async def _create_rules(db: AsyncSession):
+DBTestData = namedtuple(
+    "DBTestData",
+    (
+        "project",
+        "rulebook",
+        "ruleset",
+        "rules",
+        "inventory",
+        "activation_instance",
+        "audit_rules",
+    )
+)
+
+
+async def _create_rules(db: AsyncSession, intervals: Tuple[int, int]=(5, 6)):
     project = (
-        await db.execute(
-            sa.insert(models.projects)
-            .values(name="project--test-ruleset-1.yml")
-            .returning(models.projects.c.id, models.projects.c.name)
+        await bsql.insert_object(
+            db,
+            models.projects,
+            values={"name": "project--test-ruleset-1.yml"},
+            returning=[models.projects.c.id, models.projects.c.name]
         )
-    ).first()
+    ).one()
 
     rulebook = (
-        await db.execute(
-            sa.insert(models.rulebooks)
-            .values(
-                name="test--ruleset-1.yml",
-                rulesets=TEST_RULESET_SIMPLE,
-                project_id=project.id,
-            )
-            .returning(models.rulebooks.c.id, models.rulebooks.c.name)
+        await bsql.insert_object(
+            db,
+            models.rulebooks,
+            values={
+                "name": "test--ruleset-1.yml",
+                "rulesets": TEST_RULESET_SIMPLE,
+                "project_id": project.id,
+            },
+            returning=[models.rulebooks.c.id, models.rulebooks.c.name]
         )
-    ).first()
+    ).one()
 
     ruleset = (
-        await db.execute(
-            sa.insert(models.rulesets)
-            .values(
-                name="Test--simple",
-                rulebook_id=rulebook.id,
-            )
-            .returning(
+        await bsql.insert_object(
+            db,
+            models.rulesets,
+            values={
+                "name": "Test--simple",
+                "rulebook_id": rulebook.id,
+                "sources": [
+                    {
+                        "name": "range",
+                        "type": "range",
+                        "source": "range",
+                        "config": {"limit": 5},
+                    }
+                ]
+            },
+            returning=[
                 models.rulesets.c.id,
                 models.rulesets.c.name,
                 models.rulesets.c.rulebook_id,
                 models.rulesets.c.created_at,
                 models.rulesets.c.modified_at,
-            )
+                models.rulesets.c.sources,
+            ]
         )
-    ).first()
+    ).one()
 
     rules = (
-        await db.execute(
-            sa.insert(models.rules)
-            .values(
-                [
-                    {
-                        "name": "rule--1",
-                        "action": {"debug": None},
-                        "ruleset_id": ruleset.id,
-                    },
-                    {
-                        "name": "rule--2",
-                        "action": {"debug": "eek"},
-                        "ruleset_id": ruleset.id,
-                    },
-                ]
-            )
-            .returning(
+        await bsql.insert_object(
+            db,
+            models.rules,
+            values=[
+                {
+                    "name": "rule--1",
+                    "action": {"debug": None},
+                    "ruleset_id": ruleset.id,
+                },
+                {
+                    "name": "rule--2",
+                    "action": {"debug": "eek"},
+                    "ruleset_id": ruleset.id,
+                },
+            ],
+            returning=[
                 models.rules.c.id,
                 models.rules.c.name,
                 models.rules.c.action,
                 models.rules.c.ruleset_id,
-            )
+            ]
         )
     ).all()
+
+    inventory = (
+        await bsql.insert_object(
+            db,
+            models.inventories,
+            values={"name": "tst-inv-1", "project_id": project.id},
+            returning=[models.inventories]
+        )
+    ).one()
+
+    activation_instance = (
+        await bsql.insert_object(
+            db,
+            models.activation_instances,
+            values={
+                "name": "act-inst-1",
+                "rulebook_id": rulebook.id,
+                "inventory_id": inventory.id,
+            },
+            returning=[models.activation_instances]
+        )
+    ).one()
+
+    audit_rules = (
+        await bsql.insert_object(
+            db,
+            models.audit_rules,
+            values=[
+                {
+                    'name': rules[0].name,
+                    'description': '',
+                    'status': 'success',
+                    'fired_date': datetime.utcnow().replace(tzinfo=timezone.utc) - timedelta(days=intervals[0]),
+                    'created_at': datetime.utcnow().replace(tzinfo=timezone.utc),
+                    'definition': rules[0].action,
+                    'rule_id': rules[0].id,
+                    'ruleset_id': ruleset.id,
+                    'activation_instance_id': activation_instance.id,
+                    'job_instance_id': None
+                },
+                {
+                    'name': rules[1].name,
+                    'description': '',
+                    'status': 'success',
+                    'fired_date': datetime.utcnow().replace(tzinfo=timezone.utc) - timedelta(days=intervals[1]),
+                    'created_at': datetime.utcnow().replace(tzinfo=timezone.utc),
+                    'definition': rules[1].action,
+                    'rule_id': rules[1].id,
+                    'ruleset_id': ruleset.id,
+                    'activation_instance_id': activation_instance.id,
+                    'job_instance_id': None
+                },
+            ],
+            returning=[models.audit_rules],
+        )
+    ).all()
+
     await db.commit()
 
-    return project, rulebook, ruleset, rules
+    return DBTestData(project, rulebook, ruleset, rules, inventory, activation_instance, audit_rules)
 
 
 async def test_list_rules(client: AsyncClient, db: AsyncSession):
-    _, _, ruleset, rules = await _create_rules(db)
+    test_data = await _create_rules(db)
+    project = test_data.project
+    rulebook = test_data.rulebook
+    ruleset = test_data.ruleset
+    rules = test_data.rules
 
     response = await client.get("/api/rules")
     assert response.status_code == status_codes.HTTP_200_OK
-    assert response.json() == [
-        {
+    rule_list = response.json()
+    assert isinstance(rule_list, list)
+    assert len(rule_list) == len(rules)
+
+    expected = {
+        rule.id: {
             "id": rule.id,
             "name": rule.name,
-            "action": rule.action,
             "ruleset": {
                 "id": ruleset.id,
                 "name": ruleset.name,
             },
+            "rulebook": {
+                "id": rulebook.id,
+                "name": rulebook.name,
+            },
+            "project": {
+                "id": project.id,
+                "name": project.name,
+            },
         }
         for rule in rules
-    ]
+    }
+    for lst_rule in rule_list:
+        exp_rule = expected[lst_rule["id"]]
+        for exp_key in exp_rule:
+            assert lst_rule[exp_key] == exp_rule[exp_key]
 
 
 async def test_read_rule(client: AsyncClient, db: AsyncSession):
-    _, _, ruleset, rules = await _create_rules(db)
+    test_data = await _create_rules(db)
+    project = test_data.project
+    rulebook = test_data.rulebook
+    ruleset = test_data.ruleset
+    rules = test_data.rules
 
     response = await client.get(f"/api/rules/{rules[0].id}")
     assert response.status_code == status_codes.HTTP_200_OK
-    assert response.json() == {
+    data = response.json()
+    expected = {
         "id": rules[0].id,
         "name": rules[0].name,
         "action": rules[0].action,
@@ -121,33 +232,6 @@ async def test_read_rule(client: AsyncClient, db: AsyncSession):
             "id": ruleset.id,
             "name": ruleset.name,
         },
-    }
-
-
-async def test_list_rulesets(client: AsyncClient, db: AsyncSession):
-    _, rulebook, ruleset, rules = await _create_rules(db)
-
-    response = await client.get("/api/rulesets")
-    assert response.status_code == status_codes.HTTP_200_OK
-    assert response.json() == [
-        {
-            "id": ruleset.id,
-            "name": ruleset.name,
-            "rule_count": len(rules),
-        }
-    ]
-
-
-async def test_read_ruleset(client: AsyncClient, db: AsyncSession):
-    project, rulebook, ruleset, rules = await _create_rules(db)
-    response = await client.get(f"/api/rulesets/{ruleset.id}")
-    assert response.status_code == status_codes.HTTP_200_OK
-    assert response.json() == {
-        "id": ruleset.id,
-        "name": ruleset.name,
-        "rule_count": len(rules),
-        "created_at": ruleset.created_at.isoformat(),
-        "modified_at": ruleset.modified_at.isoformat(),
         "rulebook": {
             "id": rulebook.id,
             "name": rulebook.name,
@@ -157,6 +241,114 @@ async def test_read_ruleset(client: AsyncClient, db: AsyncSession):
             "name": project.name,
         },
     }
+    for exp_key in expected:
+        assert expected[exp_key] == data[exp_key]
+    assert len(data["fired_stats"]) > 0
+
+
+async def test_list_rulesets(client: AsyncClient, db: AsyncSession):
+    test_data = await _create_rules(db)
+    ruleset = test_data.ruleset
+    rules = test_data.rules
+
+    response = await client.get("/api/rulesets")
+    assert response.status_code == status_codes.HTTP_200_OK
+    assert response.json() == [
+        {
+            "id": ruleset.id,
+            "name": ruleset.name,
+            "rule_count": len(rules),
+            "created_at": ruleset.created_at.isoformat(),
+            "modified_at": ruleset.created_at.isoformat(),
+            "source_types": ['range'],
+            "fired_stats": [
+                {
+                    "total_type": "status",
+                    "status": "success",
+                    "status_total": 2,
+                    "object_total": 2,
+                    "pct_object_total": 100,
+                    "window_total": 2,
+                    "pct_window_total": 100,
+                }
+            ],
+        }
+    ]
+
+
+async def test_list_rulesets_no_stats(
+    client: AsyncClient, db: AsyncSession
+):
+    test_data = await _create_rules(db, (40, 41))
+    ruleset = test_data.ruleset
+    rules = test_data.rules
+
+    response = await client.get("/api/rulesets")
+    assert response.status_code == status_codes.HTTP_200_OK
+    assert response.json() == [
+        {
+            "id": ruleset.id,
+            "name": ruleset.name,
+            "rule_count": len(rules),
+            "created_at": ruleset.created_at.isoformat(),
+            "modified_at": ruleset.created_at.isoformat(),
+            "source_types": ['range'],
+            "fired_stats": [],
+        }
+    ]
+
+
+
+async def test_read_ruleset(client: AsyncClient, db: AsyncSession):
+    test_data = await _create_rules(db)
+    project = test_data.project
+    rulebook = test_data.rulebook
+    ruleset = test_data.ruleset
+    rules = test_data.rules
+    aud_rul = test_data.audit_rules
+
+    expected = {
+        "id": ruleset.id,
+        "name": ruleset.name,
+        "rule_count": len(rules),
+        "created_at": ruleset.created_at.isoformat(),
+        "modified_at": ruleset.modified_at.isoformat(),
+        "sources": [
+            {
+                "name": "range",
+                "type": "range",
+                "source": "range",
+                "config": {
+                    "limit": 5
+                }
+            }
+        ],
+        "rulebook": {
+            "id": rulebook.id,
+            "name": rulebook.name,
+        },
+        "project": {
+            "id": project.id,
+            "name": project.name
+        },
+    }
+
+    response = await client.get(f"/api/rulesets/{ruleset.id}")
+    assert response.status_code == status_codes.HTTP_200_OK
+
+    respj = response.json()
+    for key in expected:
+        assert respj[key] == expected[key]
+
+    assert len(respj["fired_stats"]) == 2
+    for fs in respj["fired_stats"]:
+        assert fs["total_type"] == "date_status_object"
+        assert fs["fired_date"] in (str(aud_rul[0].fired_date.date()), str(aud_rul[1].fired_date.date()))
+        assert fs["object_status"] in (aud_rul[0].status, aud_rul[1].status)
+        assert fs["object_status_total"] == 1
+        assert fs["pct_date_status_total"] == 100
+        assert fs["window_total"] == 2
+        assert fs["pct_window_total"] == 50
 
 
 async def test_read_ruleset_not_found(client: AsyncClient, db: AsyncSession):
