@@ -13,9 +13,7 @@ from . import (
     websocket,
 )
 
-# TODO(cutwater): Will be updated in follow up PR: Refactor routers to
-#   avoid route duplication.
-router = APIRouter()
+router = APIRouter(prefix="/api")
 router.include_router(activation.router)
 router.include_router(audit_rule.router)
 router.include_router(auth.router)

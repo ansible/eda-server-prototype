@@ -6,7 +6,7 @@ from ansible_events_ui.managers import secretsmanager
 router = APIRouter()
 
 
-@router.get("/api/ssh-public-key")
+@router.get("/ssh-public-key")
 async def ssh_public_key():
     if secretsmanager.has_secret("ssh-public-key"):
         return {"public_key": secretsmanager.get_secret("ssh-public-key")}

@@ -21,14 +21,14 @@ __all__ = ("router",)
 router = APIRouter(tags=["jobs"])
 
 
-@router.get("/api/job_instances/", operation_id="list_job_instances")
+@router.get("/job_instances/", operation_id="list_job_instances")
 async def list_job_instances(db: AsyncSession = Depends(get_db_session)):
     query = sa.select(models.job_instances)
     result = await db.execute(query)
     return result.all()
 
 
-@router.post("/api/job_instance/", operation_id="create_job_instance")
+@router.post("/job_instance/", operation_id="create_job_instance")
 async def create_job_instance(
     j: schema.JobInstance, db: AsyncSession = Depends(get_db_session)
 ):
@@ -78,7 +78,7 @@ async def create_job_instance(
 
 
 @router.get(
-    "/api/job_instance/{job_instance_id}", operation_id="read_job_instance"
+    "/job_instance/{job_instance_id}", operation_id="read_job_instance"
 )
 async def read_job_instance(
     job_instance_id: int, db: AsyncSession = Depends(get_db_session)
@@ -91,7 +91,7 @@ async def read_job_instance(
 
 
 @router.delete(
-    "/api/job_instance/{job_instance_id}",
+    "/job_instance/{job_instance_id}",
     status_code=status.HTTP_204_NO_CONTENT,
     operation_id="delete_job_instance",
 )
@@ -109,7 +109,7 @@ async def delete_job_instance(
 
 
 @router.get(
-    "/api/job_instance_events/{job_instance_id}",
+    "/job_instance_events/{job_instance_id}",
     operation_id="read_job_instance_events",
 )
 async def read_job_instance_events(

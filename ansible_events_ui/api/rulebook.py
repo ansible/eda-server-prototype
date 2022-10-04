@@ -19,7 +19,7 @@ router = APIRouter(tags=["rulebooks"])
 
 
 @router.get(
-    "/api/rules",
+    "/rules",
     response_model=List[schema.Rule],
     operation_id="list_rules",
 )
@@ -54,7 +54,7 @@ async def list_rules(db: AsyncSession = Depends(get_db_session)):
 
 
 @router.get(
-    "/api/rules/{rule_id}",
+    "/rules/{rule_id}",
     response_model=schema.Rule,
     operation_id="read_rule",
 )
@@ -133,7 +133,7 @@ BASE_RULESET_SELECT = (
 
 
 @router.get(
-    "/api/rulesets",
+    "/rulesets",
     response_model=List[schema.Ruleset],
     operation_id="list_rulesets",
 )
@@ -144,7 +144,7 @@ async def list_rulesets(db: AsyncSession = Depends(get_db_session)):
 
 
 @router.get(
-    "/api/rulesets/{ruleset_id}",
+    "/rulesets/{ruleset_id}",
     response_model=schema.RulesetDetail,
     operation_id="read_ruleset",
 )
@@ -166,7 +166,7 @@ async def get_ruleset(
 # ------------------------------------
 
 
-@router.post("/api/rulebooks", operation_id="create_rulebook")
+@router.post("/rulebooks", operation_id="create_rulebook")
 async def create_rulebook(
     rulebook: schema.Rulebook, db: AsyncSession = Depends(get_db_session)
 ):
@@ -183,14 +183,14 @@ async def create_rulebook(
     return {**rulebook.dict(), "id": id_}
 
 
-@router.get("/api/rulebooks", operation_id="list_rulebooks")
+@router.get("/rulebooks", operation_id="list_rulebooks")
 async def list_rulebooks(db: AsyncSession = Depends(get_db_session)):
     query = sa.select(models.rulebooks)
     result = await db.execute(query)
     return result.all()
 
 
-@router.get("/api/rulebooks/{rulebook_id}", operation_id="read_rulebook")
+@router.get("/rulebooks/{rulebook_id}", operation_id="read_rulebook")
 async def read_rulebook(
     rulebook_id: int, db: AsyncSession = Depends(get_db_session)
 ):
@@ -206,9 +206,7 @@ async def read_rulebook(
     return result
 
 
-@router.get(
-    "/api/rulebook_json/{rulebook_id}", operation_id="read_rulebook_json"
-)
+@router.get("/rulebook_json/{rulebook_id}", operation_id="read_rulebook_json")
 async def read_rulebook_json(
     rulebook_id: int, db: AsyncSession = Depends(get_db_session)
 ):

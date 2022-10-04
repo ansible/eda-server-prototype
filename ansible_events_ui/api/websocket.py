@@ -53,7 +53,7 @@ host_status_map = {
 }
 
 
-@router.websocket("/api/ws2")
+@router.websocket("/ws2")
 async def websocket_endpoint2(
     websocket: WebSocket,
     db_session_factory: sessionmaker = Depends(get_db_session_factory),
@@ -79,7 +79,7 @@ async def websocket_endpoint2(
         pass
 
 
-@router.websocket("/api/ws-activation/{activation_instance_id}")
+@router.websocket("/ws-activation/{activation_instance_id}")
 async def websocket_activation_endpoint(
     websocket: WebSocket, activation_instance_id
 ):
@@ -93,7 +93,7 @@ async def websocket_activation_endpoint(
         updatemanager.disconnect(page, websocket)
 
 
-@router.websocket("/api/ws-jobs")
+@router.websocket("/ws-jobs")
 async def websocket_jobs_endpoint(websocket: WebSocket):
     page = "/jobs"
     await updatemanager.connect(page, websocket)
@@ -105,7 +105,7 @@ async def websocket_jobs_endpoint(websocket: WebSocket):
         updatemanager.disconnect(page, websocket)
 
 
-@router.websocket("/api/ws-job/{job_instance_id}")
+@router.websocket("/ws-job/{job_instance_id}")
 async def websocket_job_endpoint(websocket: WebSocket, job_instance_id):
     page = f"/job_instance/{job_instance_id}"
     await updatemanager.connect(page, websocket)

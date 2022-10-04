@@ -29,7 +29,7 @@ router = APIRouter(tags=["activations"])
 
 
 @router.post(
-    "/api/activations",
+    "/activations",
     response_model=schema.ActivationBaseRead,
     operation_id="create_activation",
 )
@@ -75,7 +75,7 @@ async def create_activation(
 
 
 @router.get(
-    "/api/activations/{activation_id}",
+    "/activations/{activation_id}",
     response_model=schema.ActivationRead,
     operation_id="show_activation",
 )
@@ -136,7 +136,7 @@ async def read_activation(
 
 
 @router.get(
-    "/api/activations",
+    "/activations",
     response_model=List[schema.ActivationRead],
     operation_id="list_activations",
 )
@@ -155,7 +155,7 @@ async def list_activations(
 
 
 @router.patch(
-    "/api/activations/{activation_id}",
+    "/activations/{activation_id}",
     response_model=schema.ActivationBaseRead,
     operation_id="update_activation",
 )
@@ -200,7 +200,7 @@ async def update_activation(
 
 
 @router.delete(
-    "/api/activations/{activation_id}",
+    "/activations/{activation_id}",
     status_code=status.HTTP_204_NO_CONTENT,
     operation_id="delete_activation",
 )
@@ -245,9 +245,7 @@ async def read_output(proc, activation_instance_id, db_session_factory):
             line_number += 1
 
 
-@router.post(
-    "/api/activation_instance", operation_id="create_activation_instance"
-)
+@router.post("/activation_instance", operation_id="create_activation_instance")
 async def create_activation_instance(
     a: schema.ActivationInstance,
     db: AsyncSession = Depends(get_db_session),
@@ -317,15 +315,13 @@ async def create_activation_instance(
     return {**a.dict(), "id": id_}
 
 
-@router.post("/api/deactivate", operation_id="deactivate_activation_instance")
+@router.post("/deactivate", operation_id="deactivate_activation_instance")
 async def deactivate(activation_instance_id: int):
     await inactivate_rulesets(activation_instance_id)
     return
 
 
-@router.get(
-    "/api/activation_instances", operation_id="list_activation_instances"
-)
+@router.get("/activation_instances", operation_id="list_activation_instances")
 async def list_activation_instances(
     db: AsyncSession = Depends(get_db_session),
 ):
@@ -335,7 +331,7 @@ async def list_activation_instances(
 
 
 @router.get(
-    "/api/activation_instance/{activation_instance_id}",
+    "/activation_instance/{activation_instance_id}",
     operation_id="read_activation_instance",
 )
 async def read_activation_instance(
@@ -364,7 +360,7 @@ async def read_activation_instance(
 
 
 @router.delete(
-    "/api/activation_instance/{activation_instance_id}",
+    "/activation_instance/{activation_instance_id}",
     status_code=status.HTTP_204_NO_CONTENT,
     operation_id="delete_activation_instance",
 )
@@ -382,7 +378,7 @@ async def delete_activation_instance(
 
 
 @router.get(
-    "/api/activation_instance_logs",
+    "/activation_instance_logs",
     operation_id="list_activation_instance_logs",
     response_model=List[schema.ActivationLog],
 )
@@ -411,7 +407,7 @@ async def stream_activation_instance_logs(
 
 
 @router.get(
-    "/api/activation_instance_job_instances/{activation_instance_id}",
+    "/activation_instance_job_instances/{activation_instance_id}",
     operation_id="list_activation_instance_job_instances",
 )
 async def list_activation_instance_job_instances(
