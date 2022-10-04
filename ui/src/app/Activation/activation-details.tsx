@@ -13,7 +13,7 @@ import {
   ToggleGroupItem
 } from '@patternfly/react-core';
 import { Link } from 'react-router-dom';
-import React, {useState, useEffect, Fragment} from 'react';
+import React, {useState, useEffect} from 'react';
 import {getServer} from '@app/utils/utils';
 import {renderActivationTabs} from "@app/Activation/Activation";
 import ReactJsonView from 'react-json-view';
@@ -33,7 +33,7 @@ client.onopen = () => {
 
 const endpointVar = 'http://' + getServer() + '/api/extra_var/';
 
-const FocusWrapper = styled.div`
+export const FocusWrapper = styled.div`
   && + .keyboard-help-text {
     opacity: 0;
     transition: opacity 0.1s linear;
@@ -206,7 +206,7 @@ const ActivationDetails: React.FunctionComponent<{activation: ActivationType}> =
                       mode="javascript"
                       theme="xcode"
                       name="activation_extravars"
-                      fontSize={14}
+                      fontSize={16}
                       value={activationVars?.extra_var}
                       height={'100px'}
                       setOptions={{

@@ -7,6 +7,8 @@ import {
   FormGroup,
   Grid, GridItem,
   PageSection,
+  Stack,
+  StackItem,
   TextInput,
   Title,
   ValidatedOptions
@@ -19,13 +21,14 @@ import {TopToolbar} from "@app/shared/top-toolbar";
 import {ExclamationCircleIcon} from "@patternfly/react-icons";
 import {useIntl} from "react-intl";
 import sharedMessages from "../messages/shared.messages";
+import AceEditor from "react-ace";
+import {FocusWrapper} from "@app/Activation/activation-details";
+import 'ace-builds/src-noconflict/theme-kuroir';
 
 const CardBody = styled(PFCardBody)`
   white-space: pre-wrap;
   `
-const endpoint_inventory = 'http://' + getServer() + '/api/inventory/';
 const endpoint_inventories = 'http://' + getServer() + '/api/inventories/';
-
 
 const NewInventory: React.FunctionComponent = () => {
   const history = useHistory();
@@ -36,15 +39,6 @@ const NewInventory: React.FunctionComponent = () => {
 
   const [ validatedName, setValidatedName ] = useState<ValidatedOptions>(ValidatedOptions.default);
   const [ validatedInventory, setValidatedInventory ] = useState<ValidatedOptions>(ValidatedOptions.default);
-
-  useEffect(() => {
-     fetch(endpoint_inventory, {
-       headers: {
-         'Content-Type': 'application/json',
-       },
-     }).then(response => response.json())
-    .then((data) => setInventory(data));
-  }, []);
 
   const validateName = (value) => {
     (!value || value.length < 1 ) ?
@@ -107,48 +101,82 @@ const NewInventory: React.FunctionComponent = () => {
       <Card>
         <CardBody>
           <Form>
-            <Grid hasGutter>
-              <GridItem span={4}>
-                <FormGroup style={{paddingRight: '30px'}}
-                           label={intl.formatMessage(sharedMessages.name)}
-                           fieldId={`inventory-name`}
-                           isRequired
-                           helperTextInvalid={ intl.formatMessage(sharedMessages.enterInventoryName) }
-                           helperTextInvalidIcon={<ExclamationCircleIcon />}
-                           validated={validatedName}
+            <Stack hasGutter>
+              <StackItem>
+                <Grid hasGutter>
+                  <GridItem span={4}>
+                    <FormGroup style={{paddingRight: '30px'}}
+                               label={intl.formatMessage(sharedMessages.name)}
+                               fieldId={`inventory-name`}
+                               isRequired
+                               helperTextInvalid={ intl.formatMessage(sharedMessages.enterInventoryName) }
+                               helperTextInvalidIcon={<ExclamationCircleIcon />}
+                               validated={validatedName}
+                    >
+                      <TextInput
+                        id="inventory-name"
+                        value={name}
+                        label="Name"
+                        isRequired
+                        validated={validatedName}
+                        onChange={onNameChange}
+                        onBlur={(event) => validateName(name)}
+                        placeholder={ intl.formatMessage(sharedMessages.namePlaceholder) }
+                      />
+                    </FormGroup>
+                  </GridItem>
+                  <GridItem span={4}>
+                    <FormGroup style={{paddingRight: '30px'}}
+                               label={intl.formatMessage(sharedMessages.description)}
+                               fieldId={`inventory-description`}
+                               helperTextInvalid={ intl.formatMessage(sharedMessages.enterInventoryDescription) }
+                               helperTextInvalidIcon={<ExclamationCircleIcon />}
+                    >
+                      <TextInput
+                        id="inventory-description"
+                        label="Description"
+                        placeholder={ intl.formatMessage(sharedMessages.descriptionPlaceholder) }
+                        onChange={onDescriptionChange}
+                      />
+                    </FormGroup>
+                  </GridItem>
+                </Grid>
+              </StackItem>
+              <StackItem>
+                <FormGroup label={intl.formatMessage(sharedMessages.inventory)}
+                           fieldId={`inventory-inventory`}
                 >
-                  <TextInput
-                    id="inventory-name"
-                    value={name}
-                    label="Name"
-                    isRequired
-                    validated={validatedName}
-                    onChange={onNameChange}
-                    onBlur={(event) => validateName(name)}
-                    placeholder={ intl.formatMessage(sharedMessages.namePlaceholder) }
-                  />
+                  <Card>
+                    <FocusWrapper>
+                      <AceEditor
+                        theme={"kuroir"}
+                        name="inventory_inventory"
+                        fontSize={16}
+                        value={inventory}
+                        height={'200px'}
+                        width={'100pct'}
+                        setOptions={{
+                          enableBasicAutocompletion: false,
+                          enableLiveAutocompletion: false,
+                          enableSnippets: false,
+                          showLineNumbers: true,
+                          tabSize: 2,
+                          focus: false,
+                          highlightActiveLine: false,
+                          cursorStart: 0,
+                          cursorStyle: undefined
+                        }}/>
+                    </FocusWrapper>
+                  </Card>
                 </FormGroup>
-              </GridItem>
-              <GridItem span={4}>
-                <FormGroup style={{paddingRight: '30px'}}
-                           label={intl.formatMessage(sharedMessages.description)}
-                           fieldId={`inventory-description`}
-                           helperTextInvalid={ intl.formatMessage(sharedMessages.enterInventoryDescription) }
-                           helperTextInvalidIcon={<ExclamationCircleIcon />}
-                >
-                  <TextInput
-                    id="inventory-description"
-                    label="Description"
-                    placeholder={ intl.formatMessage(sharedMessages.descriptionPlaceholder) }
-                    onChange={onDescriptionChange}
-                  />
-                </FormGroup>
-              </GridItem>
-            </Grid>
-            <ActionGroup>
-              <Button variant="primary" onClick={handleSubmit}>Add</Button>
-              <Button variant="link" onClick={() => history.push('/inventories')}> Cancel</Button>
-            </ActionGroup>
+              </StackItem>
+              <StackItem>
+                <ActionGroup>
+                  <Button variant="primary" onClick={handleSubmit}>Add</Button>
+                  <Button variant="link" onClick={() => history.push('/inventories')}> Cancel</Button>
+                </ActionGroup>
+              </StackItem>
+            </Stack>
           </Form>
         </CardBody>
       </Card>
