@@ -47,7 +47,7 @@ export const renderInventoryTabs = (inventoryId: string, intl) => {
   return <AppTabs tabItems={inventory_tabs}/>
 };
 
-const endpoint_inventory = 'http://' + getServer() + '/api/inventories/';
+const endpoint_inventory = 'http://' + getServer() + '/api/inventory/';
 
 export const getTabFromPath = (tabs:TabItemType[], path:string ):string | undefined => {
   const currentTab=tabs.find((tabItem) => tabItem.name.split('/').pop() === path.split('/').pop());
