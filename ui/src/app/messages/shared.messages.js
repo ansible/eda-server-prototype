@@ -462,6 +462,14 @@ const sharedMessages = defineMessages({
   source_of_inventory: {
     id: 'inventory.source_of_inventory',
     defaultMessage: 'Source of inventory'
+  },
+  enterInventoryName: {
+    id: 'inventory.enterInventoryName',
+    defaultMessage: 'Enter an inventory name'
+  },
+  enterInventoryDescription: {
+    id: 'inventory.enterInventoryDescription',
+    defaultMessage: 'Enter an inventory description'
   }
 });
 
