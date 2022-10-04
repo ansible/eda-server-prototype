@@ -2,22 +2,31 @@ import {
   Card,
   CardBody,
   Flex,
-  FlexItem,
+  FlexItem, Grid, GridItem,
   PageSection,
   Stack,
   StackItem,
-  Title
+  Title, ToggleGroup, ToggleGroupItem
 } from '@patternfly/react-core';
 import {useParams} from 'react-router-dom';
-import React from 'react';
+import React, {useState} from 'react';
 import {renderInventoryTabs, InventoryType} from "@app/Inventory/inventory";
 import {useIntl} from "react-intl";
 import sharedMessages from "../messages/shared.messages";
+import ReactJsonView from "react-json-view";
+import AceEditor from "react-ace";
+import {FocusWrapper} from "@app/Activation/activation-details";
+import 'ace-builds/src-noconflict/theme-kuroir';
 
 const InventoryDetails: React.FunctionComponent<{inventory: InventoryType}> = ({ inventory }) => {
   const intl = useIntl();
   const {id} = useParams<{id: string}>();
+  const [invFormat, setInvFormat] = useState('yaml');
 
+  const handleToggleFormat = (_, event) => {
+    const id = event.currentTarget.id;
+    setInvFormat(id );
+  }
   const renderFlexInventoryDetails: React.FunctionComponent<InventoryType> = (inventory) => (
     <Stack hasGutter={true}>
       <StackItem>
@@ -61,14 +70,63 @@ const InventoryDetails: React.FunctionComponent<{inventory: InventoryType}> = ({
           <Flex direction={{ default: 'column' }} flex={{ default: 'flex_1' }}>
             <FlexItem>
               <Stack>
-                <StackItem><Title headingLevel="h3">{intl.formatMessage(sharedMessages.inventory)}</Title></StackItem>
+                <StackItem><Title headingLevel="h3">{intl.formatMessage(sharedMessages.source_of_inventory)}</Title></StackItem>
                 <StackItem>
-                  { inventory?.inventory }
+                  { inventory?.source }
                 </StackItem>
               </Stack>
             </FlexItem>
           </Flex>
         </Flex>
+      </StackItem>
+      <StackItem>
+        <Stack hasGutter={true}>
+          <StackItem>
+            <Grid>
+              <GridItem span={1}>
+                <Title headingLevel="h3">Variables</Title>
+              </GridItem>
+              <GridItem span={2}>
+                <ToggleGroup isCompact aria-label="JsonYaml">
+                  <ToggleGroupItem text="YAML" buttonId="yaml" isSelected={invFormat === 'yaml' } onChange={handleToggleFormat} />
+                  <ToggleGroupItem text="JSON" buttonId="json" isSelected={invFormat === 'json'} onChange={handleToggleFormat} />
+                </ToggleGroup>
+              </GridItem>
+            </Grid>
+          </StackItem>
+          <StackItem>
+            {inventory?.inventory ? ( invFormat === 'json' ?
+                <ReactJsonView displayObjectSize={false}
+                               displayDataTypes={false}
+                               quotesOnKeys={false}
+                               src={{inventory: inventory.inventory}}/> :
+                <Card>
+                  <FocusWrapper>
+                    <AceEditor
+                      theme={"kuroir"}
+                      name="inventory_inventory"
+                      fontSize={16}
+                      value={inventory?.inventory}
+                      height={'200px'}
+                      width={'100pct'}
+                      setOptions={{
+                        enableBasicAutocompletion: false,
+                        enableLiveAutocompletion: false,
+                        enableSnippets: false,
+                        showLineNumbers: true,
+                        tabSize: 2,
+                        readOnly: true,
+                        focus: false,
+                        highlightActiveLine: false,
+                        cursorStart: 0,
+                        cursorStyle: undefined
+                      }}/>
+                  </FocusWrapper>
+                </Card>
+            ) : null
+            }
+          </StackItem>
+        </Stack>
       </StackItem>
      </Stack>
   );
