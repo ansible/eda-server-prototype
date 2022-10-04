@@ -18,7 +18,7 @@ import { RuleSet } from '@app/RuleSet/ruleset';
 import { RuleBooks } from '@app/RuleBooks/RuleBooks';
 import { RuleBook } from '@app/RuleBook/rulebook';
 import { Inventories } from '@app/Inventories/Inventories';
-import { Inventory } from '@app/Inventory/Inventory';
+import { Inventory } from '@app/Inventory/inventory';
 import { Vars } from '@app/Vars/Vars';
 import { Var } from '@app/Var/Var';
 import { Playbooks } from '@app/Playbooks/Playbooks';
@@ -32,6 +32,7 @@ import {RulesetRules} from "@app/RuleSet/ruleset-rules";
 import { Rules } from '@app/Rules/Rules';
 import { Rule } from '@app/Rule/Rule';
 import {Fragment} from "react";
+import {NewInventory} from "@app/NewInventory/NewInventory";
 
 export interface IAppRoute {
   label?: string; // Excluding the label will exclude the route from the nav sidebar in AppLayout
@@ -185,17 +186,20 @@ const routes: AppRouteConfig[] = [
     title: 'Rule',
   },
   {
+    component: Inventory,
+    path: '/inventories/inventory/:id',
+    title: 'Inventory',
+  },
+  {
     component: Inventories,
-    exact: true,
     label: 'Inventories',
     path: '/inventories',
     title: 'Inventories',
   },
   {
-    component: Inventory,
-    exact: true,
-    path: '/inventory/:id',
-    title: 'Inventory',
+    component: NewInventory,
+    path: '/new-inventory/',
+    title: 'New Inventory',
   },
   {
     component: Vars,
