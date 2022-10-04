@@ -1,13 +1,12 @@
 import * as React from 'react';
 import {mount} from 'enzyme';
-import {Project} from "@app/Project/Project";
+import {Inventory} from "@app/Inventory/inventory";
 import {MemoryRouter} from "react-router";
 import fetchMock from "jest-fetch-mock";
 import {act} from "react-dom/test-utils";
 import {IntlProvider} from "react-intl";
 import {Route} from "react-router-dom";
 import {Tab} from "@patternfly/react-core";
-import {CaretLeftIcon} from "@patternfly/react-icons";
 
 const ComponentWrapper = ({ children, initialEntries=['/dashboard']}) => (
   <IntlProvider locale="en">
@@ -17,24 +16,24 @@ const ComponentWrapper = ({ children, initialEntries=['/dashboard']}) => (
   </IntlProvider>
 );
 
-describe('Project', () => {
+describe('Inventory', () => {
   afterEach(() => {
     jest.restoreAllMocks();
   });
 
-  it('should render the Project component tabs', async () => {
+  it('should render the Inventory component tabs', async () => {
     fetchMock.mockResponse(JSON.stringify({
-          name: 'Project 1',
+          name: 'Inventory 1',
           id: 1,
-          url: 'Project 1 Url'
-       })
+          inventory: 'inventory content'
+      })
     )
     let wrapper;
     await act(async () => {
       wrapper = mount(
-        <ComponentWrapper initialEntries={['/project/1']}>
-          <Route path='/project/:id'>
-            <Project/>
+        <ComponentWrapper initialEntries={['/inventories/inventory/1']}>
+          <Route path='/inventories/inventory/:id'>
+            <Inventory/>
           </Route>
         </ComponentWrapper>
       );
@@ -42,8 +41,8 @@ describe('Project', () => {
     await act(async () => {
       wrapper.update();
     });
-    expect(wrapper.find(Tab).length).toEqual(3);
-    expect(wrapper.find(Tab).at(0).props().title.props.children[1]).toEqual("Back to Projects");
+    expect(wrapper.find(Tab).length).toEqual(2);
+    expect(wrapper.find(Tab).at(0).props().title.props.children[1]).toEqual("Back to Inventories");
     expect(wrapper.find(Tab).at(1).props().title).toEqual('Details');
   });
 });

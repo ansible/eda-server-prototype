@@ -177,7 +177,7 @@ const sharedMessages = defineMessages({
   },
   backToProjects: {
     id: 'project.backToProjects',
-    defaultMessage: 'Back to projects'
+    defaultMessage: 'Back to Projects'
   },
   project_link: {
   id: 'project.project_link',
@@ -357,7 +357,7 @@ const sharedMessages = defineMessages({
   },
   backToRulebookActivations: {
     id: 'activation.backToRulebookActivations',
-    defaultMessage: 'Back to rulebook activations'
+    defaultMessage: 'Back to Rulebook Activations'
   },
   extraVarPlaceholder: {
     id: 'project.extraVarPlaceholder',
@@ -457,7 +457,7 @@ const sharedMessages = defineMessages({
   },
   backToInventories: {
     id: 'project.backToInventories',
-    defaultMessage: 'Back to inventories'
+    defaultMessage: 'Back to Inventories'
   },
   source_of_inventory: {
     id: 'inventory.source_of_inventory',
