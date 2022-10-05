@@ -19,9 +19,9 @@ spec:
             - -c
             - alembic upgrade head && ansible-events-ui
           env:
-            - name: AE_DATABASE_URL
+            - name: EDA_DATABASE_URL
               value: postgresql+asyncpg://postgres:secret@postgres/ansible_events
-            - name: AE_HOST
+            - name: EDA_HOST
               value: 0.0.0.0
           image: eda-server
           imagePullPolicy: Never

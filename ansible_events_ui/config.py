@@ -24,7 +24,7 @@ class Settings(BaseSettings):
     default_user_role: Optional[str] = None
 
     class Config:
-        env_prefix = "AE_"
+        env_prefix = "EDA_"
         env_nested_delimiter = "__"
 
 
