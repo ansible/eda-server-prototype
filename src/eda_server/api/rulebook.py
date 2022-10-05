@@ -93,6 +93,7 @@ ruleset = sa.orm.aliased(models.rulesets)
 rules_lat = sa.orm.aliased(models.rules)
 rulebook = sa.orm.aliased(models.rulebooks)
 project = sa.orm.aliased(models.projects)
+audit = sa.orm.aliased(models.audit_rules)
 
 rule_count_lateral = (
     (
@@ -166,16 +167,27 @@ async def get_ruleset(
 # ------------------------------------
 
 
-@router.post(
-    "/api/rulebooks",
-    response_model=schema.RulebookRead,
-    operation_id="create_rulebook",
+ruleset_count = (
+    (
+        sa.select(sa.func.count(models.rulesets.c.id).label("ruleset_count"))
+        .select_from(models.rulesets)
+        .filter(models.rulesets.c.rulebook_id == models.rulebooks.c.id)
+    )
+    .subquery()
+    .lateral()
 )
+
+ruleset_ct = sa.orm.aliased(ruleset_count)
+
+
+@router.post("/api/rulebooks", operation_id="create_rulebook")
 async def create_rulebook(
     rulebook: schema.RulebookCreate, db: AsyncSession = Depends(get_db_session)
 ):
     query = sa.insert(models.rulebooks).values(
-        name=rulebook.name, rulesets=rulebook.rulesets
+        name=rulebook.name,
+        rulesets=rulebook.rulesets,
+        description=rulebook.description,
     )
     result = await db.execute(query)
     (id_,) = result.inserted_primary_key
@@ -200,20 +212,35 @@ async def list_rulebooks(db: AsyncSession = Depends(get_db_session)):
 
 @router.get(
     "/api/rulebooks/{rulebook_id}",
-    response_model=schema.RulebookRead,
     operation_id="read_rulebook",
+    response_model=schema.RulebookRead,
 )
 async def read_rulebook(
     rulebook_id: int, db: AsyncSession = Depends(get_db_session)
 ):
-    query = sa.select(models.rulebooks).where(
-        models.rulebooks.c.id == rulebook_id
+
+    query = (
+        sa.select(
+            models.rulebooks.c.id,
+            models.rulebooks.c.name,
+            models.rulebooks.c.description,
+            models.rulebooks.c.created_at,
+            models.rulebooks.c.modified_at,
+            sa.func.coalesce(ruleset_ct.c.ruleset_count, 0).label(
+                "ruleset_count"
+            ),
+        )
+        .select_from(rulebook)
+        .outerjoin(ruleset, ruleset.c.rulebook_id == rulebook.c.id)
+        .outerjoin(ruleset_ct, sa.true())
+        .filter(models.rulebooks.c.id == rulebook_id)
     )
+
     result = (await db.execute(query)).first()
     if not result:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Inventory Not Found.",
+            detail="Rulebook Not Found.",
         )
     return result
 

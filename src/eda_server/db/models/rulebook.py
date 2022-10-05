@@ -21,11 +21,25 @@ rulebooks = sa.Table(
         primary_key=True,
     ),
     sa.Column("name", sa.String),
+    sa.Column("description", sa.String),
     sa.Column("rulesets", sa.String),
     sa.Column(
         "project_id",
         sa.ForeignKey("project.id", ondelete="CASCADE"),
         nullable=True,
+    ),
+    sa.Column(
+        "created_at",
+        sa.DateTime(timezone=True),
+        nullable=False,
+        server_default=func.now(),
+    ),
+    sa.Column(
+        "modified_at",
+        sa.DateTime(timezone=True),
+        nullable=False,
+        server_default=func.now(),
+        onupdate=func.now(),
     ),
 )
 
