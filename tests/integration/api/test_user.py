@@ -8,8 +8,8 @@ from fastapi import status
 from httpx import AsyncClient, Response
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ansible_events_ui.db import models
-from ansible_events_ui.types import Action, ResourceType
+from eda_server.db import models
+from eda_server.types import Action, ResourceType
 from tests.integration.utils.db import get_admin_user
 
 
