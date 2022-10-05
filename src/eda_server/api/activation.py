@@ -14,10 +14,7 @@ from eda_server.config import Settings, get_settings
 from eda_server.db import models
 from eda_server.db.dependency import get_db_session
 from eda_server.db.models.activation import ExecutionEnvironment
-from eda_server.db.utils.lostream import (
-    PGLargeObject,
-    decode_bytes_buff,
-)
+from eda_server.db.utils.lostream import PGLargeObject, decode_bytes_buff
 from eda_server.managers import updatemanager
 from eda_server.ruleset import activate_rulesets, inactivate_rulesets
 

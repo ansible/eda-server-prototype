@@ -1,11 +1,7 @@
 from fastapi import APIRouter
 
 from eda_server import schema
-from eda_server.users import (
-    bearer_backend,
-    cookie_backend,
-    fastapi_users,
-)
+from eda_server.users import bearer_backend, cookie_backend, fastapi_users
 
 router = APIRouter()
 router.include_router(

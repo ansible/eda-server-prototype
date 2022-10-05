@@ -12,16 +12,9 @@ import pydantic
 from fastapi_users.exceptions import UserAlreadyExists
 
 from eda_server.config import load_settings
-from eda_server.db.session import (
-    create_session_factory,
-    engine_from_config,
-)
+from eda_server.db.session import create_session_factory, engine_from_config
 from eda_server.schema import UserCreate
-from eda_server.users import (
-    RoleNotExists,
-    get_user_db,
-    get_user_manager,
-)
+from eda_server.users import RoleNotExists, get_user_db, get_user_manager
 
 logger = logging.getLogger()
 

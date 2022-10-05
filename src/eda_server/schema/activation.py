@@ -3,10 +3,7 @@ from typing import Optional
 
 from pydantic import BaseModel, Field, StrictStr
 
-from eda_server.db.models.activation import (
-    ExecutionEnvironment,
-    RestartPolicy,
-)
+from eda_server.db.models.activation import ExecutionEnvironment, RestartPolicy
 
 from .extra_vars import ExtravarsRef
 from .inventory import InventoryRef

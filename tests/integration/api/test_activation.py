@@ -6,10 +6,7 @@ from sqlalchemy import func
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from eda_server.db import models
-from eda_server.db.models.activation import (
-    ExecutionEnvironment,
-    RestartPolicy,
-)
+from eda_server.db.models.activation import ExecutionEnvironment, RestartPolicy
 from eda_server.db.utils.lostream import PGLargeObject
 
 TEST_ACTIVATION = {

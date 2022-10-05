@@ -16,10 +16,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from eda_server import schema
 from eda_server.config import load_settings
 from eda_server.db import models
-from eda_server.db.session import (
-    create_session_factory,
-    engine_from_config,
-)
+from eda_server.db.session import create_session_factory, engine_from_config
 from eda_server.types import Action, ResourceType
 from eda_server.users import UserManager, get_user_db, get_user_manager
 
