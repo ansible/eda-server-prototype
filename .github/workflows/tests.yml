@@ -42,4 +42,4 @@ jobs:
       - name: Run tests
         run: pytest
         env:
-          AE_DATABASE_URL: 'postgresql+asyncpg://postgres:secret@localhost:5432/postgres'
+          EDA_DATABASE_URL: 'postgresql+asyncpg://postgres:secret@localhost:5432/postgres'

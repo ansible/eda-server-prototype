@@ -7,7 +7,7 @@ import sqlalchemy as sa
 import sqlalchemy.future
 from sqlalchemy.ext.asyncio import AsyncConnection
 
-from ansible_events_ui.db import models
+from eda_server.db import models
 
 BASE_DIR = pathlib.Path(__file__).parents[3]
 ALEMBIC_INI = BASE_DIR / "alembic.ini"

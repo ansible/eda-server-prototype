@@ -10,7 +10,7 @@ from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 
-from ansible_events_ui.config import load_settings
+from eda_server.config import load_settings
 from tests.integration.utils.app import create_test_app
 from tests.integration.utils.db import (
     create_database,

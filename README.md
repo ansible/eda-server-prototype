@@ -31,11 +31,11 @@ It may also be convenient to place the above line in your `.bashrc` or `.zshrc`.
 
 ### 1. Clone the repository
 
-First you need to clone the `ansible-events-ui` repository:
+First you need to clone the `eda-server` repository:
 
 ```shell
-git clone https://github.com/benthomasson/ansible-events-ui.git
-cd ansible-events-ui
+git clone https://github.com/ansible/eda-server.git
+cd eda-server
 ```
 
 ### 2. Virtual environment

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# TODO(cutwater): Move to ansible_events_ui.cli package
+# TODO(cutwater): Move to eda_server.cli package
 # TODO(cutwater): Add integration tests for this script
 import argparse
 import asyncio
@@ -13,15 +13,12 @@ import sqlalchemy as sa
 import yaml
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ansible_events_ui import schema
-from ansible_events_ui.config import load_settings
-from ansible_events_ui.db import models
-from ansible_events_ui.db.session import (
-    create_session_factory,
-    engine_from_config,
-)
-from ansible_events_ui.types import Action, ResourceType
-from ansible_events_ui.users import UserManager, get_user_db, get_user_manager
+from eda_server import schema
+from eda_server.config import load_settings
+from eda_server.db import models
+from eda_server.db.session import create_session_factory, engine_from_config
+from eda_server.types import Action, ResourceType
+from eda_server.users import UserManager, get_user_db, get_user_manager
 
 logger = logging.getLogger()
 

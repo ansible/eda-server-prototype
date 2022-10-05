@@ -1,8 +1,8 @@
 from fastapi import FastAPI
 
-from ansible_events_ui.app import setup_cors, setup_routes
-from ansible_events_ui.db.dependency import get_db_session_factory
-from ansible_events_ui.users import current_active_user
+from eda_server.app import setup_cors, setup_routes
+from eda_server.db.dependency import get_db_session_factory
+from eda_server.users import current_active_user
 from tests.integration.utils.db import get_admin_user
 
 

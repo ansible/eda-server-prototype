@@ -5,7 +5,7 @@ import pytest
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ansible_events_ui.db.utils.lostream import (
+from eda_server.db.utils.lostream import (
     MODE_MAP,
     PGLargeObject,
     PGLargeObjectClosed,

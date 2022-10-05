@@ -1,7 +1,7 @@
 # Build eda-server
 FROM registry.access.redhat.com/ubi8/python-39
 ARG USER_ID=${USER_ID:-1001}
-ARG DEVEL_AE_LIBRARY=1
+ARG DEVEL_EDA_LIBRARY=1
 ARG GITHUB_TOKEN
 WORKDIR $HOME
 
@@ -18,8 +18,8 @@ RUN chown -R $USER_ID ./
 USER $USER_ID
 RUN pip install -e .
 
-RUN bash -c "if [ $DEVEL_AE_LIBRARY -ne 0 ]; then \
+RUN bash -c "if [ $DEVEL_EDA_LIBRARY -ne 0 ]; then \
     pip uninstall ansible-events -y && \
     pip install git+https://$GITHUB_TOKEN@github.com/ansible/ansible-rulebook.git; fi"
 
-CMD ["ansible-events-ui"]
+CMD ["eda-server"]

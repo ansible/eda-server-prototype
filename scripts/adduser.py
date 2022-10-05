@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# TODO(cutwater): Move to ansible_events_ui.cli package
+# TODO(cutwater): Move to eda_server.cli package
 # TODO(cutwater): Add integration tests for this script
 import argparse
 import asyncio
@@ -11,17 +11,10 @@ import sys
 import pydantic
 from fastapi_users.exceptions import UserAlreadyExists
 
-from ansible_events_ui.config import load_settings
-from ansible_events_ui.db.session import (
-    create_session_factory,
-    engine_from_config,
-)
-from ansible_events_ui.schema import UserCreate
-from ansible_events_ui.users import (
-    RoleNotExists,
-    get_user_db,
-    get_user_manager,
-)
+from eda_server.config import load_settings
+from eda_server.db.session import create_session_factory, engine_from_config
+from eda_server.schema import UserCreate
+from eda_server.users import RoleNotExists, get_user_db, get_user_manager
 
 logger = logging.getLogger()
 
