@@ -83,7 +83,7 @@ const routes: AppRouteConfig[] = [
   },
   {
     component: Activations,
-    label: 'Rulebook activations',
+    label: 'Rulebook Activations',
     path: '/activations',
     title: 'Rulebook Activations',
   },
