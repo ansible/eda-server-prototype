@@ -36,7 +36,7 @@ export interface ActivationType {
   updated_at?: string
 }
 
-const endpoint = 'http://' + getServer() + '/api/activation_instances/';
+const endpoint = 'http://' + getServer() + '/api/activations/';
 
 const columns = (intl, selectedAll, selectAll) => [
   {

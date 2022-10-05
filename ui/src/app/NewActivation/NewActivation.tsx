@@ -26,10 +26,10 @@ import {InventoryType, RuleType} from "@app/RuleSets/RuleSets";
 const CardBody = styled(PFCardBody)`
   white-space: pre-wrap;
   `
-const endpoint = 'http://' + getServer() + '/api/activation_instance/';
-const endpoint1 = 'http://' + getServer() + '/api/rulebooks/';
-const endpoint2 = 'http://' + getServer() + '/api/inventories/';
-const endpoint3 = 'http://' + getServer() + '/api/extra_vars/';
+const endpoint_activation = 'http://' + getServer() + '/api/activations/';
+const endpoint_rulebooks = 'http://' + getServer() + '/api/rulebooks/';
+const endpoint_inventories = 'http://' + getServer() + '/api/inventories/';
+const endpoint_vars = 'http://' + getServer() + '/api/extra_vars/';
 
 export interface ExecutionEnvironmentType {
   id: string;
@@ -44,7 +44,7 @@ export interface RestartPolicyType {
 const NewActivation: React.FunctionComponent = () => {
   const history = useHistory();
   const intl = useIntl();
-  const [rulesets, setRuleSets] = useState<RuleType[]>([{id:'', name:intl.formatMessage(sharedMessages.ruleSetPlaceholder)}]);
+  const [rulebooks, setRuleBooks] = useState<RuleType[]>([{id:'', name:intl.formatMessage(sharedMessages.ruleBookPlaceholder)}]);
   const [inventories, setInventories] = useState<InventoryType[]>([{id:'', name: intl.formatMessage(sharedMessages.inventoryPlaceholder) }]);
   const [extravars, setExtraVars] = useState<ExtraVarType[]>([{id:'', name:intl.formatMessage(sharedMessages.extraVarPlaceholder), extra_var:''}]);
   const [executionEnvironments, setExecutionEnvironments] = useState<ExecutionEnvironmentType[]>([{id:'',
@@ -54,28 +54,29 @@ const NewActivation: React.FunctionComponent = () => {
   const [description, setDescription] = useState('');
   const [executionEnvironment, setExecutionEnvironment] = useState('');
   const [restartPolicy, setRestartPolicy] = useState('');
-  const [ruleset, setRuleSet] = useState('');
+  const [rulebook, setRuleBook] = useState('');
   const [inventory, setInventory] = useState('');
   const [extravar, setExtraVar] = useState('');
   const [workingDirectory, setWorkingDirectory] = useState('');
 
   const [ validatedName, setValidatedName ] = useState<ValidatedOptions>(ValidatedOptions.default);
-  const [ validatedRuleSet, setValidatedRuleSet ] = useState<ValidatedOptions>(ValidatedOptions.default);
+  const [ validatedRuleBook, setValidatedRuleBook ] = useState<ValidatedOptions>(ValidatedOptions.default);
   const [ validatedInventory, setValidatedInventory ] = useState<ValidatedOptions>(ValidatedOptions.default);
   const [ validatedExtraVar, setValidatedExtraVar ] = useState<ValidatedOptions>(ValidatedOptions.default);
   const [ validatedWorkingDirectory, setValidatedWorkingDirectory ] = useState<ValidatedOptions>(ValidatedOptions.default);
   const [ validatedExecutionEnvironment, setValidatedExecutionEnvironment ] = useState<ValidatedOptions>(ValidatedOptions.default);
+
   useEffect(() => {
-     fetch(endpoint1, {
+     fetch(endpoint_rulebooks, {
        headers: {
          'Content-Type': 'application/json',
        },
      }).then(response => response.json())
-    .then(data => setRuleSets([...rulesets, ...data]));
+    .then(data => setRuleBooks([...rulebooks, ...data]));
   }, []);
 
   useEffect(() => {
-     fetch(endpoint2, {
+     fetch(endpoint_inventories, {
        headers: {
          'Content-Type': 'application/json',
        },
@@ -84,7 +85,7 @@ const NewActivation: React.FunctionComponent = () => {
   }, []);
 
   useEffect(() => {
-     fetch(endpoint3, {
+     fetch(endpoint_vars, {
        headers: {
          'Content-Type': 'application/json',
        },
@@ -116,15 +117,15 @@ const NewActivation: React.FunctionComponent = () => {
     setRestartPolicy(value);
   };
 
-  const validateRuleSet = (value) => {
+  const validateRuleBook = (value) => {
     (!value || value.length < 1 ) ?
-      setValidatedRuleSet(ValidatedOptions.error) :
-      setValidatedRuleSet(ValidatedOptions.default)
+      setValidatedRuleBook(ValidatedOptions.error) :
+      setValidatedRuleBook(ValidatedOptions.default)
   };
 
-  const onRuleSetChange = (value) => {
-    setRuleSet(value);
-    validateRuleSet(value);
+  const onRuleBookChange = (value) => {
+    setRuleBook(value);
+    validateRuleBook(value);
   };
 
   const validateInventory = (value) => {
@@ -163,7 +164,7 @@ const NewActivation: React.FunctionComponent = () => {
 
   const validateFields = () => {
     validateName(name);
-    validateRuleSet(ruleset);
+    validateRuleBook(rulebook);
     validateInventory(inventory);
     validateExtraVar(extravar);
     validateWorkingDirectory(workingDirectory);
@@ -172,12 +173,17 @@ const NewActivation: React.FunctionComponent = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     validateFields();
-    postData(endpoint, { name: name,
-                         rulebook_id: ruleset,
-                         inventory_id: inventory,
-                         extra_var_id: extravar,
-                         working_directory: workingDirectory,
-                         execution_environment: executionEnvironment})
+    postData(endpoint_activation, {
+      name: name,
+      description: description,
+      status: '',
+      rulebook_id: rulebook,
+      inventory_id: inventory,
+      restart_policy: restartPolicy || "on-failure",
+      is_enabled: true,
+      extra_var_id: extravar,
+      working_directory: workingDirectory,
+      execution_environment: executionEnvironment || 'docker'})
       .then(() => history.push("/activations"))
       .catch(() => history.push("/activations"));
     }
@@ -187,7 +193,7 @@ const NewActivation: React.FunctionComponent = () => {
     <TopToolbar
       breadcrumbs={[
         {
-          title: 'Rulebook activations',
+          title: 'Rulebook Activations',
           to: '/activations'
         },
         {
@@ -294,18 +300,18 @@ const NewActivation: React.FunctionComponent = () => {
                 </FormGroup>
               </GridItem>
               <GridItem span={4}>
-                <FormGroup style={{paddingRight: '30px'}}  label="Rule Set"
-                           fieldId={`rule-set-${ruleset}`}
-                           helperTextInvalid={ intl.formatMessage(sharedMessages.selectRuleSet) }
+                <FormGroup style={{paddingRight: '30px'}}  label="Rulebook"
+                           fieldId={`rule-set-${rulebook}`}
+                           helperTextInvalid={ intl.formatMessage(sharedMessages.selectRuleBook) }
                            helperTextInvalidIcon={<ExclamationCircleIcon />}
-                           validated={validatedRuleSet}>
-                  <FormSelect value={ruleset}
-                              onChange={onRuleSetChange}
-                              validated={validatedRuleSet}
-                              placeholder={ intl.formatMessage(sharedMessages.ruleSetPlaceholder) }
-                              onBlur={(event) => validateRuleSet(ruleset)}
-                              aria-label="FormSelect Input RuleSet">
-                    {rulesets.map((option, index) => (
+                           validated={validatedRuleBook}>
+                  <FormSelect value={rulebook}
+                              onChange={onRuleBookChange}
+                              validated={validatedRuleBook}
+                              placeholder={ intl.formatMessage(sharedMessages.ruleBookPlaceholder) }
+                              onBlur={(event) => validateRuleBook(rulebook)}
+                              aria-label="FormSelect Input Rulebook">
+                    {rulebooks.map((option, index) => (
                       <FormSelectOption
                         key={index}
                         value={option?.id}

@@ -253,15 +253,15 @@ const sharedMessages = defineMessages({
   },
   enterRulebookActivationName: {
     id: 'activation.enterRulebookActivationName',
-    defaultMessage: 'Enter a rulebook activation name'
+    defaultMessage: 'Insert name here'
   },
   enterRulebookActivationDescription: {
     id: 'activation.enterRulebookActivationDescription',
-    defaultMessage: 'Enter a rulebook activation description'
+    defaultMessage: 'Insert description here'
   },
-  selectRuleSet: {
+  selectRuleBook: {
     id: 'activation.selectRulebookActivationName',
-    defaultMessage: 'Select a rule set'
+    defaultMessage: 'Select a Rulebook'
   },
   selectExecutionEnvironment: {
     id: 'activation.selectExecutionEnvironment',
@@ -337,23 +337,23 @@ const sharedMessages = defineMessages({
   },
   executionEnvironmentPlaceholder: {
     id: 'activation.executionEnvironmentPlaceholder',
-    defaultMessage: 'Select an execution environments'
+    defaultMessage: 'Select an Execution Environment URL'
   },
   restartPolicyPlaceholder: {
     id: 'activation.restartPolicyPlaceholder',
-    defaultMessage: 'Select a restart policy'
+    defaultMessage: 'Select a Restart policy'
   },
   inventoryPlaceholder: {
     id: 'activation.inventoryPlaceholder',
-    defaultMessage: 'Select an inventory'
+    defaultMessage: 'Select an Inventory'
   },
   playbookPlaceholder: {
     id: 'activation.playbookPlaceholder',
-    defaultMessage: 'Select a playbook'
+    defaultMessage: 'Select a Playbook'
   },
-  ruleSetPlaceholder: {
-    id: 'activation.ruleSetPlaceholder',
-    defaultMessage: 'Select a rule set'
+  ruleBookPlaceholder: {
+    id: 'activation.ruleBookPlaceholder',
+    defaultMessage: 'Select a Rulebook'
   },
   backToRulebookActivations: {
     id: 'activation.backToRulebookActivations',
@@ -361,7 +361,7 @@ const sharedMessages = defineMessages({
   },
   extraVarPlaceholder: {
     id: 'project.extraVarPlaceholder',
-    defaultMessage: 'Select extra variables'
+    defaultMessage: 'Select Extra variables'
   },
   action: {
     id: 'rule.action',

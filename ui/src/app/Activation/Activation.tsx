@@ -51,7 +51,7 @@ export const renderActivationTabs = (activationId: string, intl) => {
   return <AppTabs tabItems={activation_tabs}/>
 };
 
-const endpoint1 = 'http://' + getServer() + '/api/activation_instance/';
+const endpoint1 = 'http://' + getServer() + '/api/activation/';
 const endpoint2 = 'http://' + getServer() + '/api/activation_instance_job_instances/';
 
 export const fetchActivationJobs = (activationId, pagination=defaultSettings) =>
