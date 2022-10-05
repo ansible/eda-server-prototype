@@ -3,7 +3,7 @@ from typing import List, Optional
 
 from pydantic import BaseModel, StrictStr, constr
 
-from .extra_vars import ExtravarsRef
+from .extra_vars import ExtraVarsRef
 from .inventory import InventoryRef
 from .playbook import PlaybookRef
 from .rulebook import RuleRulesetRef
@@ -29,7 +29,7 @@ class ProjectRead(ProjectCreate):
 class ProjectDetail(ProjectRead):
     rulesets: List[RuleRulesetRef]
     inventories: List[InventoryRef]
-    vars: List[ExtravarsRef]
+    vars: List[ExtraVarsRef]
     playbooks: List[PlaybookRef]
 
 

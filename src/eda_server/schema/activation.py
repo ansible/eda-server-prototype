@@ -5,7 +5,7 @@ from pydantic import BaseModel, Field, StrictStr
 
 from eda_server.db.models.activation import ExecutionEnvironment, RestartPolicy
 
-from .extra_vars import ExtravarsRef
+from .extra_vars import ExtraVarsRef
 from .inventory import InventoryRef
 from .rulebook import RulebookRef
 
@@ -38,7 +38,7 @@ class ActivationRead(BaseModel):
     execution_environment: ExecutionEnvironment
     rulebook: RulebookRef
     inventory: InventoryRef
-    extra_var: ExtravarsRef = Field(None, nullable=True)
+    extra_var: ExtraVarsRef = Field(None, nullable=True)
     restart_policy: RestartPolicy
     restarted_at: datetime = Field(None, nullable=True)
     restart_count: int

@@ -211,6 +211,7 @@ async def delete_project(
 
 @router.get(
     "/api/playbooks/",
+    response_model=List[schema.PlaybookRead],
     operation_id="list_playbooks",
     tags=["playbooks"],
 )
@@ -222,6 +223,7 @@ async def list_playbooks(db: AsyncSession = Depends(get_db_session)):
 
 @router.get(
     "/api/playbook/{playbook_id}",
+    response_model=schema.PlaybookRead,
     operation_id="read_playbook",
     tags=["playbooks"],
 )
@@ -239,7 +241,10 @@ async def read_playbook(
 
 
 @router.get(
-    "/api/inventories/", operation_id="list_inventories", tags=["inventories"]
+    "/api/inventories/",
+    response_model=List[schema.InventoryRead],
+    operation_id="list_inventories",
+    tags=["inventories"],
 )
 async def list_inventories(db: AsyncSession = Depends(get_db_session)):
     query = sa.select(inventories)
@@ -249,6 +254,7 @@ async def list_inventories(db: AsyncSession = Depends(get_db_session)):
 
 @router.get(
     "/api/inventory/{inventory_id}",
+    response_model=schema.InventoryRead,
     operation_id="read_inventory",
     tags=["inventories"],
 )
@@ -266,10 +272,13 @@ async def read_inventory(
 
 
 @router.post(
-    "/api/inventory/", operation_id="create_inventory", tags=["inventories"]
+    "/api/inventory/",
+    response_model=schema.InventoryRead,
+    operation_id="create_inventory",
+    tags=["inventories"],
 )
 async def create_inventory(
-    i: schema.Inventory, db: AsyncSession = Depends(get_db_session)
+    i: schema.InventoryCreate, db: AsyncSession = Depends(get_db_session)
 ):
     query = sa.insert(inventories).values(name=i.name, inventory=i.inventory)
     result = await db.execute(query)
@@ -279,7 +288,10 @@ async def create_inventory(
 
 
 @router.get(
-    "/api/extra_vars/", operation_id="list_extra_vars", tags=["extra vars"]
+    "/api/extra_vars/",
+    response_model=List[schema.ExtraVarsRead],
+    operation_id="list_extra_vars",
+    tags=["extra vars"],
 )
 async def list_extra_vars(db: AsyncSession = Depends(get_db_session)):
     query = sa.select(extra_vars)
@@ -289,6 +301,7 @@ async def list_extra_vars(db: AsyncSession = Depends(get_db_session)):
 
 @router.get(
     "/api/extra_var/{extra_var_id}",
+    response_model=schema.ExtraVarsRead,
     operation_id="read_extra_var",
     tags=["extra vars"],
 )
@@ -306,10 +319,13 @@ async def read_extra_var(
 
 
 @router.post(
-    "/api/extra_vars/", operation_id="create_extra_vars", tags=["extra vars"]
+    "/api/extra_vars/",
+    response_model=schema.ExtraVarsRead,
+    operation_id="create_extra_vars",
+    tags=["extra vars"],
 )
 async def create_extra_vars(
-    e: schema.Extravars, db: AsyncSession = Depends(get_db_session)
+    e: schema.ExtraVarsCreate, db: AsyncSession = Depends(get_db_session)
 ):
     query = sa.insert(extra_vars).values(name=e.name, extra_var=e.extra_var)
     result = await db.execute(query)
