@@ -229,7 +229,7 @@ const sharedMessages = defineMessages({
   },
   activations: {
     id: 'activation.activations',
-    defaultMessage: 'Rulebook activations'
+    defaultMessage: 'Rulebook Activations'
   },
   noactivations_description: {
     id: 'activation.noactivations_description',
