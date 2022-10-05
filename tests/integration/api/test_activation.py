@@ -5,12 +5,12 @@ from httpx import AsyncClient
 from sqlalchemy import func
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ansible_events_ui.db import models
-from ansible_events_ui.db.models.activation import (
+from eda_server.db import models
+from eda_server.db.models.activation import (
     ExecutionEnvironment,
     RestartPolicy,
 )
-from ansible_events_ui.db.utils.lostream import PGLargeObject
+from eda_server.db.utils.lostream import PGLargeObject
 
 TEST_ACTIVATION = {
     "name": "test-activation",

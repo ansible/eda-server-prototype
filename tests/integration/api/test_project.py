@@ -7,7 +7,7 @@ from fastapi import status as status_codes
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ansible_events_ui.db import models
+from eda_server.db import models
 
 TEST_PROJECT = {
     "url": "https://git.example.com/sample/test-project",
@@ -124,8 +124,8 @@ async def test_delete_project_not_found(client: AsyncClient):
 
 
 @pytest.mark.asyncio
-@mock.patch("ansible_events_ui.api.project.clone_project")
-@mock.patch("ansible_events_ui.api.project.sync_project")
+@mock.patch("eda_server.api.project.clone_project")
+@mock.patch("eda_server.api.project.sync_project")
 async def test_create_project(
     sync_project: mock.Mock,
     clone_project: mock.Mock,
@@ -174,7 +174,7 @@ async def test_create_project_bad_entity(
 
 
 @pytest.mark.asyncio
-@mock.patch("ansible_events_ui.api.project.clone_project")
+@mock.patch("eda_server.api.project.clone_project")
 async def test_create_project_unique_name(
     clone_project: mock.Mock,
     client: AsyncClient,

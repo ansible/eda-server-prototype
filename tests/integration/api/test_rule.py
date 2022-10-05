@@ -4,7 +4,7 @@ from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status as status_codes
 
-from ansible_events_ui.db import models
+from eda_server.db import models
 
 TEST_RULESET_SIMPLE = """
 ---
