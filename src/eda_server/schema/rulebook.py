@@ -4,10 +4,13 @@ from typing import Optional
 from pydantic import BaseModel, StrictStr
 
 
-class Rulebook(BaseModel):
+class RulebookCreate(BaseModel):
     name: StrictStr
     rulesets: StrictStr
-    id: Optional[int]
+
+
+class RulebookRead(RulebookCreate):
+    id: int
 
 
 class RulebookRef(BaseModel):

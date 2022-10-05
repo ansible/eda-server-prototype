@@ -166,9 +166,13 @@ async def get_ruleset(
 # ------------------------------------
 
 
-@router.post("/api/rulebooks", operation_id="create_rulebook")
+@router.post(
+    "/api/rulebooks",
+    response_model=schema.RulebookRead,
+    operation_id="create_rulebook",
+)
 async def create_rulebook(
-    rulebook: schema.Rulebook, db: AsyncSession = Depends(get_db_session)
+    rulebook: schema.RulebookCreate, db: AsyncSession = Depends(get_db_session)
 ):
     query = sa.insert(models.rulebooks).values(
         name=rulebook.name, rulesets=rulebook.rulesets
@@ -183,14 +187,22 @@ async def create_rulebook(
     return {**rulebook.dict(), "id": id_}
 
 
-@router.get("/api/rulebooks", operation_id="list_rulebooks")
+@router.get(
+    "/api/rulebooks",
+    response_model=List[schema.RulebookRead],
+    operation_id="list_rulebooks",
+)
 async def list_rulebooks(db: AsyncSession = Depends(get_db_session)):
     query = sa.select(models.rulebooks)
     result = await db.execute(query)
     return result.all()
 
 
-@router.get("/api/rulebooks/{rulebook_id}", operation_id="read_rulebook")
+@router.get(
+    "/api/rulebooks/{rulebook_id}",
+    response_model=schema.RulebookRead,
+    operation_id="read_rulebook",
+)
 async def read_rulebook(
     rulebook_id: int, db: AsyncSession = Depends(get_db_session)
 ):

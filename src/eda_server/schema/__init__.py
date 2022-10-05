@@ -13,11 +13,16 @@ from .audit_rule import (
     AuditRuleJobInstance,
     AuditRuleJobInstanceEvent,
 )
-from .extra_vars import Extravars, ExtravarsRef
-from .inventory import Inventory, InventoryRef
-from .job import JobInstance
+from .extra_vars import ExtraVarsCreate, ExtraVarsRead, ExtraVarsRef
+from .inventory import InventoryCreate, InventoryRead, InventoryRef
+from .job import (
+    JobInstanceBaseRead,
+    JobInstanceCreate,
+    JobInstanceEventsRead,
+    JobInstanceRead,
+)
 from .message import ProducerMessage, ProducerResponse
-from .playbook import PlaybookRef
+from .playbook import PlaybookRead, PlaybookRef
 from .project import (
     ProjectCreate,
     ProjectDetail,
@@ -33,7 +38,8 @@ from .role import (
 )
 from .rulebook import (
     Rule,
-    Rulebook,
+    RulebookCreate,
+    RulebookRead,
     RulebookRef,
     RuleRulesetRef,
     Ruleset,
@@ -52,14 +58,21 @@ __all__ = [
     "AuditRuleJobInstance",
     "AuditRuleJobInstanceEvent",
     "AuditRuleHost",
-    "Extravars",
-    "ExtravarsRef",
+    "ExtraVarsCreate",
+    "ExtraVarsRead",
+    "ExtraVarsRef",
     "Inventory",
+    "InventoryCreate",
+    "InventoryRead",
     "InventoryRef",
-    "JobInstance",
+    "JobInstanceCreate",
+    "JobInstanceBaseRead",
+    "JobInstanceRead",
+    "JobInstanceEventsRead",
     "ProducerMessage",
     "ProducerResponse",
     "PlaybookRef",
+    "PlaybookRead",
     "ProjectCreate",
     "ProjectDetail",
     "ProjectList",
@@ -71,7 +84,8 @@ __all__ = [
     "RolePermissionRead",
     "RoleRead",
     "Rule",
-    "Rulebook",
+    "RulebookCreate",
+    "RulebookRead",
     "RulebookRef",
     "Ruleset",
     "RulesetDetail",

@@ -2,6 +2,7 @@
 import asyncio
 import logging
 import uuid
+from typing import List
 
 import sqlalchemy as sa
 from fastapi import APIRouter, Depends, Response, status
@@ -21,16 +22,24 @@ __all__ = ("router",)
 router = APIRouter(tags=["jobs"])
 
 
-@router.get("/api/job_instances/", operation_id="list_job_instances")
+@router.get(
+    "/api/job_instances/",
+    response_model=List[schema.JobInstanceBaseRead],
+    operation_id="list_job_instances",
+)
 async def list_job_instances(db: AsyncSession = Depends(get_db_session)):
     query = sa.select(models.job_instances)
     result = await db.execute(query)
     return result.all()
 
 
-@router.post("/api/job_instance/", operation_id="create_job_instance")
+@router.post(
+    "/api/job_instance/",
+    response_model=schema.JobInstanceRead,
+    operation_id="create_job_instance",
+)
 async def create_job_instance(
-    j: schema.JobInstance, db: AsyncSession = Depends(get_db_session)
+    j: schema.JobInstanceCreate, db: AsyncSession = Depends(get_db_session)
 ):
 
     query = sa.select(models.playbooks).where(
@@ -78,7 +87,9 @@ async def create_job_instance(
 
 
 @router.get(
-    "/api/job_instance/{job_instance_id}", operation_id="read_job_instance"
+    "/api/job_instance/{job_instance_id}",
+    response_model=schema.JobInstanceBaseRead,
+    operation_id="read_job_instance",
 )
 async def read_job_instance(
     job_instance_id: int, db: AsyncSession = Depends(get_db_session)
@@ -110,6 +121,7 @@ async def delete_job_instance(
 
 @router.get(
     "/api/job_instance_events/{job_instance_id}",
+    response_model=List[schema.JobInstanceEventsRead],
     operation_id="read_job_instance_events",
 )
 async def read_job_instance_events(
