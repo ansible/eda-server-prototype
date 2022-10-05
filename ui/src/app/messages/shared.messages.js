@@ -189,7 +189,7 @@ const sharedMessages = defineMessages({
   },
   scmType: {
     id: 'project.scmType',
-    defaultMessage: 'SCM Type'
+    defaultMessage: 'SCM type'
   },
   scmCredentials: {
     id: 'project.scmCredentials',
@@ -197,7 +197,7 @@ const sharedMessages = defineMessages({
   },
   scmToken: {
     id: 'project.scmToken',
-    defaultMessage: 'SCM Token'
+    defaultMessage: 'SCM token'
   },
   scmUrlPlaceholder: {
     id: 'project.scmUrlPlaceholder',

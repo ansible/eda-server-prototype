@@ -67,3 +67,10 @@ export interface ProjectType {
   type?: string;
   revision?: string;
 }
+
+export interface TabItemType {
+  eventKey: number;
+  title: string|JSXElement;
+  name: string;
+}
+

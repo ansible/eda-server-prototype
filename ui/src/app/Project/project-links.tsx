@@ -32,7 +32,7 @@ const ProjectLinks: React.FunctionComponent<{project:ProjectType | undefined}> =
   const intl = useIntl();
   return (
   <PageSection page-type={'project-links'} id={'project-links'}>
-    { renderProjectTabs(intl, project?.id) }
+    { renderProjectTabs(project?.id || '', intl) }
     <Stack>
       <StackItem>
         <Card>

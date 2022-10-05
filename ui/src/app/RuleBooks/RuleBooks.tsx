@@ -122,7 +122,7 @@ const RuleBooks: React.FunctionComponent = () => {
 
   useEffect(() => {
     fetchRuleBooks().then(response => response.json())
-      .then(data => { setRuleBooks(data); console.log( 'Debug - rulebooks data: ', data);
+      .then(data => { setRuleBooks(data);
         stateDispatch({type: 'setRows', payload: createRows(ruleBooks)});});
   }, []);
 ``

@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import {useIntl} from "react-intl";
 import AppTabs from "@app/shared/app-tabs";
 import {CaretLeftIcon} from "@patternfly/react-icons";
-import {getServer} from "@app/utils/utils";
+import {getServer, getTabFromPath} from "@app/utils/utils";
 import {TopToolbar} from "@app/shared/top-toolbar";
 import {InventoryDetails} from "@app/Inventory/inventory-details";
 import sharedMessages from "../messages/shared.messages";
@@ -48,11 +48,6 @@ export const renderInventoryTabs = (inventoryId: string, intl) => {
 };
 
 const endpoint_inventory = 'http://' + getServer() + '/api/inventory/';
-
-export const getTabFromPath = (tabs:TabItemType[], path:string ):string | undefined => {
-  const currentTab=tabs.find((tabItem) => tabItem.name.split('/').pop() === path.split('/').pop());
-  return currentTab?.title.toString();
-};
 
 const Inventory: React.FunctionComponent = () => {
   const [inventory, setInventory] = useState<InventoryType|undefined>(undefined);

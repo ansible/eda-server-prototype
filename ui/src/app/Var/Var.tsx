@@ -25,7 +25,6 @@ const Var: React.FunctionComponent = () => {
   const [extraVar, setVar] = useState<ExtraVarType|undefined>(undefined);
 
   const { id } = useParams<ExtraVarType>();
-  console.log(id);
 
   useEffect(() => {
      fetch(endpoint + id, {

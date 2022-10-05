@@ -13,7 +13,6 @@ const Playbook: React.FunctionComponent = () => {
   const [playbook, setPlaybook] = useState<PlaybookType|undefined>(undefined);
 
   const { id } = useParams<{id:string}>();
-  console.log(id);
 
   useEffect(() => {
      fetch(endpoint + id, {

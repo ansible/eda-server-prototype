@@ -4,18 +4,12 @@ import React, { useState, useEffect, Fragment } from 'react';
 import {useIntl} from "react-intl";
 import AppTabs from "@app/shared/app-tabs";
 import {CaretLeftIcon} from "@patternfly/react-icons";
-import {getServer} from "@app/utils/utils";
+import {getServer, getTabFromPath} from "@app/utils/utils";
 import {TopToolbar} from "@app/shared/top-toolbar";
 import {RulebookRulesets} from "@app/RuleBook/rulebook-rulesets";
 import {RulebookDetails} from "@app/RuleBook/rulebook-details";
 import sharedMessages from "../messages/shared.messages";
-import {AnyObject} from "@app/shared/types/common-types";
-
-interface TabItemType {
-  eventKey: number;
-  title: string;
-  name: string;
-}
+import {AnyObject, TabItemType} from "@app/shared/types/common-types";
 
 export interface RuleBookType {
   id: string,
@@ -62,11 +56,6 @@ export const renderRuleBookTabs = (rulebookId: string, intl) => {
 
 const endpoint_rulebook = 'http://' + getServer() + '/api/rulebooks/';
 
-export const getTabFromPath = (tabs:TabItemType[], path:string):string | undefined => {
-  const currentTab=tabs.find((tabItem) => tabItem.name.split('/').pop() === path.split('/').pop());
-  return currentTab?.title;
-};
-
 const RuleBook: React.FunctionComponent = () => {
   const [rulebook, setRuleBook] = useState<RuleBookType|undefined>(undefined);
   const { id } = useParams<{id: string}>();
@@ -82,7 +71,6 @@ const RuleBook: React.FunctionComponent = () => {
   }, []);
 
   const location = useLocation();
-  console.log('Debug - getting current tab for rulebook, from location: ', rulebook, location);
   const currentTab = rulebook?.id ?
     getTabFromPath(buildRuleBookTabs(rulebook.id,intl), location.pathname) :
     intl.formatMessage(sharedMessages.details);

@@ -103,7 +103,7 @@ const RulebookRulesets: React.FunctionComponent<{rulebook: RuleBookType}> = ({ru
   const updateRuleSets = (pagination) => {
     stateDispatch({type: 'setFetching', payload: true});
     return fetchRulebookRuleSets(id, pagination)
-      .then(data => { setRuleSets(data); console.log( 'Debug - rulesets data: ', data);
+      .then(data => { setRuleSets(data);
         stateDispatch({type: 'setRows', payload: createRows(data)});})
       .then(() => stateDispatch({type: 'setFetching', payload: false}))
       .catch(() => stateDispatch({type: 'setFetching', payload: false}));

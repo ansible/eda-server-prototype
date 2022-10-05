@@ -4,7 +4,7 @@ import React, {useState, useEffect, ReactNode} from 'react';
 import {useIntl} from "react-intl";
 import AppTabs from "@app/shared/app-tabs";
 import {CaretLeftIcon} from "@patternfly/react-icons";
-import {getServer} from "@app/utils/utils";
+import {getServer, getTabFromPath} from "@app/utils/utils";
 import {TopToolbar} from "@app/shared/top-toolbar";
 import {RuleDetails} from "@app/Rule/rule-details";
 import {defaultSettings} from "@app/shared/pagination";
@@ -48,10 +48,6 @@ export const fetchRule = (ruleId, pagination=defaultSettings) =>
     },
   }).then(response => response.json());
 }
-export const getTabFromPath = (tabs:TabItemType[], path:string):string | ReactNode | undefined => {
-  const currentTab=tabs.find((tabItem) => tabItem.name.split('/').pop() === path.split('/').pop());
-  return currentTab?.title;
-};
 
 const Rule: React.FunctionComponent = () => {
 
