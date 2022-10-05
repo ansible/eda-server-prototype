@@ -17,7 +17,7 @@ spec:
         - args:
             - /bin/bash
             - -c
-            - alembic upgrade head && ansible-events-ui
+            - alembic upgrade head && eda-server
           env:
             - name: EDA_DATABASE_URL
               value: postgresql+asyncpg://postgres:secret@postgres/ansible_events

@@ -163,17 +163,17 @@ stop-events-ui() {
 start-events-api() {
   log-info "Starting API (eda-server)"
   cd "${EDA_PROJECT_HOME}"
-  log-debug "ansible-events-ui &"
-  ansible-events-ui &
+  log-debug "eda-server &"
+  eda-server &
 }
 
 # shellcheck disable=SC2046
 stop-events-api() {
   log-info "Stopping API (eda-server)"
 
-  if pgrep -f ansible-events-ui >/dev/null 2>&1; then
-    log-debug "kill -9 \$(pgrep -f ansible-events-ui)"
-    kill -9 $(pgrep -f ansible-events-ui) >/dev/null 2>&1
+  if pgrep -f eda-server >/dev/null 2>&1; then
+    log-debug "kill -9 \$(pgrep -f eda-server)"
+    kill -9 $(pgrep -f eda-server) >/dev/null 2>&1
   fi
 
   if lsof -i:"${EDA_PI_PORT}" >/dev/null 2>&1; then

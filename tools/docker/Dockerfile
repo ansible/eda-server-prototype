@@ -22,4 +22,4 @@ RUN bash -c "if [ $DEVEL_EDA_LIBRARY -ne 0 ]; then \
     pip uninstall ansible-events -y && \
     pip install git+https://$GITHUB_TOKEN@github.com/ansible/ansible-rulebook.git; fi"
 
-CMD ["ansible-events-ui"]
+CMD ["eda-server"]

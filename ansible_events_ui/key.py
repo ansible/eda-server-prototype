@@ -11,7 +11,7 @@ logger = logging.getLogger()
 async def generate_ssh_keys():
 
     with tempfile.TemporaryDirectory as local_working_directory:
-        cmd = ["-f", "key", "-P", "", "-C", "ansible-events-ui"]
+        cmd = ["-f", "key", "-P", "", "-C", "eda-server"]
         logger.debug(ssh_keygen)
         logger.debug(cmd)
 
