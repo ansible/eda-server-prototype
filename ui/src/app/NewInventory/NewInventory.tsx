@@ -172,7 +172,7 @@ const NewInventory: React.FunctionComponent = () => {
               </StackItem>
               <StackItem>
                 <ActionGroup>
-                  <Button variant="primary" onClick={handleSubmit}>Add</Button>
+                  <Button variant="primary" isDisabled={true} onClick={handleSubmit}>Add</Button>
                   <Button variant="link" onClick={() => history.push('/inventories')}> Cancel</Button>
                 </ActionGroup>
               </StackItem>
