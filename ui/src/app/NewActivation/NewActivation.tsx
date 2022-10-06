@@ -26,10 +26,11 @@ import {InventoryType, RuleType} from "@app/RuleSets/RuleSets";
 const CardBody = styled(PFCardBody)`
   white-space: pre-wrap;
   `
-const endpoint = 'http://' + getServer() + '/api/activation_instance/';
-const endpoint1 = 'http://' + getServer() + '/api/rulebooks/';
-const endpoint2 = 'http://' + getServer() + '/api/inventories/';
-const endpoint3 = 'http://' + getServer() + '/api/extra_vars/';
+const activation_endpoint = 'http://' + getServer() + '/api/activation_instance/';
+const rulebook_endpoint = 'http://' + getServer() + '/api/rulebooks/';
+const inventories_endpoint = 'http://' + getServer() + '/api/inventories/';
+const vars_endpoint = 'http://' + getServer() + '/api/extra_vars/';
+const project_endpoint = 'http://' + getServer() + '/api/projects/';
 
 export interface ExecutionEnvironmentType {
   id: string;
@@ -47,6 +48,7 @@ const NewActivation: React.FunctionComponent = () => {
   const [rulesets, setRuleSets] = useState<RuleType[]>([{id:'', name:intl.formatMessage(sharedMessages.ruleSetPlaceholder)}]);
   const [inventories, setInventories] = useState<InventoryType[]>([{id:'', name: intl.formatMessage(sharedMessages.inventoryPlaceholder) }]);
   const [extravars, setExtraVars] = useState<ExtraVarType[]>([{id:'', name:intl.formatMessage(sharedMessages.extraVarPlaceholder), extra_var:''}]);
+  const [projects, setProjects] = useState<ExtraVarType[]>([{id:'', name:intl.formatMessage(sharedMessages.projectPlaceholder), extra_var:''}]);
   const [executionEnvironments, setExecutionEnvironments] = useState<ExecutionEnvironmentType[]>([{id:'',
     name:intl.formatMessage(sharedMessages.executionEnvironmentPlaceholder)}]);
   const [restartPolicies, setRestartPolicies] = useState<RestartPolicyType[]>([{id:'', name: intl.formatMessage(sharedMessages.restartPolicyPlaceholder)}]);
@@ -57,16 +59,18 @@ const NewActivation: React.FunctionComponent = () => {
   const [ruleset, setRuleSet] = useState('');
   const [inventory, setInventory] = useState('');
   const [extravar, setExtraVar] = useState('');
+  const [project, setProject] = useState('');
   const [workingDirectory, setWorkingDirectory] = useState('');
 
   const [ validatedName, setValidatedName ] = useState<ValidatedOptions>(ValidatedOptions.default);
   const [ validatedRuleSet, setValidatedRuleSet ] = useState<ValidatedOptions>(ValidatedOptions.default);
   const [ validatedInventory, setValidatedInventory ] = useState<ValidatedOptions>(ValidatedOptions.default);
   const [ validatedExtraVar, setValidatedExtraVar ] = useState<ValidatedOptions>(ValidatedOptions.default);
+  const [ validatedProject, setValidatedProject ] = useState<ValidatedOptions>(ValidatedOptions.default);
   const [ validatedWorkingDirectory, setValidatedWorkingDirectory ] = useState<ValidatedOptions>(ValidatedOptions.default);
   const [ validatedExecutionEnvironment, setValidatedExecutionEnvironment ] = useState<ValidatedOptions>(ValidatedOptions.default);
   useEffect(() => {
-     fetch(endpoint1, {
+     fetch(rulebook_endpoint, {
        headers: {
          'Content-Type': 'application/json',
        },
@@ -75,7 +79,7 @@ const NewActivation: React.FunctionComponent = () => {
   }, []);
 
   useEffect(() => {
-     fetch(endpoint2, {
+     fetch(inventories_endpoint, {
        headers: {
          'Content-Type': 'application/json',
        },
@@ -84,12 +88,21 @@ const NewActivation: React.FunctionComponent = () => {
   }, []);
 
   useEffect(() => {
-     fetch(endpoint3, {
+     fetch(vars_endpoint, {
        headers: {
          'Content-Type': 'application/json',
        },
      }).then(response => response.json())
     .then(data => setExtraVars([...extravars, ...data]));
+  }, []);
+
+  useEffect(() => {
+     fetch(project_endpoint, {
+       headers: {
+         'Content-Type': 'application/json',
+       },
+     }).then(response => response.json())
+    .then(data => setProjects([...projects, ...data]));
   }, []);
 
   const validateName = (value) => {
@@ -148,6 +161,16 @@ const NewActivation: React.FunctionComponent = () => {
     validateExtraVar(value);
   };
 
+  const validateProject = (value) => {
+    (!value || value.length < 1 ) ?
+      setValidatedProject(ValidatedOptions.error) :
+      setValidatedProject(ValidatedOptions.default)
+  }
+  const onProjectChange = (value) => {
+    setProject(value);
+    validateProject(value);
+  };
+
   const validateExecutionEnvironment = (value) => {
     setValidatedExecutionEnvironment(ValidatedOptions.default)
   }
@@ -172,10 +195,11 @@ const NewActivation: React.FunctionComponent = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     validateFields();
-    postData(endpoint, { name: name,
+    postData(activation_endpoint, { name: name,
                          rulebook_id: ruleset,
                          inventory_id: inventory,
                          extra_var_id: extravar,
+                         project_id: project,
                          working_directory: workingDirectory,
                          execution_environment: executionEnvironment})
       .then(() => history.push("/activations"))
@@ -315,6 +339,7 @@ const NewActivation: React.FunctionComponent = () => {
                   </FormSelect>
                 </FormGroup>
               </GridItem>
+
               <GridItem span={4}>
                 <FormGroup style={{paddingRight: '30px'}}  label="Extra Vars"
                            fieldId={'activation-vars'}
@@ -328,6 +353,28 @@ const NewActivation: React.FunctionComponent = () => {
                               validated={validatedExtraVar}
                               aria-label="FormSelect Input ExtraVar">
                     {extravars.map((option, index) => (
+                      <FormSelectOption key={index}
+                                        value={option?.id}
+                                        label={`${option?.id} ${option?.name}`}
+                                        isPlaceholder={option?.id===''}/>
+                    ))}
+                  </FormSelect>
+                </FormGroup>
+              </GridItem>
+
+              <GridItem span={4}>
+                <FormGroup style={{paddingRight: '30px'}}  label="Project"
+                           fieldId={'activation-project'}
+                           helperTextInvalid={ intl.formatMessage(sharedMessages.selectProject) }
+                           helperTextInvalidIcon={<ExclamationCircleIcon />}
+                           validated={validatedProject}>
+                  <FormSelect value={project}
+                              onChange={onProjectChange}
+                              placeholder={ intl.formatMessage(sharedMessages.projectPlaceholder) }
+                              onBlur={() => validateProject(project)}
+                              validated={validatedProject}
+                              aria-label="FormSelect Input Project">
+                    {projects.map((option, index) => (
                       <FormSelectOption key={index}
                                         value={option?.id}
                                         label={`${option?.id} ${option?.name}`}

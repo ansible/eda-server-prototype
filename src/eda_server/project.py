@@ -1,6 +1,7 @@
 import asyncio
 import logging
 import os
+import shutil
 import tempfile
 
 import yaml
@@ -9,8 +10,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from .db import models
 from .db.models import extra_vars, inventories, playbooks, rulebooks
+from .db.utils.lostream import CHUNK_SIZE, PGLargeObject
 
 logger = logging.getLogger("eda_server")
+git = shutil.which("git")
+tar = shutil.which("tar")
 
 
 # FIXME(cutwater): Remove try: .. finally: pass
@@ -18,12 +22,12 @@ async def clone_project(url, git_hash=None):
 
     try:
         tempdir = tempfile.mkdtemp(prefix="clone_project")
-        logger.debug(tempdir)
+        logger.critical(tempdir)
 
-        cmd = f"git clone {url} ."
+        cmd = [git, "clone", url, tempdir]
 
-        proc = await asyncio.create_subprocess_shell(
-            cmd,
+        proc = await asyncio.create_subprocess_exec(
+            *cmd,
             cwd=tempdir,
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE,
@@ -36,10 +40,10 @@ async def clone_project(url, git_hash=None):
         if stderr:
             logger.debug(stderr.decode())
 
-        cmd = "git rev-parse HEAD"
+        cmd = [git, "rev-parse", "HEAD"]
 
-        proc = await asyncio.create_subprocess_shell(
-            cmd,
+        proc = await asyncio.create_subprocess_exec(
+            *cmd,
             cwd=tempdir,
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE,
@@ -57,7 +61,7 @@ async def clone_project(url, git_hash=None):
 
 
 # FIXME(cutwater): Remove try: .. finally: pass
-async def sync_project(project_id, tempdir, db: AsyncSession):
+async def sync_project(project_id, large_data_id, tempdir, db: AsyncSession):
 
     try:
 
@@ -65,6 +69,7 @@ async def sync_project(project_id, tempdir, db: AsyncSession):
         await find_inventory(project_id, tempdir, db)
         await find_extra_vars(project_id, tempdir, db)
         await find_playbook(project_id, tempdir, db)
+        await tar_project(project_id, large_data_id, tempdir, db)
 
     finally:
         pass
@@ -241,3 +246,38 @@ async def find_playbook(project_id, project_dir, db: AsyncSession):
             (record_id,) = (await db.execute(query)).inserted_primary_key
             # TODO(cutwater): Remove debugging print
             logger.debug(record_id)
+
+
+async def tar_project(
+    project_id, large_data_id, project_dir, db: AsyncSession
+):
+
+    with tempfile.TemporaryDirectory() as tempdir:
+
+        tarfile_name = os.path.join(tempdir, "project.tar.gz")
+
+        cmd = [tar, "zcvf", tarfile_name, "."]
+        proc = await asyncio.create_subprocess_exec(
+            *cmd,
+            cwd=project_dir,
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE,
+        )
+
+        stdout, stderr = await proc.communicate()
+
+        if stdout:
+            logger.critical(stdout.decode())
+        if stderr:
+            logger.critical(stderr.decode())
+
+        logger.critical(tarfile_name)
+
+        async with PGLargeObject(db, oid=large_data_id, mode="w") as lobject:
+            with open(tarfile_name, "rb") as f:
+                while True:
+                    data = f.read(CHUNK_SIZE)
+                    if not data:
+                        break
+                    await lobject.write(data)
+            await db.commit()

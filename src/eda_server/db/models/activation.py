@@ -101,7 +101,7 @@ activations = sa.Table(
 
 
 # This table will have an pre-insert trigger that will
-# set the log_id if it is null.
+# set the large_data_id if it is null.
 # This table will have a post-delete trigger that will
 # cascade delete action to the large object table.
 activation_instances = sa.Table(
@@ -124,10 +124,15 @@ activation_instances = sa.Table(
     sa.Column("working_directory", sa.String),
     sa.Column("execution_environment", sa.String),
     sa.Column(
-        "log_id",
+        "large_data_id",
         postgresql.OID,
         nullable=True,
         comment="OID of large object containing log(s).",
+    ),
+    sa.Column(
+        "project_id",
+        sa.ForeignKey("project.id", ondelete="CASCADE"),
+        nullable=True,
     ),
 )
 

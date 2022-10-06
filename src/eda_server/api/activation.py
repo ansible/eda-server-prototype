@@ -263,12 +263,12 @@ async def create_activation_instance(
         )
         .returning(
             models.activation_instances.c.id,
-            models.activation_instances.c.log_id,
+            models.activation_instances.c.large_data_id,
         )
     )
     result = await db.execute(query)
     await db.commit()
-    id_, log_id = result.first()
+    id_, large_data_id = result.first()
 
     query = (
         sa.select(
@@ -298,7 +298,7 @@ async def create_activation_instance(
         await activate_rulesets(
             settings.deployment_type,
             id_,
-            log_id,
+            large_data_id,
             a.execution_environment,
             activation_data.rulesets,
             activation_data.inventory,
@@ -388,13 +388,13 @@ async def stream_activation_instance_logs(
     db: AsyncSession = Depends(get_db_session),
     settings: Settings = Depends(get_settings),
 ):
-    query = sa.select(models.activation_instances.c.log_id).where(
+    query = sa.select(models.activation_instances.c.large_data_id).where(
         models.activation_instances.c.id == activation_instance_id
     )
     cur = await db.execute(query)
-    log_id = cur.first().log_id
+    large_data_id = cur.first().large_data_id
 
-    async with PGLargeObject(db, oid=log_id, mode="r") as lobject:
+    async with PGLargeObject(db, oid=large_data_id, mode="r") as lobject:
         leftover = b""
         async for buff in lobject:
             buff, leftover = decode_bytes_buff(leftover + buff)

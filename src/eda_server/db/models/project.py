@@ -44,6 +44,12 @@ projects = sa.Table(
         server_default=func.now(),
         onupdate=func.now(),
     ),
+    sa.Column(
+        "large_data_id",
+        sa.dialects.postgresql.OID,
+        nullable=True,
+        comment="OID of large object containing project files.",
+    ),
 )
 
 inventories = sa.Table(
