@@ -40,7 +40,7 @@ const EditProject: React.FunctionComponent = () => {
   const setScmToken = (scm_token: string) => setProject({...project, scm_token: scm_token} );
 
   const handleSubmit = () => {
-			patchData(`${endpoint}${project.id}`, { name: project.name })
+			patchData(`${endpoint}${project.id}`, { name: project.name, description: project.description })
 				.then(data => {
           history.push(`/project/${data.id}`);
 			});
