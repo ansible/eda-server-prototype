@@ -150,24 +150,21 @@ clean-deployment() {
 
 # forward localhost port to pod
 port-forward() {
-  local _pod_name=${1}
   local _local_port=${2}
-  local _pod_port=${3}
+  local _svc_name=${1}
+  local _svc_port=${3}
 
-  log-info "kubectl port-forward ${_pod_name} ${_local_port}:${_pod_port}"
-  kubectl port-forward "${_pod_name}" "${_local_port}":"${_pod_port}"
+  log-info "kubectl port-forward svc/${_svc_name} ${_local_port}:${_svc_port}"
+  kubectl port-forward "svc/${_svc_name}" "${_local_port}":"${_svc_port}"
 }
 
 port-forward-ui() {
   local _local_port=${1}
-  local _pod_name=$(kubectl get pods --template '{{range .items}}{{.metadata.name}}{{end}}' --selector=app=eda-frontend)
-  local _UI_POD_PORT=8080
+  local _svc_name=eda-frontend
+  local _svc_port=8080
 
-  log-debug "kubectl wait --for=condition=Ready pod/${_pod_name} --timeout=120s"
-  kubectl wait --for=condition=Ready pod/"${_pod_name}" --timeout=120s
-
-  log-debug "port-forward ${_pod_name} ${_local_port} ${_UI_POD_PORT}"
-  port-forward "${_pod_name}" "${_local_port}" "${_UI_POD_PORT}"
+  log-debug "port-forward ${_svc_name} ${_local_port} ${_svc_port}"
+  port-forward "${_svc_name}" "${_local_port}" "${_svc_port}"
 }
 
 #
