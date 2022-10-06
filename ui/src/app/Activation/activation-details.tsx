@@ -122,7 +122,7 @@ const ActivationDetails: React.FunctionComponent<{activation: ActivationType}> =
               <Stack>
                 <StackItem><Title headingLevel="h3">Rule set</Title></StackItem>
                 <StackItem>
-                  <Link to={"/rulesetfile/" + activation.ruleset_id}>{activation.ruleset_name}</Link>
+                  <Link to={"/ruleset/" + activation.ruleset_id}>{activation.ruleset_name}</Link>
                 </StackItem>
               </Stack>
             </FlexItem>
@@ -148,7 +148,7 @@ const ActivationDetails: React.FunctionComponent<{activation: ActivationType}> =
               <Stack>
                 <StackItem><Title headingLevel="h3">Inventory</Title></StackItem>
                 <StackItem>
-                  {<Link to={"/inventory/" + activation.inventory_id}>{activation.inventory_name}</Link>}
+                  {<Link to={"/inventories/inventory/" + activation.inventory_id}>{activation.inventory_name}</Link>}
                 </StackItem>
               </Stack>
             </FlexItem>
