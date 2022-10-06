@@ -1,7 +1,10 @@
 from .activation import (
     ActivationBaseRead,
     ActivationCreate,
-    ActivationInstance,
+    ActivationInstanceBaseRead,
+    ActivationInstanceCreate,
+    ActivationInstanceJobInstance,
+    ActivationInstanceRead,
     ActivationLog,
     ActivationRead,
     ActivationUpdate,
@@ -48,7 +51,10 @@ from .rulebook import (
 from .user import UserCreate, UserRead, UserUpdate
 
 __all__ = [
-    "ActivationInstance",
+    "ActivationInstanceCreate",
+    "ActivationInstanceBaseRead",
+    "ActivationInstanceRead",
+    "ActivationInstanceJobInstance",
     "ActivationLog",
     "ActivationUpdate",
     "ActivationRead",
