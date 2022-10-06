@@ -52,8 +52,7 @@ class ActivationUpdate(BaseModel):
     is_enabled: bool
 
 
-class ActivationInstance(BaseModel):
-    id: Optional[int]
+class ActivationInstanceCreate(BaseModel):
     name: StrictStr
     rulebook_id: int
     inventory_id: int
@@ -63,7 +62,28 @@ class ActivationInstance(BaseModel):
     project_id: Optional[int]
 
 
+class ActivationInstanceBaseRead(ActivationInstanceCreate):
+    id: int
+
+
+class ActivationInstanceRead(BaseModel):
+    id: int
+    name: StrictStr
+    ruleset_id: int
+    ruleset_name: StrictStr
+    inventory_id: int
+    inventory_name: StrictStr
+    extra_var_id: int
+    extra_var_name: StrictStr
+
+
 class ActivationLog(BaseModel):
     activation_instance_id: int
     log: StrictStr
     id: Optional[int]
+
+
+class ActivationInstanceJobInstance(BaseModel):
+    id: int
+    activation_instance_id: int
+    job_instance_id: int

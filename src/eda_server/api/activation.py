@@ -243,10 +243,12 @@ async def read_output(proc, activation_instance_id, db_session_factory):
 
 
 @router.post(
-    "/api/activation_instance", operation_id="create_activation_instance"
+    "/api/activation_instance",
+    response_model=schema.ActivationInstanceBaseRead,
+    operation_id="create_activation_instance",
 )
 async def create_activation_instance(
-    a: schema.ActivationInstance,
+    a: schema.ActivationInstanceCreate,
     db: AsyncSession = Depends(get_db_session),
     settings: Settings = Depends(get_settings),
 ):
@@ -321,7 +323,9 @@ async def deactivate(activation_instance_id: int):
 
 
 @router.get(
-    "/api/activation_instances", operation_id="list_activation_instances"
+    "/api/activation_instances",
+    response_model=List[schema.ActivationInstanceBaseRead],
+    operation_id="list_activation_instances",
 )
 async def list_activation_instances(
     db: AsyncSession = Depends(get_db_session),
@@ -333,6 +337,7 @@ async def list_activation_instances(
 
 @router.get(
     "/api/activation_instance/{activation_instance_id}",
+    response_model=schema.ActivationInstanceRead,
     operation_id="read_activation_instance",
 )
 async def read_activation_instance(
@@ -347,7 +352,7 @@ async def read_activation_instance(
             models.inventories.c.id.label("inventory_id"),
             models.inventories.c.name.label("inventory_name"),
             models.extra_vars.c.id.label("extra_var_id"),
-            models.extra_vars.c.name.label("extra_vars_name"),
+            models.extra_vars.c.name.label("extra_var_name"),
         )
         .select_from(
             models.activation_instances.join(models.rulebooks)
@@ -409,6 +414,7 @@ async def stream_activation_instance_logs(
 
 @router.get(
     "/api/activation_instance_job_instances/{activation_instance_id}",
+    response_model=List[schema.ActivationInstanceJobInstance],
     operation_id="list_activation_instance_job_instances",
 )
 async def list_activation_instance_job_instances(
