@@ -22,6 +22,8 @@ import {useIntl} from "react-intl";
 import sharedMessages from "../messages/shared.messages";
 import {ExtraVarType} from "@app/Vars/Vars";
 import {InventoryType, RuleType} from "@app/RuleSets/RuleSets";
+import {addNotification} from '@redhat-cloud-services/frontend-components-notifications';
+import {useDispatch} from "react-redux";
 
 const CardBody = styled(PFCardBody)`
   white-space: pre-wrap;
@@ -69,6 +71,9 @@ const NewActivation: React.FunctionComponent = () => {
   const [ validatedProject, setValidatedProject ] = useState<ValidatedOptions>(ValidatedOptions.default);
   const [ validatedWorkingDirectory, setValidatedWorkingDirectory ] = useState<ValidatedOptions>(ValidatedOptions.default);
   const [ validatedExecutionEnvironment, setValidatedExecutionEnvironment ] = useState<ValidatedOptions>(ValidatedOptions.default);
+
+  const dispatch = useDispatch();
+
   useEffect(() => {
      fetch(rulebook_endpoint, {
        headers: {
@@ -202,8 +207,27 @@ const NewActivation: React.FunctionComponent = () => {
                          project_id: project,
                          working_directory: workingDirectory,
                          execution_environment: executionEnvironment})
-      .then(() => history.push("/activations"))
-      .catch(() => history.push("/activations"));
+      .then((data) => { history.push(`/activation/${data.id}`);
+        dispatch(
+          addNotification({
+            variant: 'success',
+            title: intl.formatMessage(sharedMessages.addActivation),
+            dismissable: true,
+            description: intl.formatMessage(sharedMessages.add_activation_success)
+          })
+        );
+      })
+      .catch((err) => {
+        history.push(`/activations`);
+        dispatch(
+          addNotification({
+            variant: 'danger',
+            title: intl.formatMessage(sharedMessages.addActivation),
+            dismissable: true,
+            description: intl.formatMessage(sharedMessages.add_activation_failure)
+          })
+        );
+      });
     }
 
   return (

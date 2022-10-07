@@ -24,6 +24,8 @@ import sharedMessages from "../messages/shared.messages";
 import AceEditor from "react-ace";
 import {FocusWrapper} from "@app/Activation/activation-details";
 import 'ace-builds/src-noconflict/theme-kuroir';
+import {addNotification} from '@redhat-cloud-services/frontend-components-notifications';
+import {useDispatch} from "react-redux";
 
 const CardBody = styled(PFCardBody)`
   white-space: pre-wrap;
@@ -33,7 +35,8 @@ const endpoint_inventories = 'http://' + getServer() + '/api/inventories/';
 const NewInventory: React.FunctionComponent = () => {
   const history = useHistory();
   const intl = useIntl();
-    const [name, setName] = useState('');
+  const dispatch = useDispatch();
+  const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [inventory, setInventory] = useState('');
 
@@ -78,9 +81,29 @@ const NewInventory: React.FunctionComponent = () => {
     postData(endpoint_inventories, { name: name,
                          inventory: inventory
     })
-      .then(() => history.push("/inventories"))
-      .catch(() => history.push("/inventories"));
-    }
+      .then(data => {
+        data?.id ? history.push(`/inventory/${data.id}`) :
+          history.push(`/inventories`);
+        dispatch(
+          addNotification({
+            variant: 'success',
+            title: intl.formatMessage(sharedMessages.addInventory),
+            dismissable: true,
+            description: intl.formatMessage(sharedMessages.add_inventory_success)
+          })
+        );
+      }).catch((err) => {
+      history.push(`/jobs`);
+      dispatch(
+        addNotification({
+          variant: 'danger',
+          title: intl.formatMessage(sharedMessages.addInventory),
+          dismissable: true,
+          description: intl.formatMessage(sharedMessages.add_inventory_failure)
+        })
+      );
+    });
+  }
 
   return (
   <React.Fragment>

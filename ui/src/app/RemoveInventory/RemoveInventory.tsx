@@ -14,6 +14,8 @@ import sharedMessages from "../messages/shared.messages";
 import {getServer, removeData} from "@app/utils/utils";
 import {defaultSettings} from "@app/shared/pagination";
 import {InventoryType} from "@app/Inventories/Inventories";
+import {addNotification} from "@redhat-cloud-services/frontend-components-notifications";
+import {useDispatch} from "react-redux";
 
 interface IRemoveInventory {
   ids?: Array<string|number>,
@@ -37,6 +39,7 @@ const RemoveInventory: React.ComponentType<IRemoveInventory> = ( {ids = [],
                                              pagination = defaultSettings,
                                              setSelectedInventories} ) => {
   const intl = useIntl();
+  const dispatch = useDispatch();
   const [inventory, setInventory] = useState<InventoryType>();
   const { id } = useParams<{id:string}>();
   const { push, goBack } = useHistory();
@@ -48,7 +51,17 @@ const RemoveInventory: React.ComponentType<IRemoveInventory> = ( {ids = [],
   }
 
   const onSubmit = () => {
-    removeInventory(id).then(() => push('/inventories'));
+    removeInventory(id).then(() => push('/inventories'))
+    .catch((err) => {
+      dispatch(
+        addNotification({
+          variant: 'danger',
+          title: intl.formatMessage(sharedMessages.inventoryRemoveTitle),
+          dismissable: true,
+          description: intl.formatMessage(sharedMessages.delete_inventory_failure)
+        })
+      );
+    });
   };
 
   useEffect(() => {

@@ -175,6 +175,10 @@ const sharedMessages = defineMessages({
     id: 'project.addProject',
     defaultMessage: 'Add project'
   },
+  editProject: {
+    id: 'project.editProject',
+    defaultMessage: 'Update project'
+  },
   deleteProjectTitle: {
     id: 'project.deleteProject',
     defaultMessage: 'Delete project'
@@ -218,6 +222,30 @@ const sharedMessages = defineMessages({
   scmTokenPlaceholder: {
     id: 'project.scmTokenPlaceholder',
     defaultMessage: 'Select an SCM Token'
+  },
+  add_project_success: {
+    id: 'project.addProjectSuccess',
+    defaultMessage: 'Project added successfully'
+  },
+  add_project_failure: {
+    id: 'project.addProjectFailure',
+    defaultMessage: 'Error adding new project'
+  },
+  edit_project_success: {
+    id: 'project.editProjectSuccess',
+    defaultMessage: 'Project updated successfully'
+  },
+  edit_project_failure: {
+    id: 'project.editProjectFailure',
+    defaultMessage: 'Error updating project'
+  },
+  delete_project_success: {
+    id: 'project.deleteProjectSuccess',
+    defaultMessage: 'Project removed successfully'
+  },
+  delete_project_failure: {
+    id: 'project.deleteProjectFailure',
+    defaultMessage: 'Remove project failed'
   },
   activation: {
     id: 'activation.activation',
@@ -290,6 +318,30 @@ const sharedMessages = defineMessages({
   selectProject: {
     id: 'activation.selectProject',
     defaultMessage: 'Select project'
+  },
+  add_activation_success: {
+    id: 'activation.addActivationSuccess',
+    defaultMessage: 'Rulebook activation added successfully'
+  },
+  add_activation_failure: {
+    id: 'activation.addActivationFailure',
+    defaultMessage: 'Error adding new rulebook activation'
+  },
+  edit_activation_success: {
+    id: 'activation.editActivationSuccess',
+    defaultMessage: 'Rulebook activation updated successfully'
+  },
+  edit_activation_failure: {
+    id: 'activation.editActivationFailure',
+    defaultMessage: 'Error updating the rulebook activation'
+  },
+  delete_activation_success: {
+    id: 'activation.deleteActivationSuccess',
+    defaultMessage: 'Rulebook activation removed successfully'
+  },
+  delete_activation_failure: {
+    id: 'activation.deleteActivationFailure',
+    defaultMessage: 'Remove rulebook activation failed'
   },
   ruleset: {
     id: 'rulesets.ruleset',
@@ -427,6 +479,22 @@ const sharedMessages = defineMessages({
     id: 'job.removeJobDescription',
     defaultMessage: 'Are you sure you want to delete the job below?'
   },
+  add_job_success: {
+    id: 'job.addProjectSuccess',
+    defaultMessage: 'Job added successfully'
+  },
+  add_job_failure: {
+    id: 'job.addJobFailure',
+    defaultMessage: 'Error adding new job'
+  },
+  delete_job_success: {
+    id: 'job.deleteJobSuccess',
+    defaultMessage: 'Job removed successfully'
+  },
+  delete_job_failure: {
+    id: 'job.deleteJobFailure',
+    defaultMessage: 'Remove job failed'
+  },
   inventory: {
     id: 'inventory.inventory',
     defaultMessage: 'Inventory'
@@ -478,6 +546,22 @@ const sharedMessages = defineMessages({
   enterInventoryDescription: {
     id: 'inventory.enterInventoryDescription',
     defaultMessage: 'Enter an inventory description'
+  },
+  add_inventory_success: {
+    id: 'inventory.addInventorySuccess',
+    defaultMessage: 'Inventory added successfully'
+  },
+  add_inventory_failure: {
+    id: 'inventory.addInventoryFailure',
+    defaultMessage: 'Error adding new inventory'
+  },
+  delete_inventory_success: {
+    id: 'inventory.deleteInventorySuccess',
+    defaultMessage: 'Inventory removed successfully'
+  },
+  delete_inventory_failure: {
+    id: 'inventory.deleteInventoryFailure',
+    defaultMessage: 'Remove inventory failed'
   }
 });
 

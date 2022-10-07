@@ -12,6 +12,8 @@ import styled from 'styled-components';
 import {TopToolbar} from "@app/shared/top-toolbar";
 import sharedMessages from "../messages/shared.messages";
 import {ProjectType} from "@app/shared/types/common-types";
+import {addNotification} from '@redhat-cloud-services/frontend-components-notifications';
+import {useDispatch} from "react-redux";
 
 const CardBody = styled(PFCardBody)`
   white-space: pre-wrap;
@@ -23,6 +25,7 @@ const EditProject: React.FunctionComponent = () => {
   const [project, setProject] = useState<ProjectType>({id: '', name: '' });
   const { id } = useParams<{id:string}>();
   const intl = useIntl();
+  const dispatch = useDispatch();
 
   useEffect(() => {
     fetch(endpoint + id, {
@@ -41,9 +44,27 @@ const EditProject: React.FunctionComponent = () => {
 
   const handleSubmit = () => {
 			patchData(`${endpoint}${project.id}`, { name: project.name, description: project.description })
-				.then(data => {
+        .then(data => {
           history.push(`/project/${data.id}`);
-			});
+          dispatch(
+            addNotification({
+              variant: 'success',
+              title: intl.formatMessage(sharedMessages.editProject),
+              dismissable: true,
+              description: intl.formatMessage(sharedMessages.edit_project_success)
+            })
+          );
+        }).catch((err) => {
+        history.push(`/projects`);
+        dispatch(
+          addNotification({
+            variant: 'danger',
+            title: intl.formatMessage(sharedMessages.editProject),
+            dismissable: true,
+            description: intl.formatMessage(sharedMessages.edit_project_failure)
+          })
+        );
+      });
   };
 
   return (

@@ -14,6 +14,8 @@ import sharedMessages from "../messages/shared.messages";
 import {getServer, removeData} from "@app/utils/utils";
 import {defaultSettings} from "@app/shared/pagination";
 import {ActivationType} from "@app/Activations/Activations";
+import {addNotification} from "@redhat-cloud-services/frontend-components-notifications";
+import {useDispatch} from "react-redux";
 
 interface IRemoveActivation {
   ids?: Array<string|number>,
@@ -37,6 +39,7 @@ const RemoveActivation: React.ComponentType<IRemoveActivation> = ( {ids = [],
                                              pagination = defaultSettings,
                                              setSelectedActivations} ) => {
   const intl = useIntl();
+  const dispatch = useDispatch();
   const [activation, setActivation] = useState<ActivationType>();
   const { id } = useParams<{id:string}>();
   const { push, goBack } = useHistory();
@@ -48,7 +51,17 @@ const RemoveActivation: React.ComponentType<IRemoveActivation> = ( {ids = [],
   }
 
   const onSubmit = () => {
-    removeActivation(id).then(() => push('/activations'));
+    removeActivation(id).then(() => push('/activations'))
+    .catch((err) => {
+        dispatch(
+          addNotification({
+            variant: 'danger',
+            title: intl.formatMessage(sharedMessages.activationRemoveTitle),
+            dismissable: true,
+            description: intl.formatMessage(sharedMessages.delete_activation_failure)
+          })
+        );
+      });
   };
 
   useEffect(() => {
