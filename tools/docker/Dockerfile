@@ -11,6 +11,10 @@ ENV PIP_NO_BINARY=jpy
 
 RUN pip install ansible && \
     ansible-galaxy collection install git+https://github.com/ansible/event-driven-ansible.git
+
+COPY ./src/eda_server.egg-info/requires.txt $WORKDIR
+RUN pip install -r requires.txt
+
 COPY . $WORKDIR
 RUN chown -R $USER_ID ./
 
