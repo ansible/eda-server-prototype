@@ -137,7 +137,6 @@ async def activate_rulesets(
                         f"ws://{host}:{port}/api/ws2",
                         "--id",
                         str(activation_id),
-                        "--debug",
                     ],
                     "Image": execution_environment,
                     "Env": ["ANSIBLE_FORCE_COLOR=True"],
