@@ -15,6 +15,7 @@ class RulebookRead(BaseModel):
     name: StrictStr
     description: Optional[StrictStr] = ""
     ruleset_count: int
+    fire_count: int
     created_at: datetime
     modified_at: datetime
 

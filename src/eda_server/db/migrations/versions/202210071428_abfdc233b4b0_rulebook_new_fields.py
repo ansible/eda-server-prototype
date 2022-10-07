@@ -1,16 +1,16 @@
-"""rulebooks add fields.
+"""rulebook new fields.
 
-Revision ID: 53512c168e99
-Revises: 25bcfbe12475
-Create Date: 2022-10-05 18:22:57.753274+00:00
+Revision ID: abfdc233b4b0
+Revises: 12c3a0edc032
+Create Date: 2022-10-07 14:28:05.385484+00:00
 
 """
 import sqlalchemy as sa
 from alembic import op
 
 # revision identifiers, used by Alembic.
-revision = "53512c168e99"
-down_revision = "25bcfbe12475"
+revision = "abfdc233b4b0"
+down_revision = "12c3a0edc032"
 branch_labels = None
 depends_on = None
 
