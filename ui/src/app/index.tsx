@@ -8,23 +8,27 @@ import { AppRoutes } from '@app/routes';
 import { Login } from '@app/Login/Login';
 import '@app/app.css';
 import GlobalStyle from '../global-styles';
+import { Provider } from 'react-redux';
+import store from '../store';
 
 const App: React.FunctionComponent = () => (
   <React.Fragment>
   <GlobalStyle />
     <IntlProvider locale="en">
-    <Router basename="/eda">
-      <Switch>
-        <Route path="/" exact={true}>
-           <Login />
-        </Route>
-        <Route>
-          <AppLayout>
-            <AppRoutes />
-          </AppLayout>
-        </Route>
-        </Switch>
-      </Router>
+      <Provider store={store()}>
+        <Router basename="/eda">
+          <Switch>
+            <Route path="/" exact={true}>
+               <Login />
+            </Route>
+            <Route>
+              <AppLayout>
+                <AppRoutes />
+              </AppLayout>
+            </Route>
+            </Switch>
+          </Router>
+      </Provider>
     </IntlProvider>
   </React.Fragment>
 );

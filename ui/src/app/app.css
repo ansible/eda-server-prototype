@@ -1,3 +1,5 @@
+@import '~@redhat-cloud-services/frontend-components-utilities/index.scss';
+
 html, body, #root {
   height: 100%;
 }

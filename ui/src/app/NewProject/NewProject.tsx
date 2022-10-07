@@ -12,6 +12,8 @@ import {getServer} from '@app/utils/utils';
 import styled from 'styled-components';
 import {TopToolbar} from "@app/shared/top-toolbar";
 import sharedMessages from "../messages/shared.messages";
+import { addNotification } from '@redhat-cloud-services/frontend-components-notifications';
+import {useDispatch} from "react-redux";
 
 const CardBody = styled(PFCardBody)`
   white-space: pre-wrap;
@@ -28,12 +30,31 @@ const NewProject: React.FunctionComponent = () => {
   const [scmType, setScmType] = useState('');
   const [scmCredential, setScmCredential] = useState('');
   const intl = useIntl();
+  const dispatch = useDispatch();
 
   const handleSubmit = () => {
 			postData(endpoint, { url: scmUrl, name: name, description: description })
 				.then(data => {
           history.push(`/project/${data.id}`);
-			});
+          dispatch(
+            addNotification({
+              variant: 'success',
+              title: 'New project',
+              dismissable: true,
+              description: 'New project added successfully.'
+            })
+          );
+			}).catch((err) => {
+        history.push(`/projects`);
+        dispatch(
+          addNotification({
+            variant: 'danger',
+            title: 'New project',
+            dismissable: true,
+            description: 'Error adding new project.'
+          })
+        );
+      });
   };
 
   return (
