@@ -70,7 +70,7 @@ const NewProject: React.FunctionComponent = () => {
         }
         ]
       }>
-      <Title headingLevel={"h2"}>{ intl.formatMessage(sharedMessages.addProject)}</Title>
+      <Title headingLevel={"h2"}>{ intl.formatMessage(sharedMessages.add_new_project)}</Title>
     </TopToolbar>
     <PageSection>
       <Card>

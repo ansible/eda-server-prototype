@@ -7,9 +7,13 @@ import {MemoryRouter} from "react-router";
 import fetchMock from "jest-fetch-mock";
 import {AppLayout} from "@app/AppLayout/AppLayout";
 import {AppRoutes} from "@app/routes";
+import store from "../store";
+import {Provider} from "react-redux";
 
 const ComponentWrapper = ({ children }) => (
+  <Provider store={store()}>
     <MemoryRouter initialEntries={['/eda/dashboard']}>{children}</MemoryRouter>
+  </Provider>
 );
 jest.mock("react-router-dom", () => ({
   ...jest.requireActual("react-router-dom"),
@@ -19,11 +23,6 @@ jest.mock("react-router-dom", () => ({
 }));
 
 describe('App tests', () => {
-  test('should render default App component', () => {
-    const view = shallow(<App />);
-    expect(view).toMatchSnapshot();
-  });
-
   it('should render a nav-toggle button', () => {
     const wrapper = mount(<App />);
     const button = wrapper.find(Button);

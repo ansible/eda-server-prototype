@@ -4280,6 +4280,7 @@ exports[`RuleBooks should render the RuleBooks component 1`] = `
                                                                     menuAppendTo="inline"
                                                                     onSelect={[Function]}
                                                                     position="right"
+                                                                    removeFindDomNode={false}
                                                                     toggle={
                                                                       <KebabToggle
                                                                         onToggle={[Function]}
@@ -5147,6 +5148,7 @@ exports[`RuleBooks should render the RuleBooks component 1`] = `
                                                                     menuAppendTo="inline"
                                                                     onSelect={[Function]}
                                                                     position="right"
+                                                                    removeFindDomNode={false}
                                                                     toggle={
                                                                       <KebabToggle
                                                                         onToggle={[Function]}
@@ -6014,6 +6016,7 @@ exports[`RuleBooks should render the RuleBooks component 1`] = `
                                                                     menuAppendTo="inline"
                                                                     onSelect={[Function]}
                                                                     position="right"
+                                                                    removeFindDomNode={false}
                                                                     toggle={
                                                                       <KebabToggle
                                                                         onToggle={[Function]}
