@@ -14,7 +14,7 @@ import {getServer} from "@app/utils/utils";
 
 const columns = (intl) => [
   {
-    title: (intl.formatMessage(sharedMessages.rule))
+    title: (intl.formatMessage(sharedMessages.name))
   },
   {
     title: (intl.formatMessage(sharedMessages.condition)),

@@ -1,3 +1,5 @@
+import {TabItemType} from "@app/shared/types/common-types";
+
 export function accessibleRouteChangeHandler() {
   return window.setTimeout(() => {
     const mainContainer = document.getElementById('primary-app-container');
@@ -56,3 +58,8 @@ export async function patchData(url = '', data = {}) {
 export function getServer() {
     return window.location.hostname + ":" + window.location.port
 }
+
+export const getTabFromPath = (tabs:TabItemType[], path:string):string | undefined => {
+  const currentTab=tabs.find((tabItem) => tabItem.name.split('/').pop() === path.split('/').pop());
+  return currentTab?.title;
+};

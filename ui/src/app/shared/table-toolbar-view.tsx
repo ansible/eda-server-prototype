@@ -115,8 +115,6 @@ export const TableToolbarView: React.ComponentType<TableToolbarViewProps> = ({
       }}
     />
   );
-  console.log('Debug tableToolbarView - rows: ', rows);
-  console.log('Debug tableToolbarView - routes: ', routes());
   return (
     <Fragment>
       {!isLoading && rows.length === 0 ? (

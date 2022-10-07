@@ -4,7 +4,7 @@ import React, { useState, useEffect, Fragment } from 'react';
 import {useIntl} from "react-intl";
 import AppTabs from "@app/shared/app-tabs";
 import {CaretLeftIcon} from "@patternfly/react-icons";
-import {getServer} from "@app/utils/utils";
+import {getServer, getTabFromPath} from "@app/utils/utils";
 import {TopToolbar} from "@app/shared/top-toolbar";
 import {RulesetRules} from "@app/RuleSet/ruleset-rules";
 import {RulesetDetails} from "@app/RuleSet/ruleset-details";
@@ -70,11 +70,6 @@ export const renderRuleSetFileTabs = (rulesetId: string, intl) => {
 const endpoint_ruleset = 'http://' + getServer() + '/api/rulesets/';
 const endpoint_rulebook_json = 'http://' + getServer() + '/api/rulebook_json/';
 
-export const getTabFromPath = (tabs:TabItemType[], path:string):string | undefined => {
-  const currentTab=tabs.find((tabItem) => tabItem.name.split('/').pop() === path.split('/').pop());
-  return currentTab?.title;
-};
-
 const RuleSet: React.FunctionComponent = () => {
   const [ruleset, setRuleSet] = useState<RuleSetType|undefined>(undefined);
   const { id } = useParams<{id: string}>();
@@ -85,12 +80,11 @@ const RuleSet: React.FunctionComponent = () => {
       headers: {
         'Content-Type': 'application/json',
       },
-    }).then(response => { console.log('Debug response: ', response); return response.json();})
-      .then(data => { console.log('Debug - data: ', data); return setRuleSet(data);});
+    }).then(response => response.json())
+      .then(data => setRuleSet(data));
   }, []);
 
   const location = useLocation();
-  console.log('Debug - ruleset: ', ruleset);
   const currentTab = ruleset?.id ?
     getTabFromPath(buildRuleSetFileTabs(ruleset.id,intl), location.pathname) :
     intl.formatMessage(sharedMessages.details);

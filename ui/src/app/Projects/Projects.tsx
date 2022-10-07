@@ -26,11 +26,9 @@ interface ProjectType {
 
 const endpoint = 'http://' + getServer() + '/api/projects/';
 
-const columns = (intl, selectedAll, selectAll) => [
+const columns = (intl) => [
   {
-    title: (
-      <Checkbox onChange={selectAll} isChecked={selectedAll} id="select-all" />
-    ),
+    title: (''),
     transforms: [cellWidth(10 )]
   },
   {
@@ -288,7 +286,7 @@ const Projects: React.FunctionComponent = () => {
             rows={rows}
             setLimit={setLimit}
             setOffset={setOffset}
-            columns={columns(intl, selectedAll, selectAllFunction)}
+            columns={columns(intl)}
             fetchData={handlePagination}
             routes={routes}
             actionResolver={actionResolver}

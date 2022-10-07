@@ -4,7 +4,7 @@ import React, { useState, useEffect, Fragment } from 'react';
 import {useIntl} from "react-intl";
 import AppTabs from "@app/shared/app-tabs";
 import {CaretLeftIcon} from "@patternfly/react-icons";
-import {getServer} from "@app/utils/utils";
+import {getServer, getTabFromPath} from "@app/utils/utils";
 import {TopToolbar} from "@app/shared/top-toolbar";
 import {ActivationJobs} from "@app/Activation/activation-jobs";
 import {ActivationDetails} from "@app/Activation/activation-details";
@@ -13,13 +13,8 @@ import {defaultSettings} from "@app/shared/pagination";
 import {ActivationType} from "@app/Activations/Activations";
 import {JobType} from "@app/Job/Job";
 import sharedMessages from "../messages/shared.messages";
-import {AnyObject} from "@app/shared/types/common-types";
+import {AnyObject, TabItemType} from "@app/shared/types/common-types";
 
-interface TabItemType {
-  eventKey: number;
-  title: string;
-  name: string;
-}
 const buildActivationTabs = (activationId: string, intl: AnyObject) : TabItemType[] => ( [
     {
       eventKey: 0,
@@ -62,10 +57,6 @@ export const fetchActivationJobs = (activationId, pagination=defaultSettings) =>
     },
   }).then(response => response.json());
 }
-export const getTabFromPath = (tabs:TabItemType[], path:string):string | undefined => {
-  const currentTab=tabs.find((tabItem) => tabItem.name.split('/').pop() === path.split('/').pop());
-  return currentTab?.title;
-};
 
 const Activation: React.FunctionComponent = () => {
 

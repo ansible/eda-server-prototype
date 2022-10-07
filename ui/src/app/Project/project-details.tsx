@@ -96,7 +96,7 @@ const ProjectDetails: React.FunctionComponent<{project:ProjectType | undefined}>
 
   return (
   <PageSection page-type={'project-details'} id={'project-details'}>
-    { renderProjectTabs(intl, project?.id) }
+    { renderProjectTabs(project?.id || '', intl) }
     <Stack>
       <StackItem>
         <Card>

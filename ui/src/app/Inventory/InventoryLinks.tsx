@@ -13,7 +13,6 @@ const Inventory: React.FunctionComponent = () => {
   const [inventory, setInventory] = useState<InventoryType|undefined>(undefined);
 
   const { id } =  useParams<Record<string, string | undefined>>()
-  console.log(id);
 
   useEffect(() => {
      fetch(endpoint + id, {

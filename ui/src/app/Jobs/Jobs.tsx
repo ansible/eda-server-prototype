@@ -31,9 +31,7 @@ const endpoint = 'http://' + getServer() + '/api/job_instances/';
 
 const columns = (intl, selectedAll, selectAll) => [
   {
-    title: (
-      <Checkbox onChange={selectAll} isChecked={selectedAll} id="select-all" />
-    ),
+    title: (''),
     transforms: [cellWidth(10 )]
   },
   {

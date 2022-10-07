@@ -15,8 +15,7 @@ import {
 import styled from 'styled-components';
 import {getServer} from '@app/utils/utils';
 import {TopToolbar} from "@app/shared/top-toolbar";
-import {RuleSetType} from "@app/RuleSetFiles/RuleSetFiles";
-
+import {RuleSetType} from "@app/RuleSets/RuleSets";
 
 const CardBody = styled(PFCardBody)`
   white-space: pre-wrap;
@@ -34,7 +33,6 @@ const RuleSetFile: React.FunctionComponent = () => {
   const [rulesets, setRuleSets] = useState<RuleSetType[]>([]);
 
   const { id } = useParams<{id:string}>();
-  console.log(id);
 
   useEffect(() => {
      fetch(endpoint + id, {
