@@ -217,14 +217,14 @@ const NewActivation: React.FunctionComponent = () => {
           })
         );
       })
-      .catch((err) => {
+      .catch((error) => {
         history.push(`/activations`);
         dispatch(
           addNotification({
             variant: 'danger',
             title: intl.formatMessage(sharedMessages.addActivation),
             dismissable: true,
-            description: intl.formatMessage(sharedMessages.add_activation_failure)
+            description: `${intl.formatMessage(sharedMessages.add_activation_failure)} ${error}`
           })
         );
       });

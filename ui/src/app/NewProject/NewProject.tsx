@@ -44,14 +44,14 @@ const NewProject: React.FunctionComponent = () => {
               description: intl.formatMessage(sharedMessages.add_project_success)
             })
           );
-			}).catch((err) => {
+			}).catch((error) => {
         history.push(`/projects`);
         dispatch(
           addNotification({
             variant: 'danger',
             title: intl.formatMessage(sharedMessages.add_new_project),
             dismissable: true,
-            description: intl.formatMessage(sharedMessages.add_project_failure)
+            description: `${intl.formatMessage(sharedMessages.add_project_failure)}  ${error}`
           })
         );
       });

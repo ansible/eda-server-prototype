@@ -149,14 +149,14 @@ const NewJob: React.FunctionComponent = () => {
             description: intl.formatMessage(sharedMessages.add_job_success)
           })
         );
-      }).catch((err) => {
+      }).catch((error) => {
       history.push(`/jobs`);
       dispatch(
         addNotification({
           variant: 'danger',
           title: intl.formatMessage(sharedMessages.addJob),
           dismissable: true,
-          description: intl.formatMessage(sharedMessages.add_job_failure)
+          description: `${intl.formatMessage(sharedMessages.add_job_failure)}  ${error}`
         })
       );
     });

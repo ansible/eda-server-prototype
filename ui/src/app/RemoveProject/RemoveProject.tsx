@@ -52,13 +52,13 @@ const RemoveProject: React.ComponentType<IRemoveProject> = ( {ids = [],
 
   const onSubmit = () => {
     removeProject(id).then(() => push('/projects'))
-    .catch((err) => {
+    .catch((error) => {
       dispatch(
         addNotification({
           variant: 'danger',
           title: intl.formatMessage(sharedMessages.projectRemoveTitle),
           dismissable: true,
-          description: intl.formatMessage(sharedMessages.delete_project_failure)
+          description: `${intl.formatMessage(sharedMessages.delete_project_failure)}  ${error}`
         })
       );
     });

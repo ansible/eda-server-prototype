@@ -36,7 +36,11 @@ export async function postData(url = '', data = {}) {
     referrerPolicy: 'no-referrer',
     body: JSON.stringify(data)
   });
-  return response.json();
+  if (response.ok) {
+    return response.json()
+  }
+  console.log('Debug - response: ', response);
+  throw new Error( `${response?.status} - ${response?.statusText}`);
 }
 
 export async function patchData(url = '', data = {}) {
@@ -52,7 +56,10 @@ export async function patchData(url = '', data = {}) {
     referrerPolicy: 'no-referrer',
     body: JSON.stringify(data)
   });
-  return response.json();
+  if (response.ok) {
+    return response.json()
+  }
+  throw new Error( `${response?.status} - ${response?.statusText}`);
 }
 
 export function getServer() {

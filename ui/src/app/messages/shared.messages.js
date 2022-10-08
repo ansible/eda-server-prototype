@@ -139,6 +139,10 @@ const sharedMessages = defineMessages({
     id: 'shared.sources',
     defaultMessage: 'Sources'
   },
+  error: {
+    id: 'shared.error',
+    defaultMessage: 'Error'
+  },
   project: {
     id: 'project.project',
     defaultMessage: 'Project'

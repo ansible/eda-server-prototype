@@ -92,14 +92,14 @@ const NewInventory: React.FunctionComponent = () => {
             description: intl.formatMessage(sharedMessages.add_inventory_success)
           })
         );
-      }).catch((err) => {
+      }).catch((error) => {
       history.push(`/jobs`);
       dispatch(
         addNotification({
           variant: 'danger',
           title: intl.formatMessage(sharedMessages.addInventory),
           dismissable: true,
-          description: intl.formatMessage(sharedMessages.add_inventory_failure)
+          description: `${intl.formatMessage(sharedMessages.add_inventory_failure)}  ${error}`
         })
       );
     });

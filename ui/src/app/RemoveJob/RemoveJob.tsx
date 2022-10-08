@@ -52,13 +52,13 @@ const RemoveJob: React.ComponentType<IRemoveJob> = ( {ids = [],
 
   const onSubmit = () => {
     removeJob(id).then(() => push('/jobs'))
-    .catch((err) => {
+    .catch((error) => {
       dispatch(
         addNotification({
           variant: 'danger',
           title: intl.formatMessage(sharedMessages.jobRemoveTitle),
           dismissable: true,
-          description: intl.formatMessage(sharedMessages.delete_job_failure)
+          description: `${intl.formatMessage(sharedMessages.delete_job_failure)}  ${error}`
         })
       );
     });

@@ -52,13 +52,13 @@ const RemoveActivation: React.ComponentType<IRemoveActivation> = ( {ids = [],
 
   const onSubmit = () => {
     removeActivation(id).then(() => push('/activations'))
-    .catch((err) => {
+    .catch((error) => {
         dispatch(
           addNotification({
             variant: 'danger',
             title: intl.formatMessage(sharedMessages.activationRemoveTitle),
             dismissable: true,
-            description: intl.formatMessage(sharedMessages.delete_activation_failure)
+            description: `${intl.formatMessage(sharedMessages.delete_activation_failure)}  ${error}`
           })
         );
       });

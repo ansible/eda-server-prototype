@@ -54,14 +54,14 @@ const EditProject: React.FunctionComponent = () => {
               description: intl.formatMessage(sharedMessages.edit_project_success)
             })
           );
-        }).catch((err) => {
+        }).catch((error) => {
         history.push(`/projects`);
         dispatch(
           addNotification({
             variant: 'danger',
             title: intl.formatMessage(sharedMessages.editProject),
             dismissable: true,
-            description: intl.formatMessage(sharedMessages.edit_project_failure)
+            description: `${intl.formatMessage(sharedMessages.edit_project_failure)}  ${error}`
           })
         );
       });

@@ -52,13 +52,13 @@ const RemoveInventory: React.ComponentType<IRemoveInventory> = ( {ids = [],
 
   const onSubmit = () => {
     removeInventory(id).then(() => push('/inventories'))
-    .catch((err) => {
+    .catch((error) => {
       dispatch(
         addNotification({
           variant: 'danger',
           title: intl.formatMessage(sharedMessages.inventoryRemoveTitle),
           dismissable: true,
-          description: intl.formatMessage(sharedMessages.delete_inventory_failure)
+          description: `${intl.formatMessage(sharedMessages.delete_inventory_failure)}  ${error}`
         })
       );
     });
