@@ -1,7 +1,6 @@
 import hashlib
 from unittest import mock
 
-import pytest
 import sqlalchemy as sa
 from fastapi import status as status_codes
 from httpx import AsyncClient
@@ -44,7 +43,6 @@ TEST_RULEBOOK = """
 TEST_PLAYBOOK = TEST_RULEBOOK
 
 
-@pytest.mark.asyncio
 async def test_create_delete_project(client: AsyncClient, db: AsyncSession):
     query = sa.insert(models.projects).values(
         url=TEST_PROJECT["url"],
@@ -117,13 +115,11 @@ async def test_create_delete_project(client: AsyncClient, db: AsyncSession):
     assert len(playbooks) == 0
 
 
-@pytest.mark.asyncio
 async def test_delete_project_not_found(client: AsyncClient):
     response = await client.delete("/api/projects/1")
     assert response.status_code == status_codes.HTTP_404_NOT_FOUND
 
 
-@pytest.mark.asyncio
 @mock.patch("eda_server.api.project.clone_project")
 @mock.patch("eda_server.api.project.sync_project")
 async def test_create_project(
@@ -157,7 +153,6 @@ async def test_create_project(
     )
 
 
-@pytest.mark.asyncio
 async def test_create_project_bad_entity(
     client: AsyncClient, db: AsyncSession
 ):
@@ -173,7 +168,6 @@ async def test_create_project_bad_entity(
     assert response.status_code == status_codes.HTTP_422_UNPROCESSABLE_ENTITY
 
 
-@pytest.mark.asyncio
 @mock.patch("eda_server.api.project.clone_project")
 async def test_create_project_unique_name(
     clone_project: mock.Mock,
@@ -202,7 +196,6 @@ async def test_create_project_unique_name(
     )
 
 
-@pytest.mark.asyncio
 async def test_create_project_bad_name(client: AsyncClient, db: AsyncSession):
     test_project_bad = TEST_PROJECT.copy()
     test_project_bad["name"] = "     "
@@ -214,7 +207,6 @@ async def test_create_project_bad_name(client: AsyncClient, db: AsyncSession):
     assert response.status_code == status_codes.HTTP_422_UNPROCESSABLE_ENTITY
 
 
-@pytest.mark.asyncio
 async def test_create_project_missing_name(
     client: AsyncClient, db: AsyncSession
 ):
@@ -224,7 +216,6 @@ async def test_create_project_missing_name(
     assert response.status_code == status_codes.HTTP_422_UNPROCESSABLE_ENTITY
 
 
-@pytest.mark.asyncio
 async def test_get_project(client: AsyncClient, db: AsyncSession):
 
     query = sa.insert(models.projects).values(
@@ -248,7 +239,6 @@ async def test_get_project(client: AsyncClient, db: AsyncSession):
     assert data["url"] == TEST_PROJECT["url"]
 
 
-@pytest.mark.asyncio
 async def test_get_project_not_found(client: AsyncClient, db: AsyncSession):
 
     query = sa.insert(models.projects).values(
@@ -264,7 +254,6 @@ async def test_get_project_not_found(client: AsyncClient, db: AsyncSession):
     assert response.status_code == status_codes.HTTP_404_NOT_FOUND
 
 
-@pytest.mark.asyncio
 async def test_edit_project(client: AsyncClient, db: AsyncSession):
 
     query = sa.insert(models.projects).values(
@@ -291,7 +280,6 @@ async def test_edit_project(client: AsyncClient, db: AsyncSession):
     assert data["url"] == TEST_PROJECT["url"]
 
 
-@pytest.mark.asyncio
 async def test_edit_project_missing(client: AsyncClient, db: AsyncSession):
 
     response = await client.patch(
@@ -302,7 +290,6 @@ async def test_edit_project_missing(client: AsyncClient, db: AsyncSession):
     assert response.status_code == status_codes.HTTP_404_NOT_FOUND
 
 
-@pytest.mark.asyncio
 async def test_edit_project_bad_name(client: AsyncClient, db: AsyncSession):
 
     response = await client.patch(
@@ -313,7 +300,6 @@ async def test_edit_project_bad_name(client: AsyncClient, db: AsyncSession):
     assert response.status_code == status_codes.HTTP_422_UNPROCESSABLE_ENTITY
 
 
-@pytest.mark.asyncio
 async def test_edit_project_unique_name(client: AsyncClient, db: AsyncSession):
 
     test_projects_values = [
@@ -378,7 +364,6 @@ async def test_edit_project_unique_name(client: AsyncClient, db: AsyncSession):
     assert data["detail"] == expected_msg
 
 
-@pytest.mark.asyncio
 async def test_get_projects(client: AsyncClient, db: AsyncSession):
 
     test_project_two = {

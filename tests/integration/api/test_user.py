@@ -2,7 +2,6 @@ import operator
 import uuid
 from typing import List, Tuple
 
-import pytest
 import sqlalchemy as sa
 from fastapi import status
 from httpx import AsyncClient, Response
@@ -132,7 +131,6 @@ def _check_test_user_permissions_response(response: Response):
     )
 
 
-@pytest.mark.asyncio
 async def test_add_user_role(client: AsyncClient, db: AsyncSession):
     user = await _create_user(db, "test-user@example.com")
     role_id = await _create_role(db, "test-role")
@@ -153,7 +151,6 @@ async def test_add_user_role(client: AsyncClient, db: AsyncSession):
     assert role_exists
 
 
-@pytest.mark.asyncio
 async def test_add_user_role_user_not_exist(
     client: AsyncClient, db: AsyncSession
 ):
@@ -166,7 +163,6 @@ async def test_add_user_role_user_not_exist(
     assert response.status_code == status.HTTP_404_NOT_FOUND
 
 
-@pytest.mark.asyncio
 async def test_add_user_role_role_not_exist(
     client: AsyncClient, db: AsyncSession
 ):
@@ -179,7 +175,6 @@ async def test_add_user_role_role_not_exist(
     assert response.status_code == status.HTTP_404_NOT_FOUND
 
 
-@pytest.mark.asyncio
 async def test_add_user_role_duplicate(client: AsyncClient, db: AsyncSession):
     user = await _create_user(db, "test-user@example.com")
     role_id = await _create_role(db, "test-role")
@@ -190,7 +185,6 @@ async def test_add_user_role_duplicate(client: AsyncClient, db: AsyncSession):
     assert response.status_code == status.HTTP_204_NO_CONTENT
 
 
-@pytest.mark.asyncio
 async def test_remove_user_role(client: AsyncClient, db: AsyncSession):
     user = await _create_user(db, "test-user@example.com")
     role_id = await _create_role(db, "test-role")
@@ -200,7 +194,6 @@ async def test_remove_user_role(client: AsyncClient, db: AsyncSession):
     assert response.status_code == status.HTTP_204_NO_CONTENT
 
 
-@pytest.mark.asyncio
 async def test_remove_user_role_user_not_exist(
     client: AsyncClient, db: AsyncSession
 ):
@@ -213,7 +206,6 @@ async def test_remove_user_role_user_not_exist(
     assert response.status_code == status.HTTP_404_NOT_FOUND
 
 
-@pytest.mark.asyncio
 async def test_remove_user_role_role_not_exist(
     client: AsyncClient, db: AsyncSession
 ):
@@ -227,7 +219,8 @@ async def test_remove_user_role_role_not_exist(
 
 
 # Test list roles
-@pytest.mark.asyncio
+
+
 async def test_list_me_roles(client: AsyncClient, db: AsyncSession):
     user = await get_admin_user(db)
     role_ids = await _prepare_test_user_roles(db, user.id)
@@ -235,7 +228,6 @@ async def test_list_me_roles(client: AsyncClient, db: AsyncSession):
     _check_test_user_roles_response(response, role_ids)
 
 
-@pytest.mark.asyncio
 async def test_list_user_roles(client: AsyncClient, db: AsyncSession):
     user = await _create_user(db, "test-user@example.com")
     role_ids = await _prepare_test_user_roles(db, user.id)
@@ -244,7 +236,8 @@ async def test_list_user_roles(client: AsyncClient, db: AsyncSession):
 
 
 # Test list permissions
-@pytest.mark.asyncio
+
+
 async def test_list_me_permissions(client: AsyncClient, db: AsyncSession):
     user = await get_admin_user(db)
     await _prepare_test_user_roles(db, user.id)
@@ -252,7 +245,6 @@ async def test_list_me_permissions(client: AsyncClient, db: AsyncSession):
     _check_test_user_permissions_response(response)
 
 
-@pytest.mark.asyncio
 async def test_list_user_permissions(client: AsyncClient, db: AsyncSession):
     user = await _create_user(db, "test-user@example.com")
     await _prepare_test_user_roles(db, user.id)

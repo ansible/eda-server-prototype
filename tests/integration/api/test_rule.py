@@ -1,4 +1,3 @@
-import pytest
 import sqlalchemy as sa
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -90,7 +89,6 @@ async def _create_rules(db: AsyncSession):
     return project, rulebook, ruleset, rules
 
 
-@pytest.mark.asyncio
 async def test_list_rules(client: AsyncClient, db: AsyncSession):
     _, _, ruleset, rules = await _create_rules(db)
 
@@ -110,7 +108,6 @@ async def test_list_rules(client: AsyncClient, db: AsyncSession):
     ]
 
 
-@pytest.mark.asyncio
 async def test_read_rule(client: AsyncClient, db: AsyncSession):
     _, _, ruleset, rules = await _create_rules(db)
 
@@ -127,7 +124,6 @@ async def test_read_rule(client: AsyncClient, db: AsyncSession):
     }
 
 
-@pytest.mark.asyncio
 async def test_list_rulesets(client: AsyncClient, db: AsyncSession):
     _, rulebook, ruleset, rules = await _create_rules(db)
 
@@ -142,7 +138,6 @@ async def test_list_rulesets(client: AsyncClient, db: AsyncSession):
     ]
 
 
-@pytest.mark.asyncio
 async def test_read_ruleset(client: AsyncClient, db: AsyncSession):
     project, rulebook, ruleset, rules = await _create_rules(db)
     response = await client.get(f"/api/rulesets/{ruleset.id}")
@@ -164,7 +159,6 @@ async def test_read_ruleset(client: AsyncClient, db: AsyncSession):
     }
 
 
-@pytest.mark.asyncio
 async def test_read_ruleset_not_found(client: AsyncClient, db: AsyncSession):
     response = await client.get("/api/rulesets/-1")
     assert response.status_code == status_codes.HTTP_404_NOT_FOUND

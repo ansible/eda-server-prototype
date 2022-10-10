@@ -1,4 +1,3 @@
-import pytest
 import sqlalchemy as sa
 from fastapi import status as status_codes
 from httpx import AsyncClient
@@ -35,7 +34,6 @@ TEST_RULEBOOK = """
 TEST_PLAYBOOK = TEST_RULEBOOK
 
 
-@pytest.mark.asyncio
 async def test_create_delete_job(client: AsyncClient, db: AsyncSession):
     query = sa.insert(models.job_instances).values(
         uuid="f4c87c90-254e-11ed-861d-0242ac120002",
@@ -55,7 +53,6 @@ async def test_create_delete_job(client: AsyncClient, db: AsyncSession):
     assert len(jobs) == (jobs_len - 1)
 
 
-@pytest.mark.asyncio
 async def test_delete_job_not_found(client: AsyncClient):
     response = await client.delete("/api/job_instance/1")
     assert response.status_code == status_codes.HTTP_404_NOT_FOUND
