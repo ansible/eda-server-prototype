@@ -36,11 +36,14 @@ const NewProject: React.FunctionComponent = () => {
   const intl = useIntl();
   const dispatch = useDispatch();
 
-  const validateName = (value) => {
-    console.log('Debug - name: ', value);
-    (!value || value.length < 1 ) ?
-      setValidatedName(ValidatedOptions.error) :
-      setValidatedName(ValidatedOptions.default)
+  const validateName = (value): boolean => {
+    if (!value || (value.length < 1)) {
+      setValidatedName(ValidatedOptions.error);
+      return false;
+    } else {
+      setValidatedName(ValidatedOptions.default);
+      return true;
+    }
   }
 
   const onNameChange = (value) => {
@@ -48,10 +51,14 @@ const NewProject: React.FunctionComponent = () => {
     validateName(value);
   };
 
-  const validateScmUrl = (value) => {
-    (!value || value.length < 1 ) ?
-      setValidatedScmUrl(ValidatedOptions.error) :
-      setValidatedScmUrl(ValidatedOptions.default)
+  const validateScmUrl = (value): boolean => {
+    if(!value || value.length < 1 ) {
+      setValidatedScmUrl(ValidatedOptions.error);
+      return false;
+    }else {
+      setValidatedScmUrl(ValidatedOptions.default);
+      return true;
+    }
   }
 
   const onScmUrlChange = (value) => {
@@ -59,8 +66,16 @@ const NewProject: React.FunctionComponent = () => {
     validateScmUrl(value);
   };
 
+  const validateFields = () => {
+    return validateName(name) &&
+      validateScmUrl(scmUrl);
+  }
+
   const handleSubmit = () => {
-			postData(endpoint, { url: scmUrl, name: name, description: description })
+    if(!validateFields() ) {
+      return;
+    }
+    postData(endpoint, { url: scmUrl, name: name, description: description })
 				.then(data => {
           history.push(`/project/${data.id}`);
           dispatch(

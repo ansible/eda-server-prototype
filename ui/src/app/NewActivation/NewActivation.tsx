@@ -130,14 +130,10 @@ const NewActivation: React.FunctionComponent = () => {
   }, []);
 
   const validateName = (value): boolean => {
-    console.log('value, Validated name: ', value, validatedName);
-    console.log('!value, value.length: ', !value, value.length);
     if (!value || (value.length < 1)) {
-      console.log('debug - ValidatedOptions.error', ValidatedOptions.error);
       setValidatedName(ValidatedOptions.error);
       return false;
     } else {
-      console.log('debug - ValidatedOptions.default', ValidatedOptions.default);
       setValidatedName(ValidatedOptions.default);
       return true;
     }
@@ -239,6 +235,7 @@ const NewActivation: React.FunctionComponent = () => {
       validateExtraVar(extravar) &&
       validateProject(project);
   }
+
   const handleSubmit = (e) => {
     e.preventDefault();
     if(!validateFields() ) {
