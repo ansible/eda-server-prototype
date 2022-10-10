@@ -81,59 +81,73 @@ const NewJob: React.FunctionComponent = () => {
     .then(data => setExtraVars([...extravars, ...data]));
   }, []);
 
-  const validateName = (value) => {
-    (!value || value.length < 1 ) ?
-      setValidatedName(ValidatedOptions.error) :
-      setValidatedName(ValidatedOptions.default)
+  const validateName = (value) : boolean => {
+    if (!value || value.length < 1 ) {
+      setValidatedName(ValidatedOptions.error);
+      return false;
+    } else {
+      setValidatedName(ValidatedOptions.default);
+      return true;
+    }
   }
 
-  const onNameChange = (value) => {
-    setName(value);
-    validateName(value);
-  };
-
-  const validatePlaybook = (value) => {
-    (!value || value.length < 1 ) ?
-      setValidatedPlaybook(ValidatedOptions.error) :
-      setValidatedPlaybook(ValidatedOptions.default)
-  };
+  const validatePlaybook = (value) : boolean => {
+    if (!value || value.length < 1 ) {
+      setValidatedPlaybook(ValidatedOptions.error);
+      return false;
+    } else {
+      setValidatedPlaybook(ValidatedOptions.default);
+      return true;
+    }
+  }
 
   const onPlaybookChange = (value) => {
     setPlaybook(value);
     validatePlaybook(value);
-  };
+  }
 
-  const validateInventory = (value) => {
-    (!value || value.length < 1 ) ?
-      setValidatedInventory(ValidatedOptions.error) :
-      setValidatedInventory(ValidatedOptions.default)
-  };
+  const validateInventory = (value): boolean => {
+    if (!value || value.length < 1 ) {
+      setValidatedInventory(ValidatedOptions.error);
+      return false;
+    } else {
+      setValidatedInventory(ValidatedOptions.default);
+      return true;
+    }
+  }
 
   const onInventoryChange = (value) => {
     setInventory(value);
     validateInventory(value);
-  };
-
-  const validateExtraVar = (value) => {
-    (!value || value.length < 1 ) ?
-      setValidatedExtraVar(ValidatedOptions.error) :
-      setValidatedExtraVar(ValidatedOptions.default)
   }
+
+  const validateExtraVar = (value) : boolean => {
+    if(!value || value.length < 1 ) {
+      setValidatedExtraVar(ValidatedOptions.error);
+      return false;
+    } else {
+      setValidatedExtraVar(ValidatedOptions.default);
+      return true;
+    }
+  }
+
   const onExtraVarChange = (value) => {
     setExtraVar(value);
     validateExtraVar(value);
-  };
+  }
 
   const validateFields = () => {
-    validateName(name);
-    validatePlaybook(playbook);
-    validateInventory(inventory);
+    return validateName(name) &&
+    validatePlaybook(playbook) &&
+    validateInventory(inventory) &&
     validateExtraVar(extravar);
-  };
+  }
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    validateFields();
+    if ( !validateFields() )
+      return;
+
     postData(endpoint_job, { name: name,
                          playbook_id: playbook,
                          inventory_id: inventory,
