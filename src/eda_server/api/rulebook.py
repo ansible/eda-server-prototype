@@ -309,3 +309,43 @@ async def read_rulebook_json(
     response = dict(result.first())
     response["rulesets"] = yaml.safe_load(response["rulesets"])
     return response
+
+
+@router.get(
+    "/api/rulebooks/{rulebook_id}/rulesets",
+    operation_id="list_rulebook_rulesets",
+    response_model=List[schema.RulebookRulesetList],
+)
+async def list_rulebook_rulesets(
+    rulebook_id: int, db: AsyncSession = Depends(get_db_session)
+):
+    query = (
+        sa.select(
+            ruleset.c.id,
+            ruleset.c.name,
+            sa.func.coalesce(ruls_ct.c.rule_count, 0).label("rule_count"),
+            sa.func.coalesce(ruleset_fire_count.c.fire_count, 0).label("fire_count")
+        )
+        .select_from(ruleset)
+        .outerjoin(
+            ruls_ct,
+            ruls_ct.c.rule_count == ruleset.c.id,
+        )
+        .outerjoin(
+            ruleset_fire_count,
+            ruleset_fire_count.c.fire_count == ruleset.c.id,
+        )
+        .outerjoin(
+            rulebook,
+            rulebook.c.id == ruleset.c.rulebook_id
+        )
+    ).filter(rulebook.c.id == rulebook_id)
+
+    result = (await db.execute(query)).all()
+    if not result:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Rulebook Not Found.",
+        )
+    return result
+
