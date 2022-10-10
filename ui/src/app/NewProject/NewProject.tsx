@@ -1,4 +1,4 @@
-import {Grid, GridItem, PageSection, Title} from '@patternfly/react-core';
+import {Grid, GridItem, PageSection, Title, ValidatedOptions} from '@patternfly/react-core';
 import { useHistory } from "react-router-dom";
 import React, { useState, useEffect } from 'react';
 import {
@@ -14,6 +14,7 @@ import {TopToolbar} from "@app/shared/top-toolbar";
 import sharedMessages from "../messages/shared.messages";
 import {addNotification} from '@redhat-cloud-services/frontend-components-notifications';
 import {useDispatch} from "react-redux";
+import {ExclamationCircleIcon} from "@patternfly/react-icons";
 
 const CardBody = styled(PFCardBody)`
   white-space: pre-wrap;
@@ -29,8 +30,34 @@ const NewProject: React.FunctionComponent = () => {
   const [description, setDescription] = useState('');
   const [scmType, setScmType] = useState('');
   const [scmCredential, setScmCredential] = useState('');
+  const [validatedName, setValidatedName ] = useState<ValidatedOptions>(ValidatedOptions.default);
+  const [validatedScmUrl, setValidatedScmUrl ] = useState<ValidatedOptions>(ValidatedOptions.default);
+
   const intl = useIntl();
   const dispatch = useDispatch();
+
+  const validateName = (value) => {
+    console.log('Debug - name: ', value);
+    (!value || value.length < 1 ) ?
+      setValidatedName(ValidatedOptions.error) :
+      setValidatedName(ValidatedOptions.default)
+  }
+
+  const onNameChange = (value) => {
+    setName(value);
+    validateName(value);
+  };
+
+  const validateScmUrl = (value) => {
+    (!value || value.length < 1 ) ?
+      setValidatedScmUrl(ValidatedOptions.error) :
+      setValidatedScmUrl(ValidatedOptions.default)
+  }
+
+  const onScmUrlChange = (value) => {
+    setName(value);
+    validateScmUrl(value);
+  };
 
   const handleSubmit = () => {
 			postData(endpoint, { url: scmUrl, name: name, description: description })
@@ -81,11 +108,19 @@ const NewProject: React.FunctionComponent = () => {
               <FormGroup style={{paddingLeft: '15px', paddingRight: '15px'}}
                 label="Name"
                 fieldId="name"
+                isRequired
+                helperTextInvalid={ intl.formatMessage(sharedMessages.enterProjectName) }
+                helperTextInvalidIcon={<ExclamationCircleIcon />}
+                validated={validatedName}
               >
                 <TextInput
-                  onChange={setName}
+                  id="project-name"
                   value={name}
-                  id="name"
+                  label="Name"
+                  isRequired
+                  validated={validatedName}
+                  onChange={onNameChange}
+                  onBlur={(event) => validateName(name)}
                   placeholder={ intl.formatMessage(sharedMessages.namePlaceholder) }
                 />
               </FormGroup>
@@ -120,12 +155,20 @@ const NewProject: React.FunctionComponent = () => {
               <FormGroup style={{paddingLeft: '15px', paddingRight: '15px'}}
                 label="SCM URL"
                 fieldId="url-1"
+                isRequired
+                helperTextInvalid={ intl.formatMessage(sharedMessages.enterScmUrl) }
+                helperTextInvalidIcon={<ExclamationCircleIcon />}
+                validated={validatedScmUrl}
               >
                 <TextInput
-                  onChange={setScmUrl}
                   value={scmUrl}
                   id="url-1"
                   placeholder={intl.formatMessage(sharedMessages.scmUrlPlaceholder)}
+                  label="SCM URL"
+                  isRequired
+                  validated={validatedScmUrl}
+                  onChange={onScmUrlChange}
+                  onBlur={(event) => validateScmUrl(scmUrl)}
                 />
               </FormGroup>
             </GridItem>
