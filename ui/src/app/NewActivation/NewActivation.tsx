@@ -47,13 +47,32 @@ export interface RestartPolicyType {
 const NewActivation: React.FunctionComponent = () => {
   const history = useHistory();
   const intl = useIntl();
-  const [rulesets, setRuleSets] = useState<RuleType[]>([{id:'', name:intl.formatMessage(sharedMessages.ruleSetPlaceholder)}]);
-  const [inventories, setInventories] = useState<InventoryType[]>([{id:'', name: intl.formatMessage(sharedMessages.inventoryPlaceholder) }]);
-  const [extravars, setExtraVars] = useState<ExtraVarType[]>([{id:'', name:intl.formatMessage(sharedMessages.extraVarPlaceholder), extra_var:''}]);
-  const [projects, setProjects] = useState<ExtraVarType[]>([{id:'', name:intl.formatMessage(sharedMessages.projectPlaceholder), extra_var:''}]);
-  const [executionEnvironments, setExecutionEnvironments] = useState<ExecutionEnvironmentType[]>([{id:'',
-    name:intl.formatMessage(sharedMessages.executionEnvironmentPlaceholder)}]);
-  const [restartPolicies, setRestartPolicies] = useState<RestartPolicyType[]>([{id:'', name: intl.formatMessage(sharedMessages.restartPolicyPlaceholder)}]);
+  const [rulesets, setRuleSets] = useState<RuleType[]>([{
+    id: '',
+    name: intl.formatMessage(sharedMessages.ruleSetPlaceholder)
+  }]);
+  const [inventories, setInventories] = useState<InventoryType[]>([{
+    id: '',
+    name: intl.formatMessage(sharedMessages.inventoryPlaceholder)
+  }]);
+  const [extravars, setExtraVars] = useState<ExtraVarType[]>([{
+    id: '',
+    name: intl.formatMessage(sharedMessages.extraVarPlaceholder),
+    extra_var: ''
+  }]);
+  const [projects, setProjects] = useState<ExtraVarType[]>([{
+    id: '',
+    name: intl.formatMessage(sharedMessages.projectPlaceholder),
+    extra_var: ''
+  }]);
+  const [executionEnvironments, setExecutionEnvironments] = useState<ExecutionEnvironmentType[]>([{
+    id: '',
+    name: intl.formatMessage(sharedMessages.executionEnvironmentPlaceholder)
+  }]);
+  const [restartPolicies, setRestartPolicies] = useState<RestartPolicyType[]>([{
+    id: '',
+    name: intl.formatMessage(sharedMessages.restartPolicyPlaceholder)
+  }]);
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [executionEnvironment, setExecutionEnvironment] = useState('');
@@ -64,56 +83,64 @@ const NewActivation: React.FunctionComponent = () => {
   const [project, setProject] = useState('');
   const [workingDirectory, setWorkingDirectory] = useState('');
 
-  const [ validatedName, setValidatedName ] = useState<ValidatedOptions>(ValidatedOptions.default);
-  const [ validatedRuleSet, setValidatedRuleSet ] = useState<ValidatedOptions>(ValidatedOptions.default);
-  const [ validatedInventory, setValidatedInventory ] = useState<ValidatedOptions>(ValidatedOptions.default);
-  const [ validatedExtraVar, setValidatedExtraVar ] = useState<ValidatedOptions>(ValidatedOptions.default);
-  const [ validatedProject, setValidatedProject ] = useState<ValidatedOptions>(ValidatedOptions.default);
-  const [ validatedWorkingDirectory, setValidatedWorkingDirectory ] = useState<ValidatedOptions>(ValidatedOptions.default);
-  const [ validatedExecutionEnvironment, setValidatedExecutionEnvironment ] = useState<ValidatedOptions>(ValidatedOptions.default);
+  const [validatedName, setValidatedName] = useState<ValidatedOptions>(ValidatedOptions.default);
+  const [validatedRuleSet, setValidatedRuleSet] = useState<ValidatedOptions>(ValidatedOptions.default);
+  const [validatedInventory, setValidatedInventory] = useState<ValidatedOptions>(ValidatedOptions.default);
+  const [validatedExtraVar, setValidatedExtraVar] = useState<ValidatedOptions>(ValidatedOptions.default);
+  const [validatedProject, setValidatedProject] = useState<ValidatedOptions>(ValidatedOptions.default);
+  const [validatedWorkingDirectory, setValidatedWorkingDirectory] = useState<ValidatedOptions>(ValidatedOptions.default);
+  const [validatedExecutionEnvironment, setValidatedExecutionEnvironment] = useState<ValidatedOptions>(ValidatedOptions.default);
 
   const dispatch = useDispatch();
 
   useEffect(() => {
-     fetch(rulebook_endpoint, {
-       headers: {
-         'Content-Type': 'application/json',
-       },
-     }).then(response => response.json())
-    .then(data => setRuleSets([...rulesets, ...data]));
+    fetch(rulebook_endpoint, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }).then(response => response.json())
+      .then(data => setRuleSets([...rulesets, ...data]));
   }, []);
 
   useEffect(() => {
-     fetch(inventories_endpoint, {
-       headers: {
-         'Content-Type': 'application/json',
-       },
-     }).then(response => response.json())
-    .then(data => setInventories([...inventories, ...data]));
+    fetch(inventories_endpoint, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }).then(response => response.json())
+      .then(data => setInventories([...inventories, ...data]));
   }, []);
 
   useEffect(() => {
-     fetch(vars_endpoint, {
-       headers: {
-         'Content-Type': 'application/json',
-       },
-     }).then(response => response.json())
-    .then(data => setExtraVars([...extravars, ...data]));
+    fetch(vars_endpoint, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }).then(response => response.json())
+      .then(data => setExtraVars([...extravars, ...data]));
   }, []);
 
   useEffect(() => {
-     fetch(project_endpoint, {
-       headers: {
-         'Content-Type': 'application/json',
-       },
-     }).then(response => response.json())
-    .then(data => setProjects([...projects, ...data]));
+    fetch(project_endpoint, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }).then(response => response.json())
+      .then(data => setProjects([...projects, ...data]));
   }, []);
 
-  const validateName = (value) => {
-    (!value || value.length < 1 ) ?
-      setValidatedName(ValidatedOptions.error) :
-      setValidatedName(ValidatedOptions.default)
+  const validateName = (value): boolean => {
+    console.log('value, Validated name: ', value, validatedName);
+    console.log('!value, value.length: ', !value, value.length);
+    if (!value || (value.length < 1)) {
+      console.log('debug - ValidatedOptions.error', ValidatedOptions.error);
+      setValidatedName(ValidatedOptions.error);
+      return false;
+    } else {
+      console.log('debug - ValidatedOptions.default', ValidatedOptions.default);
+      setValidatedName(ValidatedOptions.default);
+      return true;
+    }
   }
 
   const onNameChange = (value) => {
@@ -135,9 +162,13 @@ const NewActivation: React.FunctionComponent = () => {
   };
 
   const validateRuleSet = (value) => {
-    (!value || value.length < 1 ) ?
-      setValidatedRuleSet(ValidatedOptions.error) :
+    if (!value || value.length < 1) {
+      setValidatedRuleSet(ValidatedOptions.error);
+      return false;
+    }else {
       setValidatedRuleSet(ValidatedOptions.default)
+      return true;
+    }
   };
 
   const onRuleSetChange = (value) => {
@@ -145,10 +176,14 @@ const NewActivation: React.FunctionComponent = () => {
     validateRuleSet(value);
   };
 
-  const validateInventory = (value) => {
-    (!value || value.length < 1 ) ?
-      setValidatedInventory(ValidatedOptions.error) :
+  const validateInventory = (value): boolean => {
+    if (!value || value.length < 1) {
+      setValidatedInventory(ValidatedOptions.error);
+      return false;
+    }else {
       setValidatedInventory(ValidatedOptions.default)
+      return true;
+    }
   };
 
   const onInventoryChange = (value) => {
@@ -156,10 +191,14 @@ const NewActivation: React.FunctionComponent = () => {
     validateInventory(value);
   };
 
-  const validateExtraVar = (value) => {
-    (!value || value.length < 1 ) ?
-      setValidatedExtraVar(ValidatedOptions.error) :
+  const validateExtraVar = (value) : boolean => {
+    if (!value || value.length < 1) {
+      setValidatedExtraVar(ValidatedOptions.error);
+      return false;
+    }else {
       setValidatedExtraVar(ValidatedOptions.default)
+      return true;
+    }
   }
   const onExtraVarChange = (value) => {
     setExtraVar(value);
@@ -167,9 +206,13 @@ const NewActivation: React.FunctionComponent = () => {
   };
 
   const validateProject = (value) => {
-    (!value || value.length < 1 ) ?
-      setValidatedProject(ValidatedOptions.error) :
+    if (!value || value.length < 1) {
+      setValidatedProject(ValidatedOptions.error);
+      return false;
+    }else {
       setValidatedProject(ValidatedOptions.default)
+      return true;
+    }
   }
   const onProjectChange = (value) => {
     setProject(value);
@@ -190,16 +233,17 @@ const NewActivation: React.FunctionComponent = () => {
   };
 
   const validateFields = () => {
-    validateName(name);
-    validateRuleSet(ruleset);
-    validateInventory(inventory);
-    validateExtraVar(extravar);
-    validateWorkingDirectory(workingDirectory);
-  };
-
+    return validateName(name) &&
+      validateRuleSet(ruleset) &&
+      validateInventory(inventory) &&
+      validateExtraVar(extravar) &&
+      validateProject(project);
+  }
   const handleSubmit = (e) => {
     e.preventDefault();
-    validateFields();
+    if(!validateFields() ) {
+      return;
+    }
     postData(activation_endpoint, { name: name,
                          rulebook_id: ruleset,
                          inventory_id: inventory,
@@ -265,7 +309,6 @@ const NewActivation: React.FunctionComponent = () => {
                     value={name}
                     label="Name"
                     isRequired
-                    validated={validatedName}
                     onChange={onNameChange}
                     onBlur={(event) => validateName(name)}
                     placeholder={ intl.formatMessage(sharedMessages.namePlaceholder) }

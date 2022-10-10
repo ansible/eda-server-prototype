@@ -251,6 +251,14 @@ const sharedMessages = defineMessages({
     id: 'project.deleteProjectFailure',
     defaultMessage: 'Remove project failed'
   },
+  enterProjectName: {
+    id: 'project.enterProjectName',
+    defaultMessage: 'Enter project name'
+  },
+  enterScmUrl: {
+    id: 'project.enterScm',
+    defaultMessage: 'Enter SCM URL'
+  },
   activation: {
     id: 'activation.activation',
     defaultMessage: 'Activation'
