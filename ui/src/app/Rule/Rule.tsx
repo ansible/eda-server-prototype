@@ -69,7 +69,7 @@ const Rule: React.FunctionComponent = () => {
     <React.Fragment>
       <TopToolbar breadcrumbs={[
         {
-          title: intl.formatMessage(sharedMessages.backToRules),
+          title: intl.formatMessage(sharedMessages.rules),
           key: 'back-to-rules',
           to: '/rules'
         },
