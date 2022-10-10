@@ -19,6 +19,12 @@ class RulebookRead(BaseModel):
     created_at: datetime
     modified_at: datetime
 
+class RulebookRulesetList(BaseModel):
+    id: int
+    name: StrictStr
+    rule_count: int
+    fire_count: int
+
 
 class RulebookRef(BaseModel):
     id: Optional[int]
