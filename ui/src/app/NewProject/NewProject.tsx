@@ -62,7 +62,7 @@ const NewProject: React.FunctionComponent = () => {
   }
 
   const onScmUrlChange = (value) => {
-    setName(value);
+    setScmUrl(value);
     validateScmUrl(value);
   };
 
