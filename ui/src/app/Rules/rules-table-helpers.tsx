@@ -17,7 +17,7 @@ export const createRows = (data) =>
       <Fragment key={`[ruleset-${id}`}>
         <Link
           to={{
-            pathname: `/rulesets/${ruleset?.id}`
+            pathname: `/ruleset/${ruleset?.id}`
           }}
         >
           {ruleset?.name || `Ruleset ${ruleset?.id}`}
