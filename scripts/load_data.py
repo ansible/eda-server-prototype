@@ -16,7 +16,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from eda_server import schema
 from eda_server.config import load_settings
 from eda_server.db import models
-from eda_server.db.session import create_session_factory, engine_from_config
+from eda_server.db.session import (
+    create_session_factory,
+    dispose_context,
+    engine_from_config,
+)
 from eda_server.types import Action, ResourceType
 from eda_server.users import UserManager, get_user_db, get_user_manager
 
@@ -124,12 +128,11 @@ def parse_args() -> argparse.Namespace:
 
 async def main(args: argparse.Namespace):
     config = load_settings()
-    engine = engine_from_config(config)
-    session_factory = create_session_factory(engine)
-
     document = load_document(args.file)
 
-    async with session_factory() as db:
+    engine = engine_from_config(config)
+    session_factory = create_session_factory(engine)
+    async with dispose_context(engine), session_factory() as db:
         await create_roles(db, document.roles)
         user_db = get_user_db(config, db)
         user_manager = get_user_manager(config, user_db)
@@ -138,8 +141,6 @@ async def main(args: argparse.Namespace):
             await assign_user_roles(db, user_id, user.roles)
 
         await db.commit()
-
-    await engine.dispose()
 
 
 def cli():

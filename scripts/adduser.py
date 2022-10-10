@@ -10,9 +10,14 @@ import sys
 
 import pydantic
 from fastapi_users.exceptions import UserAlreadyExists
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from eda_server.config import load_settings
-from eda_server.db.session import create_session_factory, engine_from_config
+from eda_server.config import Settings, load_settings
+from eda_server.db.session import (
+    create_session_factory,
+    dispose_context,
+    engine_from_config,
+)
 from eda_server.schema import UserCreate
 from eda_server.users import RoleNotExists, get_user_db, get_user_manager
 
@@ -28,36 +33,33 @@ class ApplicationError(Exception):
 
 
 async def create_user(
+    config: Settings,
+    db: AsyncSession,
     email: str,
     password: str,
     is_superuser: bool = False,
 ):
-    config = load_settings()
-    engine = engine_from_config(config)
-    session_factory = create_session_factory(engine)
+    user_db = get_user_db(config, db)
+    user_manager = get_user_manager(config, user_db)
 
-    async with session_factory() as db:
-        user_db = get_user_db(config, db)
-        user_manager = get_user_manager(config, user_db)
+    try:
+        data = UserCreate(
+            email=email, password=password, is_superuser=is_superuser
+        )
+    except pydantic.ValidationError as e:
+        message = "Invalid data"
+        for err in e.errors():
+            if err["loc"] == ("email",):
+                message = "Invalid email address"
+                break
+        raise ApplicationError(message)
 
-        try:
-            data = UserCreate(
-                email=email, password=password, is_superuser=is_superuser
-            )
-        except pydantic.ValidationError as e:
-            message = "Invalid data"
-            for err in e.errors():
-                if err["loc"] == ("email",):
-                    message = "Invalid email address"
-                    break
-            raise ApplicationError(message)
-
-        try:
-            await user_manager.create(data)
-        except UserAlreadyExists:
-            raise ApplicationError(f"User '{email}' already exists.")
-        except RoleNotExists as e:
-            raise ApplicationError(str(e))
+    try:
+        await user_manager.create(data)
+    except UserAlreadyExists:
+        raise ApplicationError(f"User '{email}' already exists.")
+    except RoleNotExists as e:
+        raise ApplicationError(str(e))
 
 
 def parse_args() -> argparse.Namespace:
@@ -116,11 +118,17 @@ def read_password(args) -> str:
 
 
 async def main(args: argparse.Namespace):
-    await create_user(
-        email=args.email,
-        password=read_password(args),
-        is_superuser=args.is_superuser,
-    )
+    config = load_settings()
+    engine = engine_from_config(config)
+    session_factory = create_session_factory(engine)
+    async with dispose_context(engine), session_factory() as db:
+        await create_user(
+            config,
+            db,
+            email=args.email,
+            password=read_password(args),
+            is_superuser=args.is_superuser,
+        )
 
 
 def cli():
