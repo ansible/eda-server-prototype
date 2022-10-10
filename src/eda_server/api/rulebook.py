@@ -108,13 +108,14 @@ ruls_ct = sa.orm.aliased(rule_count_lateral)
 
 ruleset_fire_count = (
     sa.select(
+        ruleset.c.rulebook_id,
         audit_rule.c.ruleset_id,
         sa.func.count(audit_rule.c.id).label("fire_count"),
     )
-    .select_from(audit_rule)
+    .select_from(ruleset)
     .group_by(ruleset.c.rulebook_id)
     .group_by(audit_rule.c.ruleset_id)
-    .outerjoin(ruleset, ruleset.c.id == audit_rule.c.ruleset_id)
+    .outerjoin(audit_rule, audit_rule.c.ruleset_id == ruleset.c.id)
 ).cte("ruleset_fire_count")
 
 BASE_RULESET_SELECT = (
@@ -189,11 +190,13 @@ rulebook_ruleset_count = (
 
 
 rulebook_fire_count = (
-    sa.select(sa.func.sum(ruleset_fire_count.c.fire_count).label("fire_count"))
+    sa.select(
+        ruleset_fire_count.c.rulebook_id,
+        sa.func.sum(ruleset_fire_count.c.fire_count).label("fire_count"),
+    )
     .select_from(ruleset_fire_count)
-    .group_by(rulebook.c.id)
-    .outerjoin(ruleset, ruleset.c.id == ruleset_fire_count.c.ruleset_id)
-    .outerjoin(rulebook, rulebook.c.id == ruleset.c.rulebook_id)
+    .group_by(ruleset_fire_count.c.rulebook_id)
+    .outerjoin(rulebook, rulebook.c.id == ruleset_fire_count.c.rulebook_id)
 ).cte("rulebook_fire_count")
 
 
@@ -235,7 +238,6 @@ async def list_rulebooks(db: AsyncSession = Depends(get_db_session)):
 async def read_rulebook(
     rulebook_id: int, db: AsyncSession = Depends(get_db_session)
 ):
-
     query = (
         sa.select(
             rulebook.c.id,
@@ -251,11 +253,15 @@ async def read_rulebook(
             ),
         )
         .select_from(rulebook)
-        .outerjoin(ruleset, ruleset.c.rulebook_id == rulebook.c.id)
-        .outerjoin(rulebook_ruleset_count, sa.true())
-        .outerjoin(rulebook_fire_count, sa.true())
-        .filter(rulebook.c.id == rulebook_id)
-    )
+        .outerjoin(
+            rulebook_ruleset_count,
+            rulebook_ruleset_count.c.rulebook_id == rulebook.c.id,
+        )
+        .outerjoin(
+            rulebook_fire_count,
+            rulebook_fire_count.c.rulebook_id == rulebook.c.id,
+        )
+    ).filter(rulebook.c.id == rulebook_id)
 
     result = (await db.execute(query)).first()
     if not result:
@@ -272,9 +278,32 @@ async def read_rulebook(
 async def read_rulebook_json(
     rulebook_id: int, db: AsyncSession = Depends(get_db_session)
 ):
-    query = sa.select(models.rulebooks).where(
-        models.rulebooks.c.id == rulebook_id
-    )
+    query = (
+        sa.select(
+            rulebook.c.id,
+            rulebook.c.name,
+            rulebook.c.description,
+            rulebook.c.rulesets,
+            sa.func.coalesce(rulebook_ruleset_count.c.ruleset_count, 0).label(
+                "ruleset_count"
+            ),
+            sa.func.coalesce(rulebook_fire_count.c.fire_count, 0).label(
+                "fire_count"
+            ),
+            rulebook.c.created_at,
+            rulebook.c.modified_at,
+        )
+        .select_from(rulebook)
+        .outerjoin(
+            rulebook_ruleset_count,
+            rulebook_ruleset_count.c.rulebook_id == rulebook.c.id,
+        )
+        .outerjoin(
+            rulebook_fire_count,
+            rulebook_fire_count.c.rulebook_id == rulebook.c.id,
+        )
+    ).filter(rulebook.c.id == rulebook_id)
+
     result = await db.execute(query)
 
     response = dict(result.first())
