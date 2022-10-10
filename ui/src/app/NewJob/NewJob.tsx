@@ -45,12 +45,10 @@ const NewJob: React.FunctionComponent = () => {
   const [playbooks, setPlaybooks] = useState([{"id": 0, "name": "Please select a playbook"}])
   const [inventories, setInventories] = useState([{"id": 0, "name": "Please select an inventory"}]);
   const [extravars, setExtraVars] = useState([{"id": 0, "name": "Please select vars"}]);
-  const [name, setName] = useState();
   const [playbook, setPlaybook] = useState('');
   const [inventory, setInventory] = useState('');
   const [extravar, setExtraVar] = useState('');
 
-  const [ validatedName, setValidatedName ] = useState<ValidatedOptions>(ValidatedOptions.default);
   const [ validatedPlaybook, setValidatedPlaybook ] = useState<ValidatedOptions>(ValidatedOptions.default);
   const [ validatedInventory, setValidatedInventory ] = useState<ValidatedOptions>(ValidatedOptions.default);
   const [ validatedExtraVar, setValidatedExtraVar ] = useState<ValidatedOptions>(ValidatedOptions.default);
@@ -80,16 +78,6 @@ const NewJob: React.FunctionComponent = () => {
      }).then(response => response.json())
     .then(data => setExtraVars([...extravars, ...data]));
   }, []);
-
-  const validateName = (value) : boolean => {
-    if (!value || value.length < 1 ) {
-      setValidatedName(ValidatedOptions.error);
-      return false;
-    } else {
-      setValidatedName(ValidatedOptions.default);
-      return true;
-    }
-  }
 
   const validatePlaybook = (value) : boolean => {
     if (!value || value.length < 1 ) {
@@ -137,8 +125,7 @@ const NewJob: React.FunctionComponent = () => {
   }
 
   const validateFields = () => {
-    return validateName(name) &&
-    validatePlaybook(playbook) &&
+    return validatePlaybook(playbook) &&
     validateInventory(inventory) &&
     validateExtraVar(extravar);
   }
