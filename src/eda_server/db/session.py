@@ -1,3 +1,5 @@
+import contextlib
+
 from sqlalchemy.ext.asyncio import (
     AsyncEngine,
     AsyncSession,
@@ -16,3 +18,12 @@ def create_session_factory(engine: AsyncEngine) -> sessionmaker:
     return sessionmaker(
         bind=engine, class_=AsyncSession, expire_on_commit=False
     )
+
+
+@contextlib.asynccontextmanager
+async def dispose_context(engine: AsyncEngine):
+    """Dispose engine at exit."""
+    try:
+        yield engine
+    finally:
+        await engine.dispose()
