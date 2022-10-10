@@ -219,14 +219,15 @@ const NewActivation: React.FunctionComponent = () => {
       })
       .catch((error) => {
         history.push(`/activations`);
-        dispatch(
+        //TODO - uncomment when the endpoint error is fixed
+        /*dispatch(
           addNotification({
             variant: 'danger',
             title: intl.formatMessage(sharedMessages.addActivation),
             dismissable: true,
             description: `${intl.formatMessage(sharedMessages.add_activation_failure)} ${error}`
           })
-        );
+        );*/
       });
     }
 
