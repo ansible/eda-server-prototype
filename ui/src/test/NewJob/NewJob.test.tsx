@@ -5,10 +5,10 @@ import fetchMock from "jest-fetch-mock";
 import {act} from "react-dom/test-utils";
 import {IntlProvider} from "react-intl";
 import {Route} from "react-router-dom";
-import {Button, Tab} from "@patternfly/react-core";
+import {Button} from "@patternfly/react-core";
 import store from "../../store";
 import {Provider} from "react-redux";
-import {NewActivation} from "@app/NewActivation/NewActivation";
+import {NewJob} from "@app/NewJob/NewJob";
 
 const ComponentWrapper = ({ children, initialEntries=['/dashboard']}) => (
   <Provider store={store()}>
@@ -20,28 +20,24 @@ const ComponentWrapper = ({ children, initialEntries=['/dashboard']}) => (
   </Provider>
 );
 
-describe('NewActivation', () => {
+describe('NewJob', () => {
   afterEach(() => {
     jest.restoreAllMocks();
   });
 
-  it('should render the NewActivation form', async () => {
+  it('should render the New Job form', async () => {
     fetchMock.mockResponse(JSON.stringify({
-          name: 'Activation 1',
-          id: 1,
-          ruleset_id: '2',
-          ruleset_name: 'Ruleset 1',
-          inventory_id: '3',
-          inventory_name: 'Inventory 1'
+          name: 'Job 1',
+          id: 1
       })
     )
 
     let wrapper;
     await act(async () => {
       wrapper = mount(
-        <ComponentWrapper initialEntries={['/new-activation']}>
-          <Route path='/new-activation'>
-            <NewActivation/>
+        <ComponentWrapper initialEntries={['/new-job']}>
+          <Route path='/new-job'>
+            <NewJob/>
           </Route>
         </ComponentWrapper>
       );
@@ -54,6 +50,6 @@ describe('NewActivation', () => {
     await act(async () => {
       wrapper.update();
     });
-    expect(wrapper.find('div').at(8).at(0).props().children.at(1)).toEqual('Enter a rulebook activation name')
+    expect(wrapper.find('div').at(6).at(0).props().children.at(1)).toEqual('Select a playbook')
   });
 });
