@@ -324,7 +324,9 @@ async def list_rulebook_rulesets(
             ruleset.c.id,
             ruleset.c.name,
             sa.func.coalesce(ruls_ct.c.rule_count, 0).label("rule_count"),
-            sa.func.coalesce(ruleset_fire_count.c.fire_count, 0).label("fire_count")
+            sa.func.coalesce(ruleset_fire_count.c.fire_count, 0).label(
+                "fire_count"
+            ),
         )
         .select_from(ruleset)
         .outerjoin(
@@ -335,10 +337,7 @@ async def list_rulebook_rulesets(
             ruleset_fire_count,
             ruleset_fire_count.c.fire_count == ruleset.c.id,
         )
-        .outerjoin(
-            rulebook,
-            rulebook.c.id == ruleset.c.rulebook_id
-        )
+        .outerjoin(rulebook, rulebook.c.id == ruleset.c.rulebook_id)
     ).filter(rulebook.c.id == rulebook_id)
 
     result = (await db.execute(query)).all()
@@ -348,4 +347,3 @@ async def list_rulebook_rulesets(
             detail="Rulebook Not Found.",
         )
     return result
-
