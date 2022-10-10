@@ -1,6 +1,4 @@
 import operator
-import uuid
-from typing import List, Tuple
 
 import pytest
 import sqlalchemy as sa
@@ -8,37 +6,9 @@ from fastapi import status
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from eda_server.auth import add_role_permissions, create_role
 from eda_server.db import models
 from eda_server.types import Action, ResourceType
-
-
-async def _create_role(
-    db: AsyncSession, name: str, description: str = ""
-) -> uuid.UUID:
-    (role_id,) = (
-        await db.execute(
-            sa.insert(models.roles).values(name=name, description=description)
-        )
-    ).inserted_primary_key
-    await db.commit()
-    return role_id
-
-
-async def _create_role_permissions(
-    db: AsyncSession,
-    role_id: uuid.UUID,
-    permissions: List[Tuple[ResourceType, Action]],
-):
-    query = sa.insert(models.role_permissions)
-    result = await db.execute(
-        query,
-        [
-            {"role_id": role_id, "resource_type": item[0], "action": item[1]}
-            for item in permissions
-        ],
-    )
-    await db.commit()
-    return [pk[0] for pk in result.inserted_primary_key_rows]
 
 
 @pytest.mark.asyncio
@@ -65,7 +35,7 @@ async def test_create_role(client: AsyncClient, db: AsyncSession):
 
 @pytest.mark.asyncio
 async def test_show_role(client: AsyncClient, db: AsyncSession):
-    role_id = await _create_role(db, "test-role-02")
+    role_id = await create_role(db, "test-role-02")
 
     response = await client.get(f"/api/roles/{role_id}")
     assert response.status_code == status.HTTP_200_OK
@@ -101,7 +71,7 @@ async def test_show_role_not_exist(client: AsyncClient):
 
 @pytest.mark.asyncio
 async def test_delete_role(client: AsyncClient, db: AsyncSession):
-    role_id = await _create_role(db, "test-role-03")
+    role_id = await create_role(db, "test-role-03")
 
     response = await client.delete(f"/api/roles/{role_id}")
     assert response.status_code == status.HTTP_204_NO_CONTENT
@@ -126,8 +96,8 @@ async def test_delete_role_not_exist(client: AsyncClient):
 
 @pytest.mark.asyncio
 async def test_list_role_permissions(client: AsyncClient, db: AsyncSession):
-    role_id = await _create_role(db, "test-role-04")
-    await _create_role_permissions(
+    role_id = await create_role(db, "test-role-04")
+    await add_role_permissions(
         db,
         role_id,
         [
@@ -155,7 +125,7 @@ async def test_list_role_permissions(client: AsyncClient, db: AsyncSession):
 
 @pytest.mark.asyncio
 async def test_add_role_permissions(client: AsyncClient, db: AsyncSession):
-    role_id = await _create_role(db, "test-role-05")
+    role_id = await create_role(db, "test-role-05")
 
     response = await client.post(
         f"/api/roles/{role_id}/permissions",
@@ -185,7 +155,7 @@ async def test_add_role_permissions(client: AsyncClient, db: AsyncSession):
 async def test_add_role_permissions_invalid(
     client: AsyncClient, db: AsyncSession, data
 ):
-    role_id = await _create_role(db, "test-role-06")
+    role_id = await create_role(db, "test-role-06")
     response = await client.post(
         f"/api/roles/{role_id}/permissions", json=data
     )
@@ -194,8 +164,8 @@ async def test_add_role_permissions_invalid(
 
 @pytest.mark.asyncio
 async def test_delete_role_permissions(client: AsyncClient, db: AsyncSession):
-    role_id = await _create_role(db, "test-role-07")
-    permission_ids = await _create_role_permissions(
+    role_id = await create_role(db, "test-role-07")
+    permission_ids = await add_role_permissions(
         db,
         role_id,
         [(ResourceType.PROJECT, Action.READ)],
