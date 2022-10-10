@@ -1,14 +1,34 @@
 import operator
 
 import pytest
+import pytest_asyncio
 import sqlalchemy as sa
-from fastapi import status
+from fastapi import FastAPI, status
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from eda_server.auth import add_role_permissions, create_role
 from eda_server.db import models
 from eda_server.types import Action, ResourceType
+from eda_server.users import UserDatabase, current_active_user
+from tests.integration.utils.app import override_dependencies
+
+
+@pytest_asyncio.fixture
+async def admin_user(db: AsyncSession):
+    return await UserDatabase(db).create(
+        {
+            "email": "admin@example.com",
+            "hashed_password": "",
+            "is_superuser": True,
+        }
+    )
+
+
+@pytest.fixture
+def app(app: FastAPI, admin_user: models.User):
+    with override_dependencies(app, {current_active_user: lambda: admin_user}):
+        yield app
 
 
 @pytest.mark.asyncio

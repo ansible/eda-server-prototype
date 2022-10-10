@@ -3,22 +3,35 @@ import uuid
 from typing import List, Tuple
 
 import pytest
+import pytest_asyncio
 import sqlalchemy as sa
-from fastapi import status
+from fastapi import FastAPI, status
 from httpx import AsyncClient, Response
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from eda_server.auth import add_role_permissions, add_user_role, create_role
 from eda_server.db import models
 from eda_server.types import Action, ResourceType
-from eda_server.users import UserDatabase
-from tests.integration.utils.db import get_admin_user
+from eda_server.users import UserDatabase, current_active_user
+from tests.integration.utils.app import override_dependencies
 
 
-async def _create_user(db: AsyncSession, email: str):
+@pytest_asyncio.fixture
+async def admin_user(db: AsyncSession):
     return await UserDatabase(db).create(
         {
-            "email": email,
+            "email": "admin@example.com",
+            "hashed_password": "",
+            "is_superuser": True,
+        }
+    )
+
+
+@pytest_asyncio.fixture
+async def test_user(db: AsyncSession):
+    return await UserDatabase(db).create(
+        {
+            "email": "admin@example.com",
             "hashed_password": "",
         }
     )
@@ -102,11 +115,12 @@ def _check_test_user_permissions_response(response: Response):
 
 
 @pytest.mark.asyncio
-async def test_add_user_role(client: AsyncClient, db: AsyncSession):
-    user = await _create_user(db, "test-user@example.com")
+async def test_add_user_role(
+    client: AsyncClient, db: AsyncSession, test_user: models.User
+):
     role_id = await create_role(db, "test-role")
 
-    response = await client.put(f"/api/users/{user.id}/roles/{role_id}")
+    response = await client.put(f"/api/users/{test_user.id}/roles/{role_id}")
     assert response.status_code == status.HTTP_204_NO_CONTENT
 
     # TODO(cutwater): Reduce code duplication
@@ -114,7 +128,7 @@ async def test_add_user_role(client: AsyncClient, db: AsyncSession):
     role_exists = await db.scalar(
         sa.select(
             sa.exists(models.user_roles).where(
-                models.user_roles.c.user_id == user.id,
+                models.user_roles.c.user_id == test_user.id,
                 models.user_roles.c.role_id == role_id,
             )
         )
@@ -137,35 +151,38 @@ async def test_add_user_role_user_not_exist(
 
 @pytest.mark.asyncio
 async def test_add_user_role_role_not_exist(
-    client: AsyncClient, db: AsyncSession
+    client: AsyncClient, test_user: models.User
 ):
-    user = await _create_user(db, "test-user@example.com")
     invalid_role_id = "42424242-4242-4242-4242-424242424242"
 
     response = await client.put(
-        f"/api/users/{user.id}/roles/{invalid_role_id}"
+        f"/api/users/{test_user.id}/roles/{invalid_role_id}"
     )
     assert response.status_code == status.HTTP_404_NOT_FOUND
 
 
 @pytest.mark.asyncio
-async def test_add_user_role_duplicate(client: AsyncClient, db: AsyncSession):
-    user = await _create_user(db, "test-user@example.com")
+async def test_add_user_role_duplicate(
+    client: AsyncClient, db: AsyncSession, test_user: models.User
+):
     role_id = await create_role(db, "test-role")
-    await add_user_role(db, user.id, role_id)
+    await add_user_role(db, test_user.id, role_id)
 
     # Attempt to create an existing binding must return successful status code.
-    response = await client.put(f"/api/users/{user.id}/roles/{role_id}")
+    response = await client.put(f"/api/users/{test_user.id}/roles/{role_id}")
     assert response.status_code == status.HTTP_204_NO_CONTENT
 
 
 @pytest.mark.asyncio
-async def test_remove_user_role(client: AsyncClient, db: AsyncSession):
-    user = await _create_user(db, "test-user@example.com")
+async def test_remove_user_role(
+    client: AsyncClient, db: AsyncSession, test_user: models.User
+):
     role_id = await create_role(db, "test-role")
-    await add_user_role(db, user.id, role_id)
+    await add_user_role(db, test_user.id, role_id)
 
-    response = await client.delete(f"/api/users/{user.id}/roles/{role_id}")
+    response = await client.delete(
+        f"/api/users/{test_user.id}/roles/{role_id}"
+    )
     assert response.status_code == status.HTTP_204_NO_CONTENT
 
 
@@ -184,46 +201,51 @@ async def test_remove_user_role_user_not_exist(
 
 @pytest.mark.asyncio
 async def test_remove_user_role_role_not_exist(
-    client: AsyncClient, db: AsyncSession
+    client: AsyncClient, db: AsyncSession, test_user: models.User
 ):
-    user = await _create_user(db, "test-user@example.com")
     invalid_role_id = "42424242-4242-4242-4242-424242424242"
 
     response = await client.delete(
-        f"/api/users/{user.id}/roles/{invalid_role_id}"
+        f"/api/users/{test_user.id}/roles/{invalid_role_id}"
     )
     assert response.status_code == status.HTTP_404_NOT_FOUND
 
 
 # Test list roles
 @pytest.mark.asyncio
-async def test_list_me_roles(client: AsyncClient, db: AsyncSession):
-    user = await get_admin_user(db)
-    role_ids = await _prepare_test_user_roles(db, user.id)
-    response = await client.get("/api/users/me/roles")
+async def test_list_me_roles(
+    app: FastAPI, client: AsyncClient, db: AsyncSession, test_user: models.User
+):
+    role_ids = await _prepare_test_user_roles(db, test_user.id)
+    with override_dependencies(app, {current_active_user: lambda: test_user}):
+        response = await client.get("/api/users/me/roles")
     _check_test_user_roles_response(response, role_ids)
 
 
 @pytest.mark.asyncio
-async def test_list_user_roles(client: AsyncClient, db: AsyncSession):
-    user = await _create_user(db, "test-user@example.com")
-    role_ids = await _prepare_test_user_roles(db, user.id)
-    response = await client.get(f"/api/users/{user.id}/roles")
+async def test_list_user_roles(
+    client: AsyncClient, db: AsyncSession, test_user: models.User
+):
+    role_ids = await _prepare_test_user_roles(db, test_user.id)
+    response = await client.get(f"/api/users/{test_user.id}/roles")
     _check_test_user_roles_response(response, role_ids)
 
 
 # Test list permissions
 @pytest.mark.asyncio
-async def test_list_me_permissions(client: AsyncClient, db: AsyncSession):
-    user = await get_admin_user(db)
-    await _prepare_test_user_roles(db, user.id)
-    response = await client.get("/api/users/me/permissions")
+async def test_list_me_permissions(
+    app: FastAPI, client: AsyncClient, db: AsyncSession, test_user: models.User
+):
+    await _prepare_test_user_roles(db, test_user.id)
+    with override_dependencies(app, {current_active_user: lambda: test_user}):
+        response = await client.get("/api/users/me/permissions")
     _check_test_user_permissions_response(response)
 
 
 @pytest.mark.asyncio
-async def test_list_user_permissions(client: AsyncClient, db: AsyncSession):
-    user = await _create_user(db, "test-user@example.com")
-    await _prepare_test_user_roles(db, user.id)
-    response = await client.get(f"/api/users/{user.id}/permissions")
+async def test_list_user_permissions(
+    client: AsyncClient, db: AsyncSession, test_user: models.User
+):
+    await _prepare_test_user_roles(db, test_user.id)
+    response = await client.get(f"/api/users/{test_user.id}/permissions")
     _check_test_user_permissions_response(response)

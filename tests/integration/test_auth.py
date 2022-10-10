@@ -19,7 +19,7 @@ from eda_server.users import UserDatabase
 async def admin_user(db: AsyncSession):
     return await UserDatabase(db).create(
         {
-            "email": "superadmin@example.com",
+            "email": "admin@example.com",
             "hashed_password": "",
             "is_superuser": True,
         }
