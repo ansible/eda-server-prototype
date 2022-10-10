@@ -98,6 +98,13 @@ tasks:
         vars:
           CLI_ARGS: db-migrations
 
+  dev:user:add:
+    desc: "Add development user"
+    cmds:
+      - task: dev
+        vars:
+          CLI_ARGS: add-dev-user
+
   dev:api:start:
     desc: "Start API server"
     cmds:
@@ -219,11 +226,18 @@ tasks:
           CLI_ARGS: clean {{.CLI_ARGS}}
 
   minikube:fp:ui:
-    desc: "forward local port to ui instance port in minikube"
+    desc: "Forward local port to ui instance port in minikube"
     cmds:
       - task: minikube
         vars:
           CLI_ARGS: port-forward-ui {{.CLI_ARGS}}
+
+  minikube:devuser:add:
+    desc: "Add development user"
+    cmds:
+      - task: minikube
+        vars:
+          CLI_ARGS: add-dev-user
 
   minikube:all:
     desc: "clean, build, deploy"

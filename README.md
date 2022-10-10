@@ -93,9 +93,12 @@ task dev:ui:start
 
 ### 6. Accessing the UI
 
-1. Create a superuser account for `user@example.com` and password `test`:
+1. Create a dev superuser account
+  Defaults: user: dev_user@redhat.com, password: none2tuff
 
-       python scripts/adduser.py -S --password test admin@example.com
+```shell
+task dev:user:add
+```
 
 2. You can now login to the UI at <http://localhost:8080/eda/>.
 
