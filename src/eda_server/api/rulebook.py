@@ -89,21 +89,35 @@ async def read_rule(rule_id: int, db: AsyncSession = Depends(get_db_session)):
 
 # This query will leverage a left outer join lateral
 # in order to get the rule counts.
+# TODO(sdonahue): Refactor to minimize aliasing tables
 ruleset = sa.orm.aliased(models.rulesets)
-rules_lat = sa.orm.aliased(models.rules)
+rule = sa.orm.aliased(models.rules)
 rulebook = sa.orm.aliased(models.rulebooks)
 project = sa.orm.aliased(models.projects)
+audit_rule = sa.orm.aliased(models.audit_rules)
 
 rule_count_lateral = (
     (
-        sa.select(sa.func.count(rules_lat.c.id).label("rule_count"))
-        .select_from(rules_lat)
-        .filter(rules_lat.c.ruleset_id == ruleset.c.id)
+        sa.select(sa.func.count(rule.c.id).label("rule_count"))
+        .select_from(rule)
+        .filter(rule.c.ruleset_id == ruleset.c.id)
     )
     .subquery()
     .lateral()
 )
 ruls_ct = sa.orm.aliased(rule_count_lateral)
+
+ruleset_fire_count = (
+    sa.select(
+        ruleset.c.rulebook_id,
+        audit_rule.c.ruleset_id,
+        sa.func.count(audit_rule.c.id).label("fire_count"),
+    )
+    .select_from(ruleset)
+    .group_by(ruleset.c.rulebook_id)
+    .group_by(audit_rule.c.ruleset_id)
+    .outerjoin(audit_rule, audit_rule.c.ruleset_id == ruleset.c.id)
+).cte("ruleset_fire_count")
 
 BASE_RULESET_SELECT = (
     sa.select(
@@ -165,17 +179,36 @@ async def get_ruleset(
 #   rulebooks endpoints
 # ------------------------------------
 
+rulebook_ruleset_count = (
+    sa.select(
+        ruleset.c.rulebook_id,
+        sa.func.count(ruleset.c.id).label("ruleset_count"),
+    )
+    .select_from(ruleset)
+    .group_by(ruleset.c.rulebook_id)
+    .outerjoin(rulebook, rulebook.c.id == ruleset.c.rulebook_id)
+).cte("rulebook_ruleset_count")
 
-@router.post(
-    "/api/rulebooks",
-    response_model=schema.RulebookRead,
-    operation_id="create_rulebook",
-)
+
+rulebook_fire_count = (
+    sa.select(
+        ruleset_fire_count.c.rulebook_id,
+        sa.func.sum(ruleset_fire_count.c.fire_count).label("fire_count"),
+    )
+    .select_from(ruleset_fire_count)
+    .group_by(ruleset_fire_count.c.rulebook_id)
+    .outerjoin(rulebook, rulebook.c.id == ruleset_fire_count.c.rulebook_id)
+).cte("rulebook_fire_count")
+
+
+@router.post("/api/rulebooks", operation_id="create_rulebook")
 async def create_rulebook(
     rulebook: schema.RulebookCreate, db: AsyncSession = Depends(get_db_session)
 ):
     query = sa.insert(models.rulebooks).values(
-        name=rulebook.name, rulesets=rulebook.rulesets
+        name=rulebook.name,
+        rulesets=rulebook.rulesets,
+        description=rulebook.description,
     )
     result = await db.execute(query)
     (id_,) = result.inserted_primary_key
@@ -189,7 +222,7 @@ async def create_rulebook(
 
 @router.get(
     "/api/rulebooks",
-    response_model=List[schema.RulebookRead],
+    response_model=List[schema.RulebookList],
     operation_id="list_rulebooks",
 )
 async def list_rulebooks(db: AsyncSession = Depends(get_db_session)):
@@ -200,20 +233,42 @@ async def list_rulebooks(db: AsyncSession = Depends(get_db_session)):
 
 @router.get(
     "/api/rulebooks/{rulebook_id}",
-    response_model=schema.RulebookRead,
     operation_id="read_rulebook",
+    response_model=schema.RulebookRead,
 )
 async def read_rulebook(
     rulebook_id: int, db: AsyncSession = Depends(get_db_session)
 ):
-    query = sa.select(models.rulebooks).where(
-        models.rulebooks.c.id == rulebook_id
-    )
+    query = (
+        sa.select(
+            rulebook.c.id,
+            rulebook.c.name,
+            rulebook.c.description,
+            rulebook.c.created_at,
+            rulebook.c.modified_at,
+            sa.func.coalesce(rulebook_ruleset_count.c.ruleset_count, 0).label(
+                "ruleset_count"
+            ),
+            sa.func.coalesce(rulebook_fire_count.c.fire_count, 0).label(
+                "fire_count"
+            ),
+        )
+        .select_from(rulebook)
+        .outerjoin(
+            rulebook_ruleset_count,
+            rulebook_ruleset_count.c.rulebook_id == rulebook.c.id,
+        )
+        .outerjoin(
+            rulebook_fire_count,
+            rulebook_fire_count.c.rulebook_id == rulebook.c.id,
+        )
+    ).filter(rulebook.c.id == rulebook_id)
+
     result = (await db.execute(query)).first()
     if not result:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Inventory Not Found.",
+            detail="Rulebook Not Found.",
         )
     return result
 
@@ -224,11 +279,72 @@ async def read_rulebook(
 async def read_rulebook_json(
     rulebook_id: int, db: AsyncSession = Depends(get_db_session)
 ):
-    query = sa.select(models.rulebooks).where(
-        models.rulebooks.c.id == rulebook_id
-    )
+    query = (
+        sa.select(
+            rulebook.c.id,
+            rulebook.c.name,
+            rulebook.c.description,
+            rulebook.c.rulesets,
+            sa.func.coalesce(rulebook_ruleset_count.c.ruleset_count, 0).label(
+                "ruleset_count"
+            ),
+            sa.func.coalesce(rulebook_fire_count.c.fire_count, 0).label(
+                "fire_count"
+            ),
+            rulebook.c.created_at,
+            rulebook.c.modified_at,
+        )
+        .select_from(rulebook)
+        .outerjoin(
+            rulebook_ruleset_count,
+            rulebook_ruleset_count.c.rulebook_id == rulebook.c.id,
+        )
+        .outerjoin(
+            rulebook_fire_count,
+            rulebook_fire_count.c.rulebook_id == rulebook.c.id,
+        )
+    ).filter(rulebook.c.id == rulebook_id)
+
     result = await db.execute(query)
 
     response = dict(result.first())
     response["rulesets"] = yaml.safe_load(response["rulesets"])
     return response
+
+
+@router.get(
+    "/api/rulebooks/{rulebook_id}/rulesets",
+    operation_id="list_rulebook_rulesets",
+    response_model=List[schema.RulebookRulesetList],
+)
+async def list_rulebook_rulesets(
+    rulebook_id: int, db: AsyncSession = Depends(get_db_session)
+):
+    query = (
+        sa.select(
+            ruleset.c.id,
+            ruleset.c.name,
+            sa.func.coalesce(ruls_ct.c.rule_count, 0).label("rule_count"),
+            sa.func.coalesce(ruleset_fire_count.c.fire_count, 0).label(
+                "fire_count"
+            ),
+        )
+        .select_from(ruleset)
+        .outerjoin(
+            ruls_ct,
+            ruls_ct.c.rule_count == ruleset.c.id,
+        )
+        .outerjoin(
+            ruleset_fire_count,
+            ruleset_fire_count.c.fire_count == ruleset.c.id,
+        )
+        .outerjoin(rulebook, rulebook.c.id == ruleset.c.rulebook_id)
+    ).filter(rulebook.c.id == rulebook_id)
+
+    result = (await db.execute(query)).all()
+    if not result:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Rulebook Not Found.",
+        )
+    return result
