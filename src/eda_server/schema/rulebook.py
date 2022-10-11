@@ -6,11 +6,29 @@ from pydantic import BaseModel, StrictStr
 
 class RulebookCreate(BaseModel):
     name: StrictStr
+    description: Optional[StrictStr] = ""
     rulesets: StrictStr
 
 
-class RulebookRead(RulebookCreate):
+class RulebookRead(BaseModel):
     id: int
+    name: StrictStr
+    description: Optional[StrictStr] = ""
+    ruleset_count: int
+    fire_count: int
+    created_at: datetime
+    modified_at: datetime
+
+
+class RulebookList(RulebookCreate):
+    id: int
+
+
+class RulebookRulesetList(BaseModel):
+    id: int
+    name: StrictStr
+    rule_count: int
+    fire_count: int
 
 
 class RulebookRef(BaseModel):
