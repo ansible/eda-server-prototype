@@ -15,7 +15,6 @@ from tests.integration.utils.app import create_test_app
 from tests.integration.utils.db import (
     create_database,
     drop_database,
-    insert_initial_data,
     upgrade_database,
 )
 
@@ -63,7 +62,6 @@ async def db_engine(default_engine, db_url):
 
     async with engine.connect() as connection:
         await upgrade_database(connection)
-        await insert_initial_data(connection)
 
     yield engine
 

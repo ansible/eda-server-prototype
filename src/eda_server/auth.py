@@ -1,4 +1,5 @@
 import uuid
+from typing import List, Tuple
 
 import sqlalchemy as sa
 from fastapi import Depends, HTTPException, status
@@ -50,6 +51,36 @@ def requires_permission(resource_type: ResourceType, action: Action):
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
 
     return requires_permission_dependency
+
+
+# TODO(cutwater): The functions below will be moved under
+#   the `eda_server.db.repositories` package as a part of
+#   the https://issues.redhat.com/browse/AAP-5249 issue.
+async def create_role(
+    db: AsyncSession, name: str, description: str = ""
+) -> uuid.UUID:
+    (role_id,) = (
+        await db.execute(
+            sa.insert(models.roles).values(name=name, description=description)
+        )
+    ).inserted_primary_key
+    return role_id
+
+
+async def add_role_permissions(
+    db: AsyncSession,
+    role_id: uuid.UUID,
+    permissions: List[Tuple[ResourceType, Action]],
+) -> List[uuid.UUID]:
+    query = sa.insert(models.role_permissions)
+    result = await db.execute(
+        query,
+        [
+            {"role_id": role_id, "resource_type": item[0], "action": item[1]}
+            for item in permissions
+        ],
+    )
+    return [pk[0] for pk in result.inserted_primary_key_rows]
 
 
 async def get_user_roles(
