@@ -60,8 +60,6 @@ handle_errors() {
   exit 1
 }
 
-check_bash_version
-
 check_uvicorn_status() {
   local _url=http://localhost:"${EDA_PI_PORT}"/api/docs
   local _timeout=10
