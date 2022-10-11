@@ -222,11 +222,31 @@ async def create_rulebook(
 
 @router.get(
     "/api/rulebooks",
-    response_model=List[schema.RulebookList],
     operation_id="list_rulebooks",
+    response_model=List[schema.RulebookList],
 )
 async def list_rulebooks(db: AsyncSession = Depends(get_db_session)):
-    query = sa.select(models.rulebooks)
+    query = (
+        sa.select(
+            rulebook.c.id,
+            rulebook.c.name,
+            sa.func.coalesce(rulebook_ruleset_count.c.ruleset_count, 0).label(
+                "ruleset_count"
+            ),
+            sa.func.coalesce(rulebook_fire_count.c.fire_count, 0).label(
+                "fire_count"
+            ),
+        )
+        .select_from(rulebook)
+        .outerjoin(
+            rulebook_ruleset_count,
+            rulebook_ruleset_count.c.rulebook_id == rulebook.c.id,
+        )
+        .outerjoin(
+            rulebook_fire_count,
+            rulebook_fire_count.c.rulebook_id == rulebook.c.id,
+        )
+    )
     result = await db.execute(query)
     return result.all()
 

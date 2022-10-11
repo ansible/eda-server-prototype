@@ -20,14 +20,17 @@ class RulebookRead(BaseModel):
     modified_at: datetime
 
 
-class RulebookList(RulebookCreate):
-    id: int
-
-
 class RulebookRulesetList(BaseModel):
     id: int
     name: StrictStr
     rule_count: int
+    fire_count: int
+
+
+class RulebookList(BaseModel):
+    id: int
+    name: StrictStr
+    ruleset_count: int
     fire_count: int
 
 
