@@ -1,6 +1,6 @@
 import logging
 import uuid
-from typing import Any, Dict, Optional, Type
+from typing import Any, Dict, Optional
 
 import sqlalchemy as sa
 from fastapi import Depends, Request
@@ -11,11 +11,7 @@ from fastapi_users.authentication import (
     CookieTransport,
     JWTStrategy,
 )
-from fastapi_users.db import (
-    BaseUserDatabase,
-    SQLAlchemyBaseOAuthAccountTable,
-    SQLAlchemyUserDatabase,
-)
+from fastapi_users.db import BaseUserDatabase, SQLAlchemyUserDatabase
 from fastapi_users.password import PasswordHelperProtocol
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -34,13 +30,9 @@ class UserDatabase(SQLAlchemyUserDatabase[models.User, uuid.UUID]):
     def __init__(
         self,
         session: AsyncSession,
-        user_table: Type[models.User],
-        oauth_account_table: Optional[
-            Type[SQLAlchemyBaseOAuthAccountTable]
-        ] = None,
         default_role: Optional[str] = None,
     ):
-        super().__init__(session, user_table, oauth_account_table)
+        super().__init__(session, models.User, None)
         self.default_role = default_role
 
     async def _add_default_role(self, user: models.User) -> None:
@@ -109,9 +101,7 @@ def get_user_db(
     settings: Settings = Depends(get_settings),
     session: AsyncSession = Depends(get_db_session),
 ):
-    return UserDatabase(
-        session, models.User, default_role=settings.default_user_role
-    )
+    return UserDatabase(session, default_role=settings.default_user_role)
 
 
 def get_user_manager(
