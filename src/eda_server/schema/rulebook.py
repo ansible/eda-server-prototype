@@ -19,6 +19,9 @@ class RulebookRead(BaseModel):
     created_at: datetime
     modified_at: datetime
 
+class RulebookList(RulebookCreate):
+    id: int
+
 
 class RulebookRulesetList(BaseModel):
     id: int

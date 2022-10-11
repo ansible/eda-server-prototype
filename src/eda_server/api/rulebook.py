@@ -222,7 +222,7 @@ async def create_rulebook(
 
 @router.get(
     "/api/rulebooks",
-    response_model=List[schema.RulebookRead],
+    response_model=List[schema.RulebookList],
     operation_id="list_rulebooks",
 )
 async def list_rulebooks(db: AsyncSession = Depends(get_db_session)):
