@@ -89,6 +89,7 @@ async def read_rule(rule_id: int, db: AsyncSession = Depends(get_db_session)):
 
 # This query will leverage a left outer join lateral
 # in order to get the rule counts.
+# TODO(sdonahue): Refactor to minimize aliasing tables
 ruleset = sa.orm.aliased(models.rulesets)
 rule = sa.orm.aliased(models.rules)
 rulebook = sa.orm.aliased(models.rulebooks)
