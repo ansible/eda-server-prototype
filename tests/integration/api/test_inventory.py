@@ -1,4 +1,3 @@
-import pytest
 import sqlalchemy as sa
 from fastapi import status as status_codes
 from httpx import AsyncClient
@@ -22,7 +21,6 @@ TEST_RULESET_SIMPLE = """
 """
 
 
-@pytest.mark.asyncio
 async def test_create_rulebook(client: AsyncClient, db: AsyncSession):
     response = await client.post(
         "/api/rulebooks",
@@ -49,7 +47,6 @@ async def test_create_rulebook(client: AsyncClient, db: AsyncSession):
     assert rule["action"] == {"debug": None}
 
 
-@pytest.mark.asyncio
 async def test_create_inventory(client: AsyncClient):
     response = await client.post(
         "/api/inventory/",
@@ -65,7 +62,6 @@ async def test_create_inventory(client: AsyncClient):
     assert data["inventory"] == "all: {}"  # noqa: P103
 
 
-@pytest.mark.asyncio
 async def test_list_inventories(client: AsyncClient, db: AsyncSession):
     query = sa.insert(models.inventories).values(
         name="test-list-inventories-01", inventory="{}"  # noqa: P103
@@ -86,7 +82,6 @@ async def test_list_inventories(client: AsyncClient, db: AsyncSession):
     ]
 
 
-@pytest.mark.asyncio
 async def test_read_inventory_not_found(client: AsyncClient):
 
     response = await client.get("/api/inventory/42")

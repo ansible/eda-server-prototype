@@ -1,6 +1,5 @@
 import datetime
 
-import pytest
 import sqlalchemy as sa
 from fastapi import status as status_codes
 from httpx import AsyncClient
@@ -192,7 +191,6 @@ async def _create_audit_rule(
     return audit_rule_id
 
 
-@pytest.mark.asyncio
 async def test_read_audit_rule_jobs(client: AsyncClient, db: AsyncSession):
     foreign_keys = await _create_activation_dependent_objects(client, db)
     audit_rule_id = await _create_audit_rule(client, db, foreign_keys)
@@ -212,7 +210,6 @@ async def test_read_audit_rule_jobs(client: AsyncClient, db: AsyncSession):
     assert job["status"] == TEST_AUDIT_RULE["status"]
 
 
-@pytest.mark.asyncio
 async def test_read_audit_details(client: AsyncClient, db: AsyncSession):
     foreign_keys = await _create_activation_dependent_objects(client, db)
     audit_rule_id = await _create_audit_rule(client, db, foreign_keys)
@@ -238,7 +235,6 @@ async def test_read_audit_details(client: AsyncClient, db: AsyncSession):
     assert audit_rule["definition"] == TEST_AUDIT_RULE["definition"]
 
 
-@pytest.mark.asyncio
 async def test_read_audit_rule_events(client: AsyncClient, db: AsyncSession):
     foreign_keys = await _create_activation_dependent_objects(client, db)
     audit_rule_id = await _create_audit_rule(client, db, foreign_keys)
@@ -261,7 +257,6 @@ async def test_read_audit_rule_events(client: AsyncClient, db: AsyncSession):
     assert job_event["name"] == TEST_AUDIT_RULE["name"]
 
 
-@pytest.mark.asyncio
 async def test_read_audit_rule_hosts(client: AsyncClient, db: AsyncSession):
     foreign_keys = await _create_activation_dependent_objects(client, db)
     audit_rule_id = await _create_audit_rule(client, db, foreign_keys)
@@ -281,7 +276,6 @@ async def test_read_audit_rule_hosts(client: AsyncClient, db: AsyncSession):
     assert host["status"] == TEST_AUDIT_RULE_JOB_HOST["status"]
 
 
-@pytest.mark.asyncio
 async def test_audit_rule_404(client: AsyncClient, db: AsyncSession):
     audit_rule_id = 100
     details_response = await client.get(
