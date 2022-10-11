@@ -29,7 +29,7 @@ log-warn() {
 }
 
 log-err() {
-    log "ERROR" "${ERR} $@"
+    log "ERROR" "${ERR} \U274C $@"
 }
 
 log-debug() {
