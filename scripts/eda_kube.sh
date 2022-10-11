@@ -122,7 +122,7 @@ deploy() {
     kubectl apply -f "${DEPLOY_DIR}"/temp
 
   else
-    log-info "You must run 'minikube:build' before running minikube:deploy"
+    log-err "You must run 'minikube:build' before running minikube:deploy"
   fi
 }
 
