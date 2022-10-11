@@ -113,7 +113,6 @@ def _check_test_user_permissions_response(response: Response):
     )
 
 
-
 async def test_add_user_role(
     client: AsyncClient, db: AsyncSession, test_user: models.User
 ):
