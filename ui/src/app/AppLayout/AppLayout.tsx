@@ -23,6 +23,7 @@ import { StatefulDropdown } from './stateful-dropdown';
 import {getUser, logoutUser} from '@app/shared/auth';
 import {User} from "@app/shared/types/common-types";
 import {AboutModalWindow} from "@app/AppLayout/about-modal";
+import {NotificationsPortal} from "@redhat-cloud-services/frontend-components-notifications";
 
 interface IAppLayout {
   children: React.ReactNode;
@@ -197,6 +198,7 @@ const AppLayout: React.FunctionComponent<IAppLayout> = ({ children }) => {
       onPageResize={onPageResize}
       skipToContent={PageSkipToContent}>
       {aboutModalVisible && aboutModal()}
+      <NotificationsPortal />
       {children}
     </Page>
   );

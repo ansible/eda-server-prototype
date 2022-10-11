@@ -6,12 +6,14 @@ import {
   CardBody as PFCardBody
 } from '@patternfly/react-core';
 import {useIntl} from "react-intl";
-import { ActionGroup, Button, Form, FormGroup, TextInput } from '@patternfly/react-core';
-import { postData } from '@app/utils/utils';
+import {ActionGroup, Button, Form, FormGroup, TextInput} from '@patternfly/react-core';
+import {postData} from '@app/utils/utils';
 import {getServer} from '@app/utils/utils';
 import styled from 'styled-components';
 import {TopToolbar} from "@app/shared/top-toolbar";
 import sharedMessages from "../messages/shared.messages";
+import {addNotification} from '@redhat-cloud-services/frontend-components-notifications';
+import {useDispatch} from "react-redux";
 
 const CardBody = styled(PFCardBody)`
   white-space: pre-wrap;
@@ -28,12 +30,31 @@ const NewProject: React.FunctionComponent = () => {
   const [scmType, setScmType] = useState('');
   const [scmCredential, setScmCredential] = useState('');
   const intl = useIntl();
+  const dispatch = useDispatch();
 
   const handleSubmit = () => {
 			postData(endpoint, { url: scmUrl, name: name, description: description })
 				.then(data => {
           history.push(`/project/${data.id}`);
-			});
+          dispatch(
+            addNotification({
+              variant: 'success',
+              title: intl.formatMessage(sharedMessages.add_new_project),
+              dismissable: true,
+              description: intl.formatMessage(sharedMessages.add_project_success)
+            })
+          );
+			}).catch((error) => {
+        history.push(`/projects`);
+        dispatch(
+          addNotification({
+            variant: 'danger',
+            title: intl.formatMessage(sharedMessages.add_new_project),
+            dismissable: true,
+            description: `${intl.formatMessage(sharedMessages.add_project_failure)}  ${error}`
+          })
+        );
+      });
   };
 
   return (

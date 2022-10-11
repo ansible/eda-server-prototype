@@ -7,13 +7,17 @@ import {IntlProvider} from "react-intl";
 import {Modal, Tab} from "@patternfly/react-core";
 import {RemoveProject} from "@app/RemoveProject/RemoveProject";
 import {defaultSettings} from "@app/shared/pagination";
+import store from '../../store'
+import {Provider} from "react-redux";
 
 const ComponentWrapper = ({ children, initialEntries=['/dashboard']}) => (
-  <IntlProvider locale="en">
-    <MemoryRouter initialEntries={initialEntries} keyLength={0} key={'test'}>
-      {children}
-    </MemoryRouter>
-  </IntlProvider>
+  <Provider store={store()}>
+    <IntlProvider locale="en">
+      <MemoryRouter initialEntries={initialEntries} keyLength={0} key={'test'}>
+        {children}
+      </MemoryRouter>
+    </IntlProvider>
+  </Provider>
 );
 
 describe('RemoveProject', () => {

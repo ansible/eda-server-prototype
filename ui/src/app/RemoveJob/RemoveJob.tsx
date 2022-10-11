@@ -14,6 +14,8 @@ import sharedMessages from "../messages/shared.messages";
 import {getServer, removeData} from "@app/utils/utils";
 import {defaultSettings} from "@app/shared/pagination";
 import {JobType} from "@app/Job/Job";
+import {useDispatch} from "react-redux";
+import {addNotification} from "@redhat-cloud-services/frontend-components-notifications";
 
 interface IRemoveJob {
   ids?: Array<string|number>,
@@ -37,6 +39,7 @@ const RemoveJob: React.ComponentType<IRemoveJob> = ( {ids = [],
                                              pagination = defaultSettings,
                                              setSelectedJobs} ) => {
   const intl = useIntl();
+  const dispatch = useDispatch();
   const [job, setJob] = useState<JobType>();
   const { id } = useParams<{id:string}>();
   const { push, goBack } = useHistory();
@@ -48,7 +51,17 @@ const RemoveJob: React.ComponentType<IRemoveJob> = ( {ids = [],
   }
 
   const onSubmit = () => {
-    removeJob(id).then(() => push('/jobs'));
+    removeJob(id).then(() => push('/jobs'))
+    .catch((error) => {
+      dispatch(
+        addNotification({
+          variant: 'danger',
+          title: intl.formatMessage(sharedMessages.jobRemoveTitle),
+          dismissable: true,
+          description: `${intl.formatMessage(sharedMessages.delete_job_failure)}  ${error}`
+        })
+      );
+    });
   };
 
   useEffect(() => {

@@ -23,6 +23,8 @@ import {TopToolbar} from "@app/shared/top-toolbar";
 import {ExclamationCircleIcon} from "@patternfly/react-icons";
 import {useIntl} from "react-intl";
 import sharedMessages from "../messages/shared.messages";
+import {addNotification} from '@redhat-cloud-services/frontend-components-notifications';
+import {useDispatch} from "react-redux";
 
 const CardBody = styled(PFCardBody)`
   white-space: pre-wrap;
@@ -31,14 +33,15 @@ const SimpleList = styled(PFSimpleList)`
   white-space: pre-wrap;
 `
 
-const endpoint = 'http://' + getServer() + '/api/job_instance/';
-const endpoint1 = 'http://' + getServer() + '/api/playbooks/';
-const endpoint2 = 'http://' + getServer() + '/api/inventories/';
-const endpoint3 = 'http://' + getServer() + '/api/extra_vars/';
+const endpoint_job = 'http://' + getServer() + '/api/job_instance/';
+const endpoint_playbooks = 'http://' + getServer() + '/api/playbooks/';
+const endpoint_inventories = 'http://' + getServer() + '/api/inventories/';
+const endpoint_vars = 'http://' + getServer() + '/api/extra_vars/';
 
 const NewJob: React.FunctionComponent = () => {
   const history = useHistory();
   const intl = useIntl();
+  const dispatch = useDispatch();
   const [playbooks, setPlaybooks] = useState([{"id": 0, "name": "Please select a playbook"}])
   const [inventories, setInventories] = useState([{"id": 0, "name": "Please select an inventory"}]);
   const [extravars, setExtraVars] = useState([{"id": 0, "name": "Please select vars"}]);
@@ -52,7 +55,7 @@ const NewJob: React.FunctionComponent = () => {
   const [ validatedInventory, setValidatedInventory ] = useState<ValidatedOptions>(ValidatedOptions.default);
   const [ validatedExtraVar, setValidatedExtraVar ] = useState<ValidatedOptions>(ValidatedOptions.default);
   useEffect(() => {
-     fetch(endpoint1, {
+     fetch(endpoint_playbooks, {
        headers: {
          'Content-Type': 'application/json',
        },
@@ -61,7 +64,7 @@ const NewJob: React.FunctionComponent = () => {
   }, []);
 
   useEffect(() => {
-     fetch(endpoint2, {
+     fetch(endpoint_inventories, {
        headers: {
          'Content-Type': 'application/json',
        },
@@ -70,7 +73,7 @@ const NewJob: React.FunctionComponent = () => {
   }, []);
 
   useEffect(() => {
-     fetch(endpoint3, {
+     fetch(endpoint_vars, {
        headers: {
          'Content-Type': 'application/json',
        },
@@ -131,13 +134,31 @@ const NewJob: React.FunctionComponent = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     validateFields();
-    postData(endpoint, { name: name,
+    postData(endpoint_job, { name: name,
                          playbook_id: playbook,
                          inventory_id: inventory,
                          extra_var_id: extravar})
       .then(data => {
         data?.id ? history.push(`/job/${data.id}`) :
-          console.log('no job was added')
+          history.push(`/jobs`);
+        dispatch(
+          addNotification({
+            variant: 'success',
+            title: intl.formatMessage(sharedMessages.addJob),
+            dismissable: true,
+            description: intl.formatMessage(sharedMessages.add_job_success)
+          })
+        );
+      }).catch((error) => {
+      history.push(`/jobs`);
+      dispatch(
+        addNotification({
+          variant: 'danger',
+          title: intl.formatMessage(sharedMessages.addJob),
+          dismissable: true,
+          description: `${intl.formatMessage(sharedMessages.add_job_failure)}  ${error}`
+        })
+      );
     });
   };
 

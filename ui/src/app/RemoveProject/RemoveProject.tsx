@@ -14,6 +14,8 @@ import sharedMessages from "../messages/shared.messages";
 import {ProjectType} from "@app/shared/types/common-types";
 import {getServer, removeData} from "@app/utils/utils";
 import {defaultSettings} from "@app/shared/pagination";
+import {useDispatch} from "react-redux";
+import {addNotification} from "@redhat-cloud-services/frontend-components-notifications";
 
 interface IRemoveProject {
   ids?: Array<string|number>,
@@ -37,6 +39,7 @@ const RemoveProject: React.ComponentType<IRemoveProject> = ( {ids = [],
                                              pagination = defaultSettings,
                                              setSelectedProjects} ) => {
   const intl = useIntl();
+  const dispatch = useDispatch();
   const [project, setProject] = useState<ProjectType>();
   const { id } = useParams<{id:string}>();
   const { push, goBack } = useHistory();
@@ -48,7 +51,17 @@ const RemoveProject: React.ComponentType<IRemoveProject> = ( {ids = [],
   }
 
   const onSubmit = () => {
-    removeProject(id).then(() => push('/projects'));
+    removeProject(id).then(() => push('/projects'))
+    .catch((error) => {
+      dispatch(
+        addNotification({
+          variant: 'danger',
+          title: intl.formatMessage(sharedMessages.projectRemoveTitle),
+          dismissable: true,
+          description: `${intl.formatMessage(sharedMessages.delete_project_failure)}  ${error}`
+        })
+      );
+    });
   };
 
   useEffect(() => {
