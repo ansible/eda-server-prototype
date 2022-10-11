@@ -67,12 +67,12 @@ tasks:
       Example:
         $ task dev -- services-start
     cmds:
+      - task: version:check:bash
       - '{{.DEV_CMD}} {{.CLI_ARGS}}'
 
   dev:services:start:
     desc: "Start EDA service containers"
     cmds:
-      - task: version:check:bash
       - task: dev
         vars:
           CLI_ARGS: services-start
