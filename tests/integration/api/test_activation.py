@@ -1,4 +1,3 @@
-import pytest
 import sqlalchemy as sa
 from fastapi import status as status_codes
 from httpx import AsyncClient
@@ -109,7 +108,6 @@ async def _create_activation(
     return activation_id
 
 
-@pytest.mark.asyncio
 async def test_create_activation(client: AsyncClient, db: AsyncSession):
     await _create_activation_dependent_objects(client, db)
 
@@ -128,7 +126,6 @@ async def test_create_activation(client: AsyncClient, db: AsyncSession):
     assert activation["is_enabled"] == TEST_ACTIVATION["is_enabled"]
 
 
-@pytest.mark.asyncio
 async def test_delete_activation_instance(
     client: AsyncClient, db: AsyncSession
 ):
@@ -159,7 +156,6 @@ async def test_delete_activation_instance(
     assert num_activation_instances == 0
 
 
-@pytest.mark.asyncio
 async def test_ins_del_activation_instance_manages_log_lob(
     client: AsyncClient, db: AsyncSession
 ):
@@ -206,7 +202,6 @@ async def test_ins_del_activation_instance_manages_log_lob(
     )
 
 
-@pytest.mark.asyncio
 async def test_create_activation_bad_entity(
     client: AsyncClient, db: AsyncSession
 ):
@@ -217,13 +212,11 @@ async def test_create_activation_bad_entity(
     assert response.status_code == status_codes.HTTP_422_UNPROCESSABLE_ENTITY
 
 
-@pytest.mark.asyncio
 async def test_delete_activation_instance_not_found(client: AsyncClient):
     response = await client.delete("/api/activation_instance/1")
     assert response.status_code == status_codes.HTTP_404_NOT_FOUND
 
 
-@pytest.mark.asyncio
 async def test_read_activation(client: AsyncClient, db: AsyncSession):
     foreign_keys = await _create_activation_dependent_objects(client, db)
     activation_id = await _create_activation(client, db, foreign_keys)
@@ -260,13 +253,11 @@ async def test_read_activation(client: AsyncClient, db: AsyncSession):
     }
 
 
-@pytest.mark.asyncio
 async def test_read_activation_not_found(client: AsyncClient):
     response = await client.get("/api/activations/1")
     assert response.status_code == status_codes.HTTP_404_NOT_FOUND
 
 
-@pytest.mark.asyncio
 async def test_read_activations(client: AsyncClient, db: AsyncSession):
     foreign_keys = await _create_activation_dependent_objects(client, db)
     activation_id = await _create_activation(client, db, foreign_keys)
@@ -285,7 +276,6 @@ async def test_read_activations(client: AsyncClient, db: AsyncSession):
     assert activation["description"] == TEST_ACTIVATION["description"]
 
 
-@pytest.mark.asyncio
 async def test_read_activations_empty_response(
     client: AsyncClient, db: AsyncSession
 ):
@@ -297,7 +287,6 @@ async def test_read_activations_empty_response(
     assert activations == []
 
 
-@pytest.mark.asyncio
 async def test_update_activation(client: AsyncClient, db: AsyncSession):
     foreign_keys = await _create_activation_dependent_objects(client, db)
     activation_id = await _create_activation(client, db, foreign_keys)
@@ -320,7 +309,6 @@ async def test_update_activation(client: AsyncClient, db: AsyncSession):
     assert activation["is_enabled"] == new_activation["is_enabled"]
 
 
-@pytest.mark.asyncio
 async def test_update_activation_bad_entity(
     client: AsyncClient, db: AsyncSession
 ):
@@ -336,7 +324,6 @@ async def test_update_activation_bad_entity(
     assert response.status_code == status_codes.HTTP_422_UNPROCESSABLE_ENTITY
 
 
-@pytest.mark.asyncio
 async def test_update_activation_not_found(client: AsyncClient):
     new_activation = {
         "name": "new demo",
@@ -351,7 +338,6 @@ async def test_update_activation_not_found(client: AsyncClient):
     assert response.status_code == status_codes.HTTP_404_NOT_FOUND
 
 
-@pytest.mark.asyncio
 async def test_delete_activation(client: AsyncClient, db: AsyncSession):
     foreign_keys = await _create_activation_dependent_objects(client, db)
     activation_id = await _create_activation(client, db, foreign_keys)
@@ -370,7 +356,6 @@ async def test_delete_activation(client: AsyncClient, db: AsyncSession):
     assert num_activations == 0
 
 
-@pytest.mark.asyncio
 async def test_delete_activation_not_found(client: AsyncClient):
     response = await client.delete("/api/activations/1")
     assert response.status_code == status_codes.HTTP_404_NOT_FOUND

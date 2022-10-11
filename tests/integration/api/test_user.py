@@ -3,7 +3,6 @@ import uuid
 from typing import List, Tuple
 
 import pytest
-import pytest_asyncio
 import sqlalchemy as sa
 from fastapi import FastAPI, status
 from httpx import AsyncClient, Response
@@ -16,7 +15,7 @@ from eda_server.users import UserDatabase, current_active_user
 from tests.integration.utils.app import override_dependencies
 
 
-@pytest_asyncio.fixture
+@pytest.fixture
 async def admin_user(db: AsyncSession):
     return await UserDatabase(db).create(
         {
@@ -27,7 +26,7 @@ async def admin_user(db: AsyncSession):
     )
 
 
-@pytest_asyncio.fixture
+@pytest.fixture
 async def test_user(db: AsyncSession):
     return await UserDatabase(db).create(
         {
@@ -114,7 +113,6 @@ def _check_test_user_permissions_response(response: Response):
     )
 
 
-@pytest.mark.asyncio
 async def test_add_user_role(
     client: AsyncClient, db: AsyncSession, test_user: models.User
 ):
@@ -136,7 +134,6 @@ async def test_add_user_role(
     assert role_exists
 
 
-@pytest.mark.asyncio
 async def test_add_user_role_user_not_exist(
     client: AsyncClient, db: AsyncSession
 ):
@@ -149,7 +146,6 @@ async def test_add_user_role_user_not_exist(
     assert response.status_code == status.HTTP_404_NOT_FOUND
 
 
-@pytest.mark.asyncio
 async def test_add_user_role_role_not_exist(
     client: AsyncClient, test_user: models.User
 ):
@@ -161,7 +157,6 @@ async def test_add_user_role_role_not_exist(
     assert response.status_code == status.HTTP_404_NOT_FOUND
 
 
-@pytest.mark.asyncio
 async def test_add_user_role_duplicate(
     client: AsyncClient, db: AsyncSession, test_user: models.User
 ):
@@ -173,7 +168,6 @@ async def test_add_user_role_duplicate(
     assert response.status_code == status.HTTP_204_NO_CONTENT
 
 
-@pytest.mark.asyncio
 async def test_remove_user_role(
     client: AsyncClient, db: AsyncSession, test_user: models.User
 ):
@@ -186,7 +180,6 @@ async def test_remove_user_role(
     assert response.status_code == status.HTTP_204_NO_CONTENT
 
 
-@pytest.mark.asyncio
 async def test_remove_user_role_user_not_exist(
     client: AsyncClient, db: AsyncSession
 ):
@@ -199,7 +192,6 @@ async def test_remove_user_role_user_not_exist(
     assert response.status_code == status.HTTP_404_NOT_FOUND
 
 
-@pytest.mark.asyncio
 async def test_remove_user_role_role_not_exist(
     client: AsyncClient, db: AsyncSession, test_user: models.User
 ):
@@ -212,7 +204,6 @@ async def test_remove_user_role_role_not_exist(
 
 
 # Test list roles
-@pytest.mark.asyncio
 async def test_list_me_roles(
     app: FastAPI, client: AsyncClient, db: AsyncSession, test_user: models.User
 ):
@@ -222,7 +213,6 @@ async def test_list_me_roles(
     _check_test_user_roles_response(response, role_ids)
 
 
-@pytest.mark.asyncio
 async def test_list_user_roles(
     client: AsyncClient, db: AsyncSession, test_user: models.User
 ):
@@ -232,7 +222,6 @@ async def test_list_user_roles(
 
 
 # Test list permissions
-@pytest.mark.asyncio
 async def test_list_me_permissions(
     app: FastAPI, client: AsyncClient, db: AsyncSession, test_user: models.User
 ):
@@ -242,7 +231,6 @@ async def test_list_me_permissions(
     _check_test_user_permissions_response(response)
 
 
-@pytest.mark.asyncio
 async def test_list_user_permissions(
     client: AsyncClient, db: AsyncSession, test_user: models.User
 ):

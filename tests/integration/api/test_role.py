@@ -31,7 +31,6 @@ def app(app: FastAPI, admin_user: models.User):
         yield app
 
 
-@pytest.mark.asyncio
 async def test_create_role(client: AsyncClient, db: AsyncSession):
     response = await client.post(
         "/api/roles",
@@ -53,7 +52,6 @@ async def test_create_role(client: AsyncClient, db: AsyncSession):
     assert role["description"] == "A test role 01."
 
 
-@pytest.mark.asyncio
 async def test_show_role(client: AsyncClient, db: AsyncSession):
     role_id = await create_role(db, "test-role-02")
 
@@ -66,7 +64,6 @@ async def test_show_role(client: AsyncClient, db: AsyncSession):
     }
 
 
-@pytest.mark.asyncio
 async def test_role_invalid_id(client: AsyncClient):
     response = await client.get("/api/roles/42")
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
@@ -81,7 +78,6 @@ async def test_role_invalid_id(client: AsyncClient):
     }
 
 
-@pytest.mark.asyncio
 async def test_show_role_not_exist(client: AsyncClient):
     response = await client.get(
         "/api/roles/42424242-4242-4242-4242-424242424242"
@@ -89,7 +85,6 @@ async def test_show_role_not_exist(client: AsyncClient):
     assert response.status_code == status.HTTP_404_NOT_FOUND
 
 
-@pytest.mark.asyncio
 async def test_delete_role(client: AsyncClient, db: AsyncSession):
     role_id = await create_role(db, "test-role-03")
 
@@ -106,7 +101,6 @@ async def test_delete_role(client: AsyncClient, db: AsyncSession):
     assert response.status_code == status.HTTP_404_NOT_FOUND
 
 
-@pytest.mark.asyncio
 async def test_delete_role_not_exist(client: AsyncClient):
     response = await client.delete(
         "/api/roles/42424242-4242-4242-4242-424242424242"
@@ -114,7 +108,6 @@ async def test_delete_role_not_exist(client: AsyncClient):
     assert response.status_code == status.HTTP_404_NOT_FOUND
 
 
-@pytest.mark.asyncio
 async def test_list_role_permissions(client: AsyncClient, db: AsyncSession):
     role_id = await create_role(db, "test-role-04")
     await add_role_permissions(
@@ -143,7 +136,6 @@ async def test_list_role_permissions(client: AsyncClient, db: AsyncSession):
         assert item["resource_type"], item["action"] == expected
 
 
-@pytest.mark.asyncio
 async def test_add_role_permissions(client: AsyncClient, db: AsyncSession):
     role_id = await create_role(db, "test-role-05")
 
@@ -162,7 +154,6 @@ async def test_add_role_permissions(client: AsyncClient, db: AsyncSession):
     assert data["action"] == "read"
 
 
-@pytest.mark.asyncio
 @pytest.mark.parametrize(
     "data",
     [
@@ -182,7 +173,6 @@ async def test_add_role_permissions_invalid(
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
 
-@pytest.mark.asyncio
 async def test_delete_role_permissions(client: AsyncClient, db: AsyncSession):
     role_id = await create_role(db, "test-role-07")
     permission_ids = await add_role_permissions(
