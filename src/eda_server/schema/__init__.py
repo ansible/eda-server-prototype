@@ -42,8 +42,8 @@ from .role import (
 from .rulebook import (
     Rule,
     RulebookCreate,
-    RulebookRead,
     RulebookList,
+    RulebookRead,
     RulebookRef,
     RulebookRulesetList,
     RuleRulesetRef,
