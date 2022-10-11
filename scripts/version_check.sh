@@ -26,13 +26,13 @@ check_version() {
   local _current_version="${1}"
   local _expected_version="${2}"
 
-  log-info "\U2796 Current version: ${_current_version}"
+  log-info "Current version: ${_current_version}"
 
   if [ "${_current_version}" -lt "${_expected_version}" ]; then
     log-err "version must be ${_expected_version} or higher"
     exit 1
   else
-    log-info "\U1F7E2 Check successful"
+    log-info "Check successful"
   fi
 }
 
@@ -46,7 +46,7 @@ check_bash_version() {
 # execute
 #
 ARG=$(echo "${CMD}" |tr [a-z] [A-Z])
-log-info "\U1F52C Checking ${CMD} version..."
+log-info "Checking ${CMD} version..."
 
 case ${ARG} in
   "BASH") check_bash_version ;;

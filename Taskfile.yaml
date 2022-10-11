@@ -72,6 +72,7 @@ tasks:
   dev:services:start:
     desc: "Start EDA service containers"
     cmds:
+      - task: version:check:bash
       - task: dev
         vars:
           CLI_ARGS: services-start
@@ -193,7 +194,7 @@ tasks:
       Example:
         $ task minikube -- services-start
     cmds:
-      - task version:check:bash
+      - task: version:check:bash
       - '{{.MINIKUBE_CMD}} {{.CLI_ARGS}}'
 
   minikube:build:
