@@ -53,7 +53,7 @@ def configure_logging(app):
     settings = app.state.settings
     log_level = settings.log_level.upper()
     # The nested loggers will inherit parent logger log level.
-    logging.getLogger("ansible_rulebook_ui").setLevel(log_level)
+    logging.getLogger("eda_server").setLevel(log_level)
 
 
 # TODO(cutwater): Use dependency overrides.
