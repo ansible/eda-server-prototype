@@ -20,7 +20,7 @@ spec:
             - alembic upgrade head && eda-server
           env:
             - name: EDA_DATABASE_URL
-              value: postgresql+asyncpg://postgres:secret@postgres/ansible_rulebook
+              value: postgresql+asyncpg://postgres:secret@postgres/eda_server
             - name: EDA_HOST
               value: 0.0.0.0
           image: eda-server

@@ -17,7 +17,7 @@ class Settings(BaseSettings):
     port: int = 9000
 
     database_url: str = (
-        "postgresql+asyncpg://postgres:secret@localhost:5432/ansible_rulebook"
+        "postgresql+asyncpg://postgres:secret@localhost:5432/eda_server"
     )
 
     deployment_type: str = "docker"
