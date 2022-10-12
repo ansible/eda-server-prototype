@@ -1,11 +1,11 @@
 from .activation import (
     ActivationBaseRead,
     ActivationCreate,
-    ActivationJob,
     ActivationInstanceBaseRead,
     ActivationInstanceCreate,
     ActivationInstanceJobInstance,
     ActivationInstanceRead,
+    ActivationJob,
     ActivationLog,
     ActivationRead,
     ActivationUpdate,

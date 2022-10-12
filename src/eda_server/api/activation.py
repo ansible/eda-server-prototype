@@ -225,8 +225,7 @@ async def list_activation_jobs(
     activation_id: int, db: AsyncSession = Depends(get_db_session)
 ):
     query = sa.select(models.activation_jobs).where(
-        models.activation_jobs.c.activation_id
-        == activation_id
+        models.activation_jobs.c.activation_id == activation_id
     )
     result = await db.execute(query)
     return result.all()
