@@ -288,6 +288,7 @@ const Projects: React.FunctionComponent = () => {
             setOffset={setOffset}
             columns={columns(intl)}
             fetchData={handlePagination}
+
             routes={routes}
             actionResolver={actionResolver}
             plural={intl.formatMessage(sharedMessages.projects)}

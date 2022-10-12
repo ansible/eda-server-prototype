@@ -74,6 +74,10 @@ const sharedMessages = defineMessages({
     id: 'shared.jobs',
     defaultMessage: 'Jobs'
   },
+  sync: {
+    id: 'shared.sync',
+    defaultMessage: 'Sync'
+  },
   addJob: {
     id: 'activation.addJob',
     defaultMessage: 'Add job'
