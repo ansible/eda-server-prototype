@@ -50,9 +50,7 @@ activation_jobs = sa.Table(
         "activation_id",
         sa.ForeignKey("activation.id", ondelete="CASCADE"),
     ),
-    sa.Column(
-        "job_id", sa.ForeignKey("job.id", ondelete="CASCADE")
-    ),
+    sa.Column("job_id", sa.ForeignKey("job.id", ondelete="CASCADE")),
 )
 
 

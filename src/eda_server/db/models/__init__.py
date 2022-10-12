@@ -6,8 +6,8 @@ from .activation import (
 from .auth import User, role_permissions, roles, user_roles
 from .base import Base, metadata
 from .job import (
-    activation_jobs,
     activation_instance_job_instances,
+    activation_jobs,
     job_instance_events,
     job_instance_hosts,
     job_instances,
