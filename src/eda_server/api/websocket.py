@@ -73,7 +73,7 @@ async def websocket_endpoint2(
                 elif data_type == "Job":
                     await handle_jobs(data, db)
                 elif data_type == "AnsibleEvent":
-                    await handle_ansible_events(data, db)
+                    await handle_ansible_rulebook(data, db)
                 elif data_type == "Action":
                     await handle_actions(data, db)
     except WebSocketDisconnect:
@@ -215,7 +215,7 @@ async def handle_workers(websocket: WebSocket, data: dict, db: AsyncSession):
         )
 
 
-async def handle_ansible_events(data: dict, db: AsyncSession):
+async def handle_ansible_rulebook(data: dict, db: AsyncSession):
     event_data = data.get("event", {})
     if event_data.get("stdout"):
         query = select(models.job_instances).where(
@@ -273,7 +273,7 @@ async def handle_jobs(data: dict, db: AsyncSession):
     result = await db.execute(query)
     (job_instance_id,) = result.inserted_primary_key
 
-    activation_instance_id = int(data.get("ansible_events_id"))
+    activation_instance_id = int(data.get("ansible_rulebook_id"))
     query = insert(models.activation_instance_job_instances).values(
         job_instance_id=job_instance_id,
         activation_instance_id=activation_instance_id,

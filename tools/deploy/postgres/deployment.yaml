@@ -17,7 +17,7 @@ spec:
       containers:
         - env:
             - name: POSTGRES_DB
-              value: ansible_events
+              value: ansible_rulebook
             - name: POSTGRES_PASSWORD
               value: secret
           image: docker.io/library/postgres:13
