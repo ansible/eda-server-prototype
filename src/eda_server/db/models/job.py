@@ -8,6 +8,7 @@ __all__ = (
     "job_instances",
     "job_instance_events",
     "job_instance_hosts",
+    "activation_jobs",
     "activation_instance_job_instances",
 )
 
@@ -34,6 +35,26 @@ job_instances = sa.Table(
     ),
     sa.Column("uuid", postgresql.UUID),
 )
+
+
+activation_jobs = sa.Table(
+    "activation_job",
+    metadata,
+    sa.Column(
+        "id",
+        sa.Integer,
+        sa.Identity(always=True),
+        primary_key=True,
+    ),
+    sa.Column(
+        "activation_id",
+        sa.ForeignKey("activation.id", ondelete="CASCADE"),
+    ),
+    sa.Column(
+        "job_id", sa.ForeignKey("job.id", ondelete="CASCADE")
+    ),
+)
+
 
 activation_instance_job_instances = sa.Table(
     "activation_instance_job_instance",

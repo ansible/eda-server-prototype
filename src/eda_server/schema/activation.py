@@ -52,6 +52,12 @@ class ActivationUpdate(BaseModel):
     is_enabled: bool
 
 
+class ActivationJob(BaseModel):
+    id: int
+    activation_id: int
+    job_id: int
+
+
 class ActivationInstanceCreate(BaseModel):
     name: StrictStr
     rulebook_id: int

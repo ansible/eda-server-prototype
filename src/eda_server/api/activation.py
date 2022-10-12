@@ -216,6 +216,22 @@ async def delete_activation(
     await db.commit()
 
 
+@router.get(
+    "/api/activations/{activation_id}/jobs",
+    response_model=List[schema.ActivationJob],
+    operation_id="list_activation_jobs",
+)
+async def list_activation_jobs(
+    activation_id: int, db: AsyncSession = Depends(get_db_session)
+):
+    query = sa.select(models.activation_jobs).where(
+        models.activation_jobs.c.activation_id
+        == activation_id
+    )
+    result = await db.execute(query)
+    return result.all()
+
+
 async def read_output(proc, activation_instance_id, db_session_factory):
     # TODO(cutwater): Replace with FastAPI dependency injections,
     #   that is available in BackgroundTasks
