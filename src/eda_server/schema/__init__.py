@@ -1,6 +1,7 @@
 from .activation import (
     ActivationBaseRead,
     ActivationCreate,
+    ActivationJob,
     ActivationInstanceBaseRead,
     ActivationInstanceCreate,
     ActivationInstanceJobInstance,
@@ -62,6 +63,7 @@ __all__ = [
     "ActivationRead",
     "ActivationBaseRead",
     "ActivationCreate",
+    "ActivationJob",
     "AuditRule",
     "AuditRuleJobInstance",
     "AuditRuleJobInstanceEvent",
