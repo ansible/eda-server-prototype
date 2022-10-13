@@ -13,7 +13,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from eda_server import schema
 from eda_server.config import Settings, get_settings
 from eda_server.db import models
-from eda_server.db.dependency import get_db_session
+from eda_server.db.dependency import get_db_session, get_db_session_factory
 from eda_server.db.models.activation import ExecutionEnvironment
 from eda_server.db.utils.lostream import PGLargeObject, decode_bytes_buff
 from eda_server.managers import updatemanager
@@ -257,6 +257,7 @@ async def read_output(proc, activation_instance_id, db_session_factory):
 async def create_activation_instance(
     a: schema.ActivationInstanceCreate,
     db: AsyncSession = Depends(get_db_session),
+    db_factory=Depends(get_db_session_factory),
     settings: Settings = Depends(get_settings),
 ):
 
@@ -315,7 +316,7 @@ async def create_activation_instance(
             a.working_directory,
             settings.server_name,
             settings.port,
-            db,
+            db_factory,
         )
     except aiodocker.exceptions.DockerError as e:
         return JSONResponse(

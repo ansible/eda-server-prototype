@@ -31,7 +31,6 @@ from functools import partial
 import aiodocker
 import ansible_runner
 from sqlalchemy import insert
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from eda_server.db.utils.lostream import (
     CHUNK_SIZE,
@@ -75,7 +74,7 @@ async def activate_rulesets(
     working_directory,
     host,
     port,
-    db: AsyncSession,
+    db_factory,
 ):
     """
     Spawn ansible-events.
@@ -112,7 +111,7 @@ async def activate_rulesets(
         activated_rulesets[activation_id] = proc
 
         task = asyncio.create_task(
-            read_output(proc, activation_id, large_data_id, db),
+            read_output(proc, activation_id, large_data_id, db_factory),
             name=f"read_output {proc.pid}",
         )
         taskmanager.tasks.append(task)
@@ -150,7 +149,9 @@ async def activate_rulesets(
         activated_rulesets[activation_id] = container
 
         task = asyncio.create_task(
-            read_log(docker, container, activation_id, large_data_id, db),
+            read_log(
+                docker, container, activation_id, large_data_id, db_factory
+            ),
             name=f"read_log {container}",
         )
         taskmanager.tasks.append(task)
@@ -170,22 +171,38 @@ async def inactivate_rulesets(activation_id):
 
 
 async def read_output(
-    proc, activation_instance_id, activation_instance_large_data_id, db
+    proc, activation_instance_id, activation_instance_large_data_id, db_factory
 ):
-    # TODO(cutwater): Replace with FastAPI dependency injections,
-    #   that is available in BackgroundTasks
-    async with PGLargeObject(
-        db, oid=activation_instance_large_data_id, mode="w"
-    ) as lobject:
-        leftover = b""
-        for buff in iter(lambda: proc.stdout.read(CHUNK_SIZE), b""):
-            await lobject.write(buff)
-            await db.commit()
+
+    try:
+        logger.debug(
+            "read_output %s %s %s",
+            proc.pid,
+            activation_instance_id,
+            activation_instance_large_data_id,
+        )
+        async with db_factory() as db:
+            async with PGLargeObject(
+                db, oid=activation_instance_large_data_id, mode="w"
+            ) as lobject:
+                while True:
+                    buff = await proc.stdout.read(CHUNK_SIZE)
+                    if not buff:
+                        break
+                    logger.debug("read_output %s", buff)
+                    leftover = b""
+                    await lobject.write(buff)
+                    await db.commit()
             buff, leftover = decode_bytes_buff(leftover + buff)
             await updatemanager.broadcast(
                 f"/activation_instance/{activation_instance_id}",
                 json.dumps(["Stdout", {"stdout": buff}]),
             )
+
+    except Exception as e:
+        logger.error("read_output %s", e)
+    finally:
+        logger.info("read_output complete")
 
 
 async def read_log(
@@ -193,25 +210,29 @@ async def read_log(
     container,
     activation_instance_id,
     activation_instance_large_data_id,
-    db,
+    db_factory,
 ):
-    async with PGLargeObject(
-        db, oid=activation_instance_large_data_id, mode="w"
-    ) as lobject:
-        async for chunk in container.log(
-            stdout=True, stderr=True, follow=True
-        ):
-            await lobject.write(chunk.encode())
-            await db.commit()
-            await updatemanager.broadcast(
-                f"/activation_instance/{activation_instance_id}",
-                json.dumps(["Stdout", {"stdout": chunk}]),
-            )
-        await docker.close()
+    try:
+        async with db_factory() as db:
+            async with PGLargeObject(
+                db, oid=activation_instance_large_data_id, mode="w"
+            ) as lobject:
+                async for chunk in container.log(
+                    stdout=True, stderr=True, follow=True
+                ):
+                    await lobject.write(chunk.encode())
+                    await db.commit()
+                    await updatemanager.broadcast(
+                        f"/activation_instance/{activation_instance_id}",
+                        json.dumps(["Stdout", {"stdout": chunk}]),
+                    )
+                await docker.close()
+    except Exception as e:
+        logger.error("read_log %s", e)
 
 
 async def run_job(
-    job_uuid, event_log, playbook, inventory, extravars, db: AsyncSession
+    job_uuid, event_log, playbook, inventory, extravars, db_factory
 ):
     loop = asyncio.get_running_loop()
     task_pool = concurrent.futures.ThreadPoolExecutor()
@@ -252,7 +273,7 @@ async def run_job(
     await event_log.put(JobEnd(job_uuid))
 
 
-async def write_job_events(event_log, db: AsyncSession, job_instance_id):
+async def write_job_events(event_log, job_instance_id, db_factory):
 
     while True:
 
@@ -267,10 +288,11 @@ async def write_job_events(event_log, db: AsyncSession, job_instance_id):
                 json.dumps(["Stdout", {"stdout": event.get("stdout")}]),
             )
 
-        query = insert(job_instance_events).values(
-            job_uuid=event.get("job_id"),
-            counter=event.get("counter"),
-            stdout=event.get("stdout"),
-        )
-        await db.execute(query)
-        await db.commit()
+        async with db_factory() as db:
+            query = insert(job_instance_events).values(
+                job_uuid=event.get("job_id"),
+                counter=event.get("counter"),
+                stdout=event.get("stdout"),
+            )
+            await db.execute(query)
+            await db.commit()

@@ -11,7 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from eda_server import schema
 from eda_server.db import models
-from eda_server.db.dependency import get_db_session
+from eda_server.db.dependency import get_db_session, get_db_session_factory
 from eda_server.managers import taskmanager
 from eda_server.ruleset import run_job, write_job_events
 
@@ -39,7 +39,9 @@ async def list_job_instances(db: AsyncSession = Depends(get_db_session)):
     operation_id="create_job_instance",
 )
 async def create_job_instance(
-    j: schema.JobInstanceCreate, db: AsyncSession = Depends(get_db_session)
+    j: schema.JobInstanceCreate,
+    db: AsyncSession = Depends(get_db_session),
+    db_factory=Depends(get_db_session_factory),
 ):
 
     query = sa.select(models.playbooks).where(
@@ -79,7 +81,7 @@ async def create_job_instance(
     )
     taskmanager.tasks.append(task)
     task = asyncio.create_task(
-        write_job_events(event_log, db, job_instance_id),
+        write_job_events(event_log, job_instance_id, db_factory),
         name=f"write_job_events {job_instance_id}",
     )
     taskmanager.tasks.append(task)
@@ -121,7 +123,6 @@ async def delete_job_instance(
 
 @router.get(
     "/api/job_instance_events/{job_instance_id}",
-    response_model=List[schema.JobInstanceEventsRead],
     operation_id="read_job_instance_events",
 )
 async def read_job_instance_events(
