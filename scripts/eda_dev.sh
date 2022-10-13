@@ -100,27 +100,26 @@ start-events-services() {
     # Reference:
     #      https://github.com/containers/podman/issues/11645
     #
-    # Default is to use the Docker key value if both Podman and Docker are installed.
+    # Default is to check if podman is installed. If true then use podman.
     #
     local heath_check=".State.Health.Status"
 
-    if which docker &> /dev/null; then
-      heath_check="${heath_check}"
-      log-debug "Using docker installation"
-      log-debug "Set healthcheck flag: ${heath_check}"
-
-    elif which podman &> /dev/null; then
+    if which podman &> /dev/null; then
       _podman_version=$(podman -v)
       _podman_major_version=$(podman -v | awk '{print substr($3,0,1)}')
 
-      log-debug "Using podman installation"
+      log-info "Using podman installation"
       log-debug "podman version: ${_podman_version}"
-      log-debug "Using docker installation"
 
       if [ "${_podman_major_version}" -lt "4" ]; then
         heath_check=".State.Healthcheck.Status"
         log-debug "Set healthcheck flag: ${heath_check}"
       fi
+    elif which docker &> /dev/null; then
+      heath_check="${heath_check}"
+      log-info "Using docker installation"
+      log-debug "docker version: $(docker -v)"
+      log-debug "Set healthcheck flag: ${heath_check}"
     fi
 
     local _cnt=0
