@@ -95,12 +95,12 @@ start-events-services() {
     docker-compose -p eda-server -f tools/docker/docker-compose.yml up -d postgres
 
     #
-    # The below code is needed do to Podman versions pre V4, us a different string variation of
-    # the key for health check.
+    # Podman versions previous to v4 use a different string variation for health check.
+    #
     # Reference:
     #      https://github.com/containers/podman/issues/11645
     #
-    # Default is to use the Docker key value, if both Podman and Docker are installed.
+    # Default is to use the Docker key value if both Podman and Docker are installed.
     #
     local heath_check=".State.Health.Status"
 
