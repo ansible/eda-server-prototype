@@ -120,16 +120,19 @@ async def test_delete_project_not_found(client: AsyncClient):
     assert response.status_code == status_codes.HTTP_404_NOT_FOUND
 
 
-@mock.patch("eda_server.api.project.clone_project")
-@mock.patch("eda_server.api.project.sync_project")
+@mock.patch("tempfile.TemporaryDirectory")
+@mock.patch("eda_server.project.clone_project")
+@mock.patch("eda_server.project.sync_project")
 async def test_create_project(
     sync_project: mock.Mock,
     clone_project: mock.Mock,
+    tempfile: mock.Mock(),
     client: AsyncClient,
     db: AsyncSession,
 ):
+    tempfile.return_value.__enter__.return_value = "/tmp/test-create-project"
     found_hash = hashlib.sha1(b"test").hexdigest()
-    clone_project.return_value = found_hash, "/tmp/test-create-project"
+    clone_project.return_value = found_hash
 
     response = await client.post(
         "/api/projects",
@@ -147,9 +150,9 @@ async def test_create_project(
     assert project["name"] == TEST_PROJECT["name"]
     assert project["url"] == TEST_PROJECT["url"]
 
-    clone_project.assert_called_once_with(TEST_PROJECT["url"], None)
+    clone_project.assert_called_once_with(TEST_PROJECT["url"], mock.ANY)
     sync_project.assert_called_once_with(
-        project["id"], project["large_data_id"], "/tmp/test-create-project", db
+        db, project["id"], project["large_data_id"], "/tmp/test-create-project"
     )
 
 
@@ -168,7 +171,7 @@ async def test_create_project_bad_entity(
     assert response.status_code == status_codes.HTTP_422_UNPROCESSABLE_ENTITY
 
 
-@mock.patch("eda_server.api.project.clone_project")
+@mock.patch("eda_server.project.clone_project")
 async def test_create_project_unique_name(
     clone_project: mock.Mock,
     client: AsyncClient,
@@ -180,6 +183,7 @@ async def test_create_project_unique_name(
         description=TEST_PROJECT["description"],
     )
     await db.execute(query)
+    await db.commit()
 
     found_hash = hashlib.sha1(b"test").hexdigest()
     clone_project.return_value = found_hash, "/tmp/test-create-project"
@@ -196,7 +200,7 @@ async def test_create_project_unique_name(
     )
 
 
-async def test_create_project_bad_name(client: AsyncClient, db: AsyncSession):
+async def test_create_project_bad_name(client: AsyncClient):
     test_project_bad = TEST_PROJECT.copy()
     test_project_bad["name"] = "     "
     response = await client.post("/api/projects", json=test_project_bad)
@@ -207,9 +211,7 @@ async def test_create_project_bad_name(client: AsyncClient, db: AsyncSession):
     assert response.status_code == status_codes.HTTP_422_UNPROCESSABLE_ENTITY
 
 
-async def test_create_project_missing_name(
-    client: AsyncClient, db: AsyncSession
-):
+async def test_create_project_missing_name(client: AsyncClient):
     test_project_bad = TEST_PROJECT.copy()
     del test_project_bad["name"]
     response = await client.post("/api/projects", json=test_project_bad)
@@ -217,13 +219,11 @@ async def test_create_project_missing_name(
 
 
 async def test_get_project(client: AsyncClient, db: AsyncSession):
-
     query = sa.insert(models.projects).values(
         url=TEST_PROJECT["url"],
         name=TEST_PROJECT["name"],
         description=TEST_PROJECT["description"],
     )
-
     await db.execute(query)
 
     projects = (await db.execute(sa.select(models.projects))).all()
