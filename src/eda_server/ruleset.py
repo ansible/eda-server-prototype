@@ -47,9 +47,9 @@ from .messages import JobEnd
 logger = logging.getLogger("eda_server")
 
 activated_rulesets = {}
-ansible_events = shutil.which("ansible-events")
-if ansible_events is None:
-    raise Exception("ansible-events not found")
+ansible_rulebook = shutil.which("ansible-rulebook")
+if ansible_rulebook is None:
+    raise Exception("ansible-rulebook not found")
 ssh_agent = shutil.which("ssh-agent")
 if ssh_agent is None:
     raise Exception("ssh-agent not found")
@@ -91,14 +91,14 @@ async def activate_rulesets(
 
         # for local development this is better
         cmd_args = [
-            ansible_events,
+            ansible_rulebook,
             "--worker",
             "--websocket-address",
             "ws://localhost:8080/api/ws2",
             "--id",
             str(activation_id),
         ]
-        logger.debug(ansible_events)
+        logger.debug(ansible_rulebook)
         logger.debug(cmd_args)
 
         proc = await asyncio.create_subprocess_exec(
