@@ -9,8 +9,6 @@ on:
 jobs:
   test-docker-deployment:
     runs-on: ubuntu-latest
-    env:
-      EDA_TOKEN: ${{ secrets.EDA_SERVER_TOKEN }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -18,7 +16,6 @@ jobs:
       - name: Deploy docker-compose and test it
         working-directory: tools/docker
         run: |
-          export GITHUB_TOKEN=$EDA_TOKEN
           docker-compose up -d --build
           curl -v -q --fail -o /dev/null http://localhost:9000/ping
           curl -v -q --fail -o /dev/null http://localhost:8080/eda/index.html

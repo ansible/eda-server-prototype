@@ -94,8 +94,44 @@ start-events-services() {
     log-debug "docker-compose -p eda-server -f tools/docker/docker-compose.yml up -d postgres"
     docker-compose -p eda-server -f tools/docker/docker-compose.yml up -d postgres
 
-    until [ "$(docker inspect -f '{{.State.Health.Status}}' eda-postgres)" == "healthy" ]; do
+    #
+    # Podman versions previous to v4 use a different string variation for health check.
+    #
+    # Reference:
+    #      https://github.com/containers/podman/issues/11645
+    #
+    # Default is to check if podman is installed. If true then use podman.
+    #
+    local heath_check=".State.Health.Status"
+
+    if which podman &> /dev/null; then
+      _podman_version=$(podman -v)
+      _podman_major_version=$(podman -v | awk '{print substr($3,0,1)}')
+
+      log-info "Using podman installation"
+      log-debug "podman version: ${_podman_version}"
+
+      if [ "${_podman_major_version}" -lt "4" ]; then
+        heath_check=".State.Healthcheck.Status"
+        log-debug "Set healthcheck flag: ${heath_check}"
+      fi
+    elif which docker &> /dev/null; then
+      heath_check="${heath_check}"
+      log-info "Using docker installation"
+      log-debug "docker version: $(docker -v)"
+      log-debug "Set healthcheck flag: ${heath_check}"
+    fi
+
+    local _cnt=0
+    local _timeout=15
+    until [ "$(docker inspect -f "{{${heath_check}}}" eda-postgres)" == "healthy" ] || [ "${_cnt}" -eq "${_timeout}" ]; do
+      log-debug "Healthcheck waiting...[$((++_cnt))s]"
       sleep 1;
+
+      if [ "${_cnt}" -eq "${_timeout}" ]; then
+        log-err "timeout waiting for postgres service!"
+        exit 1
+      fi
     done;
   fi
 }
