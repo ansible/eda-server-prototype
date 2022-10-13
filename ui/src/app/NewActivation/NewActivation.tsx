@@ -67,7 +67,7 @@ const NewActivation: React.FunctionComponent = () => {
   }]);
   const [executionEnvironments, setExecutionEnvironments] = useState<ExecutionEnvironmentType[]>([{
     id: '',
-    name: intl.formatMessage(sharedMessages.executionEnvironmentPlaceholder)
+    name: intl.formatMessage(sharedMessages.edaContainerImagePlaceholder)
   }]);
   const [restartPolicies, setRestartPolicies] = useState<RestartPolicyType[]>([{
     id: '',
@@ -350,18 +350,18 @@ const NewActivation: React.FunctionComponent = () => {
               </GridItem>
               <GridItem span={4}>
                 <FormGroup style={{paddingRight: '30px'}}
-                           label="Execution environment"
+                           label={intl.formatMessage(sharedMessages.edaContainerImage)}
                            fieldId={'activation-exec-env'}
-                           helperTextInvalid={ intl.formatMessage(sharedMessages.selectExecutionEnvironment) }
+                           helperTextInvalid={ intl.formatMessage(sharedMessages.edaContainerImagePlaceholder) }
                            helperTextInvalidIcon={<ExclamationCircleIcon />}>
                   <TextInput
                     id="activation-exec-env"
                     value={executionEnvironment}
-                    label="Execution environment"
+                    label={ intl.formatMessage(sharedMessages.edaContainerImage) }
                     validated={validatedExecutionEnvironment}
                     onChange={onExecutionEnvironmentChange}
                     onBlur={(event) => validateExecutionEnvironment(executionEnvironment)}
-                    placeholder={ intl.formatMessage(sharedMessages.executionEnvironmentPlaceholder) }
+                    placeholder={ intl.formatMessage(sharedMessages.edaContainerImagePlaceholder) }
                   />
                 </FormGroup>
               </GridItem>

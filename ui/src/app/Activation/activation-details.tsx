@@ -24,6 +24,7 @@ import styled from 'styled-components';
 import {ActivationType} from "@app/Activations/Activations";
 import {ExtraVarType} from "@app/Vars/Vars";
 import {useIntl} from "react-intl";
+import sharedMessages from "../messages/shared.messages";
 
 const client = new WebSocket('ws://' + getServer() + '/api/ws');
 
@@ -86,7 +87,7 @@ const ActivationDetails: React.FunctionComponent<{activation: ActivationType}> =
             </FlexItem>
             <FlexItem>
               <Stack>
-                <StackItem><Title headingLevel="h3">Execution environment</Title></StackItem>
+                <StackItem><Title headingLevel="h3">{intl.formatMessage(sharedMessages.edaContainerImage)}</Title></StackItem>
                 <StackItem>
                   {activation?.execution_environment}
                 </StackItem>

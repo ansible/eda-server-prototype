@@ -307,10 +307,6 @@ const sharedMessages = defineMessages({
     id: 'activation.selectRulebookActivationName',
     defaultMessage: 'Select a rule set'
   },
-  selectExecutionEnvironment: {
-    id: 'activation.selectExecutionEnvironment',
-    defaultMessage: 'Select a execution environment'
-  },
   selectRestartPolicy: {
     id: 'activation.selectRestartPolicy',
     defaultMessage: 'Select a restart policy'
@@ -407,9 +403,13 @@ const sharedMessages = defineMessages({
     id: 'activation.lastFiredDate',
     defaultMessage: 'Last fired date'
   },
-  executionEnvironmentPlaceholder: {
-    id: 'activation.executionEnvironmentPlaceholder',
-    defaultMessage: 'Select an execution environments'
+  edaContainerImage: {
+    id: 'activation.edaContainerImage',
+    defaultMessage: 'EDA container image'
+  },
+  edaContainerImagePlaceholder: {
+    id: 'activation.edaContainerImagePlaceholder',
+    defaultMessage: 'Insert an EDA container image here'
   },
   restartPolicyPlaceholder: {
     id: 'activation.restartPolicyPlaceholder',

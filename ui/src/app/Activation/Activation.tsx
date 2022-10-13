@@ -12,8 +12,8 @@ import {ActivationStdout} from "@app/Activation/activation-stdout";
 import {defaultSettings} from "@app/shared/pagination";
 import {ActivationType} from "@app/Activations/Activations";
 import {JobType} from "@app/Job/Job";
-import sharedMessages from "../messages/shared.messages";
 import {AnyObject, TabItemType} from "@app/shared/types/common-types";
+import sharedMessages from '../messages/shared.messages';
 
 const buildActivationTabs = (activationId: string, intl: AnyObject) : TabItemType[] => ( [
     {
