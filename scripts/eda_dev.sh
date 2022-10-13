@@ -94,8 +94,6 @@ start-events-services() {
     log-debug "docker-compose -p eda-server -f tools/docker/docker-compose.yml up -d postgres"
     docker-compose -p eda-server -f tools/docker/docker-compose.yml up -d postgres
 
-    local heath_check=".State.Health.Status"
-
     #
     # The below code is needed do to Podman versions pre V4, us a different string variation of
     # the key for health check.
@@ -104,6 +102,8 @@ start-events-services() {
     #
     # Default is to use the Docker key value, if both Podman and Docker are installed.
     #
+    local heath_check=".State.Health.Status"
+
     if which docker &> /dev/null; then
       heath_check="${heath_check}"
       log-debug "Using docker installation"
@@ -111,13 +111,13 @@ start-events-services() {
 
     elif which podman &> /dev/null; then
       _podman_version=$(podman -v)
-      _podman_major_version=$(podman -v | awk -F'[ .]' '{print $(NF-2)}')
+      _podman_major_version=$(podman -v | awk '{print substr($3,0,1)}')
 
       log-debug "Using podman installation"
       log-debug "podman version: ${_podman_version}"
       log-debug "Using docker installation"
 
-      if [ "${_podman_major_version}" -lt 4 ]; then
+      if [ "${_podman_major_version}" -lt "4" ]; then
         heath_check=".State.Healthcheck.Status"
         log-debug "Set healthcheck flag: ${heath_check}"
       fi
