@@ -77,7 +77,7 @@ build-server() {
   local _image="eda-server:${1}"
 
   log-info "minikube image build . -t ${_image} -f tools/docker/Dockerfile"
-  minikube image build . -t "${_image}" -f tools/docker/Dockerfile --build-opt=build-arg=GITHUB_TOKEN=$GITHUB_TOKEN
+  minikube image build . -t "${_image}" -f tools/docker/Dockerfile
 }
 
 build-all() {
