@@ -52,10 +52,10 @@ class ActivationUpdate(BaseModel):
     is_enabled: bool
 
 
-class ActivationJob(BaseModel):
+class ActivationJobInstance(BaseModel):
     id: int
     activation_id: int
-    job_id: int
+    job_instance_id: int
 
 
 class ActivationInstanceCreate(BaseModel):

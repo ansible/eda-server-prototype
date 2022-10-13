@@ -8,7 +8,7 @@ __all__ = (
     "job_instances",
     "job_instance_events",
     "job_instance_hosts",
-    "activation_jobs",
+    "activation_job_instances",
     "activation_instance_job_instances",
 )
 
@@ -37,8 +37,8 @@ job_instances = sa.Table(
 )
 
 
-activation_jobs = sa.Table(
-    "activation_job",
+activation_job_instances = sa.Table(
+    "activation_job_instance",
     metadata,
     sa.Column(
         "id",
@@ -50,7 +50,9 @@ activation_jobs = sa.Table(
         "activation_id",
         sa.ForeignKey("activation.id", ondelete="CASCADE"),
     ),
-    sa.Column("job_id", sa.ForeignKey("job.id", ondelete="CASCADE")),
+    sa.Column(
+        "job_instance_id", sa.ForeignKey("job_instance.id", ondelete="CASCADE")
+    ),
 )
 
 

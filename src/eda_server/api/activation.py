@@ -217,15 +217,15 @@ async def delete_activation(
 
 
 @router.get(
-    "/api/activations/{activation_id}/jobs",
-    response_model=List[schema.ActivationJob],
-    operation_id="list_activation_jobs",
+    "/api/activations/{activation_id}/job_instances",
+    response_model=List[schema.ActivationJobInstance],
+    operation_id="list_activation_job_instances",
 )
-async def list_activation_jobs(
+async def list_activation_job_instances(
     activation_id: int, db: AsyncSession = Depends(get_db_session)
 ):
-    query = sa.select(models.activation_jobs).where(
-        models.activation_jobs.c.activation_id == activation_id
+    query = sa.select(models.activation_job_instances).where(
+        models.activation_job_instances.c.activation_id == activation_id
     )
     result = await db.execute(query)
     return result.all()

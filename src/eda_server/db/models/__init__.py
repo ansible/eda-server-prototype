@@ -7,7 +7,7 @@ from .auth import User, role_permissions, roles, user_roles
 from .base import Base, metadata
 from .job import (
     activation_instance_job_instances,
-    activation_jobs,
+    activation_job_instances,
     job_instance_events,
     job_instance_hosts,
     job_instances,
@@ -30,7 +30,7 @@ __all__ = (
     "activation_instances",
     "activation_instance_logs",
     # job
-    "activation_jobs",
+    "activation_job_instances",
     "activation_instance_job_instances",
     "job_instance_events",
     "job_instance_hosts",
