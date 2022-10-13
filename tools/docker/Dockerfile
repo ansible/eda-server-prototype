@@ -2,7 +2,6 @@
 FROM registry.access.redhat.com/ubi8/python-39
 ARG USER_ID=${USER_ID:-1001}
 ARG DEVEL_EDA_LIBRARY=1
-ARG GITHUB_TOKEN
 WORKDIR $HOME
 
 USER 0
@@ -11,7 +10,7 @@ ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk
 ENV PIP_NO_BINARY=jpy
 
 RUN pip install ansible && \
-    ansible-galaxy collection install git+https://$GITHUB_TOKEN@github.com/ansible/event-driven-ansible.git
+    ansible-galaxy collection install git+https://github.com/ansible/event-driven-ansible.git
 COPY . $WORKDIR
 RUN chown -R $USER_ID ./
 
@@ -19,7 +18,7 @@ USER $USER_ID
 RUN pip install -e .
 
 RUN bash -c "if [ $DEVEL_EDA_LIBRARY -ne 0 ]; then \
-    pip uninstall ansible-events -y && \
-    pip install git+https://$GITHUB_TOKEN@github.com/ansible/ansible-rulebook.git; fi"
+    pip uninstall ansible-rulebook -y && \
+    pip install git+https://github.com/ansible/ansible-rulebook.git; fi"
 
 CMD ["eda-server"]

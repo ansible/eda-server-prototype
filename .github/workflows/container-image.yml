@@ -9,7 +9,6 @@ jobs:
   build-eda-server-image:
     runs-on: ubuntu-latest
     env:
-      EDA_TOKEN: ${{ secrets.EDA_SERVER_TOKEN }}
       QUAY_PASSWORD: ${{ secrets.EDA_AIZQUIERDO_QUAY_PW }}
       QUAY_USERNAME: "aizquier+edaci"
     steps:
@@ -18,9 +17,8 @@ jobs:
 
       - name: Build image
         run: |
-          export GITHUB_TOKEN=$EDA_TOKEN
           docker build -t eda-server:latest -f tools/docker/Dockerfile . \
-          --no-cache --build-arg GITHUB_TOKEN=$GITHUB_TOKEN
+          --no-cache
 
       - name: Tag image
         run: >

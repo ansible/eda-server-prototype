@@ -21,7 +21,6 @@ services:
       dockerfile: tools/docker/Dockerfile
       args:
         DEVEL_EDA_LIBRARY: ${DEVEL_EDA_LIBRARY:-1}
-        GITHUB_TOKEN: $GITHUB_TOKEN
     command:
       [
         "/bin/bash",
