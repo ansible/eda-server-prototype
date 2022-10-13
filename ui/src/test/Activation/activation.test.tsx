@@ -6,7 +6,8 @@ import fetchMock from "jest-fetch-mock";
 import {act} from "react-dom/test-utils";
 import {IntlProvider} from "react-intl";
 import {Route} from "react-router-dom";
-import {Tab} from "@patternfly/react-core";
+import {Tab, TextInput, Title} from "@patternfly/react-core";
+import {ActivationDetails} from "@app/Activation/activation-details";
 
 const ComponentWrapper = ({ children, initialEntries=['/dashboard']}) => (
   <IntlProvider locale="en">
@@ -48,5 +49,39 @@ describe('Activation', () => {
     expect(wrapper.find(Tab).at(0).props().title.props.children[1]).toEqual("Back to Rulebook Activations");
     expect(wrapper.find(Tab).at(1).props().title).toEqual('Details');
     expect(wrapper.find(Tab).at(2).props().title).toEqual('Jobs');
+  });
+
+  it('should render the Activation details with EDA container image', async () => {
+    fetchMock.mockResponse(JSON.stringify({
+        name: 'Activation 1',
+        id: 1,
+        ruleset_id: '2',
+        ruleset_name: 'Ruleset 1',
+        inventory_id: '3',
+        inventory_name: 'Inventory 1'
+      })
+    )
+    let wrapper;
+    await act(async () => {
+      wrapper = mount(
+        <ComponentWrapper initialEntries={['/activation/1']}>
+          <Route path='/activation/:id'>
+            <ActivationDetails activation={{
+              id: '1',
+              name: 'Activation 1',
+              description: '',
+              ruleset_id: '2',
+              ruleset_name: 'Ruleset 1',
+              inventory_id: '3',
+              inventory_name: 'Inventory 1'}}/>
+          </Route>
+        </ComponentWrapper>
+      );
+    });
+    await act(async () => {
+      wrapper.update();
+    });
+    expect(wrapper.find(Title).length).toEqual(13);
+    expect(wrapper.find(Title).at(1).props().children).toEqual('EDA container image');
   });
 });
