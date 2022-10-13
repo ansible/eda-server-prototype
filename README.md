@@ -8,7 +8,7 @@
 - Docker-compose: `pip install docker-compose`
 - [Taskfile](https://taskfile.dev/installation/)
 - Git
-- Python >= 3.8
+- Python >= 3.9
 - Node >= v16 (**NOTE:** node v17 does not seem to work with websockets)
 
 NOTE podman users (only for mac and linux):
