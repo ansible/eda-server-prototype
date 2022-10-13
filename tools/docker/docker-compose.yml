@@ -34,7 +34,7 @@ services:
       - "9000:9000"
     environment:
       - EDA_HOST=0.0.0.0
-      - EDA_DATABASE_URL=postgresql+asyncpg://postgres:secret@postgres/ansible_events
+      - EDA_DATABASE_URL=postgresql+asyncpg://postgres:secret@postgres/eda_server
     depends_on:
       postgres:
         condition: service_healthy
@@ -56,7 +56,7 @@ services:
     container_name: eda-postgres
     environment:
       - "POSTGRES_PASSWORD=secret"
-      - "POSTGRES_DB=ansible_events"
+      - "POSTGRES_DB=eda_server"
     ports:
       - "5432:5432"
     volumes:

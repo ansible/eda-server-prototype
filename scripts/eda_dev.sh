@@ -91,8 +91,8 @@ start-events-services() {
   if [[ $(docker inspect --format '{{json .State.Running}}' eda-postgres) = "true" ]]; then
     log-warn "eda-postgres service is already running"
   else
-    log-debug "docker-compose -p ansible-events -f tools/docker/docker-compose.yml up -d postgres"
-    docker-compose -p ansible-events -f tools/docker/docker-compose.yml up -d postgres
+    log-debug "docker-compose -p eda-server -f tools/docker/docker-compose.yml up -d postgres"
+    docker-compose -p eda-server -f tools/docker/docker-compose.yml up -d postgres
 
     until [ "$(docker inspect -f '{{.State.Health.Status}}' eda-postgres)" == "healthy" ]; do
       sleep 1;
@@ -115,8 +115,8 @@ stop-events-services() {
   cd "${EDA_PROJECT_HOME}"
 
   if [[ $(docker inspect --format '{{json .State.Running}}' eda-postgres) = "true" ]]; then
-    log-debug "docker-compose -p ansible-events -f tools/docker/docker-compose.yml down"
-    docker-compose -p ansible-events -f tools/docker/docker-compose.yml down
+    log-debug "docker-compose -p eda-server -f tools/docker/docker-compose.yml down"
+    docker-compose -p eda-server -f tools/docker/docker-compose.yml down
   fi
 }
 
@@ -126,9 +126,9 @@ clean-events-services() {
     log-debug "docker rmi -f postgres:13"
     docker rmi -f postgres:13 > /dev/null 2>&1
   fi
-  if docker volume inspect -f '{{.Name}}' ansible-events_postgres_data| grep ansible-events_postgres_data > /dev/null 2>&1; then
-    log-debug "docker volume rm ansible-events_postgres_data"
-    docker volume rm ansible-events_postgres_data > /dev/null 2>&1
+  if docker volume inspect -f '{{.Name}}' eda_server_postgres_data| grep eda_server_postgres_data > /dev/null 2>&1; then
+    log-debug "docker volume rm eda_server_postgres_data"
+    docker volume rm eda_server_postgres_data > /dev/null 2>&1
   fi
 }
 
