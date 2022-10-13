@@ -193,6 +193,13 @@ tasks:
         vars:
           CLI_ARGS: down --volumes
 
+  docker:devuser:add:
+    desc: "Add development user"
+    cmds:
+      - task: dev
+        vars:
+          CLI_ARGS: add-dev-user
+
   minikube:
     desc: "Run eda_kube.sh with specified CLI arguments."
     summary: |
