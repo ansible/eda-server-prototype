@@ -78,6 +78,10 @@ const sharedMessages = defineMessages({
     id: 'shared.sync',
     defaultMessage: 'Sync'
   },
+  launch: {
+    id: 'shared.launch',
+    defaultMessage: 'Launch'
+  },
   relaunch: {
     id: 'shared.relaunch',
     defaultMessage: 'Relaunch'

@@ -123,7 +123,6 @@ const routes: AppRouteConfig[] = [
   },
   {
     component: Job,
-    exact: true,
     path: '/job/:id',
     title: 'Job',
   },

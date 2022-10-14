@@ -19,9 +19,9 @@ import {addNotification} from "@redhat-cloud-services/frontend-components-notifi
 
 interface IRemoveJob {
   ids?: Array<string|number>,
-  fetchData: any,
+  fetchData?: any,
   pagination?: PaginationConfiguration,
-  setSelectedJobs: any
+  setSelectedJobs?: any
 }
 const jobEndpoint = 'http://' + getServer() + '/api/job_instance/';
 
@@ -35,24 +35,24 @@ export const fetchJob = (jobId, pagination=defaultSettings) =>
 }
 
 const RemoveJob: React.ComponentType<IRemoveJob> = ( {ids = [],
-                                             fetchData,
+                                             fetchData = null,
                                              pagination = defaultSettings,
-                                             setSelectedJobs} ) => {
+                                             setSelectedJobs = null} ) => {
   const intl = useIntl();
   const dispatch = useDispatch();
   const [job, setJob] = useState<JobType>();
   const { id } = useParams<{id:string}>();
   const { push, goBack } = useHistory();
 
-  const removeJob = async (jobId) =>
-  {
-    await removeData(`${jobEndpoint}${jobId}`);
-    return fetchData(pagination);
-  }
+  console.log('Debug - job', job);
+  console.log('Debug - id', id);
+  const removeJob = (jobId) => removeData(`${jobEndpoint}/${jobId}`);
 
   const onSubmit = () => {
-    removeJob(id).then(() => push('/jobs'))
+    removeJob(id).then(() => { if(fetchData) { fetchData(pagination);} push('/jobs');})
     .catch((error) => {
+      if(fetchData) { fetchData(pagination);}
+      push('/jobs');
       dispatch(
         addNotification({
           variant: 'danger',

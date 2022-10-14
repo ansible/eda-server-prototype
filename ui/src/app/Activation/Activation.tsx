@@ -109,7 +109,6 @@ const Activation: React.FunctionComponent = () => {
       aria-label="Edit"
       key="relaunch-activation"
       id="relaunch-activation"
-      isDisabled={true}
       component={ <Link to={`/activation/${id}/relaunch`}>
         {intl.formatMessage(sharedMessages.relaunch)}
       </Link>
