@@ -76,6 +76,11 @@ const EditProject: React.FunctionComponent = () => {
           to: '/projects'
         },
         {
+          title: project?.name,
+          key: 'edit-project',
+          to: `/edit-project/${project?.id}`
+        },
+        {
           title: 'Edit'
         }
         ]
