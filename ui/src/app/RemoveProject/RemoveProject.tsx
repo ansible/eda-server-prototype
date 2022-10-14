@@ -23,11 +23,11 @@ interface IRemoveProject {
   pagination?: PaginationConfiguration,
   setSelectedProjects: any
 }
-const projectEndpoint = 'http://' + getServer() + '/api/projects/';
+const projectEndpoint = 'http://' + getServer() + '/api/projects';
 
 export const fetchProject = (projectId, pagination=defaultSettings) =>
 {
-  return fetch(`${projectEndpoint}${projectId}`, {
+  return fetch(`${projectEndpoint}/${projectId}`, {
     headers: {
       'Content-Type': 'application/json',
     },
@@ -46,7 +46,7 @@ const RemoveProject: React.ComponentType<IRemoveProject> = ( {ids = [],
 
   const removeProject = async (projectId) =>
   {
-    await removeData(`${projectEndpoint}${projectId}`);
+    await removeData(`${projectEndpoint}/${projectId}`);
     return fetchData(pagination);
   }
 

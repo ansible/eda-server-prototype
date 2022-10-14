@@ -18,7 +18,7 @@ import {useDispatch} from "react-redux";
 const CardBody = styled(PFCardBody)`
   white-space: pre-wrap;
   `
-const endpoint = 'http://' + getServer() + '/api/projects/';
+const endpoint = 'http://' + getServer() + '/api/projects';
 
 const EditProject: React.FunctionComponent = () => {
   const history = useHistory();
@@ -43,7 +43,7 @@ const EditProject: React.FunctionComponent = () => {
   const setScmToken = (scm_token: string) => setProject({...project, scm_token: scm_token} );
 
   const handleSubmit = () => {
-			patchData(`${endpoint}${project.id}`, { name: project.name, description: project.description })
+			patchData(`${endpoint}/${project.id}`, { name: project.name, description: project.description })
         .then(data => {
           history.push(`/project/${data.id}`);
           dispatch(

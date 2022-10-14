@@ -32,7 +32,7 @@ const activation_endpoint = 'http://' + getServer() + '/api/activation_instance/
 const rulebook_endpoint = 'http://' + getServer() + '/api/rulebooks/';
 const inventories_endpoint = 'http://' + getServer() + '/api/inventories/';
 const vars_endpoint = 'http://' + getServer() + '/api/extra_vars/';
-const project_endpoint = 'http://' + getServer() + '/api/projects/';
+const project_endpoint = 'http://' + getServer() + '/api/projects';
 
 export interface ExecutionEnvironmentType {
   id: string;

@@ -24,7 +24,7 @@ interface ProjectType {
   url: string;
 }
 
-const endpoint = 'http://' + getServer() + '/api/projects/';
+const endpoint = 'http://' + getServer() + '/api/projects';
 
 const columns = (intl) => [
   {
