@@ -7,6 +7,7 @@ import aiodocker.exceptions
 import sqlalchemy as sa
 from fastapi import APIRouter, Depends, Response, status
 from fastapi.exceptions import HTTPException
+from fastapi.responses import JSONResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from eda_server import schema
@@ -16,6 +17,7 @@ from eda_server.db.dependency import get_db_session
 from eda_server.db.models.activation import ExecutionEnvironment
 from eda_server.db.utils.lostream import PGLargeObject, decode_bytes_buff
 from eda_server.managers import updatemanager
+from eda_server.messages import ActivationErrorMessage
 from eda_server.ruleset import activate_rulesets, inactivate_rulesets
 
 logger = logging.getLogger("eda_server")
@@ -245,6 +247,11 @@ async def read_output(proc, activation_instance_id, db_session_factory):
 @router.post(
     "/api/activation_instance",
     response_model=schema.ActivationInstanceBaseRead,
+    responses={
+        status.HTTP_500_INTERNAL_SERVER_ERROR: {
+            "model": ActivationErrorMessage
+        }
+    },
     operation_id="create_activation_instance",
 )
 async def create_activation_instance(
@@ -311,7 +318,13 @@ async def create_activation_instance(
             db,
         )
     except aiodocker.exceptions.DockerError as e:
-        return HTTPException(status_code=500, detail=str(e))
+        return JSONResponse(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            content={
+                "message": "Error occurred while activating rulesets.",
+                "detail": str(e),
+            },
+        )
 
     return {**a.dict(), "id": id_}
 
