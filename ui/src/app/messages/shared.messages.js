@@ -78,6 +78,14 @@ const sharedMessages = defineMessages({
     id: 'shared.sync',
     defaultMessage: 'Sync'
   },
+  relaunch: {
+    id: 'shared.relaunch',
+    defaultMessage: 'Relaunch'
+  },
+  restart: {
+    id: 'shared.restart',
+    defaultMessage: 'Restart'
+  },
   addJob: {
     id: 'activation.addJob',
     defaultMessage: 'Add job'

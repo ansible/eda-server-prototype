@@ -16,8 +16,6 @@ import {ProjectLinks} from "@app/Project/project-links";
 import sharedMessages from "../messages/shared.messages";
 import {useIntl} from "react-intl";
 import {AnyObject, ProjectType, TabItemType} from "@app/shared/types/common-types";
-import {NewProject} from "@app/NewProject/NewProject";
-import {EditProject} from "@app/EditProject/EditProject";
 import {RemoveProject} from "@app/RemoveProject/RemoveProject";
 
 const buildProjectTabs = (projectId: string, intl: AnyObject) : TabItemType[] => ( [

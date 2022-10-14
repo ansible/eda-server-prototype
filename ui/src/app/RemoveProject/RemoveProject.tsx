@@ -44,15 +44,12 @@ const RemoveProject: React.ComponentType<IRemoveProject> = ( {ids = [],
   const { id } = useParams<{id:string}>();
   const { push, goBack } = useHistory();
 
-  const removeProject = async (projectId) =>
-  {
-    await removeData(`${projectEndpoint}${projectId}`);
-    if(fetchData) { fetchData(pagination); }
-  }
+  const removeProject = (projectId) => removeData(`${projectEndpoint}/${projectId}`);
 
   const onSubmit = () => {
-    removeProject(id).then(() => push('/projects'))
+    removeProject(id).then(() => { if(fetchData) { fetchData(pagination)} push('/projects');})
     .catch((error) => {
+      if(fetchData) { fetchData(pagination) }
       push('/projects');
       dispatch(
         addNotification({

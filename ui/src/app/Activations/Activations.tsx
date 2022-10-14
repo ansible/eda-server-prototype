@@ -221,11 +221,27 @@ const Activations: React.FunctionComponent = () => {
 
   const actionResolver = () => [
     {
-      title: intl.formatMessage(sharedMessages.edit),
+      title: intl.formatMessage(sharedMessages.relaunch),
       component: 'button',
       onClick: (_event, _rowId, activation) =>
         history.push({
-          pathname: `/activations/edit-activation/${activation.id}`
+          pathname: `/activations/relaunch/${activation.id}`
+        })
+    },
+    {
+      title: intl.formatMessage(sharedMessages.restart),
+      component: 'button',
+      onClick: (_event, _rowId, activation) =>
+        history.push({
+          pathname: `/activations/restart/${activation.id}`
+        })
+    },
+    {
+      title: intl.formatMessage(sharedMessages.disable),
+      component: 'button',
+      onClick: (_event, _rowId, activation) =>
+        history.push({
+          pathname: `/activations/disable/${activation.id}`
         })
     },
     {

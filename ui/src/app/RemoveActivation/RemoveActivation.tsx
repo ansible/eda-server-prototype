@@ -19,9 +19,9 @@ import {useDispatch} from "react-redux";
 
 interface IRemoveActivation {
   ids?: Array<string|number>,
-  fetchData: any,
+  fetchData?: any,
   pagination?: PaginationConfiguration,
-  setSelectedActivations: any
+  setSelectedActivations?: any
 }
 const activationEndpoint = 'http://' + getServer() + '/api/activation_instance/';
 
@@ -35,9 +35,9 @@ export const fetchActivation = (activationId, pagination=defaultSettings) =>
 }
 
 const RemoveActivation: React.ComponentType<IRemoveActivation> = ( {ids = [],
-                                             fetchData,
+                                             fetchData = null,
                                              pagination = defaultSettings,
-                                             setSelectedActivations} ) => {
+                                             setSelectedActivations = null } ) => {
   const intl = useIntl();
   const dispatch = useDispatch();
   const [activation, setActivation] = useState<ActivationType>();
@@ -45,14 +45,14 @@ const RemoveActivation: React.ComponentType<IRemoveActivation> = ( {ids = [],
   const { push, goBack } = useHistory();
 
   const removeActivation = async (activationId) =>
-  {
-    await removeData(`${activationEndpoint}${activationId}`);
-    return fetchData(pagination);
-  }
+    removeData(`${activationEndpoint}${activationId}`);
 
   const onSubmit = () => {
-    removeActivation(id).then(() => push('/activations'))
+    removeActivation(id).then(() => { if(fetchData) { fetchData(pagination);} push('/activations');})
     .catch((error) => {
+        if(fetchData) {
+          fetchData(pagination);
+        }
         dispatch(
           addNotification({
             variant: 'danger',
@@ -61,6 +61,7 @@ const RemoveActivation: React.ComponentType<IRemoveActivation> = ( {ids = [],
             description: `${intl.formatMessage(sharedMessages.delete_activation_failure)}  ${error}`
           })
         );
+        push('/activations');
       });
   };
 
