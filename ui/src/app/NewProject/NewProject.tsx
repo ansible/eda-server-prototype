@@ -19,7 +19,7 @@ import {ExclamationCircleIcon} from "@patternfly/react-icons";
 const CardBody = styled(PFCardBody)`
   white-space: pre-wrap;
   `
-const endpoint = 'http://' + getServer() + '/api/projects/';
+const endpoint = 'http://' + getServer() + '/api/projects';
 
 const NewProject: React.FunctionComponent = () => {
 

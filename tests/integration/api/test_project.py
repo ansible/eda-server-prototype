@@ -132,7 +132,7 @@ async def test_create_project(
     clone_project.return_value = found_hash, "/tmp/test-create-project"
 
     response = await client.post(
-        "/api/projects/",
+        "/api/projects",
         json=TEST_PROJECT,
     )
     assert response.status_code == status_codes.HTTP_201_CREATED
@@ -162,7 +162,7 @@ async def test_create_project_bad_entity(
         "description": "This is a test description",
     }
     response = await client.post(
-        "/api/projects/",
+        "/api/projects",
         json=bad_project,
     )
     assert response.status_code == status_codes.HTTP_422_UNPROCESSABLE_ENTITY
@@ -185,7 +185,7 @@ async def test_create_project_unique_name(
     clone_project.return_value = found_hash, "/tmp/test-create-project"
 
     response = await client.post(
-        "/api/projects/",
+        "/api/projects",
         json=TEST_PROJECT,
     )
     assert response.status_code == status_codes.HTTP_409_CONFLICT
@@ -199,11 +199,11 @@ async def test_create_project_unique_name(
 async def test_create_project_bad_name(client: AsyncClient, db: AsyncSession):
     test_project_bad = TEST_PROJECT.copy()
     test_project_bad["name"] = "     "
-    response = await client.post("/api/projects/", json=test_project_bad)
+    response = await client.post("/api/projects", json=test_project_bad)
     assert response.status_code == status_codes.HTTP_422_UNPROCESSABLE_ENTITY
 
     test_project_bad["name"] = ""
-    response = await client.post("/api/projects/", json=test_project_bad)
+    response = await client.post("/api/projects", json=test_project_bad)
     assert response.status_code == status_codes.HTTP_422_UNPROCESSABLE_ENTITY
 
 
@@ -212,7 +212,7 @@ async def test_create_project_missing_name(
 ):
     test_project_bad = TEST_PROJECT.copy()
     del test_project_bad["name"]
-    response = await client.post("/api/projects/", json=test_project_bad)
+    response = await client.post("/api/projects", json=test_project_bad)
     assert response.status_code == status_codes.HTTP_422_UNPROCESSABLE_ENTITY
 
 
@@ -385,7 +385,7 @@ async def test_get_projects(client: AsyncClient, db: AsyncSession):
     projects = (await db.execute(sa.select(models.projects))).all()
     assert len(projects) == 2
 
-    response = await client.get("/api/projects/")
+    response = await client.get("/api/projects")
 
     assert response.status_code == status_codes.HTTP_200_OK
 

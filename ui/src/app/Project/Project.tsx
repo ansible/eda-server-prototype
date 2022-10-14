@@ -39,7 +39,7 @@ export const renderProjectTabs = (projectId: string, intl) => {
   return <AppTabs tabItems={project_tabs}/>
 };
 
-const endpoint_project = 'http://' + getServer() + '/api/projects/';
+const endpoint_project = 'http://' + getServer() + '/api/projects';
 
 const Project: React.FunctionComponent = () => {
 
