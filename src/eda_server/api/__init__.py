@@ -8,9 +8,9 @@ from . import (
     project,
     role,
     rulebook,
+    ssh,
     task,
     user,
-    ssh,
     websocket,
 )
 
