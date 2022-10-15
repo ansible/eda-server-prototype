@@ -21,8 +21,4 @@ RUN chown -R $USER_ID ./
 USER $USER_ID
 RUN pip install -e .
 
-RUN bash -c "if [ $DEVEL_EDA_LIBRARY -ne 0 ]; then \
-    pip uninstall ansible-rulebook -y && \
-    pip install git+https://github.com/ansible/ansible-rulebook.git; fi"
-
 CMD ["eda-server"]
