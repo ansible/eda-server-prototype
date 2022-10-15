@@ -1,0 +1,11 @@
+alembic
+asyncpg
+fastapi
+fastapi-users[sqlalchemy]
+pyyaml
+sqlalchemy~=1.4
+uvicorn
+websockets
+environs
+aiodocker
+ansible-rulebook
