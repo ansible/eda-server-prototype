@@ -48,7 +48,7 @@ const Project: React.FunctionComponent = () => {
   const intl = useIntl();
 
   useEffect(() => {
-    fetch(endpoint_project + id, {
+    fetch(`${endpoint_project}/${id}`, {
       headers: {
         'Content-Type': 'application/json',
       },
