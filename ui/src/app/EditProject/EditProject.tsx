@@ -30,7 +30,7 @@ const EditProject: React.FunctionComponent = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    fetch(endpoint + id, {
+    fetch(`${endpoint}/${id}`, {
       headers: {
         'Content-Type': 'application/json',
       },
