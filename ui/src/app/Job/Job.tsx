@@ -156,7 +156,7 @@ const Job: React.FunctionComponent = () => {
         <Card>
           <CardTitle>Standard Out</CardTitle>
           <CardBody>
-            {stdout.length !== 0 && (
+            {stdout && stdout.length !== 0 && (
               <SimpleList style={{ whiteSpace: 'pre-wrap' }}>
                 {stdout.map((item, i) => (
                   <SimpleListItem key={i}><Ansi>{item?.stdout}</Ansi></SimpleListItem>

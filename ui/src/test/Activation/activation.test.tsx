@@ -6,7 +6,7 @@ import fetchMock from "jest-fetch-mock";
 import {act} from "react-dom/test-utils";
 import {IntlProvider} from "react-intl";
 import {Route} from "react-router-dom";
-import {Tab, TextInput, Title} from "@patternfly/react-core";
+import {DropdownItem, KebabToggle, Tab, Title} from "@patternfly/react-core";
 import {ActivationDetails} from "@app/Activation/activation-details";
 
 const ComponentWrapper = ({ children, initialEntries=['/dashboard']}) => (
@@ -83,5 +83,42 @@ describe('Activation', () => {
     });
     expect(wrapper.find(Title).length).toEqual(13);
     expect(wrapper.find(Title).at(1).props().children).toEqual('EDA container image');
+  });
+
+  it('has a top toolbar kebab menu ', async () => {
+    fetchMock.mockResponse(JSON.stringify({
+        name: 'Activation 1',
+        id: 1,
+        ruleset_id: '2',
+        ruleset_name: 'Ruleset 1',
+        inventory_id: '3',
+        inventory_name: 'Inventory 1'
+      })
+    )
+    let wrapper;
+    await act(async () => {
+      wrapper = mount(
+        <ComponentWrapper initialEntries={['/activation/1']}>
+          <Route path='/activation/:id'>
+            <Activation/>
+          </Route>
+        </ComponentWrapper>
+      );
+    });
+
+    await act(async () => {
+      wrapper.update();
+    });
+    expect(wrapper.find(KebabToggle).length).toEqual(1);
+    expect(wrapper.find('.pf-c-dropdown__toggle').length).toEqual(1);
+    wrapper
+      .find('.pf-c-dropdown__toggle')
+      .simulate('click');
+    wrapper.update();
+    expect(wrapper.find(DropdownItem).length).toEqual(4);
+    expect(wrapper.find(DropdownItem).at(0).props().component.props.children).toEqual('Relaunch')
+    expect(wrapper.find(DropdownItem).at(1).props().component.props.children).toEqual('Restart')
+    expect(wrapper.find(DropdownItem).at(2).props().component.props.children).toEqual('Disable')
+    expect(wrapper.find(DropdownItem).at(3).props().component.props.children).toEqual('Delete')
   });
 });

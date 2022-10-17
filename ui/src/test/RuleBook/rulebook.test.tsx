@@ -6,7 +6,7 @@ import fetchMock from "jest-fetch-mock";
 import {act} from "react-dom/test-utils";
 import {IntlProvider} from "react-intl";
 import {Route} from "react-router-dom";
-import {Tab} from "@patternfly/react-core";
+import {DropdownItem, KebabToggle, Tab} from "@patternfly/react-core";
 
 const ComponentWrapper = ({ children, initialEntries=['/dashboard']}) => (
   <IntlProvider locale="en">
@@ -47,4 +47,36 @@ describe('RuleBook', () => {
     expect(wrapper.find(Tab).at(1).props().title).toEqual('Details');
     expect(wrapper.find(Tab).at(2).props().title).toEqual('Rule sets');
   });
+
+  it('has a top toolbar kebabmenu', async () => {
+    fetchMock.mockResponse(JSON.stringify({
+        name: 'RuleBook 1',
+        id: 1,
+        project: {id: '1', name: 'Project 1'},
+        rulesets: {id: '1', name: 'Project 1'}
+      })
+    )
+    let wrapper;
+    await act(async () => {
+      wrapper = mount(
+        <ComponentWrapper initialEntries={['/rulebooks/rulebook/1']}>
+          <Route path='/rulebooks/rulebook/:id'>
+            <RuleBook/>
+          </Route>
+        </ComponentWrapper>
+      );
+    });
+    await act(async () => {
+      wrapper.update();
+    });
+    expect(wrapper.find(KebabToggle).length).toEqual(1);
+    expect(wrapper.find('.pf-c-dropdown__toggle').length).toEqual(1);
+    wrapper
+      .find('.pf-c-dropdown__toggle')
+      .simulate('click');
+    wrapper.update();
+    expect(wrapper.find(DropdownItem).length).toEqual(1);
+    expect(wrapper.find(DropdownItem).at(0).props().component.props.children).toEqual('Disable')
+  });
+
 });
