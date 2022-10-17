@@ -2,9 +2,12 @@
 FROM docker.io/node:16-alpine AS ui-builder
 WORKDIR /app
 
-COPY . $WORKDIR
+COPY ui/package.json /app/ui/
+RUN cd ui && npm install
 
-RUN cd ui && npm install && npm run build
+COPY ui /app/ui
+
+RUN cd ui && npm run build
 
 FROM docker.io/nginx
 ARG NGINX_CONF=tools/docker/nginx/default.conf

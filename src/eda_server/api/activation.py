@@ -270,6 +270,7 @@ async def create_activation_instance(
             extra_var_id=a.extra_var_id,
             working_directory=a.working_directory,
             execution_environment=a.execution_environment,
+            project_id=a.project_id,
         )
         .returning(
             models.activation_instances.c.id,

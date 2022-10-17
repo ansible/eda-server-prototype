@@ -154,6 +154,10 @@ async def handle_workers(websocket: WebSocket, data: dict, db: AsyncSession):
     if project_row:
         if project_row.large_data_id:
             await send_project_data(project_row.large_data_id, websocket, db)
+        else:
+            logger.debug("no project large_data_id")
+    else:
+        logger.debug("no project row")
 
     query = select(models.rulebooks).where(
         models.rulebooks.c.id == activation.rulebook_id

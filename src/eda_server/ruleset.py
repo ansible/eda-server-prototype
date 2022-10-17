@@ -29,6 +29,7 @@ import tempfile
 from functools import partial
 
 import aiodocker
+import aiodocker.images
 import ansible_runner
 from sqlalchemy import insert
 
@@ -76,14 +77,10 @@ async def activate_rulesets(
     port,
     db_factory,
 ):
-    """
-    Spawn ansible-events.
-
-    Call ansible-events with ruleset, inventory, and extravars added
-    as volumes to a container.
-    """
     local_working_directory = working_directory
     ensure_directory(local_working_directory)
+
+    logger.debug("activate_rulesets %s %s", activation_id, deployment_type)
 
     # TODO(ben): Change to enum
     if deployment_type == "local":
@@ -120,30 +117,44 @@ async def activate_rulesets(
 
         docker = aiodocker.Docker()
 
-        if deployment_type == "docker":
-            host = "host.docker.internal"
+        host = "eda-server"
 
-        container = await docker.containers.create(
-            {
-                "Cmd": [
-                    "ssh-agent",
-                    "ansible-events",
-                    "--worker",
-                    "--websocket-address",
-                    f"ws://{host}:{port}/api/ws2",
-                    "--id",
-                    str(activation_id),
-                ],
-                "Image": execution_environment,
-                "Env": ["ANSIBLE_FORCE_COLOR=True"],
-                "ExtraHosts": ["host.docker.internal:host-gateway"],
-            }
-        )
         try:
+            await aiodocker.images.DockerImages(docker).pull(
+                execution_environment
+            )
+
+            logger.debug("Creating container")
+            logger.debug("Host: %s", host)
+            logger.debug("Port: %s", port)
+            container = await docker.containers.create(
+                {
+                    "Cmd": [
+                        "ssh-agent",
+                        "ansible-rulebook",
+                        "--worker",
+                        "--websocket-address",
+                        f"ws://{host}:{port}/api/ws2",
+                        "--id",
+                        str(activation_id),
+                        "--debug",
+                    ],
+                    "Image": execution_environment,
+                    "Env": ["ANSIBLE_FORCE_COLOR=True"],
+                    "ExtraHosts": ["host.docker.internal:host-gateway"],
+                    "ExposedPorts": {"8000/tcp": {}},
+                    "HostConfig": {
+                        "PortBindings": {"8000/tcp": [{"HostPort": "8000"}]},
+                        "NetworkMode": "eda-network",
+                    },
+                }
+            )
+            logger.debug("Starting container")
             await container.start()
         except aiodocker.exceptions.DockerError as e:
             logger.error("Failed to start container: %s", e)
             await container.delete()
+            await docker.close()
             raise
 
         activated_rulesets[activation_id] = container
