@@ -39,7 +39,7 @@ export const renderProjectTabs = (projectId: string, intl) => {
   return <AppTabs tabItems={project_tabs}/>
 };
 
-const endpoint_project = 'http://' + getServer() + '/api/projects/';
+const endpoint_project = 'http://' + getServer() + '/api/projects';
 
 const Project: React.FunctionComponent = () => {
 
@@ -48,7 +48,7 @@ const Project: React.FunctionComponent = () => {
   const intl = useIntl();
 
   useEffect(() => {
-    fetch(endpoint_project + id, {
+    fetch(`${endpoint_project}/${id}`, {
       headers: {
         'Content-Type': 'application/json',
       },

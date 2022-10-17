@@ -8,6 +8,7 @@ from . import (
     project,
     role,
     rulebook,
+    ssh,
     task,
     user,
     websocket,
@@ -25,4 +26,5 @@ router.include_router(role.router)
 router.include_router(rulebook.router)
 router.include_router(task.router)
 router.include_router(user.router)
+router.include_router(ssh.router)
 router.include_router(websocket.router)

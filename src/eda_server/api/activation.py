@@ -7,15 +7,17 @@ import aiodocker.exceptions
 import sqlalchemy as sa
 from fastapi import APIRouter, Depends, Response, status
 from fastapi.exceptions import HTTPException
+from fastapi.responses import JSONResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from eda_server import schema
 from eda_server.config import Settings, get_settings
 from eda_server.db import models
-from eda_server.db.dependency import get_db_session
+from eda_server.db.dependency import get_db_session, get_db_session_factory
 from eda_server.db.models.activation import ExecutionEnvironment
 from eda_server.db.utils.lostream import PGLargeObject, decode_bytes_buff
 from eda_server.managers import updatemanager
+from eda_server.messages import ActivationErrorMessage
 from eda_server.ruleset import activate_rulesets, inactivate_rulesets
 
 logger = logging.getLogger("eda_server")
@@ -245,11 +247,17 @@ async def read_output(proc, activation_instance_id, db_session_factory):
 @router.post(
     "/api/activation_instance",
     response_model=schema.ActivationInstanceBaseRead,
+    responses={
+        status.HTTP_500_INTERNAL_SERVER_ERROR: {
+            "model": ActivationErrorMessage
+        }
+    },
     operation_id="create_activation_instance",
 )
 async def create_activation_instance(
     a: schema.ActivationInstanceCreate,
     db: AsyncSession = Depends(get_db_session),
+    db_factory=Depends(get_db_session_factory),
     settings: Settings = Depends(get_settings),
 ):
 
@@ -262,6 +270,7 @@ async def create_activation_instance(
             extra_var_id=a.extra_var_id,
             working_directory=a.working_directory,
             execution_environment=a.execution_environment,
+            project_id=a.project_id,
         )
         .returning(
             models.activation_instances.c.id,
@@ -308,10 +317,16 @@ async def create_activation_instance(
             a.working_directory,
             settings.server_name,
             settings.port,
-            db,
+            db_factory,
         )
     except aiodocker.exceptions.DockerError as e:
-        return HTTPException(status_code=500, detail=str(e))
+        return JSONResponse(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            content={
+                "message": "Error occurred while activating rulesets.",
+                "detail": str(e),
+            },
+        )
 
     return {**a.dict(), "id": id_}
 

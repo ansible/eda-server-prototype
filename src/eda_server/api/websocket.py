@@ -65,6 +65,7 @@ async def websocket_endpoint2(
         while True:
             data = await websocket.receive_text()
             data = json.loads(data)
+            logger.debug(f"ws2 received: {data}")
             # TODO(cutwater): Some data validation is needed
             data_type = data.get("type")
             async with db_session_factory() as db:
@@ -153,6 +154,10 @@ async def handle_workers(websocket: WebSocket, data: dict, db: AsyncSession):
     if project_row:
         if project_row.large_data_id:
             await send_project_data(project_row.large_data_id, websocket, db)
+        else:
+            logger.debug("no project large_data_id")
+    else:
+        logger.debug("no project row")
 
     query = select(models.rulebooks).where(
         models.rulebooks.c.id == activation.rulebook_id
@@ -271,6 +276,7 @@ async def handle_ansible_rulebook(data: dict, db: AsyncSession):
 async def handle_jobs(data: dict, db: AsyncSession):
     query = insert(models.job_instances).values(uuid=data.get("job_id"))
     result = await db.execute(query)
+    await db.commit()
     (job_instance_id,) = result.inserted_primary_key
 
     activation_instance_id = int(data.get("ansible_rulebook_id"))

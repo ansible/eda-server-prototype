@@ -20,7 +20,7 @@ router = APIRouter()
 
 
 @router.get(
-    "/api/projects/",
+    "/api/projects",
     response_model=List[schema.ProjectList],
     operation_id="list_projects",
     tags=["projects"],
@@ -32,7 +32,7 @@ async def list_projects(db: AsyncSession = Depends(get_db_session)):
 
 
 @router.post(
-    "/api/projects/",
+    "/api/projects",
     response_model=schema.ProjectRead,
     operation_id="create_project",
     status_code=status.HTTP_201_CREATED,

@@ -21,6 +21,7 @@ services:
       dockerfile: tools/docker/Dockerfile
       args:
         DEVEL_EDA_LIBRARY: ${DEVEL_EDA_LIBRARY:-1}
+        USER_ID: ${EDA_USER_ID:-1001}
     command:
       [
         "/bin/bash",
@@ -75,3 +76,7 @@ services:
       start_period: 5s
 volumes:
   postgres_data:
+
+networks:
+  default:
+    name: eda-network

@@ -55,7 +55,7 @@ export interface RuleSetType {
   rulesets: string;
 }
 
-const endpoint = 'http://' + getServer() + '/api/rulesets/';
+const endpoint = 'http://' + getServer() + '/api/rulesets';
 
 const columns = (intl) => [
   {
