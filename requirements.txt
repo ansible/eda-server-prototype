@@ -1,0 +1,11 @@
+alembic
+asyncpg
+fastapi
+fastapi-users[sqlalchemy]
+pyyaml
+sqlalchemy ~= 1.4
+uvicorn
+websockets  # TODO(cutwater): Check if this is dependency is necessary
+environs
+aiodocker
+ansible-rulebook

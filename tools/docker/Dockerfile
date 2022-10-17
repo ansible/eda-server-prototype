@@ -12,13 +12,13 @@ ENV PIP_NO_BINARY=jpy
 RUN pip install ansible && \
     ansible-galaxy collection install git+https://github.com/ansible/event-driven-ansible.git
 
-COPY ./src/eda_server.egg-info/requires.txt $WORKDIR
-RUN pip install -r requires.txt
+COPY requirements.txt /tmp/requirements.txt
+RUN pip install -r /tmp/requirements.txt
 
 COPY . $WORKDIR
 RUN chown -R $USER_ID ./
 
 USER $USER_ID
-RUN pip install -e .
+RUN pip install --no-deps -e .
 
 CMD ["eda-server"]
