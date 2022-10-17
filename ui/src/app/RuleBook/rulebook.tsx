@@ -54,7 +54,7 @@ export const renderRuleBookTabs = (rulebookId: string, intl) => {
   return <AppTabs tabItems={rulebook_tabs}/>
 };
 
-const endpoint_rulebook = 'http://' + getServer() + '/api/rulebooks/';
+const endpoint_rulebook = 'http://' + getServer() + '/api/rulebooks';
 
 const RuleBook: React.FunctionComponent = () => {
   const [rulebook, setRuleBook] = useState<RuleBookType|undefined>(undefined);
@@ -62,7 +62,7 @@ const RuleBook: React.FunctionComponent = () => {
   const intl = useIntl();
 
   useEffect(() => {
-    fetch(`${endpoint_rulebook}${id}`, {
+    fetch(`${endpoint_rulebook}/${id}`, {
       headers: {
         'Content-Type': 'application/json',
       },

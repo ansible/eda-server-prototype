@@ -15,7 +15,7 @@ import {createRows} from "@app/RuleBooks/rulebooks-table-helpers";
 import {RuleSetType} from "@app/RuleSet/ruleset";
 import {RuleBookType} from "@app/RuleBook/rulebook";
 
-const endpoint = 'http://' + getServer() + '/api/rulebooks/';
+const endpoint = 'http://' + getServer() + '/api/rulebooks';
 
 const columns = (intl) => [
   {
