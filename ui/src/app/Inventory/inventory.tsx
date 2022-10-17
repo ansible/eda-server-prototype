@@ -1,5 +1,5 @@
-import {Title} from '@patternfly/react-core';
-import {Route, Switch, useLocation, useParams} from 'react-router-dom';
+import {Dropdown, DropdownItem, DropdownPosition, KebabToggle, Level, LevelItem, Title} from '@patternfly/react-core';
+import {Link, Route, Switch, useLocation, useParams} from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
 import {useIntl} from "react-intl";
 import AppTabs from "@app/shared/app-tabs";
@@ -52,6 +52,7 @@ const endpoint_inventory = 'http://' + getServer() + '/api/inventory/';
 const Inventory: React.FunctionComponent = () => {
   const [inventory, setInventory] = useState<InventoryType|undefined>(undefined);
   const { id } = useParams<{id: string}>();
+  const [isOpen, setOpen] = useState<boolean>(false);
   const intl = useIntl();
 
   useEffect(() => {
@@ -67,6 +68,30 @@ const Inventory: React.FunctionComponent = () => {
   const currentTab = inventory?.id ?
     getTabFromPath(buildInventoryTabs(inventory.id,intl), location.pathname) :
     intl.formatMessage(sharedMessages.details);
+
+  const dropdownItems = [
+    <DropdownItem
+      aria-label="Edit"
+      key="edit-inventory"
+      id="edit-inventory"
+      component={ <Link to={`/inventories/inventory/edit-inventory/${id}`}>
+        {intl.formatMessage(sharedMessages.edit)}
+      </Link>
+      }
+      role="link"
+    />,
+    <DropdownItem
+      aria-label="Delete"
+      key="delete-inventory"
+      id="delete-inventory"
+      component={ <Link to={`/inventory/${id}/remove`}>
+        {intl.formatMessage(sharedMessages.delete)}
+      </Link>
+      }
+      role="link"
+    />
+  ]
+
   return (
     <React.Fragment>
       <TopToolbar breadcrumbs={[
@@ -86,7 +111,25 @@ const Inventory: React.FunctionComponent = () => {
         }
       ]
       }>
-        <Title headingLevel={"h2"}>{`${inventory?.name}`}</Title>
+        <Level>
+          <LevelItem>
+            <Title headingLevel={"h2"}>{`${inventory?.name}`}</Title>
+          </LevelItem>
+          <LevelItem>
+            <Dropdown
+              isPlain
+              onSelect={() => setOpen(false)}
+              position={DropdownPosition.right}
+              toggle={
+                <KebabToggle
+                  id="rulebook-details-toggle"
+                  onToggle={(isOpen) => setOpen(isOpen)}
+                />}
+              isOpen={isOpen}
+              dropdownItems={dropdownItems}
+            />
+          </LevelItem>
+        </Level>
       </TopToolbar>
       { inventory &&
         <Switch>
