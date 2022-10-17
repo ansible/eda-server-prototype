@@ -44,8 +44,6 @@ const RemoveJob: React.ComponentType<IRemoveJob> = ( {ids = [],
   const { id } = useParams<{id:string}>();
   const { push, goBack } = useHistory();
 
-  console.log('Debug - job', job);
-  console.log('Debug - id', id);
   const removeJob = (jobId) => removeData(`${jobEndpoint}/${jobId}`);
 
   const onSubmit = () => {

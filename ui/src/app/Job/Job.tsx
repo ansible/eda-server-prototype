@@ -94,7 +94,7 @@ const Job: React.FunctionComponent = () => {
       aria-label="Edit"
       key="edit-job"
       id="edit-job"
-      component={ <Link to={`/edit-job/${id}`}>
+      component={ <Link to={`/job/${id}/edit`}>
         {intl.formatMessage(sharedMessages.edit)}
       </Link>
       }

@@ -1,5 +1,5 @@
-import {Title} from '@patternfly/react-core';
-import {Route, Switch, useLocation, useParams} from 'react-router-dom';
+import {Dropdown, DropdownItem, DropdownPosition, KebabToggle, Level, LevelItem, Title} from '@patternfly/react-core';
+import {Link, Route, Switch, useLocation, useParams} from 'react-router-dom';
 import React, { useState, useEffect, Fragment } from 'react';
 import {useIntl} from "react-intl";
 import AppTabs from "@app/shared/app-tabs";
@@ -15,7 +15,7 @@ export interface RuleBookType {
   id: string,
   name?: string,
   description?: string,
-  number_of_rulesets?: string,
+  ruleset_count?: string,
   created_at?: string,
   fire_count?: string,
   last_modified?: string
@@ -59,6 +59,7 @@ const endpoint_rulebook = 'http://' + getServer() + '/api/rulebooks';
 const RuleBook: React.FunctionComponent = () => {
   const [rulebook, setRuleBook] = useState<RuleBookType|undefined>(undefined);
   const { id } = useParams<{id: string}>();
+  const [isOpen, setOpen] = useState<boolean>(false);
   const intl = useIntl();
 
   useEffect(() => {
@@ -74,6 +75,20 @@ const RuleBook: React.FunctionComponent = () => {
   const currentTab = rulebook?.id ?
     getTabFromPath(buildRuleBookTabs(rulebook.id,intl), location.pathname) :
     intl.formatMessage(sharedMessages.details);
+
+  const dropdownItems = [
+    <DropdownItem
+      aria-label="Relaunch"
+      key="disable-rulebook"
+      id="disable-rulebook"
+      component={ <Link to={`/rulebooks/rulebook/${id}/disable`}>
+        {intl.formatMessage(sharedMessages.disable)}
+      </Link>
+      }
+      role="link"
+    />
+  ]
+
   return (
     <React.Fragment>
       <TopToolbar breadcrumbs={[
@@ -93,7 +108,25 @@ const RuleBook: React.FunctionComponent = () => {
         }
       ]
       }>
-        <Title headingLevel={"h2"}>{`${rulebook?.name}`}</Title>
+        <Level>
+          <LevelItem>
+            <Title headingLevel={"h2"}>{`${rulebook?.name}`}</Title>
+          </LevelItem>
+          <LevelItem>
+            <Dropdown
+              isPlain
+              onSelect={() => setOpen(false)}
+              position={DropdownPosition.right}
+              toggle={
+                <KebabToggle
+                  id="rulebook-details-toggle"
+                  onToggle={(isOpen) => setOpen(isOpen)}
+                />}
+              isOpen={isOpen}
+              dropdownItems={dropdownItems}
+            />
+          </LevelItem>
+        </Level>
       </TopToolbar>
       { rulebook &&
         <Switch>

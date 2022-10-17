@@ -5864,7 +5864,17 @@ exports[`Activations should render the Activations component 1`] = `
                                                                     Object {
                                                                       "component": "button",
                                                                       "onClick": [Function],
-                                                                      "title": "Edit",
+                                                                      "title": "Relaunch",
+                                                                    },
+                                                                    Object {
+                                                                      "component": "button",
+                                                                      "onClick": [Function],
+                                                                      "title": "Restart",
+                                                                    },
+                                                                    Object {
+                                                                      "component": "button",
+                                                                      "onClick": [Function],
+                                                                      "title": "Disable",
                                                                     },
                                                                     Object {
                                                                       "component": "button",
@@ -5963,11 +5973,25 @@ exports[`Activations should render the Activations component 1`] = `
                                                                         data-key={0}
                                                                         onClick={[Function]}
                                                                       >
-                                                                        Edit
+                                                                        Relaunch
                                                                       </DropdownItem>,
                                                                       <DropdownItem
                                                                         component="button"
                                                                         data-key={1}
+                                                                        onClick={[Function]}
+                                                                      >
+                                                                        Restart
+                                                                      </DropdownItem>,
+                                                                      <DropdownItem
+                                                                        component="button"
+                                                                        data-key={2}
+                                                                        onClick={[Function]}
+                                                                      >
+                                                                        Disable
+                                                                      </DropdownItem>,
+                                                                      <DropdownItem
+                                                                        component="button"
+                                                                        data-key={3}
                                                                         onClick={[Function]}
                                                                       >
                                                                         Delete
@@ -5994,11 +6018,25 @@ exports[`Activations should render the Activations component 1`] = `
                                                                           data-key={0}
                                                                           onClick={[Function]}
                                                                         >
-                                                                          Edit
+                                                                          Relaunch
                                                                         </DropdownItem>,
                                                                         <DropdownItem
                                                                           component="button"
                                                                           data-key={1}
+                                                                          onClick={[Function]}
+                                                                        >
+                                                                          Restart
+                                                                        </DropdownItem>,
+                                                                        <DropdownItem
+                                                                          component="button"
+                                                                          data-key={2}
+                                                                          onClick={[Function]}
+                                                                        >
+                                                                          Disable
+                                                                        </DropdownItem>,
+                                                                        <DropdownItem
+                                                                          component="button"
+                                                                          data-key={3}
                                                                           onClick={[Function]}
                                                                         >
                                                                           Delete
@@ -7020,7 +7058,17 @@ exports[`Activations should render the Activations component 1`] = `
                                                                     Object {
                                                                       "component": "button",
                                                                       "onClick": [Function],
-                                                                      "title": "Edit",
+                                                                      "title": "Relaunch",
+                                                                    },
+                                                                    Object {
+                                                                      "component": "button",
+                                                                      "onClick": [Function],
+                                                                      "title": "Restart",
+                                                                    },
+                                                                    Object {
+                                                                      "component": "button",
+                                                                      "onClick": [Function],
+                                                                      "title": "Disable",
                                                                     },
                                                                     Object {
                                                                       "component": "button",
@@ -7119,11 +7167,25 @@ exports[`Activations should render the Activations component 1`] = `
                                                                         data-key={0}
                                                                         onClick={[Function]}
                                                                       >
-                                                                        Edit
+                                                                        Relaunch
                                                                       </DropdownItem>,
                                                                       <DropdownItem
                                                                         component="button"
                                                                         data-key={1}
+                                                                        onClick={[Function]}
+                                                                      >
+                                                                        Restart
+                                                                      </DropdownItem>,
+                                                                      <DropdownItem
+                                                                        component="button"
+                                                                        data-key={2}
+                                                                        onClick={[Function]}
+                                                                      >
+                                                                        Disable
+                                                                      </DropdownItem>,
+                                                                      <DropdownItem
+                                                                        component="button"
+                                                                        data-key={3}
                                                                         onClick={[Function]}
                                                                       >
                                                                         Delete
@@ -7150,11 +7212,25 @@ exports[`Activations should render the Activations component 1`] = `
                                                                           data-key={0}
                                                                           onClick={[Function]}
                                                                         >
-                                                                          Edit
+                                                                          Relaunch
                                                                         </DropdownItem>,
                                                                         <DropdownItem
                                                                           component="button"
                                                                           data-key={1}
+                                                                          onClick={[Function]}
+                                                                        >
+                                                                          Restart
+                                                                        </DropdownItem>,
+                                                                        <DropdownItem
+                                                                          component="button"
+                                                                          data-key={2}
+                                                                          onClick={[Function]}
+                                                                        >
+                                                                          Disable
+                                                                        </DropdownItem>,
+                                                                        <DropdownItem
+                                                                          component="button"
+                                                                          data-key={3}
                                                                           onClick={[Function]}
                                                                         >
                                                                           Delete
@@ -8176,7 +8252,17 @@ exports[`Activations should render the Activations component 1`] = `
                                                                     Object {
                                                                       "component": "button",
                                                                       "onClick": [Function],
-                                                                      "title": "Edit",
+                                                                      "title": "Relaunch",
+                                                                    },
+                                                                    Object {
+                                                                      "component": "button",
+                                                                      "onClick": [Function],
+                                                                      "title": "Restart",
+                                                                    },
+                                                                    Object {
+                                                                      "component": "button",
+                                                                      "onClick": [Function],
+                                                                      "title": "Disable",
                                                                     },
                                                                     Object {
                                                                       "component": "button",
@@ -8275,11 +8361,25 @@ exports[`Activations should render the Activations component 1`] = `
                                                                         data-key={0}
                                                                         onClick={[Function]}
                                                                       >
-                                                                        Edit
+                                                                        Relaunch
                                                                       </DropdownItem>,
                                                                       <DropdownItem
                                                                         component="button"
                                                                         data-key={1}
+                                                                        onClick={[Function]}
+                                                                      >
+                                                                        Restart
+                                                                      </DropdownItem>,
+                                                                      <DropdownItem
+                                                                        component="button"
+                                                                        data-key={2}
+                                                                        onClick={[Function]}
+                                                                      >
+                                                                        Disable
+                                                                      </DropdownItem>,
+                                                                      <DropdownItem
+                                                                        component="button"
+                                                                        data-key={3}
                                                                         onClick={[Function]}
                                                                       >
                                                                         Delete
@@ -8306,11 +8406,25 @@ exports[`Activations should render the Activations component 1`] = `
                                                                           data-key={0}
                                                                           onClick={[Function]}
                                                                         >
-                                                                          Edit
+                                                                          Relaunch
                                                                         </DropdownItem>,
                                                                         <DropdownItem
                                                                           component="button"
                                                                           data-key={1}
+                                                                          onClick={[Function]}
+                                                                        >
+                                                                          Restart
+                                                                        </DropdownItem>,
+                                                                        <DropdownItem
+                                                                          component="button"
+                                                                          data-key={2}
+                                                                          onClick={[Function]}
+                                                                        >
+                                                                          Disable
+                                                                        </DropdownItem>,
+                                                                        <DropdownItem
+                                                                          component="button"
+                                                                          data-key={3}
                                                                           onClick={[Function]}
                                                                         >
                                                                           Delete
