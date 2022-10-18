@@ -3,6 +3,9 @@ import logging
 import os
 import shutil
 import tempfile
+from dataclasses import dataclass
+from enum import Enum
+from typing import Any, Iterator, Literal, Optional
 
 import sqlalchemy as sa
 import yaml
@@ -19,11 +22,34 @@ logger = logging.getLogger("eda_server")
 GIT_BIN = shutil.which("git")
 TAR_BIN = shutil.which("tar")
 
+DEFAULT_TIMEOUT = 10
 GIT_CLONE_TIMEOUT = 30
-GIT_TIMEOUT = 10
+GIT_ARCHIVE_TIMEOUT = 30
 GIT_ENVIRON = {
     "GIT_TERMINAL_PROMPT": "0",
 }
+
+TEMPFILE_PREFIX = "eda-import-project"
+
+# ---- IMPORT -----------------------------------------------------------------
+
+
+async def import_project(db: AsyncSession, data: ProjectCreate):
+    with tempfile.TemporaryDirectory(prefix=TEMPFILE_PREFIX) as repo_dir:
+        commit_id = await clone_project(data.url, repo_dir)
+        project = await create_project(
+            db,
+            url=data.url,
+            git_hash=commit_id,
+            name=data.name,
+            description=data.description,
+        )
+        await sync_project(db, project.id, repo_dir)
+        await tar_project(db, project.large_data_id, repo_dir)
+        return project
+
+
+# ---- GIT --------------------------------------------------------------------
 
 
 class GitCommandFailed(Exception):
@@ -61,7 +87,7 @@ async def git_clone(url: str, dest: str) -> None:
     :param dest: The directory to clone into.
     :raises GitError: If git returns non-zero exit code.
     """
-    cmd = [GIT_BIN, "clone", "--quiet", url, dest]
+    cmd = [GIT_BIN, "clone", "--quiet", "--depth", "1", url, dest]
     await run_git_command(
         *cmd,
         cwd=dest,
@@ -84,9 +110,169 @@ async def git_get_current_commit(repo: str) -> str:
         cwd=repo,
         stdout=asyncio.subprocess.PIPE,
         stderr=asyncio.subprocess.PIPE,
-        timeout=GIT_TIMEOUT,
+        timeout=DEFAULT_TIMEOUT,
     )
     return result.stdout.strip()
+
+
+async def git_archive(
+    repo: str,
+    commit_id: str,
+    *,
+    output: str,
+    format: Literal["tar", "tar.gz"] = "tar.gz",
+):
+    cmd = [GIT_BIN, "archive", "--format", format, "-o", output, commit_id]
+    await run_git_command(
+        *cmd,
+        cwd=repo,
+        stdout=asyncio.subprocess.DEVNULL,
+        stderr=asyncio.subprocess.PIPE,
+        timeout=GIT_ARCHIVE_TIMEOUT,
+    )
+
+
+async def clone_project(url: str, dest: str):
+    await git_clone(url, dest)
+    return await git_get_current_commit(dest)
+
+
+# ---- SYNC -------------------------------------------------------------------
+
+
+async def sync_project(db: AsyncSession, project_id: int, repo_dir: str):
+    for result in scan_project(repo_dir):
+        if result.kind is ProjectFileKind.RULEBOOK:
+            rulebook_id = await create_rulebook(
+                db,
+                project_id=project_id,
+                name=result.filename,
+                rulesets=result.raw_content,
+            )
+            await create_rules(db, rulebook_id, result.content)
+        elif result.kind is ProjectFileKind.PLAYBOOK:
+            await create_playbook(
+                db,
+                project_id=project_id,
+                name=result.filename,
+                playbook=result.raw_content,
+            )
+        elif result.kind is ProjectFileKind.INVENTORY:
+            await create_inventory(
+                db,
+                project_id=project_id,
+                name=result.filename,
+                inventory=result.raw_content,
+            )
+        elif result.kind is ProjectFileKind.EXTRA_VARS:
+            await create_extra_var(
+                db,
+                project_id=project_id,
+                name=result.filename,
+                extra_var=result.raw_content,
+            )
+
+
+IGNORED_DIRS = frozenset([".git", ".github"])
+
+
+class ProjectFileKind(Enum):
+    RULEBOOK = "rulebook"
+    INVENTORY = "inventory"
+    EXTRA_VARS = "extra_vars"
+    PLAYBOOK = "playbook"
+
+
+@dataclass
+class ScanResult:
+    kind: ProjectFileKind
+    filename: str
+    raw_content: str
+    content: Any
+
+
+def get_file_kind(content: Any) -> ProjectFileKind:
+    if is_rulebook_file(content):
+        return ProjectFileKind.RULEBOOK
+    elif is_inventory_file(content):
+        return ProjectFileKind.INVENTORY
+    elif is_playbook_file(content):
+        return ProjectFileKind.PLAYBOOK
+    else:
+        return ProjectFileKind.EXTRA_VARS
+
+
+def scan_file(path: str) -> Optional[ScanResult]:
+    _, ext = os.path.splitext(path)
+    if ext not in (".yml", ".yaml"):
+        return None
+
+    try:
+        with open(path) as f:
+            raw_content = f.read()
+    except OSError as exc:
+        logger.warning("Cannot open file %s: %s", os.path.basename(path), exc)
+        return None
+
+    try:
+        content = yaml.safe_load(raw_content)
+    except yaml.YAMLError as exc:
+        logger.warning("Invalid YAML file %s: %s", os.path.basename(path), exc)
+        return None
+
+    kind = get_file_kind(content)
+    if kind is None:
+        return None
+
+    return ScanResult(
+        kind=kind,
+        filename=os.path.basename(path),
+        raw_content=raw_content,
+        content=content,
+    )
+
+
+def scan_project(project_dir: str) -> Iterator[ScanResult]:
+    for root, dirs, files in os.walk(project_dir):
+        # Skip ignored directories
+        dirs[:] = [x for x in dirs if x not in IGNORED_DIRS]
+        for filename in files:
+            path = os.path.join(root, filename)
+            try:
+                result = scan_file(path)
+            except Exception:
+                logger.exception(
+                    "Unexpected exception when scanning file %s", path
+                )
+                continue
+            if result is not None:
+                yield result
+
+
+def is_rulebook_file(data: Any):
+    if not isinstance(data, list):
+        return False
+    return all("rules" in entry for entry in data)
+
+
+def is_playbook_file(data: Any):
+    if not isinstance(data, list):
+        return False
+    for entry in data:
+        if not isinstance(entry, dict):
+            return False
+        if entry.keys() & {"tasks", "roles"}:
+            return True
+    return False
+
+
+def is_inventory_file(data: Any):
+    if not isinstance(data, dict):
+        return False
+    return "all" in data
+
+
+# ---- DATABASE ---------------------------------------------------------------
 
 
 async def create_project(
@@ -106,62 +292,8 @@ async def create_project(
     return result.first()
 
 
-async def import_project(db: AsyncSession, data: ProjectCreate):
-    with tempfile.TemporaryDirectory(prefix="eda-import-project") as repo_dir:
-        commit_id = await clone_project(data.url, repo_dir)
-        project = await create_project(
-            db,
-            url=data.url,
-            git_hash=commit_id,
-            name=data.name,
-            description=data.description,
-        )
-        await sync_project(db, project.id, project.large_data_id, repo_dir)
-        return project
-
-
-async def clone_project(url: str, dest: str):
-    await git_clone(url, dest)
-    return await git_get_current_commit(dest)
-
-
-async def sync_project(
-    db: AsyncSession, project_id: int, large_data_id: int, repo_dir: str
-):
-    await find_rules(db, project_id, repo_dir)
-    await find_inventory(db, project_id, repo_dir)
-    await find_extra_vars(db, project_id, repo_dir)
-    await find_playbook(db, project_id, repo_dir)
-    await tar_project(db, large_data_id, repo_dir)
-
-
-def is_rules_file(filename: str):
-    if not filename.endswith(".yml"):
-        return False
-    try:
-        with open(filename) as f:
-            data = yaml.safe_load(f.read())
-            if not isinstance(data, list):
-                return False
-            for entry in data:
-                if "rules" not in entry:
-                    return False
-    except Exception:
-        logger.exception(filename)
-        return False
-
-    return True
-
-
-def yield_files(project_dir: str):
-    for root, _dirs, files in os.walk(project_dir):
-        if ".git" in root:
-            continue
-        for f in files:
-            yield root, f
-
-
-async def insert_rulebook_related_data(
+# TODO(cutwater): Move into the Table Data Gateway pattern implementation.
+async def create_rules(
     db: AsyncSession, rulebook_id: int, rulebook_data: dict
 ):
     ruleset_values = [
@@ -184,150 +316,55 @@ async def insert_rulebook_related_data(
     await db.execute(query)
 
 
-async def find_rules(db: AsyncSession, project_id: int, project_dir: str):
-
-    for directory, filename in yield_files(project_dir):
-        full_path = os.path.join(directory, filename)
-        # TODO(cutwater): Remove debugging print
-        logger.debug(filename)
-        if not is_rules_file(full_path):
-            continue
-
-        with open(full_path) as f:
-            rulesets = f.read()
-
-        query = sa.insert(rulebooks).values(
-            name=filename, rulesets=rulesets, project_id=project_id
-        )
-        (rulebook_id,) = (await db.execute(query)).inserted_primary_key
-        # TODO(cutwater): Remove debugging print
-        logger.debug(rulebook_id)
-
-        rulebook_data = yaml.safe_load(rulesets)
-        await insert_rulebook_related_data(db, rulebook_id, rulebook_data)
-
-
-def is_inventory_file(filename: str):
-    if not filename.endswith(".yml"):
-        return False
-    try:
-        with open(filename) as f:
-            data = yaml.safe_load(f.read())
-            if not isinstance(data, dict):
-                return False
-            if "all" not in data:
-                return False
-    except Exception:
-        logger.exception(filename)
-        return False
-
-    return True
-
-
-async def find_inventory(db: AsyncSession, project_id: int, project_dir: str):
-    for directory, filename in yield_files(project_dir):
-        full_path = os.path.join(directory, filename)
-        # TODO(cutwater): Remove debugging print
-        logger.debug(filename)
-        if is_inventory_file(full_path):
-            with open(full_path) as f:
-                inventory = f.read()
-
-            query = sa.insert(inventories).values(
-                name=filename, inventory=inventory, project_id=project_id
-            )
-            (record_id,) = (await db.execute(query)).inserted_primary_key
-            # TODO(cutwater): Remove debugging print
-            logger.debug(record_id)
-
-
-def is_playbook_file(filename: str):
-    if not filename.endswith(".yml"):
-        return False
-    try:
-        with open(filename) as f:
-            data = yaml.safe_load(f.read())
-            if not isinstance(data, list):
-                return False
-            for entry in data:
-                if "tasks" in entry:
-                    return True
-                if "roles" in entry:
-                    return True
-    except Exception:
-        logger.exception(filename)
-        return False
-    return False
-
-
-def is_extra_vars_file(filename):
-    if not filename.endswith(".yml"):
-        return False
-    return (
-        not is_rules_file(filename)
-        and not is_inventory_file(filename)
-        and not is_playbook_file(filename)
+async def create_rulebook(
+    db: AsyncSession, *, project_id: int, name: str, rulesets: str
+):
+    query = sa.insert(rulebooks).values(
+        name=name, rulesets=rulesets, project_id=project_id
     )
+    (id_,) = (await db.execute(query)).inserted_primary_key
+    return id_
 
 
-async def find_extra_vars(db: AsyncSession, project_id, project_dir):
-
-    for directory, filename in yield_files(project_dir):
-        full_path = os.path.join(directory, filename)
-        # TODO(cutwater): Remove debugging print
-        logger.debug(filename)
-        if is_extra_vars_file(full_path):
-            with open(full_path) as f:
-                extra_var = f.read()
-
-            query = sa.insert(extra_vars).values(
-                name=filename, extra_var=extra_var, project_id=project_id
-            )
-            (record_id,) = (await db.execute(query)).inserted_primary_key
-            # TODO(cutwater): Remove debugging print
-            logger.debug(record_id)
+async def create_inventory(
+    db: AsyncSession, *, project_id: int, name: str, inventory: str
+):
+    query = sa.insert(inventories).values(
+        name=name, inventory=inventory, project_id=project_id
+    )
+    (id_,) = (await db.execute(query)).inserted_primary_key
+    return id_
 
 
-async def find_playbook(db: AsyncSession, project_id, project_dir):
+async def create_extra_var(
+    db: AsyncSession, *, project_id: int, name: str, extra_var: str
+):
+    query = sa.insert(extra_vars).values(
+        name=name, extra_var=extra_var, project_id=project_id
+    )
+    (id_,) = (await db.execute(query)).inserted_primary_key
+    return id_
 
-    for directory, filename in yield_files(project_dir):
-        full_path = os.path.join(directory, filename)
-        # TODO(cutwater): Remove debugging print
-        logger.debug(filename)
-        if is_playbook_file(full_path):
-            with open(full_path) as f:
-                playbook = f.read()
 
-            query = sa.insert(playbooks).values(
-                name=filename, playbook=playbook, project_id=project_id
-            )
-            (record_id,) = (await db.execute(query)).inserted_primary_key
-            # TODO(cutwater): Remove debugging print
-            logger.debug(record_id)
+async def create_playbook(
+    db: AsyncSession, *, project_id: int, name: str, playbook: str
+):
+    query = sa.insert(playbooks).values(
+        name=name, playbook=playbook, project_id=project_id
+    )
+    (id_,) = (await db.execute(query)).inserted_primary_key
+    return id_
+
+
+# ---- ARCHIVE ----------------------------------------------------------------
 
 
 async def tar_project(db: AsyncSession, large_data_id: int, project_dir: str):
-    with tempfile.TemporaryDirectory() as tempdir:
-        tarfile_name = os.path.join(tempdir, "project.tar.gz")
+    archive_path = os.path.join(project_dir, "project.tar.gz")
 
-        cmd = [TAR_BIN, "zcvf", tarfile_name, "."]
-        proc = await asyncio.create_subprocess_exec(
-            *cmd,
-            cwd=project_dir,
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE,
-        )
+    await git_archive(project_dir, "HEAD", output=archive_path)
 
-        stdout, stderr = await proc.communicate()
-
-        if stdout:
-            logger.critical(stdout.decode())
-        if stderr:
-            logger.critical(stderr.decode())
-
-        logger.critical(tarfile_name)
-
-        async with PGLargeObject(db, oid=large_data_id, mode="w") as lobject:
-            with open(tarfile_name, "rb") as f:
-                while data := f.read(CHUNK_SIZE):
-                    await lobject.write(data)
+    async with PGLargeObject(db, oid=large_data_id, mode="w") as lobject:
+        with open(archive_path, "rb") as f:
+            while data := f.read(CHUNK_SIZE):
+                await lobject.write(data)

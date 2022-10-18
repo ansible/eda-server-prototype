@@ -123,7 +123,9 @@ async def test_delete_project_not_found(client: AsyncClient):
 @mock.patch("tempfile.TemporaryDirectory")
 @mock.patch("eda_server.project.clone_project")
 @mock.patch("eda_server.project.sync_project")
+@mock.patch("eda_server.project.tar_project")
 async def test_create_project(
+    tar_project: mock.Mock,
     sync_project: mock.Mock,
     clone_project: mock.Mock,
     tempfile: mock.Mock(),
@@ -152,7 +154,10 @@ async def test_create_project(
 
     clone_project.assert_called_once_with(TEST_PROJECT["url"], mock.ANY)
     sync_project.assert_called_once_with(
-        db, project["id"], project["large_data_id"], "/tmp/test-create-project"
+        db, project["id"], "/tmp/test-create-project"
+    )
+    tar_project.assert_called_once_with(
+        db, project["large_data_id"], "/tmp/test-create-project"
     )
 
 

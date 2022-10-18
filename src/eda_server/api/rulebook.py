@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from eda_server import schema
 from eda_server.db import models
 from eda_server.db.dependency import get_db_session
-from eda_server.project import insert_rulebook_related_data
+from eda_server.project import create_rules
 
 router = APIRouter(tags=["rulebooks"])
 
@@ -214,7 +214,7 @@ async def create_rulebook(
     (id_,) = result.inserted_primary_key
 
     rulebook_data = yaml.safe_load(rulebook.rulesets)
-    await insert_rulebook_related_data(db, id_, rulebook_data)
+    await create_rules(db, id_, rulebook_data)
     await db.commit()
 
     return {**rulebook.dict(), "id": id_}
