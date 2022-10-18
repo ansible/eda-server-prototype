@@ -41,8 +41,8 @@ const SimpleList = styled(PFSimpleList)`
   white-space: pre-wrap;
 `
 
-const endpoint = 'http://' + getServer() + '/api/job_instance/';
-const event_endpoint = 'http://' + getServer() + '/api/job_instance_events/';
+const endpoint = 'http://' + getServer() + '/api/job_instance';
+const event_endpoint = 'http://' + getServer() + '/api/job_instance_events';
 
 const Job: React.FunctionComponent = () => {
 
@@ -75,13 +75,13 @@ const Job: React.FunctionComponent = () => {
   }, [newStdout]);
 
   useEffect(() => {
-     fetch(endpoint + id, {
+     fetch(`${endpoint}/${id}`, {
        headers: {
          'Content-Type': 'application/json',
        },
      }).then(response => response.json())
     .then(data => setJob(data));
-     fetch(event_endpoint + id, {
+     fetch(`${event_endpoint}/${id}`, {
        headers: {
          'Content-Type': 'application/json',
        },

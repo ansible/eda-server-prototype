@@ -23,11 +23,11 @@ interface IRemoveJob {
   pagination?: PaginationConfiguration,
   setSelectedJobs?: any
 }
-const jobEndpoint = 'http://' + getServer() + '/api/job_instance/';
+const jobEndpoint = 'http://' + getServer() + '/api/job_instance';
 
 export const fetchJob = (jobId, pagination=defaultSettings) =>
 {
-  return fetch(`${jobEndpoint}${jobId}`, {
+  return fetch(`${jobEndpoint}/${jobId}`, {
     headers: {
       'Content-Type': 'application/json',
     },
