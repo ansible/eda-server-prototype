@@ -31,7 +31,7 @@ async def project_by_name_exists_or_404(db: AsyncSession, project_name: str):
 
 @router.get(
     "/api/projects/",
-    response_model= LimitOffsetPage[schema.ProjectList],
+    response_model=LimitOffsetPage[schema.ProjectList],
     operation_id="list_projects",
     tags=["projects"],
 )
