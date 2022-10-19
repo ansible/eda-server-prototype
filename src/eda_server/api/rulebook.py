@@ -214,7 +214,7 @@ async def create_rulebook(
     (id_,) = result.inserted_primary_key
 
     rulebook_data = yaml.safe_load(rulebook.rulesets)
-    await insert_rulebook_related_data(id_, rulebook_data, db)
+    await insert_rulebook_related_data(db, id_, rulebook_data)
     await db.commit()
 
     return {**rulebook.dict(), "id": id_}

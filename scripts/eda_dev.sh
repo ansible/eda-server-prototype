@@ -31,6 +31,7 @@ usage() {
     log-info "start-all           start both the services and EDA UI"
     log-info "stop-all            stop both the services and EDA UI"
     log-info "restart-all         restart both the services and EDA UI"
+    log-info "add-dev-user        add dev user(defaults): user dev_user@redhat.com, password: none2tuff"
     log-info "help                gives this usage output"
 }
 
@@ -44,7 +45,7 @@ EDA_PI_PORT=9000
 
 DEV_SCRIPTS_PATH=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
-DEV_USER="${DEV_USER:=demo_user@redhat.com}"
+DEV_USER="${DEV_USER:=dev_user@redhat.com}"
 DEV_PASS="${DEV_PASS:=none2tuff}"
 
 EDA_PROJECT_HOME="${DEV_SCRIPTS_PATH}/.."
@@ -78,8 +79,8 @@ check_uvicorn_status() {
   return 1
 }
 
-add_demo_user() {
-  log-info "Adding demo user: ${DEV_USER}, pass: ${DEV_PASS}"
+add-dev-user() {
+  log-info "Adding dev user: ${DEV_USER}, pass: ${DEV_PASS}"
   log-debug "scripts/adduser.py --password ${DEV_PASS} ${DEV_USER}"
   "${DEV_SCRIPTS_PATH}"/adduser.py --password "${DEV_PASS}" "${DEV_USER}"
 }
@@ -265,6 +266,8 @@ case ${ARG} in
   "RESTART-ALL")
     stop-events-all
     start-events-all ;;
+  "ADD-DEV-USER")
+    add-dev-user ;;
  "HELP") usage ;;
  *) usage ;;
 esac
