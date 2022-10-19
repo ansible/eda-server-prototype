@@ -14,7 +14,6 @@ def strict_not_empty_str():
 
 
 class ProjectCreate(BaseModel):
-    git_hash: Optional[StrictStr]
     url: StrictStr
     name: strict_not_empty_str()
     description: Optional[StrictStr] = ""
@@ -22,6 +21,7 @@ class ProjectCreate(BaseModel):
 
 class ProjectRead(ProjectCreate):
     id: int
+    git_hash: Optional[StrictStr]
     created_at: datetime
     modified_at: datetime
 
