@@ -29,7 +29,7 @@ export const createRows = (data: ProjectType[]) =>
     id,
     cells: [
       <React.Fragment key={`${id}-checkbox`}>
-        <SelectBox id={`${id}`} />
+        <SelectBox id={id} />
       </React.Fragment>,
       <Fragment key={`[project-${id}`}>
         <Link

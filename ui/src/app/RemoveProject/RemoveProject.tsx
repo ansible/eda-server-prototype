@@ -21,7 +21,7 @@ interface IRemoveProject {
   ids?: Array<string|number>,
   fetchData?: any,
   pagination?: PaginationConfiguration,
-  setSelectedProjects?: any
+  resetSelectedProjects?: any
 }
 const projectEndpoint = 'http://' + getServer() + '/api/projects';
 
@@ -37,17 +37,32 @@ export const fetchProject = (projectId, pagination=defaultSettings) =>
 const RemoveProject: React.ComponentType<IRemoveProject> = ( {ids = [],
                                              fetchData = null,
                                              pagination = defaultSettings,
-                                             setSelectedProjects = null} ) => {
+                                             resetSelectedProjects = null} ) => {
   const intl = useIntl();
   const dispatch = useDispatch();
   const [project, setProject] = useState<ProjectType>();
-  const { id } = useParams<{id:string}>();
+  const{ id } = useParams<{id:string}>();
   const { push, goBack } = useHistory();
+
+  console.log('Debig removeProject - id, ids', id, ids);
+  const removeId = id ? id : ( !id && ids && ids.length === 1 ) ? ids[0] : undefined;
 
   const removeProject = (projectId) => removeData(`${projectEndpoint}/${projectId}`);
 
+  async function removeProjects(ids) {
+    return Promise.all(
+      ids.map(
+        async (id) => await removeProject(id)
+      )
+    );
+  }
+
   const onSubmit = () => {
-    removeProject(id).then(() => { if(fetchData) { fetchData(pagination)} push('/projects');})
+    if ( !id && !(ids && ids.length > 0 )) {
+      return;
+    }
+
+    ( removeId ? removeProject(removeId) : removeProjects(ids)).then(() => { if(fetchData) { fetchData(pagination)} push('/projects');})
     .catch((error) => {
       if(fetchData) { fetchData(pagination) }
       push('/projects');
@@ -71,7 +86,7 @@ const RemoveProject: React.ComponentType<IRemoveProject> = ( {ids = [],
         intl.formatMessage(sharedMessages.projectRemoveTitle) as string
       }
       titleIconVariant="warning"
-      title={intl.formatMessage(sharedMessages.projectRemoveTitle)}
+      title={ removeId ? intl.formatMessage(sharedMessages.projectRemoveTitle) : intl.formatMessage(sharedMessages.projectsRemoveTitle)}
       isOpen
       variant="small"
       onClose={goBack}
@@ -101,15 +116,18 @@ const RemoveProject: React.ComponentType<IRemoveProject> = ( {ids = [],
       <StackItem>
         <TextContent>
           <Text component={TextVariants.p}>
-            {intl.formatMessage(sharedMessages.projectRemoveDescription)}
+            { removeId ? intl.formatMessage(sharedMessages.projectRemoveDescription)
+              : intl.formatMessage(sharedMessages.projectsRemoveDescription)}
           </Text>
         </TextContent>
       </StackItem>
       <StackItem>
         <TextContent>
-          <Text component={TextVariants.p}>
+          { removeId ? <Text component={TextVariants.p}>
             <strong> { project?.name } </strong>
-          </Text>
+          </Text> : <Text component={TextVariants.p}>
+            <strong> { `${ids.length} selected`  } </strong>
+          </Text>  }
         </TextContent>
       </StackItem>
     </Stack>

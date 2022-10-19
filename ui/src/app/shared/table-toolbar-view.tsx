@@ -41,7 +41,20 @@ export interface TableToolbarViewProps {
   onSort?: OnSort;
   rows: IRow[];
   ouiaId?: string;
+  bulkSelect?: {
+    count?: number;
+    className?: string;
+    items?: {
+      title?: string;
+      onClick?: (
+        event: React.MouseEvent<any> | React.KeyboardEvent | MouseEvent,
+        item: any,
+        key: number
+      ) => void;
+    }[];
+  };
 }
+
 export const TableToolbarView: React.ComponentType<TableToolbarViewProps> = ({
   columns,
   fetchData,
@@ -59,7 +72,8 @@ export const TableToolbarView: React.ComponentType<TableToolbarViewProps> = ({
   sortBy,
   onSort,
   rows,
-  ouiaId
+  ouiaId,
+  bulkSelect= undefined
 }) => {
   const intl = useIntl();
 
@@ -81,6 +95,7 @@ export const TableToolbarView: React.ComponentType<TableToolbarViewProps> = ({
   const renderToolbar = () => (
     <PrimaryToolbar
       pagination={paginationConfig}
+      bulkSelect={bulkSelect}
       {...(toolbarButtons && {
         actionsConfig: {
           dropdownProps: {
@@ -140,6 +155,7 @@ export const TableToolbarView: React.ComponentType<TableToolbarViewProps> = ({
           )}
           {pagination.count! > 0 && (
             <PrimaryToolbar
+              bulkSelect={bulkSelect}
               pagination={{
                 ...paginationConfig,
                 dropDirection: 'up',

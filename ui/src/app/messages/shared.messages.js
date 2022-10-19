@@ -195,9 +195,17 @@ const sharedMessages = defineMessages({
     id: 'project.removeProject',
     defaultMessage: 'Delete project'
   },
+  projectsRemoveTitle: {
+    id: 'project.removeProjects',
+    defaultMessage: 'Delete selected projects'
+  },
   projectRemoveDescription: {
     id: 'project.removeProjectDescription',
     defaultMessage: 'Are you sure you want to delete the project below?'
+  },
+  projectsRemoveDescription: {
+    id: 'project.removeProjectDescription',
+    defaultMessage: 'Are you sure you want to delete the selected projects?'
   },
   projectPlaceholder: {
     id: 'activation.projectPlaceholder',
