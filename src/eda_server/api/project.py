@@ -14,9 +14,19 @@ from eda_server.db.models.project import (
     projects,
 )
 from eda_server.db.models.rulebook import rulebooks
-from eda_server.project import clone_project, sync_project
+from eda_server.project import GitCommandFailed, import_project
 
 router = APIRouter()
+
+
+async def project_by_name_exists_or_404(db: AsyncSession, project_name: str):
+    query = sa.select(sa.exists().where(projects.c.name == project_name))
+    project_exists = await db.scalar(query)
+    if project_exists:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=f"Project with name '{project_name}' already exists",
+        )
 
 
 @router.get(
@@ -39,45 +49,22 @@ async def list_projects(db: AsyncSession = Depends(get_db_session)):
     tags=["projects"],
 )
 async def create_project(
-    project: schema.ProjectCreate, db: AsyncSession = Depends(get_db_session)
+    data: schema.ProjectCreate, db: AsyncSession = Depends(get_db_session)
 ):
-    found_hash, tempdir = await clone_project(project.url, project.git_hash)
-    project.git_hash = found_hash
+    # Close a transaction before the project is cloned.
+    async with db.begin():
+        await project_by_name_exists_or_404(db, data.name)
 
-    query = sa.select(sa.exists().where(projects.c.name == project.name))
-    project_exists = await db.scalar(query)
-    if project_exists:
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail=f"Project with name '{project.name}' already exists",
-        )
+    async with db.begin():
+        try:
+            project = await import_project(db, data)
+        except GitCommandFailed:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail="Cannot clone repository.",
+            )
 
-    query = (
-        sa.insert(projects)
-        .values(
-            url=project.url,
-            git_hash=project.git_hash,
-            name=project.name,
-            description=project.description,
-        )
-        .returning(projects.c.id, projects.c.large_data_id)
-    )
-    try:
-        result = await db.execute(query)
-    except sa.exc.IntegrityError:
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail="Unprocessable Entity.",
-        )
-
-    project_id, large_data_id = result.first()
-    await sync_project(project_id, large_data_id, tempdir, db)
-    await db.commit()
-
-    query = sa.select(projects).where(projects.c.id == project_id)
-    created_project = (await db.execute(query)).first()
-
-    return created_project
+    return project
 
 
 @router.get(
