@@ -28,7 +28,6 @@ const inventoryEndpoint = 'http://' + getServer() + '/api/inventory';
 
 export const fetchInventory = (inventoryId, pagination=defaultSettings) =>
 {
-  console.log('Debug - removeInventory: ', inventoryId);
   return fetch(`${inventoryEndpoint}/${inventoryId}`, {
     headers: {
       'Content-Type': 'application/json',

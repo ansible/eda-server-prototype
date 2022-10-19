@@ -16,7 +16,6 @@ import {defaultSettings} from "@app/shared/pagination";
 import {JobType} from "@app/Job/Job";
 import {useDispatch} from "react-redux";
 import {addNotification} from "@redhat-cloud-services/frontend-components-notifications";
-import {fetchProject} from "@app/RemoveProject/RemoveProject";
 
 interface IRemoveJob {
   ids?: Array<string|number>,

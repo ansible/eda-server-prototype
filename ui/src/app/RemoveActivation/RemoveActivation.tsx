@@ -62,8 +62,8 @@ const RemoveActivation: React.ComponentType<IRemoveActivation> = ( {ids = [],
     }
 
     ( removeId ? removeActivation(removeId) : removeActivations(ids))
-    .catch((error) => {
-      //TODO - when the endpoint error on POST is fixed, remove the fetch data and the resetSelected activations on error
+      .catch((error) => {
+        //TODO - when the endpoint error on POST is fixed, remove the fetch data and the resetSelected activations on error
         if(fetchData) {
           fetchData(pagination);
         }
