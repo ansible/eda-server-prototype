@@ -229,10 +229,10 @@ const Projects: React.FunctionComponent = () => {
   ];
 
   const selectAllFunction = () =>
-      stateDispatch({type: 'selectAll', payload: data.map((wf) => wf.id)});
+      stateDispatch({type: 'selectAll', payload: data.map(( item) =>  item.id)});
 
   const unselectAllFunction = () =>
-    stateDispatch({type: 'unselectAll', payload: data.map((wf) => wf.id)});
+    stateDispatch({type: 'unselectAll', payload: data.map(( item) =>  item.id)});
 
   const anyProjectsSelected = selectedProjects.length > 0;
 

@@ -21,13 +21,13 @@ interface IRemoveActivation {
   ids?: Array<string|number>,
   fetchData?: any,
   pagination?: PaginationConfiguration,
-  setSelectedActivations?: any
+  resetSelectedActivations?: any
 }
-const activationEndpoint = 'http://' + getServer() + '/api/activation_instance/';
+const activationEndpoint = 'http://' + getServer() + '/api/activation_instance';
 
 export const fetchActivation = (activationId, pagination=defaultSettings) =>
 {
-  return fetch(`${activationEndpoint}${activationId}`, {
+  return fetch(`${activationEndpoint}/${activationId}`, {
     headers: {
       'Content-Type': 'application/json',
     },
@@ -37,19 +37,33 @@ export const fetchActivation = (activationId, pagination=defaultSettings) =>
 const RemoveActivation: React.ComponentType<IRemoveActivation> = ( {ids = [],
                                              fetchData = null,
                                              pagination = defaultSettings,
-                                             setSelectedActivations = null } ) => {
+                                             resetSelectedActivations = null } ) => {
   const intl = useIntl();
   const dispatch = useDispatch();
   const [activation, setActivation] = useState<ActivationType>();
   const { id } = useParams<{id:string}>();
   const { push, goBack } = useHistory();
 
-  const removeActivation = async (activationId) =>
-    removeData(`${activationEndpoint}${activationId}`);
+  const removeId = id ? id : ( !id && ids && ids.length === 1 ) ? ids[0] : undefined;
+
+  const removeActivation = (activationId) => removeData(`${activationEndpoint}/${activationId}`);
+
+  async function removeActivations(ids) {
+    return Promise.all(
+      ids.map(
+        async (id) => await removeActivation(id)
+      )
+    );
+  }
 
   const onSubmit = () => {
-    removeActivation(id).then(() => { if(fetchData) { fetchData(pagination);} push('/activations');})
+    if ( !id && !(ids && ids.length > 0 )) {
+      return;
+    }
+
+    ( removeId ? removeActivation(removeId) : removeActivations(ids))
     .catch((error) => {
+      //TODO - when the endpoint error on POST is fixed, remove the fetch data and the resetSelected activations on error
         if(fetchData) {
           fetchData(pagination);
         }
@@ -62,19 +76,22 @@ const RemoveActivation: React.ComponentType<IRemoveActivation> = ( {ids = [],
           })
         );
         push('/activations');
-      });
+      })
+      .then(() => push('/activations'))
+      .then(() => { if ( !id ) { resetSelectedActivations();} })
+      .then(() => { if(fetchData) { fetchData(pagination) } });
   };
 
   useEffect(() => {
-    fetchActivation(id).then(data => setActivation(data))
-  }, []);
+    fetchActivation(id || removeId).then(data => setActivation(data))
+  }, [removeId]);
 
   return <Modal
       aria-label={
         intl.formatMessage(sharedMessages.activationRemoveTitle) as string
       }
       titleIconVariant="warning"
-      title={intl.formatMessage(sharedMessages.activationRemoveTitle)}
+      title={ removeId ? intl.formatMessage(sharedMessages.activationRemoveTitle) : intl.formatMessage(sharedMessages.activationsRemoveTitle)}
       isOpen
       variant="small"
       onClose={goBack}
@@ -104,15 +121,18 @@ const RemoveActivation: React.ComponentType<IRemoveActivation> = ( {ids = [],
       <StackItem>
         <TextContent>
           <Text component={TextVariants.p}>
-            {intl.formatMessage(sharedMessages.activationRemoveDescription)}
+            { removeId ? intl.formatMessage(sharedMessages.activationRemoveDescription)
+              : intl.formatMessage(sharedMessages.activationsRemoveDescription)}
           </Text>
         </TextContent>
       </StackItem>
       <StackItem>
         <TextContent>
-          <Text component={TextVariants.p}>
-            <strong>{ activation?.name }</strong>
-          </Text>
+          { removeId ? <Text component={TextVariants.p}>
+            <strong> { activation?.name } </strong>
+          </Text> : <Text component={TextVariants.p}>
+            <strong> { `${ids.length} selected`  } </strong>
+          </Text>  }
         </TextContent>
       </StackItem>
     </Stack>

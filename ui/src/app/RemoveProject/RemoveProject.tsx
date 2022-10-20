@@ -61,10 +61,8 @@ const RemoveProject: React.ComponentType<IRemoveProject> = ( {ids = [],
     if ( !id && !(ids && ids.length > 0 )) {
       return;
     }
-
-    ( removeId ? removeProject(removeId) : removeProjects(ids)).then(() => { if(fetchData) { fetchData(pagination)} push('/projects');})
+    (removeId ? removeProject(removeId) : removeProjects(ids))
     .catch((error) => {
-      if(fetchData) { fetchData(pagination) }
       push('/projects');
       dispatch(
         addNotification({
@@ -74,12 +72,14 @@ const RemoveProject: React.ComponentType<IRemoveProject> = ( {ids = [],
           description: `${intl.formatMessage(sharedMessages.delete_project_failure)}  ${error}`
         })
       );
-    });
+    }).then(() => push('/projects'))
+      .then(() => { if ( !id ) { resetSelectedProjects();} })
+      .then(() => { if(fetchData) { fetchData(pagination) } })
   };
 
   useEffect(() => {
-    fetchProject(id).then(data => setProject(data))
-  }, []);
+    fetchProject(id || removeId).then(data => setProject(data))
+  }, [removeId]);
 
   return <Modal
       aria-label={

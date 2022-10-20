@@ -303,9 +303,17 @@ const sharedMessages = defineMessages({
     id: 'activation.removeActivation',
     defaultMessage: 'Delete rulebook activation'
   },
+  activationsRemoveTitle: {
+    id: 'activation.removeActivations',
+    defaultMessage: 'Delete selected rulebook activations'
+  },
   activationRemoveDescription: {
     id: 'activation.removeActivationDescription',
     defaultMessage: 'Are you sure you want to delete the rulebook activation below?'
+  },
+  activationsRemoveDescription: {
+    id: 'activation.removeActivationsDescription',
+    defaultMessage: 'Are you sure you want to delete the selected rulebook activations?'
   },
   activations: {
     id: 'activation.activations',
