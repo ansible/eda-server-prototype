@@ -38,7 +38,7 @@ export interface InventoryType {
 
 const endpoint = 'http://' + getServer() + '/api/inventories/';
 
-const columns = (intl, selectedAll, selectAll) => [
+const columns = (intl) => [
   {
     title: (''),
     transforms: [cellWidth(10 )]
@@ -191,25 +191,26 @@ const Inventories: React.FunctionComponent = () => {
       : stateDispatch({type: 'setFilterValue', payload: value});
   };
 
-  const routes = () => <Fragment>
-    <Route
-      exact
-      path={'/inventories/new-inventory'}
-      render={(props: AnyObject) => (
-        <NewInventory {...props} />
-      )}
-    />
-    <Route exact path="/inventories/remove/:id"
-           render={ props => <RemoveInventory { ...props }
-                                               fetchData={ handlePagination }
-                                               setSelectedInventories={setSelectedInventories } /> }/>
-    <Route exact path="/inventories/remove"
-           render={ props => <RemoveInventory { ...props }
-                                               ids={ selectedInventories }
-                                               fetchData={ handlePagination }
-                                               setSelectedInventories={ setSelectedInventories } /> }/>
-  </Fragment>;
-
+  const routes = () => (
+    <Fragment>
+      <Route
+        exact
+        path={'/new-inventory'}>
+        <NewInventory/>
+      </Route>
+      <Route exact path="/inventories/remove"
+             render={ props => <RemoveInventory { ...props }
+                                              ids={ selectedInventories }
+                                              fetchData={ handlePagination }
+                                              resetSelectedInventories={() =>
+                                                stateDispatch({ type: 'resetSelected' })
+                                              }/>}/>
+      <Route exact path="/inventories/remove/:id"
+             render={ props => <RemoveInventory { ...props }
+                                              fetchData={ handlePagination }
+             /> }/>
+    </Fragment>
+  );
 
   const actionResolver = () => [
     {
@@ -231,11 +232,29 @@ const Inventories: React.FunctionComponent = () => {
   ];
 
   const selectAllFunction = () =>
-    selectedAll
-      ? stateDispatch({type: 'unselectAll', payload: data.map((wf) => wf.id)})
-      : stateDispatch({type: 'selectAll', payload: data.map((wf) => wf.id)});
+      stateDispatch({type: 'selectAll', payload: data.map(( item) =>  item.id)});
+  const unselectAllFunction = () =>
+    stateDispatch({type: 'unselectAll', payload: data.map(( item) =>  item.id)});
 
   const anyInventoriesSelected = selectedInventories.length > 0;
+
+  const bulkSelectProps = React.useMemo(() => {
+    return {
+      count: selectedInventories.length || 0,
+      items: [
+        {
+          title: 'Select none (0)',
+          onClick: unselectAllFunction
+        },
+        {
+          title: `Select all (${inventories.length || 0})`,
+          onClick: selectAllFunction
+        }
+      ],
+      checked: selectedInventories.length === inventories.length,
+      onSelect: (isChecked: boolean) => isChecked ? selectAllFunction() : unselectAllFunction()
+    };
+  }, [ selectedInventories.length, inventories.length ]);
 
   const toolbarButtons = () => (
     <ToolbarGroup className={`pf-u-pl-lg top-toolbar`}>
@@ -290,7 +309,8 @@ const Inventories: React.FunctionComponent = () => {
             rows={rows}
             setLimit={setLimit}
             setOffset={setOffset}
-            columns={columns(intl, selectedAll, selectAllFunction)}
+            columns={columns(intl)}
+            bulkSelect={bulkSelectProps}
             fetchData={handlePagination}
             routes={routes}
             actionResolver={actionResolver}

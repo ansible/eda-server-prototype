@@ -583,9 +583,17 @@ const sharedMessages = defineMessages({
     id: 'inventory.removeInventory',
     defaultMessage: 'Delete inventory'
   },
+  inventoriesRemoveTitle: {
+    id: 'inventory.removeInventories',
+    defaultMessage: 'Delete inventories'
+  },
   inventoryRemoveDescription: {
     id: 'inventory.removeInventoryDescription',
     defaultMessage: 'Are you sure you want to delete the inventory below?'
+  },
+  inventoriesRemoveDescription: {
+    id: 'inventory.removeInventoriesDescription',
+    defaultMessage: 'Are you sure you want to delete the selected inventories?'
   },
   addInventory: {
     id: 'inventory.addInventory',

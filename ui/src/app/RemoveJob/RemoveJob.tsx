@@ -16,6 +16,7 @@ import {defaultSettings} from "@app/shared/pagination";
 import {JobType} from "@app/Job/Job";
 import {useDispatch} from "react-redux";
 import {addNotification} from "@redhat-cloud-services/frontend-components-notifications";
+import {fetchProject} from "@app/RemoveProject/RemoveProject";
 
 interface IRemoveJob {
   ids?: Array<string|number>,
@@ -77,8 +78,8 @@ const RemoveJob: React.ComponentType<IRemoveJob> = ( {ids = [],
   };
 
   useEffect(() => {
-    fetchJob(id).then(data => setJob(data))
-  }, []);
+    fetchJob(id || removeId).then(data => setJob(data))
+  }, [removeId]);
 
   return <Modal
       aria-label={
