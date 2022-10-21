@@ -44,7 +44,6 @@ const RemoveProject: React.ComponentType<IRemoveProject> = ( {ids = [],
   const{ id } = useParams<{id:string}>();
   const { push, goBack } = useHistory();
 
-  console.log('Debig removeProject - id, ids', id, ids);
   const removeId = id ? id : ( !id && ids && ids.length === 1 ) ? ids[0] : undefined;
 
   const removeProject = (projectId) => removeData(`${projectEndpoint}/${projectId}`);

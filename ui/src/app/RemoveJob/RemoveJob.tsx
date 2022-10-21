@@ -124,7 +124,7 @@ const RemoveJob: React.ComponentType<IRemoveJob> = ( {ids = [],
       <StackItem>
         <TextContent>
           { removeId ? <Text component={TextVariants.p}>
-            <strong> { job?.name } </strong>
+            <strong> { job?.name || `Job ${job?.id}` } </strong>
           </Text> : <Text component={TextVariants.p}>
             <strong> { `${ids.length} selected`  } </strong>
           </Text>  }
