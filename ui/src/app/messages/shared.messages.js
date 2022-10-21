@@ -531,9 +531,17 @@ const sharedMessages = defineMessages({
     id: 'job.removeJob',
     defaultMessage: 'Delete job'
   },
+  jobsRemoveTitle: {
+    id: 'job.removeJobs',
+    defaultMessage: 'Delete jobs'
+  },
   jobRemoveDescription: {
     id: 'job.removeJobDescription',
     defaultMessage: 'Are you sure you want to delete the job below?'
+  },
+  jobsRemoveDescription: {
+    id: 'job.removeJobsDescription',
+    defaultMessage: 'Are you sure you want to delete the selected jobs?'
   },
   add_job_success: {
     id: 'job.addProjectSuccess',

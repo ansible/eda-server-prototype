@@ -21,7 +21,7 @@ interface IRemoveJob {
   ids?: Array<string|number>,
   fetchData?: any,
   pagination?: PaginationConfiguration,
-  setSelectedJobs?: any
+  resetSelectedJobs?: any
 }
 const jobEndpoint = 'http://' + getServer() + '/api/job_instance';
 
@@ -37,19 +37,31 @@ export const fetchJob = (jobId, pagination=defaultSettings) =>
 const RemoveJob: React.ComponentType<IRemoveJob> = ( {ids = [],
                                              fetchData = null,
                                              pagination = defaultSettings,
-                                             setSelectedJobs = null} ) => {
+                                             resetSelectedJobs = null} ) => {
   const intl = useIntl();
   const dispatch = useDispatch();
   const [job, setJob] = useState<JobType>();
   const { id } = useParams<{id:string}>();
   const { push, goBack } = useHistory();
 
+  const removeId = id ? id : ( !id && ids && ids.length === 1 ) ? ids[0] : undefined;
+
   const removeJob = (jobId) => removeData(`${jobEndpoint}/${jobId}`);
 
+  async function removeJobs(ids) {
+    return Promise.all(
+      ids.map(
+        async (id) => await removeJob(id)
+      )
+    );
+  }
+
   const onSubmit = () => {
-    removeJob(id).then(() => { if(fetchData) { fetchData(pagination);} push('/jobs');})
+    if ( !id && !(ids && ids.length > 0 )) {
+      return;
+    }
+    (removeId ? removeJob(removeId) : removeJobs(ids))
     .catch((error) => {
-      if(fetchData) { fetchData(pagination);}
       push('/jobs');
       dispatch(
         addNotification({
@@ -59,7 +71,9 @@ const RemoveJob: React.ComponentType<IRemoveJob> = ( {ids = [],
           description: `${intl.formatMessage(sharedMessages.delete_job_failure)}  ${error}`
         })
       );
-    });
+    }).then(() => push('/jobs'))
+      .then(() => { if ( !id ) { resetSelectedJobs();} })
+      .then(() => { if(fetchData) { fetchData(pagination) } })
   };
 
   useEffect(() => {
@@ -71,7 +85,7 @@ const RemoveJob: React.ComponentType<IRemoveJob> = ( {ids = [],
         intl.formatMessage(sharedMessages.jobRemoveTitle) as string
       }
       titleIconVariant="warning"
-      title={intl.formatMessage(sharedMessages.jobRemoveTitle)}
+      title={ removeId ? intl.formatMessage(sharedMessages.jobRemoveTitle) : intl.formatMessage(sharedMessages.jobsRemoveTitle)}
       isOpen
       variant="small"
       onClose={goBack}
@@ -101,15 +115,18 @@ const RemoveJob: React.ComponentType<IRemoveJob> = ( {ids = [],
       <StackItem>
         <TextContent>
           <Text component={TextVariants.p}>
-            {intl.formatMessage(sharedMessages.jobRemoveDescription)}
+            { removeId ? intl.formatMessage(sharedMessages.jobRemoveDescription)
+              : intl.formatMessage(sharedMessages.jobsRemoveDescription)}
           </Text>
         </TextContent>
       </StackItem>
       <StackItem>
         <TextContent>
-          <Text component={TextVariants.p}>
-            <strong>{ job?.name || `Job ${job?.id}` }</strong>
-          </Text>
+          { removeId ? <Text component={TextVariants.p}>
+            <strong> { job?.name } </strong>
+          </Text> : <Text component={TextVariants.p}>
+            <strong> { `${ids.length} selected`  } </strong>
+          </Text>  }
         </TextContent>
       </StackItem>
     </Stack>

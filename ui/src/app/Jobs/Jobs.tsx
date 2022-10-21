@@ -27,9 +27,9 @@ interface JobRowType {
   isChecked: boolean
 }
 
-const endpoint = 'http://' + getServer() + '/api/job_instances/';
+const endpoint = 'http://' + getServer() + '/api/job_instances';
 
-const columns = (intl, selectedAll, selectAll) => [
+const columns = (intl) => [
   {
     title: (''),
     transforms: [cellWidth(10 )]
@@ -205,15 +205,17 @@ const Jobs: React.FunctionComponent = () => {
         path={'/new-job'}>
         <NewJob/>
       </Route>
+      <Route exact path="/jobs/remove"
+             render={ props => <RemoveJob { ...props }
+                                              ids={ selectedJobs }
+                                              fetchData={ handlePagination }
+                                              resetSelectedJobs={() =>
+                                                stateDispatch({ type: 'resetSelected' })
+                                              }/>}/>
       <Route exact path="/jobs/remove/:id"
              render={ props => <RemoveJob { ...props }
-                                                 fetchData={ handlePagination }
-                                                 setSelectedJobs={setSelectedJobs } /> }/>
-      <Route exact path="/activations/remove"
-             render={ props => <RemoveJob { ...props }
-                                                 ids={ selectedJobs }
-                                                 fetchData={ handlePagination }
-                                                 setSelectedJobs={ setSelectedJobs } /> }/>
+                                              fetchData={ handlePagination }
+             /> }/>
     </Fragment>
   );
 
@@ -229,11 +231,30 @@ const Jobs: React.FunctionComponent = () => {
   ];
 
   const selectAllFunction = () =>
-    selectedAll
-      ? stateDispatch({type: 'unselectAll', payload: data.map((wf) => wf.id)})
-      : stateDispatch({type: 'selectAll', payload: data.map((wf) => wf.id)});
+      stateDispatch({type: 'selectAll', payload: data.map(( item) =>  item.id)});
+
+  const unselectAllFunction = () =>
+    stateDispatch({type: 'unselectAll', payload: data.map(( item) =>  item.id)});
 
   const anyJobsSelected = selectedJobs.length > 0;
+
+  const bulkSelectProps = React.useMemo(() => {
+    return {
+      count: selectedJobs.length || 0,
+      items: [
+        {
+          title: 'Select none (0)',
+          onClick: unselectAllFunction
+        },
+        {
+          title: `Select all (${jobs.length || 0})`,
+          onClick: selectAllFunction
+        }
+      ],
+      checked: selectedJobs.length === jobs.length,
+      onSelect: (isChecked: boolean) => isChecked ? selectAllFunction() : unselectAllFunction()
+    };
+  }, [ selectedJobs.length, jobs.length ]);
 
   const toolbarButtons = () => (
     <ToolbarGroup className={`pf-u-pl-lg top-toolbar`}>
@@ -255,7 +276,7 @@ const Jobs: React.FunctionComponent = () => {
         <Link
           id="remove-multiple-jobs"
           className={anyJobsSelected ? '' : 'disabled-link'}
-          to={{pathname: '/remove-jobs'}}
+          to={{pathname: '/jobs/remove'}}
         >
           <Button
             variant="secondary"
@@ -288,7 +309,8 @@ const Jobs: React.FunctionComponent = () => {
             rows={rows}
             setLimit={setLimit}
             setOffset={setOffset}
-            columns={columns(intl, selectedAll, selectAllFunction)}
+            columns={columns(intl)}
+            bulkSelect={bulkSelectProps}
             fetchData={handlePagination}
             routes={routes}
             actionResolver={actionResolver}
