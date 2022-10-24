@@ -8,16 +8,13 @@ import {
   FormSelect,
   FormSelectOption,
   PageSection,
-  SimpleList as PFSimpleList,
   Text,
-  TextInput,
   TextVariants,
   Title,
   ValidatedOptions
 } from '@patternfly/react-core';
-import {Link, useHistory} from "react-router-dom";
+import {useHistory} from "react-router-dom";
 import React, {useEffect, useState} from 'react';
-import {getServer, postData} from '@app/utils/utils';
 import styled from 'styled-components';
 import {TopToolbar} from "@app/shared/top-toolbar";
 import {ExclamationCircleIcon} from "@patternfly/react-icons";
@@ -25,19 +22,14 @@ import {useIntl} from "react-intl";
 import sharedMessages from "../messages/shared.messages";
 import {addNotification} from '@redhat-cloud-services/frontend-components-notifications';
 import {useDispatch} from "react-redux";
+import {listInventories} from "@app/API/Inventory";
+import {listExtraVars} from "@app/API/Extravar";
+import {listPlaybooks} from "@app/API/Playbook";
+import {addJob} from "@app/API/Job";
 
 const CardBody = styled(PFCardBody)`
   white-space: pre-wrap;
   `
-const SimpleList = styled(PFSimpleList)`
-  white-space: pre-wrap;
-`
-
-const endpoint_job = 'http://' + getServer() + '/api/job_instance/';
-const endpoint_playbooks = 'http://' + getServer() + '/api/playbooks/';
-const endpoint_inventories = 'http://' + getServer() + '/api/inventories/';
-const endpoint_vars = 'http://' + getServer() + '/api/extra_vars/';
-
 const NewJob: React.FunctionComponent = () => {
   const history = useHistory();
   const intl = useIntl();
@@ -55,29 +47,16 @@ const NewJob: React.FunctionComponent = () => {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   useEffect(() => {
-     fetch(endpoint_playbooks, {
-       headers: {
-         'Content-Type': 'application/json',
-       },
-     }).then(response => response.json())
-    .then(data => setPlaybooks([...playbooks, ...data]));
+     listPlaybooks().then(data => setPlaybooks([...playbooks, ...data]));
   }, []);
 
   useEffect(() => {
-     fetch(endpoint_inventories, {
-       headers: {
-         'Content-Type': 'application/json',
-       },
-     }).then(response => response.json())
+     listInventories()
     .then(data => setInventories([...inventories, ...data]));
   }, []);
 
   useEffect(() => {
-     fetch(endpoint_vars, {
-       headers: {
-         'Content-Type': 'application/json',
-       },
-     }).then(response => response.json())
+     listExtraVars()
     .then(data => setExtraVars([...extravars, ...data]));
   }, []);
 
@@ -137,12 +116,13 @@ const NewJob: React.FunctionComponent = () => {
     if ( !validateFields() )
       return;
     setIsSubmitting(true);
-    postData(endpoint_job, { name: name,
-                         playbook_id: playbook,
-                         inventory_id: inventory,
-                         extra_var_id: extravar})
-      .then(data => {
-        setIsSubmitting(false);
+    addJob( {
+      name: '',
+      playbook_id: playbook,
+      inventory_id: inventory,
+      extra_var_id: extravar
+    }).then(data => {
+      setIsSubmitting(false);
         data?.id ? history.push(`/job/${data.id}`) :
           history.push(`/jobs`);
         dispatch(

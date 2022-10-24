@@ -11,7 +11,6 @@ import {
 } from '@patternfly/react-core';
 import {useIntl} from "react-intl";
 import sharedMessages from "../messages/shared.messages";
-import {getServer, removeData} from "@app/utils/utils";
 import {defaultSettings} from "@app/shared/pagination";
 import {InventoryType} from "@app/Inventories/Inventories";
 import {addNotification} from "@redhat-cloud-services/frontend-components-notifications";

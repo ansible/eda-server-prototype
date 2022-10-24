@@ -14,7 +14,7 @@ import {
 } from '@patternfly/react-core';
 import {useHistory} from "react-router-dom";
 import React, {useEffect, useState} from 'react';
-import {getServer, postData} from '@app/utils/utils';
+import {getServer} from '@app/utils/utils';
 import styled from 'styled-components';
 import {TopToolbar} from "@app/shared/top-toolbar";
 import {ExclamationCircleIcon} from "@patternfly/react-icons";
@@ -33,8 +33,6 @@ import {listProjects} from "@app/API/Project";
 const CardBody = styled(PFCardBody)`
   white-space: pre-wrap;
   `
-const project_endpoint = 'http://' + getServer() + '/api/projects';
-
 export interface ExecutionEnvironmentType {
   id: string;
   name?: string;

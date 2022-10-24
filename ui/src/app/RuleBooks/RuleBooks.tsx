@@ -1,8 +1,7 @@
 import {PageSection, Title} from '@patternfly/react-core';
-import {Route, useHistory} from 'react-router-dom';
+import {useHistory} from 'react-router-dom';
 import React, {useState, useEffect, useReducer, Fragment} from 'react';
 import { Button } from '@patternfly/react-core';
-import {getServer} from '@app/utils/utils';
 import {TopToolbar} from '../shared/top-toolbar';
 import { PlusCircleIcon } from '@patternfly/react-icons';
 import sharedMessages from '../messages/shared.messages';
@@ -14,8 +13,7 @@ import {defaultSettings} from "@app/shared/pagination";
 import {createRows} from "@app/RuleBooks/rulebooks-table-helpers";
 import {RuleSetType} from "@app/RuleSet/ruleset";
 import {RuleBookType} from "@app/RuleBook/rulebook";
-
-const endpoint = 'http://' + getServer() + '/api/rulebooks';
+import {listRuleBooks} from "@app/API/Rulebook";
 
 const columns = (intl) => [
   {
@@ -83,12 +81,6 @@ export const RuleSetsListState = (state, action) => {
   }
 };
 
-const fetchRuleBooks = (pagination = defaultSettings) => fetch(endpoint, {
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
-
 const RuleBooks: React.FunctionComponent = () => {
   const intl = useIntl();
   const history = useHistory();
@@ -115,13 +107,13 @@ const RuleBooks: React.FunctionComponent = () => {
 
   const updateRuleBooks = (pagination) => {
     stateDispatch({type: 'setFetching', payload: true});
-    return fetchRuleBooks(pagination)
+    return listRuleBooks(pagination)
       .then(() => stateDispatch({type: 'setFetching', payload: false}))
       .catch(() => stateDispatch({type: 'setFetching', payload: false}));
   };
 
   useEffect(() => {
-    fetchRuleBooks().then(response => response.json())
+    listRuleBooks().then(response => response.json())
       .then(data => { setRuleBooks(data);
         stateDispatch({type: 'setRows', payload: createRows(ruleBooks)});});
   }, []);

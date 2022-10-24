@@ -11,6 +11,7 @@ import {createRows} from "./rulesets-table-helpers";
 import {CubesIcon} from "@patternfly/react-icons";
 import {renderRuleBookTabs, RuleBookType, RuleSetType} from "@app/RuleBook/rulebook";
 import {getServer} from "@app/utils/utils";
+import {fetchRulebookRuleSets} from "@app/API/Rulebook";
 
 const columns = (intl) => [
   {
@@ -72,15 +73,6 @@ export const rulesetsListState = (state, action) => {
       return state;
   }
 };
-const endpoint_rulesets = 'http://' + getServer() + '/api/rulebook_json/';
-const fetchRulebookRuleSets = (id, pagination=defaultSettings) =>
-{
-  return fetch(`${endpoint_rulesets}${id}`, {
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  }).then(response => response.json()).then(data => ( data ? data.rulesets : []))
-}
 
 const RulebookRulesets: React.FunctionComponent<{rulebook: RuleBookType}> = ({rulebook}) => {
   const history = useHistory();

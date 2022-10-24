@@ -8,7 +8,7 @@ import {
   StackItem,
   Title
 } from '@patternfly/react-core';
-import {Link, useParams} from 'react-router-dom';
+import {useParams} from 'react-router-dom';
 import React from 'react';
 import {renderRuleBookTabs, RuleBookType} from "@app/RuleBook/rulebook";
 import {useIntl} from "react-intl";

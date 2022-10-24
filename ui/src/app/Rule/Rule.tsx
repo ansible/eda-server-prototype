@@ -4,13 +4,13 @@ import React, {useState, useEffect, ReactNode} from 'react';
 import {useIntl} from "react-intl";
 import AppTabs from "@app/shared/app-tabs";
 import {CaretLeftIcon} from "@patternfly/react-icons";
-import {getServer, getTabFromPath} from "@app/utils/utils";
+import {getTabFromPath} from "@app/utils/utils";
 import {TopToolbar} from "@app/shared/top-toolbar";
 import {RuleDetails} from "@app/Rule/rule-details";
-import {defaultSettings} from "@app/shared/pagination";
 import {RuleType} from "@app/Rules/Rules";
 import sharedMessages from "../messages/shared.messages";
 import {AnyObject} from "@app/shared/types/common-types";
+import {fetchRule} from "@app/API/Rule";
 
 interface TabItemType {
   eventKey: number;
@@ -37,17 +37,6 @@ export const renderRuleTabs = (ruleId: string, intl) => {
   const rule_tabs = buildRuleTabs(ruleId, intl);
   return <AppTabs tabItems={rule_tabs}/>
 };
-
-const endpoint_rule = 'http://' + getServer() + '/api/rules/';
-
-export const fetchRule = (ruleId, pagination=defaultSettings) =>
-{
-  return fetch(`${endpoint_rule}${ruleId}`, {
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  }).then(response => response.json());
-}
 
 const Rule: React.FunctionComponent = () => {
 

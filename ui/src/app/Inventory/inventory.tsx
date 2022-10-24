@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import {useIntl} from "react-intl";
 import AppTabs from "@app/shared/app-tabs";
 import {CaretLeftIcon} from "@patternfly/react-icons";
-import {getServer, getTabFromPath} from "@app/utils/utils";
+import {getTabFromPath} from "@app/utils/utils";
 import {TopToolbar} from "@app/shared/top-toolbar";
 import {InventoryDetails} from "@app/Inventory/inventory-details";
 import sharedMessages from "../messages/shared.messages";

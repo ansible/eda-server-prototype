@@ -1,4 +1,4 @@
-import {Checkbox, PageSection, Title, ToolbarGroup, ToolbarItem} from '@patternfly/react-core';
+import {PageSection, Title, ToolbarGroup, ToolbarItem} from '@patternfly/react-core';
 import {Link, Route, useHistory} from 'react-router-dom';
 import React, {useState, useEffect, useReducer, Fragment} from 'react';
 import { Button } from '@patternfly/react-core';
@@ -15,6 +15,7 @@ import {defaultSettings} from "@app/shared/pagination";
 import {NewJob} from "@app/NewJob/NewJob";
 import {createRows} from "@app/Jobs/jobs-table-helpers";
 import {RemoveJob} from "@app/RemoveJob/RemoveJob";
+import {listJobs} from "@app/API/Job";
 
 interface JobType {
   id: string;
@@ -26,8 +27,6 @@ interface JobRowType {
   name?: string;
   isChecked: boolean
 }
-
-const endpoint = 'http://' + getServer() + '/api/job_instances';
 
 const columns = (intl) => [
   {
@@ -124,12 +123,6 @@ export const jobsListState = (state, action) => {
   }
 };
 
-const fetchJobs = (pagination = defaultSettings) => fetch(endpoint, {
-  headers: {
-    'Content-Type': 'application/json',
-  },
-}).then(response => response.json());
-
 const Jobs: React.FunctionComponent = () => {
   const intl = useIntl();
   const history = useHistory();
@@ -157,7 +150,7 @@ const Jobs: React.FunctionComponent = () => {
 
   const handlePagination = (pagination) => {
     stateDispatch({type: 'setFetching', payload: true});
-    return fetchJobs(pagination).then(data => { setJobs(data); stateDispatch({type: 'setRows', payload: createRows(jobs)});})
+    return listJobs(pagination).then(data => { setJobs(data); stateDispatch({type: 'setRows', payload: createRows(jobs)});})
       .then(() => {stateDispatch({type: 'setFetching', payload: false});})
       .catch(() => stateDispatch({type: 'setFetching', payload: false}));
   };

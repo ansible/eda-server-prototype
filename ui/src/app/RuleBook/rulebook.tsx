@@ -10,6 +10,7 @@ import {RulebookRulesets} from "@app/RuleBook/rulebook-rulesets";
 import {RulebookDetails} from "@app/RuleBook/rulebook-details";
 import sharedMessages from "../messages/shared.messages";
 import {AnyObject, TabItemType} from "@app/shared/types/common-types";
+import {fetchRulebook} from "@app/API/Rulebook";
 
 export interface RuleBookType {
   id: string,
@@ -54,8 +55,6 @@ export const renderRuleBookTabs = (rulebookId: string, intl) => {
   return <AppTabs tabItems={rulebook_tabs}/>
 };
 
-const endpoint_rulebook = 'http://' + getServer() + '/api/rulebooks';
-
 const RuleBook: React.FunctionComponent = () => {
   const [rulebook, setRuleBook] = useState<RuleBookType|undefined>(undefined);
   const { id } = useParams<{id: string}>();
@@ -63,11 +62,7 @@ const RuleBook: React.FunctionComponent = () => {
   const intl = useIntl();
 
   useEffect(() => {
-    fetch(`${endpoint_rulebook}/${id}`, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    }).then(response => response.json())
+    fetchRulebook(id)
       .then(data => setRuleBook(data));
   }, []);
 

@@ -9,7 +9,7 @@ import React, {useState, useEffect, Fragment} from 'react';
 import AppTabs from "@app/shared/app-tabs";
 
 import {CaretLeftIcon} from "@patternfly/react-icons";
-import {getServer, getTabFromPath} from "@app/utils/utils";
+import {getTabFromPath} from "@app/utils/utils";
 import {TopToolbar} from "@app/shared/top-toolbar";
 import {ProjectDetails} from "@app/Project/project-details";
 import {ProjectLinks} from "@app/Project/project-links";

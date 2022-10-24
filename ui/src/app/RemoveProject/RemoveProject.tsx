@@ -12,7 +12,6 @@ import {
 import {useIntl} from "react-intl";
 import sharedMessages from "../messages/shared.messages";
 import {ProjectType} from "@app/shared/types/common-types";
-import {getServer, removeData} from "@app/utils/utils";
 import {defaultSettings} from "@app/shared/pagination";
 import {useDispatch} from "react-redux";
 import {addNotification} from "@redhat-cloud-services/frontend-components-notifications";

@@ -14,7 +14,6 @@ import {
 } from '@patternfly/react-core';
 import { Link } from 'react-router-dom';
 import React, {useState, useEffect} from 'react';
-import {getServer} from '@app/utils/utils';
 import {renderRuleTabs} from "@app/Rule/Rule";
 import ReactJsonView from 'react-json-view';
 import AceEditor from "react-ace";
@@ -24,8 +23,7 @@ import styled from 'styled-components';
 import {RuleType} from "@app/RuleSets/RuleSets";
 import {ExtraVarType} from "@app/Vars/Vars";
 import {useIntl} from "react-intl";
-
-const endpointVar = 'http://' + getServer() + '/api/extra_var/';
+import {fetchRuleVars} from "@app/API/Extravar";
 
 const FocusWrapper = styled.div`
   && + .keyboard-help-text {
@@ -47,15 +45,7 @@ const RuleDetails: React.FunctionComponent<{rule: RuleType}> = ({ rule }) => {
   const id = rule?.id;
   const intl = useIntl();
 
-  const fetchRuleVars = (varname) => {
-    return fetch(endpointVar + varname, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    }).then(response => response.json())
-  };
-
-    useEffect(() => {
+  useEffect(() => {
     rule?.extra_var_id ? fetchRuleVars(rule.extra_var_id)
       .then(data => setRuleVars(data)) : setRuleVars(undefined);
   }, [rule]);

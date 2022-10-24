@@ -1,8 +1,7 @@
-import {Checkbox, PageSection, Title, ToolbarGroup, ToolbarItem} from '@patternfly/react-core';
+import {Checkbox, PageSection, Title} from '@patternfly/react-core';
 import {Link, Route, useHistory} from 'react-router-dom';
 import React, {useState, useEffect, useReducer, Fragment} from 'react';
 import { Button } from '@patternfly/react-core';
-import {getServer} from '@app/utils/utils';
 import {TopToolbar} from '../shared/top-toolbar';
 import { PlusCircleIcon } from '@patternfly/react-icons';
 import sharedMessages from '../messages/shared.messages';
@@ -11,6 +10,7 @@ import TableEmptyState from "@app/shared/table-empty-state";
 import {useIntl} from "react-intl";
 import {defaultSettings} from "@app/shared/pagination";
 import {createRows} from "@app/Rules/rules-table-helpers";
+import {listRules} from "@app/API/Rule";
 
 export interface RuleType {
   id: string;
@@ -30,8 +30,6 @@ export interface RuleType {
   created_at?: string,
   updated_at?: string
 }
-
-const endpoint = 'http://' + getServer() + '/api/rules/';
 
 const columns = (intl) => [
   {
@@ -93,12 +91,6 @@ export const rulesListState = (state, action) => {
   }
 };
 
-const fetchRules = (pagination = defaultSettings) => fetch(endpoint, {
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
-
 const Rules: React.FunctionComponent = () => {
   const intl = useIntl();
   const history = useHistory();
@@ -106,7 +98,6 @@ const Rules: React.FunctionComponent = () => {
   const [limit, setLimit] = useState(defaultSettings.limit);
   const [offset, setOffset] = useState(1);
 
-  const data = rules;
   const meta = {count: rules?.length || 0, limit, offset};
   const [
     {
@@ -123,13 +114,13 @@ const Rules: React.FunctionComponent = () => {
 
   const updateRules = (pagination) => {
     stateDispatch({type: 'setFetching', payload: true});
-    return fetchRules(pagination)
+    return listRules(pagination)
       .then(() => stateDispatch({type: 'setFetching', payload: false}))
       .catch(() => stateDispatch({type: 'setFetching', payload: false}));
   };
 
   useEffect(() => {
-    fetchRules().then(response => response.json())
+    listRules().then(response => response.json())
       .then(data => { setRules(data); stateDispatch({type: 'setRows', payload: createRows(rules)});});
   }, []);
 

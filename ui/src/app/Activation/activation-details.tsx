@@ -25,14 +25,13 @@ import {ActivationType} from "@app/Activations/Activations";
 import {ExtraVarType} from "@app/Vars/Vars";
 import {useIntl} from "react-intl";
 import sharedMessages from "../messages/shared.messages";
+import {fetchRuleVars} from "@app/API/Extravar";
 
 const client = new WebSocket('ws://' + getServer() + '/api/ws');
 
 client.onopen = () => {
     console.log('Websocket client connected');
 };
-
-const endpointVar = 'http://' + getServer() + '/api/extra_var/';
 
 export const FocusWrapper = styled.div`
   && + .keyboard-help-text {
@@ -54,16 +53,8 @@ const ActivationDetails: React.FunctionComponent<{activation: ActivationType}> =
   const id = activation?.id;
   const intl = useIntl();
 
-  const fetchActivationVars = (varname) => {
-    return fetch(endpointVar + varname, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    }).then(response => response.json())
-  };
-
-    useEffect(() => {
-    activation?.extra_var_id ? fetchActivationVars(activation.extra_var_id)
+  useEffect(() => {
+    activation?.extra_var_id ? fetchRuleVars(activation.extra_var_id)
       .then(data => setActivationVars(data)) : setActivationVars(undefined);
   }, [activation]);
 

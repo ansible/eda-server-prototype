@@ -2,7 +2,6 @@ import { Title } from '@patternfly/react-core';
 import { useParams } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
 import { CodeBlock, CodeBlockCode  } from '@patternfly/react-core';
-import {getServer} from '@app/utils/utils';
 import {TopToolbar} from "@app/shared/top-toolbar";
 import {InventoryType} from "@app/RuleSets/RuleSets";
 import {fetchInventory} from "@app/API/Inventory";

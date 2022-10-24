@@ -1,4 +1,4 @@
-import { PageSection, Title } from '@patternfly/react-core';
+import { Title } from '@patternfly/react-core';
 import { Link } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import React, { useState, useEffect } from 'react';

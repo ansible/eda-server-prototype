@@ -11,27 +11,17 @@ import {
 } from '@patternfly/react-core';
 import {useIntl} from "react-intl";
 import sharedMessages from "../messages/shared.messages";
-import {getServer, removeData} from "@app/utils/utils";
 import {defaultSettings} from "@app/shared/pagination";
 import {JobType} from "@app/Job/Job";
 import {useDispatch} from "react-redux";
 import {addNotification} from "@redhat-cloud-services/frontend-components-notifications";
+import {fetchJob, removeJob} from "@app/API/Job";
 
 interface IRemoveJob {
   ids?: Array<string|number>,
   fetchData?: any,
   pagination?: PaginationConfiguration,
   resetSelectedJobs?: any
-}
-const jobEndpoint = 'http://' + getServer() + '/api/job_instance';
-
-export const fetchJob = (jobId, pagination=defaultSettings) =>
-{
-  return fetch(`${jobEndpoint}/${jobId}`, {
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  }).then(response => response.json());
 }
 
 const RemoveJob: React.ComponentType<IRemoveJob> = ( {ids = [],
@@ -45,8 +35,6 @@ const RemoveJob: React.ComponentType<IRemoveJob> = ( {ids = [],
   const { push, goBack } = useHistory();
 
   const removeId = id ? id : ( !id && ids && ids.length === 1 ) ? ids[0] : undefined;
-
-  const removeJob = (jobId) => removeData(`${jobEndpoint}/${jobId}`);
 
   async function removeJobs(ids) {
     return Promise.all(
@@ -77,7 +65,10 @@ const RemoveJob: React.ComponentType<IRemoveJob> = ( {ids = [],
   };
 
   useEffect(() => {
-    fetchJob(id || removeId).then(data => setJob(data))
+    if(!id && !removeId) {
+      return;
+    }
+    fetchJob(id ? id : removeId).then(data => setJob(data))
   }, [removeId]);
 
   return <Modal

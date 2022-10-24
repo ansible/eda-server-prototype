@@ -26,6 +26,7 @@ import sharedMessages from "../messages/shared.messages";
 import {AnyObject} from "@app/shared/types/common-types";
 import {useIntl} from "react-intl";
 import {RemoveJob} from "@app/RemoveJob/RemoveJob";
+import {fetchJob, fetchJobEvents} from "@app/API/Job";
 
 export interface JobType {
   id: string;
@@ -38,10 +39,6 @@ const CardBody = styled(PFCardBody)`
 const SimpleList = styled(PFSimpleList)`
   white-space: pre-wrap;
 `
-
-const endpoint = 'http://' + getServer() + '/api/job_instance';
-const event_endpoint = 'http://' + getServer() + '/api/job_instance_events';
-
 const Job: React.FunctionComponent = () => {
 
   const [job, setJob] = useState<JobType|undefined>(undefined);
@@ -73,17 +70,9 @@ const Job: React.FunctionComponent = () => {
   }, [newStdout]);
 
   useEffect(() => {
-     fetch(`${endpoint}/${id}`, {
-       headers: {
-         'Content-Type': 'application/json',
-       },
-     }).then(response => response.json())
+    fetchJob(id)
     .then(data => setJob(data));
-     fetch(`${event_endpoint}/${id}`, {
-       headers: {
-         'Content-Type': 'application/json',
-       },
-     }).then(response => response.json())
+     fetchJobEvents(id)
     .then(data => setStdout(data));
   }, []);
 

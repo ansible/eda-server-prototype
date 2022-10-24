@@ -1,14 +1,12 @@
 import {Grid, GridItem, PageSection, Title, ValidatedOptions} from '@patternfly/react-core';
 import { useHistory } from "react-router-dom";
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   Card,
   CardBody as PFCardBody
 } from '@patternfly/react-core';
 import {useIntl} from "react-intl";
 import {ActionGroup, Button, Form, FormGroup, TextInput} from '@patternfly/react-core';
-import {postData} from '@app/utils/utils';
-import {getServer} from '@app/utils/utils';
 import styled from 'styled-components';
 import {TopToolbar} from "@app/shared/top-toolbar";
 import sharedMessages from "../messages/shared.messages";

@@ -1,8 +1,7 @@
-import {Checkbox, PageSection, Title, ToolbarGroup, ToolbarItem} from '@patternfly/react-core';
+import {PageSection, Title, ToolbarGroup, ToolbarItem} from '@patternfly/react-core';
 import {Link, Route, useHistory} from 'react-router-dom';
 import React, {useState, useEffect, useReducer, Fragment} from 'react';
 import { Button } from '@patternfly/react-core';
-import {getServer} from '@app/utils/utils';
 import {TopToolbar} from '../shared/top-toolbar';
 import { PlusCircleIcon } from '@patternfly/react-icons';
 import sharedMessages from '../messages/shared.messages';
@@ -14,7 +13,6 @@ import {useIntl} from "react-intl";
 import {defaultSettings} from "@app/shared/pagination";
 import {NewInventory} from "@app/NewInventory/NewInventory";
 import {createRows} from "@app/Inventories/inventories-table-helpers";
-import {AnyObject} from "@app/shared/types/common-types";
 import {RemoveInventory} from "@app/RemoveInventory/RemoveInventory";
 import {listInventories} from "@app/API/Inventory";
 

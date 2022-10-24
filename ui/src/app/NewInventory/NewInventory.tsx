@@ -14,8 +14,7 @@ import {
   ValidatedOptions
 } from '@patternfly/react-core';
 import {useHistory} from "react-router-dom";
-import React, {useEffect, useState} from 'react';
-import {getServer, postData} from '@app/utils/utils';
+import React, {useState} from 'react';
 import styled from 'styled-components';
 import {TopToolbar} from "@app/shared/top-toolbar";
 import {ExclamationCircleIcon} from "@patternfly/react-icons";
