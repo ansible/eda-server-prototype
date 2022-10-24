@@ -1,9 +1,12 @@
+from unittest import mock
+
 import sqlalchemy as sa
 from fastapi import status as status_codes
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from eda_server.db import models
+from eda_server.types import Action, ResourceType
 
 TEST_EXTRA_VAR = """
 ---
@@ -34,7 +37,9 @@ TEST_RULEBOOK = """
 TEST_PLAYBOOK = TEST_RULEBOOK
 
 
-async def test_create_delete_job(client: AsyncClient, db: AsyncSession):
+async def test_create_delete_job(
+    client: AsyncClient, db: AsyncSession, check_permission_spy: mock.Mock
+):
     query = sa.insert(models.job_instances).values(
         uuid="f4c87c90-254e-11ed-861d-0242ac120002",
     )
@@ -51,6 +56,10 @@ async def test_create_delete_job(client: AsyncClient, db: AsyncSession):
 
     jobs = (await db.execute(sa.select(models.job_instances))).all()
     assert len(jobs) == (jobs_len - 1)
+
+    check_permission_spy.assert_called_once_with(
+        mock.ANY, mock.ANY, ResourceType.JOB, Action.DELETE
+    )
 
 
 async def test_delete_job_not_found(client: AsyncClient):

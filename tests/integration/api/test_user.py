@@ -1,6 +1,7 @@
 import operator
 import uuid
 from typing import List, Tuple
+from unittest import mock
 
 import pytest
 import sqlalchemy as sa
@@ -16,21 +17,10 @@ from tests.integration.utils.app import override_dependencies
 
 
 @pytest.fixture
-async def admin_user(db: AsyncSession):
-    return await UserDatabase(db).create(
-        {
-            "email": "admin@example.com",
-            "hashed_password": "",
-            "is_superuser": True,
-        }
-    )
-
-
-@pytest.fixture
 async def test_user(db: AsyncSession):
     return await UserDatabase(db).create(
         {
-            "email": "admin@example.com",
+            "email": "test@example.com",
             "hashed_password": "",
         }
     )
@@ -114,7 +104,10 @@ def _check_test_user_permissions_response(response: Response):
 
 
 async def test_add_user_role(
-    client: AsyncClient, db: AsyncSession, test_user: models.User
+    client: AsyncClient,
+    db: AsyncSession,
+    test_user: models.User,
+    check_permission_spy: mock.Mock,
 ):
     role_id = await create_role(db, "test-role")
 
@@ -132,6 +125,10 @@ async def test_add_user_role(
         )
     )
     assert role_exists
+
+    check_permission_spy.assert_called_once_with(
+        mock.ANY, mock.ANY, ResourceType.USER, Action.UPDATE
+    )
 
 
 async def test_add_user_role_user_not_exist(
@@ -169,7 +166,10 @@ async def test_add_user_role_duplicate(
 
 
 async def test_remove_user_role(
-    client: AsyncClient, db: AsyncSession, test_user: models.User
+    client: AsyncClient,
+    db: AsyncSession,
+    test_user: models.User,
+    check_permission_spy: mock.Mock,
 ):
     role_id = await create_role(db, "test-role")
     await add_user_role(db, test_user.id, role_id)
@@ -178,6 +178,10 @@ async def test_remove_user_role(
         f"/api/users/{test_user.id}/roles/{role_id}"
     )
     assert response.status_code == status.HTTP_204_NO_CONTENT
+
+    check_permission_spy.assert_called_once_with(
+        mock.ANY, mock.ANY, ResourceType.USER, Action.UPDATE
+    )
 
 
 async def test_remove_user_role_user_not_exist(
@@ -193,7 +197,7 @@ async def test_remove_user_role_user_not_exist(
 
 
 async def test_remove_user_role_role_not_exist(
-    client: AsyncClient, db: AsyncSession, test_user: models.User
+    client: AsyncClient, test_user: models.User
 ):
     invalid_role_id = "42424242-4242-4242-4242-424242424242"
 
@@ -205,35 +209,59 @@ async def test_remove_user_role_role_not_exist(
 
 # Test list roles
 async def test_list_me_roles(
-    app: FastAPI, client: AsyncClient, db: AsyncSession, test_user: models.User
+    app: FastAPI,
+    client: AsyncClient,
+    db: AsyncSession,
+    test_user: models.User,
+    check_permission_spy: mock.Mock,
 ):
     role_ids = await _prepare_test_user_roles(db, test_user.id)
     with override_dependencies(app, {current_active_user: lambda: test_user}):
         response = await client.get("/api/users/me/roles")
     _check_test_user_roles_response(response, role_ids)
+    # Only the user themselves is allowed to read their roles
+    check_permission_spy.assert_not_called()
 
 
 async def test_list_user_roles(
-    client: AsyncClient, db: AsyncSession, test_user: models.User
+    client: AsyncClient,
+    db: AsyncSession,
+    test_user: models.User,
+    check_permission_spy: mock.Mock,
 ):
     role_ids = await _prepare_test_user_roles(db, test_user.id)
     response = await client.get(f"/api/users/{test_user.id}/roles")
     _check_test_user_roles_response(response, role_ids)
+    check_permission_spy.assert_called_once_with(
+        mock.ANY, mock.ANY, ResourceType.USER, Action.READ
+    )
 
 
 # Test list permissions
 async def test_list_me_permissions(
-    app: FastAPI, client: AsyncClient, db: AsyncSession, test_user: models.User
+    app: FastAPI,
+    client: AsyncClient,
+    db: AsyncSession,
+    test_user: models.User,
+    check_permission_spy: mock.Mock,
 ):
     await _prepare_test_user_roles(db, test_user.id)
     with override_dependencies(app, {current_active_user: lambda: test_user}):
         response = await client.get("/api/users/me/permissions")
     _check_test_user_permissions_response(response)
+    # Only the user themselves is allowed to read their roles
+    check_permission_spy.assert_not_called()
 
 
 async def test_list_user_permissions(
-    client: AsyncClient, db: AsyncSession, test_user: models.User
+    client: AsyncClient,
+    db: AsyncSession,
+    test_user: models.User,
+    check_permission_spy: mock.Mock,
 ):
     await _prepare_test_user_roles(db, test_user.id)
     response = await client.get(f"/api/users/{test_user.id}/permissions")
     _check_test_user_permissions_response(response)
+    check_permission_spy.assert_called_once_with(
+        mock.ANY, mock.ANY, ResourceType.USER, Action.READ
+    )

@@ -1,9 +1,12 @@
+from unittest import mock
+
 import sqlalchemy as sa
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status as status_codes
 
 from eda_server.db import models
+from eda_server.types import Action, ResourceType
 
 TEST_RULESET_SIMPLE = """
 ---
@@ -89,7 +92,9 @@ async def _create_rules(db: AsyncSession):
     return project, rulebook, ruleset, rules
 
 
-async def test_list_rules(client: AsyncClient, db: AsyncSession):
+async def test_list_rules(
+    client: AsyncClient, db: AsyncSession, check_permission_spy: mock.Mock
+):
     _, _, ruleset, rules = await _create_rules(db)
 
     response = await client.get("/api/rules")
@@ -107,8 +112,14 @@ async def test_list_rules(client: AsyncClient, db: AsyncSession):
         for rule in rules
     ]
 
+    check_permission_spy.assert_called_once_with(
+        mock.ANY, mock.ANY, ResourceType.RULEBOOK, Action.READ
+    )
 
-async def test_read_rule(client: AsyncClient, db: AsyncSession):
+
+async def test_read_rule(
+    client: AsyncClient, db: AsyncSession, check_permission_spy: mock.Mock
+):
     _, _, ruleset, rules = await _create_rules(db)
 
     response = await client.get(f"/api/rules/{rules[0].id}")
@@ -123,8 +134,14 @@ async def test_read_rule(client: AsyncClient, db: AsyncSession):
         },
     }
 
+    check_permission_spy.assert_called_once_with(
+        mock.ANY, mock.ANY, ResourceType.RULEBOOK, Action.READ
+    )
 
-async def test_list_rulesets(client: AsyncClient, db: AsyncSession):
+
+async def test_list_rulesets(
+    client: AsyncClient, db: AsyncSession, check_permission_spy: mock.Mock
+):
     _, rulebook, ruleset, rules = await _create_rules(db)
 
     response = await client.get("/api/rulesets")
@@ -137,8 +154,14 @@ async def test_list_rulesets(client: AsyncClient, db: AsyncSession):
         }
     ]
 
+    check_permission_spy.assert_called_once_with(
+        mock.ANY, mock.ANY, ResourceType.RULEBOOK, Action.READ
+    )
 
-async def test_read_ruleset(client: AsyncClient, db: AsyncSession):
+
+async def test_read_ruleset(
+    client: AsyncClient, db: AsyncSession, check_permission_spy: mock.Mock
+):
     project, rulebook, ruleset, rules = await _create_rules(db)
     response = await client.get(f"/api/rulesets/{ruleset.id}")
     assert response.status_code == status_codes.HTTP_200_OK
@@ -158,7 +181,11 @@ async def test_read_ruleset(client: AsyncClient, db: AsyncSession):
         },
     }
 
+    check_permission_spy.assert_called_once_with(
+        mock.ANY, mock.ANY, ResourceType.RULEBOOK, Action.READ
+    )
 
-async def test_read_ruleset_not_found(client: AsyncClient, db: AsyncSession):
+
+async def test_read_ruleset_not_found(client: AsyncClient):
     response = await client.get("/api/rulesets/-1")
     assert response.status_code == status_codes.HTTP_404_NOT_FOUND

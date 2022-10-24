@@ -2,6 +2,12 @@ from enum import Enum
 
 
 class ResourceType(Enum):
+    ACTIVATION = "activation"
+    ACTIVATION_INSTANCE = "activation_instance"
+    AUDIT_RULE = "audit_rule"
+    JOB = "job"
+    TASK = "task"
+    USER = "user"
     PROJECT = "project"
     INVENTORY = "inventory"
     EXTRA_VAR = "extra_var"
