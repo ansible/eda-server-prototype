@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 import sqlalchemy as sa
 from fastapi import APIRouter, Depends, HTTPException, Response, status
@@ -30,14 +30,13 @@ async def project_by_name_exists_or_404(db: AsyncSession, project_name: str):
 
 @router.get(
     "/api/projects",
-    response_model=List[schema.ProjectList],
     operation_id="list_projects",
     tags=["projects"],
 )
 async def list_projects(
     db: AsyncSession = Depends(get_db_session),
-    limit: int = 10,
-    offset: int = 0,
+    limit: Optional[int] = 10,
+    offset: Optional[int] = 0,
 ):
     query = (
         sa.select(projects.c.id, projects.c.url, projects.c.name)
@@ -45,7 +44,12 @@ async def list_projects(
         .offset(offset)
     )
     result = await db.execute(query)
-    return result.all()
+    return schema.ProjectListWithMeta(
+        meta=schema.MetaData(
+            params=schema.BaseParams(limit=limit, offset=offset)
+        ),
+        data=result.all(),
+    )
 
 
 @router.post(

@@ -367,7 +367,7 @@ async def test_edit_project_unique_name(client: AsyncClient, db: AsyncSession):
 async def test_get_projects(client: AsyncClient, db: AsyncSession):
 
     test_project_two = {
-        "url": "https://github.com/benthomasson/eda-project",
+        "url": TEST_PROJECT["url"],
         "name": "Test Name TWO",
         "description": "This is a test description two",
     }
@@ -390,6 +390,7 @@ async def test_get_projects(client: AsyncClient, db: AsyncSession):
     assert response.status_code == status_codes.HTTP_200_OK
 
     data = response.json()
-    assert len(data) == 2
-    assert data[0]["name"] == TEST_PROJECT["name"]
-    assert data[1]["url"] == test_project_two["url"]
+    assert data["meta"]["params"]["limit"] == 10
+    assert len(data["data"]) == 2
+    assert data["data"][0]["name"] == TEST_PROJECT["name"]
+    assert data["data"][1]["url"] == test_project_two["url"]

@@ -27,11 +27,13 @@ from .job import (
     JobInstanceRead,
 )
 from .message import ProducerMessage, ProducerResponse
+from .meta import BaseParams, MetaData
 from .playbook import PlaybookRead, PlaybookRef
 from .project import (
     ProjectCreate,
     ProjectDetail,
     ProjectList,
+    ProjectListWithMeta,
     ProjectRead,
     ProjectUpdate,
 )
@@ -99,6 +101,7 @@ __all__ = [
     "ProjectList",
     "ProjectRead",
     "ProjectUpdate",
+    "ProjectListWithMeta",
     "RestartPolicy",
     "RoleCreate",
     "RolePermissionCreate",
@@ -122,4 +125,6 @@ __all__ = [
     "UserCreate",
     "UserRead",
     "UserUpdate",
+    "BaseParams",
+    "MetaData",
 ]
