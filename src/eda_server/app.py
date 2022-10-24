@@ -2,7 +2,6 @@ import logging
 
 from fastapi import APIRouter, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi_pagination import add_pagination
 
 from eda_server.api import router as api_router
 from eda_server.config import load_settings
@@ -76,6 +75,5 @@ def create_app() -> FastAPI:
     setup_routes(app)
 
     setup_database(app)
-    add_pagination(app)
 
     return app

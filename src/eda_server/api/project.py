@@ -2,7 +2,6 @@ from typing import List
 
 import sqlalchemy as sa
 from fastapi import APIRouter, Depends, HTTPException, Response, status
-from fastapi_pagination import LimitOffsetPage, paginate
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from eda_server import schema
@@ -30,15 +29,15 @@ async def project_by_name_exists_or_404(db: AsyncSession, project_name: str):
 
 
 @router.get(
-    "/api/projects/",
-    response_model=LimitOffsetPage[schema.ProjectList],
+    "/api/projects",
+    response_model=List[schema.ProjectList],
     operation_id="list_projects",
     tags=["projects"],
 )
-async def list_projects(db: AsyncSession = Depends(get_db_session)):
-    query = sa.select(projects.c.id, projects.c.url, projects.c.name)
+async def list_projects(db: AsyncSession = Depends(get_db_session), limit: int = 10, offset: int = 0):
+    query = sa.select(projects.c.id, projects.c.url, projects.c.name).limit(limit).offset(offset)
     result = await db.execute(query)
-    return paginate(result.all())
+    return result.all()
 
 
 @router.post(
