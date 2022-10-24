@@ -21,8 +21,10 @@ from sqlalchemy import desc
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from eda_server import schema
+from eda_server.auth import requires_permission
 from eda_server.db import models
 from eda_server.db.dependency import get_db_session
+from eda_server.types import Action, ResourceType
 
 router = APIRouter(tags=["audit_rules"])
 
@@ -31,6 +33,9 @@ router = APIRouter(tags=["audit_rules"])
     "/api/audit/rule/{rule_id}/details",
     response_model=schema.AuditRule,
     operation_id="read_audit_rule_details",
+    dependencies=[
+        Depends(requires_permission(ResourceType.AUDIT_RULE, Action.READ)),
+    ],
 )
 async def read_audit_rule_details(
     rule_id: int, db: AsyncSession = Depends(get_db_session)
@@ -82,6 +87,9 @@ async def read_audit_rule_details(
     "/api/audit/rule/{rule_id}/jobs",
     response_model=List[schema.AuditRuleJobInstance],
     operation_id="list_audit_rule_jobs",
+    dependencies=[
+        Depends(requires_permission(ResourceType.AUDIT_RULE, Action.READ)),
+    ],
 )
 async def list_audit_rule_jobs(
     rule_id: int, db: AsyncSession = Depends(get_db_session)
@@ -115,6 +123,9 @@ async def list_audit_rule_jobs(
     "/api/audit/rule/{rule_id}/hosts",
     response_model=List[schema.AuditRuleHost],
     operation_id="list_audit_rule_hosts",
+    dependencies=[
+        Depends(requires_permission(ResourceType.AUDIT_RULE, Action.READ)),
+    ],
 )
 async def list_audit_rule_hosts(
     rule_id: int, db: AsyncSession = Depends(get_db_session)
@@ -160,6 +171,9 @@ async def list_audit_rule_hosts(
     "/api/audit/rule/{rule_id}/events",
     response_model=List[schema.AuditRuleJobInstanceEvent],
     operation_id="list_audit_rule_events",
+    dependencies=[
+        Depends(requires_permission(ResourceType.AUDIT_RULE, Action.READ)),
+    ],
 )
 async def list_audit_rule_events(
     rule_id: int, db: AsyncSession = Depends(get_db_session)

@@ -15,6 +15,7 @@
 from collections import namedtuple
 from datetime import datetime, timedelta, timezone
 from typing import Tuple
+from unittest import mock
 
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -22,6 +23,7 @@ from starlette import status as status_codes
 
 from eda_server.db import models
 from eda_server.db.sql import base as bsql
+from eda_server.types import Action, ResourceType
 
 TEST_RULESET_SIMPLE = """
 ---
@@ -207,7 +209,9 @@ async def _create_rules(db: AsyncSession, intervals: Tuple[int, int] = (5, 6)):
     )
 
 
-async def test_list_rules(client: AsyncClient, db: AsyncSession):
+async def test_list_rules(
+    client: AsyncClient, db: AsyncSession, check_permission_spy: mock.Mock
+):
     test_data = await _create_rules(db)
     project = test_data.project
     rulebook = test_data.rulebook
@@ -244,8 +248,14 @@ async def test_list_rules(client: AsyncClient, db: AsyncSession):
         for exp_key in exp_rule:
             assert lst_rule[exp_key] == exp_rule[exp_key]
 
+    check_permission_spy.assert_called_once_with(
+        mock.ANY, mock.ANY, ResourceType.RULEBOOK, Action.READ
+    )
 
-async def test_read_rule(client: AsyncClient, db: AsyncSession):
+
+async def test_read_rule(
+    client: AsyncClient, db: AsyncSession, check_permission_spy: mock.Mock
+):
     test_data = await _create_rules(db)
     project = test_data.project
     rulebook = test_data.rulebook
@@ -285,8 +295,14 @@ async def test_read_rule(client: AsyncClient, db: AsyncSession):
         assert fs["window_total"] == 1
         assert fs["pct_window_total"] == 100
 
+    check_permission_spy.assert_called_once_with(
+        mock.ANY, mock.ANY, ResourceType.RULEBOOK, Action.READ
+    )
 
-async def test_list_rulesets(client: AsyncClient, db: AsyncSession):
+
+async def test_list_rulesets(
+    client: AsyncClient, db: AsyncSession, check_permission_spy: mock.Mock
+):
     test_data = await _create_rules(db)
     ruleset = test_data.ruleset
     rules = test_data.rules
@@ -315,8 +331,14 @@ async def test_list_rulesets(client: AsyncClient, db: AsyncSession):
         }
     ]
 
+    check_permission_spy.assert_called_once_with(
+        mock.ANY, mock.ANY, ResourceType.RULEBOOK, Action.READ
+    )
 
-async def test_list_rulesets_no_stats(client: AsyncClient, db: AsyncSession):
+
+async def test_list_rulesets_no_stats(
+    client: AsyncClient, db: AsyncSession, check_permission_spy: mock.Mock
+):
     test_data = await _create_rules(db, (40, 41))
     ruleset = test_data.ruleset
     rules = test_data.rules
@@ -336,7 +358,9 @@ async def test_list_rulesets_no_stats(client: AsyncClient, db: AsyncSession):
     ]
 
 
-async def test_read_ruleset(client: AsyncClient, db: AsyncSession):
+async def test_read_ruleset(
+    client: AsyncClient, db: AsyncSession, check_permission_spy: mock.Mock
+):
     test_data = await _create_rules(db)
     project = test_data.project
     rulebook = test_data.rulebook
@@ -386,13 +410,17 @@ async def test_read_ruleset(client: AsyncClient, db: AsyncSession):
         assert fs["window_total"] == 2
         assert fs["pct_window_total"] == 50
 
+    check_permission_spy.assert_called_once_with(
+        mock.ANY, mock.ANY, ResourceType.RULEBOOK, Action.READ
+    )
 
-async def test_read_ruleset_not_found(client: AsyncClient, db: AsyncSession):
+
+async def test_read_ruleset_not_found(client: AsyncClient):
     response = await client.get("/api/rulesets/-1")
     assert response.status_code == status_codes.HTTP_404_NOT_FOUND
 
 
-async def test_resd_ruleset_rules(client: AsyncClient, db: AsyncSession):
+async def test_read_ruleset_rules(client: AsyncClient, db: AsyncSession):
     test_data = await _create_rules(db)
     ruleset = test_data.ruleset
     rules = test_data.rules
