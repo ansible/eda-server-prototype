@@ -16,23 +16,13 @@ import {defaultSettings} from "@app/shared/pagination";
 import {InventoryType} from "@app/Inventories/Inventories";
 import {addNotification} from "@redhat-cloud-services/frontend-components-notifications";
 import {useDispatch} from "react-redux";
-import {fetchProject} from "@app/RemoveProject/RemoveProject";
+import {fetchInventory, removeInventory} from "@app/API/Inventory";
 
 interface IRemoveInventory {
   ids?: Array<string|number>,
   fetchData: any,
   pagination?: PaginationConfiguration,
   resetSelectedInventories?: any
-}
-const inventoryEndpoint = 'http://' + getServer() + '/api/inventory';
-
-export const fetchInventory = (inventoryId, pagination=defaultSettings) =>
-{
-  return fetch(`${inventoryEndpoint}/${inventoryId}`, {
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  }).then(response => response.json());
 }
 
 const RemoveInventory: React.ComponentType<IRemoveInventory> = ( {ids = [],
@@ -46,8 +36,6 @@ const RemoveInventory: React.ComponentType<IRemoveInventory> = ( {ids = [],
   const { push, goBack } = useHistory();
 
   const removeId = id ? id : ( !id && ids && ids.length === 1 ) ? ids[0] : undefined;
-
-  const removeInventory = (inventoryId) => removeData(`${inventoryEndpoint}/${inventoryId}`);
 
   async function removeInventories(ids) {
     return Promise.all(
@@ -78,7 +66,10 @@ const RemoveInventory: React.ComponentType<IRemoveInventory> = ( {ids = [],
   };
 
   useEffect(() => {
-    fetchInventory(id || removeId).then(data => setInventory(data))
+    if( !id && !removeId) {
+      return;
+    }
+    fetchInventory(id ? id : removeId).then(data => setInventory(data))
   }, [removeId]);
 
   return <Modal

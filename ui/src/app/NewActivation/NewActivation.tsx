@@ -24,14 +24,15 @@ import {ExtraVarType} from "@app/Vars/Vars";
 import {InventoryType, RuleType} from "@app/RuleSets/RuleSets";
 import {addNotification} from '@redhat-cloud-services/frontend-components-notifications';
 import {useDispatch} from "react-redux";
+import {addRulebookActivation} from "@app/API/Activation";
+import {listRulebooks} from "@app/API/Rulebook";
+import {listInventories} from "@app/API/Inventory";
+import {listExtraVars} from "@app/API/Extravar";
+import {listProjects} from "@app/API/Project";
 
 const CardBody = styled(PFCardBody)`
   white-space: pre-wrap;
   `
-const activation_endpoint = 'http://' + getServer() + '/api/activation_instance';
-const rulebook_endpoint = 'http://' + getServer() + '/api/rulebooks';
-const inventories_endpoint = 'http://' + getServer() + '/api/inventories';
-const vars_endpoint = 'http://' + getServer() + '/api/extra_vars';
 const project_endpoint = 'http://' + getServer() + '/api/projects';
 
 export interface ExecutionEnvironmentType {
@@ -95,38 +96,22 @@ const NewActivation: React.FunctionComponent = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    fetch(rulebook_endpoint, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    }).then(response => response.json())
+    listRulebooks()
       .then(data => setRuleSets([...rulesets, ...data]));
   }, []);
 
   useEffect(() => {
-    fetch(inventories_endpoint, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    }).then(response => response.json())
+    listInventories()
       .then(data => setInventories([...inventories, ...data]));
   }, []);
 
   useEffect(() => {
-    fetch(vars_endpoint, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    }).then(response => response.json())
+    listExtraVars()
       .then(data => setExtraVars([...extravars, ...data]));
   }, []);
 
   useEffect(() => {
-    fetch(project_endpoint, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    }).then(response => response.json())
+    listProjects()
       .then(data => setProjects([...projects, ...data]));
   }, []);
 
@@ -243,7 +228,7 @@ const NewActivation: React.FunctionComponent = () => {
       return;
     }
     setIsSubmitting(true);
-    postData(activation_endpoint, { name: name,
+    addRulebookActivation({ name: name,
                          rulebook_id: ruleset,
                          inventory_id: inventory,
                          extra_var_id: extravar,

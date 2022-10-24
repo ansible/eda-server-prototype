@@ -17,14 +17,13 @@ import {createRows} from "@app/Projects/projects-table-helpers";
 import {AnyObject} from "@app/shared/types/common-types";
 import {cellWidth} from "@patternfly/react-table";
 import {RemoveProject} from "@app/RemoveProject/RemoveProject";
+import {listProjects} from "@app/API/Project";
 
 interface ProjectType {
   id: string;
   git_hash?: string;
   url: string;
 }
-
-const endpoint = 'http://' + getServer() + '/api/projects';
 
 const columns = (intl) => [
   {
@@ -130,12 +129,6 @@ export const projectsListState = (state, action) => {
   }
 };
 
-const fetchProjects = (pagination = defaultSettings) => fetch(endpoint, {
-  headers: {
-    'Content-Type': 'application/json',
-  },
-}).then(response => response.json());
-
 const Projects: React.FunctionComponent = () => {
   const intl = useIntl();
   const history = useHistory();
@@ -162,7 +155,7 @@ const Projects: React.FunctionComponent = () => {
 
   const handlePagination = (pagination) => {
     stateDispatch({type: 'setFetching', payload: true});
-    return fetchProjects(pagination).then(data => { setProjects(data); stateDispatch({type: 'setRows', payload: createRows(projects)});})
+    return listProjects(pagination).then(data => { setProjects(data); stateDispatch({type: 'setRows', payload: createRows(projects)});})
       .then(() => {stateDispatch({type: 'setFetching', payload: false});})
       .catch(() => stateDispatch({type: 'setFetching', payload: false}));
   };

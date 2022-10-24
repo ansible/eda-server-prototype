@@ -15,12 +15,11 @@ import sharedMessages from "../messages/shared.messages";
 import {addNotification} from '@redhat-cloud-services/frontend-components-notifications';
 import {useDispatch} from "react-redux";
 import {ExclamationCircleIcon} from "@patternfly/react-icons";
+import {addProject} from "@app/API/Project";
 
 const CardBody = styled(PFCardBody)`
   white-space: pre-wrap;
   `
-const endpoint = 'http://' + getServer() + '/api/projects';
-
 const NewProject: React.FunctionComponent = () => {
 
   const history = useHistory();
@@ -77,7 +76,7 @@ const NewProject: React.FunctionComponent = () => {
       return;
     }
     setIsSubmitting(true);
-    postData(endpoint, { url: scmUrl, name: name, description: description })
+    addProject({ url: scmUrl, name: name, description: description })
 				.then(data => {
           setIsSubmitting(false);
           history.push(`/project/${data.id}`);

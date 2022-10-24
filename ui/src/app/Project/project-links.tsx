@@ -12,15 +12,7 @@ import {
 import styled from 'styled-components';
 import {renderProjectTabs} from "@app/Project/Project";
 import {useIntl} from "react-intl";
-
-interface ProjectType {
-  id: string,
-  name?: string,
-  vars?: [{id: string, name: string}]
-  rulesets?: [{id: string, name: string}],
-  inventories?: [{id: string, name: string}],
-  playbooks?: [{id: string, name: string}]
-}
+import {ProjectType} from "@app/shared/types/common-types";
 
 const CardBody = styled(PFCardBody)`
   white-space: pre-wrap;

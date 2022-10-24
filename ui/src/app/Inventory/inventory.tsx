@@ -9,6 +9,7 @@ import {TopToolbar} from "@app/shared/top-toolbar";
 import {InventoryDetails} from "@app/Inventory/inventory-details";
 import sharedMessages from "../messages/shared.messages";
 import {AnyObject} from "@app/shared/types/common-types";
+import {fetchInventory} from "@app/API/Inventory";
 
 interface TabItemType {
   eventKey: number;
@@ -47,8 +48,6 @@ export const renderInventoryTabs = (inventoryId: string, intl) => {
   return <AppTabs tabItems={inventory_tabs}/>
 };
 
-const endpoint_inventory = 'http://' + getServer() + '/api/inventory/';
-
 const Inventory: React.FunctionComponent = () => {
   const [inventory, setInventory] = useState<InventoryType|undefined>(undefined);
   const { id } = useParams<{id: string}>();
@@ -56,12 +55,7 @@ const Inventory: React.FunctionComponent = () => {
   const intl = useIntl();
 
   useEffect(() => {
-    fetch(`${endpoint_inventory}${id}`, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    }).then(response => response.json())
-      .then(data => setInventory(data));
+    fetchInventory(id).then(data => setInventory(data));
   }, []);
 
   const location = useLocation();

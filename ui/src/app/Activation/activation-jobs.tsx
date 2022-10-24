@@ -1,7 +1,7 @@
 import {Button, PageSection} from '@patternfly/react-core';
 import {useHistory} from 'react-router-dom';
 import React, {useEffect, useReducer, useState} from 'react';
-import {fetchActivationJobs, renderActivationTabs} from "@app/Activation/Activation";
+import {renderActivationTabs} from "@app/Activation/Activation";
 import {TableToolbarView} from "@app/shared/table-toolbar-view";
 import sharedMessages from "../messages/shared.messages";
 import {cellWidth} from "@patternfly/react-table";
@@ -12,6 +12,7 @@ import {createRows} from "./jobs-table-helpers";
 import {CubesIcon} from "@patternfly/react-icons";
 import {ActivationType} from "@app/Activations/Activations";
 import {JobType} from "@app/Job/Job";
+import {listActivationJobs} from "@app/API/Activation";
 
 const columns = (intl) => [
   {
@@ -94,7 +95,7 @@ const ActivationJobs: React.FunctionComponent<{activation: ActivationType, jobs:
   const intl = useIntl();
   const updateJobs = (pagination) => {
     stateDispatch({type: 'setFetching', payload: true});
-    return fetchActivationJobs(activation?.id, pagination)
+    return listActivationJobs(activation?.id, pagination)
       .then(() => stateDispatch({type: 'setFetching', payload: false}))
       .catch(() => stateDispatch({type: 'setFetching', payload: false}));
   };

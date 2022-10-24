@@ -16,6 +16,7 @@ import {NewInventory} from "@app/NewInventory/NewInventory";
 import {createRows} from "@app/Inventories/inventories-table-helpers";
 import {AnyObject} from "@app/shared/types/common-types";
 import {RemoveInventory} from "@app/RemoveInventory/RemoveInventory";
+import {listInventories} from "@app/API/Inventory";
 
 export interface InventoryType {
   id: string;
@@ -35,8 +36,6 @@ export interface InventoryType {
   created_at?: string,
   updated_at?: string
 }
-
-const endpoint = 'http://' + getServer() + '/api/inventories/';
 
 const columns = (intl) => [
   {
@@ -135,12 +134,6 @@ export const inventoriesListState = (state, action) => {
   }
 };
 
-const fetchInventories = (pagination = defaultSettings) => fetch(endpoint, {
-  headers: {
-    'Content-Type': 'application/json',
-  },
-}).then(response => response.json());
-
 const Inventories: React.FunctionComponent = () => {
   const intl = useIntl();
   const history = useHistory();
@@ -167,7 +160,7 @@ const Inventories: React.FunctionComponent = () => {
 
   const handlePagination = (pagination) => {
     stateDispatch({type: 'setFetching', payload: true});
-    return fetchInventories(pagination).then(data => { setInventories(data); stateDispatch({type: 'setRows', payload: createRows(inventories)});})
+    return listInventories(pagination).then(data => { setInventories(data); stateDispatch({type: 'setRows', payload: createRows(inventories)});})
       .then(() => {stateDispatch({type: 'setFetching', payload: false});})
       .catch(() => stateDispatch({type: 'setFetching', payload: false}));
   };

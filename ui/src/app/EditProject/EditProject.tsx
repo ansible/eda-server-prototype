@@ -7,19 +7,17 @@ import {
 } from '@patternfly/react-core';
 import {useIntl} from "react-intl";
 import { ActionGroup, Button, Form, FormGroup, TextInput } from '@patternfly/react-core';
-import {patchData, getServer} from '@app/utils/utils';
 import styled from 'styled-components';
 import {TopToolbar} from "@app/shared/top-toolbar";
 import sharedMessages from "../messages/shared.messages";
 import {ProjectType} from "@app/shared/types/common-types";
 import {addNotification} from '@redhat-cloud-services/frontend-components-notifications';
 import {useDispatch} from "react-redux";
+import {fetchProject, updateProject} from "@app/API/Project";
 
 const CardBody = styled(PFCardBody)`
   white-space: pre-wrap;
   `
-const endpoint = 'http://' + getServer() + '/api/projects';
-
 const EditProject: React.FunctionComponent = () => {
   const history = useHistory();
   const [project, setProject] = useState<ProjectType>({id: '', name: '' });
@@ -30,12 +28,7 @@ const EditProject: React.FunctionComponent = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    fetch(`${endpoint}/${id}`, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    }).then(response => response.json())
-      .then(data => setProject(data));
+    fetchProject(id).then(data => setProject(data));
   }, []);
 
   const setScmUrl = (url: string) =>  setProject({...project, url: url} );
@@ -45,8 +38,8 @@ const EditProject: React.FunctionComponent = () => {
   const setScmToken = (scm_token: string) => setProject({...project, scm_token: scm_token} );
 
   const handleSubmit = () => {
-      setIsSubmitting(true);
-			patchData(`${endpoint}/${project.id}`, { name: project.name, description: project.description })
+    setIsSubmitting(true);
+    updateProject(project)
         .then(data => {
           setIsSubmitting(false);
           history.push(`/project/${data.id}`);

@@ -16,6 +16,7 @@ import {NewActivation} from "@app/NewActivation/NewActivation";
 import {createRows} from "@app/Activations/activations-table-helpers";
 import {AnyObject} from "@app/shared/types/common-types";
 import {RemoveActivation} from "@app/RemoveActivation/RemoveActivation";
+import {listActivations} from "@app/API/Activation";
 
 export interface ActivationType {
   id: string;
@@ -37,8 +38,6 @@ export interface ActivationType {
   created_at?: string,
   updated_at?: string
 }
-
-const endpoint = 'http://' + getServer() + '/api/activation_instances';
 
 const columns = (intl) => [
   {
@@ -145,12 +144,6 @@ export const activationsListState = (state, action) => {
   }
 };
 
-const fetchActivations = (pagination = defaultSettings) => fetch(endpoint, {
-  headers: {
-    'Content-Type': 'application/json',
-  },
-}).then(response => response.json());
-
 const Activations: React.FunctionComponent = () => {
   const intl = useIntl();
   const history = useHistory();
@@ -177,7 +170,7 @@ const Activations: React.FunctionComponent = () => {
 
   const handlePagination = (pagination) => {
     stateDispatch({type: 'setFetching', payload: true});
-    return fetchActivations(pagination).then(data => { setActivations(data); stateDispatch({type: 'setRows', payload: createRows(activations)});})
+    return listActivations(pagination).then(data => { setActivations(data); stateDispatch({type: 'setRows', payload: createRows(activations)});})
       .then(() => {stateDispatch({type: 'setFetching', payload: false});})
       .catch(() => stateDispatch({type: 'setFetching', payload: false}));
   };

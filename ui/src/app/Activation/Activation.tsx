@@ -9,12 +9,12 @@ import {TopToolbar} from "@app/shared/top-toolbar";
 import {ActivationJobs} from "@app/Activation/activation-jobs";
 import {ActivationDetails} from "@app/Activation/activation-details";
 import {ActivationStdout} from "@app/Activation/activation-stdout";
-import {defaultSettings} from "@app/shared/pagination";
 import {ActivationType} from "@app/Activations/Activations";
 import {JobType} from "@app/Job/Job";
 import {AnyObject, TabItemType} from "@app/shared/types/common-types";
 import sharedMessages from '../messages/shared.messages';
 import {RemoveActivation} from "@app/RemoveActivation/RemoveActivation";
+import {fetchActivation, listActivationJobs} from "@app/API/Activation";
 
 const buildActivationTabs = (activationId: string, intl: AnyObject) : TabItemType[] => ( [
     {
@@ -47,18 +47,6 @@ export const renderActivationTabs = (activationId: string, intl) => {
   return <AppTabs tabItems={activation_tabs}/>
 };
 
-const endpoint1 = 'http://' + getServer() + '/api/activation_instance/';
-const endpoint2 = 'http://' + getServer() + '/api/activation_instance_job_instances/';
-
-export const fetchActivationJobs = (activationId, pagination=defaultSettings) =>
-{
-  return fetch(`${endpoint2}${activationId}`, {
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  }).then(response => response.json());
-}
-
 const Activation: React.FunctionComponent = () => {
 
   const [activation, setActivation] = useState<ActivationType|undefined>(undefined);
@@ -70,16 +58,12 @@ const Activation: React.FunctionComponent = () => {
   const intl = useIntl();
 
   useEffect(() => {
-    fetch(endpoint1 + id, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    }).then(response => response.json())
+    fetchActivation(id)
       .then(data => setActivation(data));
   }, []);
 
   useEffect(() => {
-    fetchActivationJobs(id)
+    listActivationJobs(id)
       .then(data => setJobs(data));
   }, []);
 

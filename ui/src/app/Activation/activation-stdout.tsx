@@ -12,8 +12,7 @@ import {getServer} from "@app/utils/utils";
 import {renderActivationTabs} from "@app/Activation/Activation";
 import Ansi from "ansi-to-react";
 import {ActivationType} from "@app/Activations/Activations";
-
-const endpoint3 = 'http://' + getServer() + '/api/activation_instance_logs/?activation_instance_id=';
+import {fetchActivationOutput} from "@app/API/Activation";
 
 const ActivationStdout: React.FunctionComponent<{activation: ActivationType}> = ({activation}) => {
   const intl = useIntl();
@@ -21,11 +20,7 @@ const ActivationStdout: React.FunctionComponent<{activation: ActivationType}> = 
   const [newStdout, setNewStdout] = useState<string>('');
 
   useEffect(() => {
-    fetch(endpoint3 + activation.id, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
+    fetchActivationOutput(activation.id)
   }, []);
 
   const [update_client, setUpdateClient] = useState<WebSocket|unknown>({});

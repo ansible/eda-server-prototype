@@ -5,8 +5,7 @@ import { CodeBlock, CodeBlockCode  } from '@patternfly/react-core';
 import {getServer} from '@app/utils/utils';
 import {TopToolbar} from "@app/shared/top-toolbar";
 import {InventoryType} from "@app/RuleSets/RuleSets";
-
-const endpoint = 'http://' + getServer() + '/api/inventory/';
+import {fetchInventory} from "@app/API/Inventory";
 
 const Inventory: React.FunctionComponent = () => {
 
@@ -15,13 +14,12 @@ const Inventory: React.FunctionComponent = () => {
   const { id } =  useParams<Record<string, string | undefined>>()
 
   useEffect(() => {
-     fetch(endpoint + id, {
-       headers: {
-         'Content-Type': 'application/json',
-       },
-     }).then(response => response.json())
+    if (!id ){
+      return;
+    }
+     fetchInventory(id)
     .then(data => setInventory(data));
-  }, []);
+  }, [id]);
 
   return (
   <React.Fragment>

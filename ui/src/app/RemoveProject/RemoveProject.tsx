@@ -16,22 +16,13 @@ import {getServer, removeData} from "@app/utils/utils";
 import {defaultSettings} from "@app/shared/pagination";
 import {useDispatch} from "react-redux";
 import {addNotification} from "@redhat-cloud-services/frontend-components-notifications";
+import {fetchProject, removeProject} from "@app/API/Project";
 
 interface IRemoveProject {
   ids?: Array<string|number>,
   fetchData?: any,
   pagination?: PaginationConfiguration,
   resetSelectedProjects?: any
-}
-const projectEndpoint = 'http://' + getServer() + '/api/projects';
-
-export const fetchProject = (projectId, pagination=defaultSettings) =>
-{
-  return fetch(`${projectEndpoint}/${projectId}`, {
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  }).then(response => response.json());
 }
 
 const RemoveProject: React.ComponentType<IRemoveProject> = ( {ids = [],
@@ -45,8 +36,6 @@ const RemoveProject: React.ComponentType<IRemoveProject> = ( {ids = [],
   const { push, goBack } = useHistory();
 
   const removeId = id ? id : ( !id && ids && ids.length === 1 ) ? ids[0] : undefined;
-
-  const removeProject = (projectId) => removeData(`${projectEndpoint}/${projectId}`);
 
   async function removeProjects(ids) {
     return Promise.all(
@@ -77,7 +66,7 @@ const RemoveProject: React.ComponentType<IRemoveProject> = ( {ids = [],
   };
 
   useEffect(() => {
-    fetchProject(id || removeId).then(data => setProject(data))
+    fetchProject(id ? id : removeId).then(data => setProject(data))
   }, [removeId]);
 
   return <Modal

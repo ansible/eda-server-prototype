@@ -26,12 +26,11 @@ import {FocusWrapper} from "@app/Activation/activation-details";
 import 'ace-builds/src-noconflict/theme-kuroir';
 import {addNotification} from '@redhat-cloud-services/frontend-components-notifications';
 import {useDispatch} from "react-redux";
+import {addInventory} from "@app/API/Inventory";
 
 const CardBody = styled(PFCardBody)`
   white-space: pre-wrap;
   `
-const endpoint_inventories = 'http://' + getServer() + '/api/inventories/';
-
 const NewInventory: React.FunctionComponent = () => {
   const history = useHistory();
   const intl = useIntl();
@@ -79,9 +78,7 @@ const NewInventory: React.FunctionComponent = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     validateFields();
-    postData(endpoint_inventories, { name: name,
-                         inventory: inventory
-    })
+    addInventory({name: name, description: description, inventory: inventory})
       .then(data => {
         data?.id ? history.push(`/inventory/${data.id}`) :
           history.push(`/inventories`);

@@ -16,23 +16,7 @@ import {defaultSettings} from "@app/shared/pagination";
 import {ActivationType} from "@app/Activations/Activations";
 import {addNotification} from "@redhat-cloud-services/frontend-components-notifications";
 import {useDispatch} from "react-redux";
-
-interface IRemoveActivation {
-  ids?: Array<string|number>,
-  fetchData?: any,
-  pagination?: PaginationConfiguration,
-  resetSelectedActivations?: any
-}
-const activationEndpoint = 'http://' + getServer() + '/api/activation_instance';
-
-export const fetchActivation = (activationId, pagination=defaultSettings) =>
-{
-  return fetch(`${activationEndpoint}/${activationId}`, {
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  }).then(response => response.json());
-}
+import {fetchActivation, IRemoveActivation, removeActivation} from "@app/API/Activation";
 
 const RemoveActivation: React.ComponentType<IRemoveActivation> = ( {ids = [],
                                              fetchData = null,
@@ -45,8 +29,6 @@ const RemoveActivation: React.ComponentType<IRemoveActivation> = ( {ids = [],
   const { push, goBack } = useHistory();
 
   const removeId = id ? id : ( !id && ids && ids.length === 1 ) ? ids[0] : undefined;
-
-  const removeActivation = (activationId) => removeData(`${activationEndpoint}/${activationId}`);
 
   async function removeActivations(ids) {
     return Promise.all(

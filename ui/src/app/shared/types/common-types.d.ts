@@ -66,6 +66,10 @@ export interface ProjectType {
   status?: string;
   type?: string;
   revision?: string;
+  vars?: [{id: string, name: string}]
+  rulesets?: [{id: string, name: string}],
+  inventories?: [{id: string, name: string}],
+  playbooks?: [{id: string, name: string}]
 }
 
 export interface TabItemType {

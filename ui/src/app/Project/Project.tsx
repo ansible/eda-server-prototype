@@ -17,6 +17,7 @@ import sharedMessages from "../messages/shared.messages";
 import {useIntl} from "react-intl";
 import {AnyObject, ProjectType, TabItemType} from "@app/shared/types/common-types";
 import {RemoveProject} from "@app/RemoveProject/RemoveProject";
+import {fetchProject} from "@app/API/Project";
 
 const buildProjectTabs = (projectId: string, intl: AnyObject) : TabItemType[] => ( [
   {
@@ -44,8 +45,6 @@ export const renderProjectTabs = (projectId: string, intl) => {
   const project_tabs = buildProjectTabs(projectId, intl);
   return <AppTabs tabItems={project_tabs}/>
 };
-
-const endpoint_project = 'http://' + getServer() + '/api/projects';
 
 const Project: React.FunctionComponent = () => {
 
@@ -93,11 +92,7 @@ const Project: React.FunctionComponent = () => {
   </Fragment>;
 
   useEffect(() => {
-    fetch(`${endpoint_project}/${id}`, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    }).then(response => response.json())
+    fetchProject(id)
       .then(data => setProject(data));
   }, []);
   const location = useLocation();
