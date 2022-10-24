@@ -21,8 +21,10 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from eda_server import auth, schema
+from eda_server.auth import requires_permission
 from eda_server.db import models
 from eda_server.db.dependency import get_db_session
+from eda_server.types import Action, ResourceType
 from eda_server.users import current_active_user, fastapi_users
 
 router = APIRouter(prefix="/api/users", tags=["users"])
@@ -79,6 +81,9 @@ async def list_me_roles(
     "/{user_id}/roles",
     operation_id="list_user_roles",
     response_model=List[schema.RoleRead],
+    dependencies=[
+        Depends(requires_permission(ResourceType.USER, Action.READ))
+    ],
 )
 async def list_user_roles(
     user_id: uuid.UUID,
@@ -93,6 +98,9 @@ async def list_user_roles(
     "/{user_id}/roles/{role_id}",
     status_code=status.HTTP_204_NO_CONTENT,
     operation_id="add_user_role",
+    dependencies=[
+        Depends(requires_permission(ResourceType.USER, Action.UPDATE))
+    ],
 )
 async def add_user_role(
     user_id: uuid.UUID,
@@ -115,6 +123,9 @@ async def add_user_role(
     "/{user_id}/roles/{role_id}",
     status_code=status.HTTP_204_NO_CONTENT,
     operation_id="remove_user_role",
+    dependencies=[
+        Depends(requires_permission(ResourceType.USER, Action.UPDATE))
+    ],
 )
 async def remove_user_role(
     user_id: uuid.UUID,
@@ -146,6 +157,9 @@ async def list_me_permissions(
     "/{user_id}/permissions",
     operation_id="list_user_permissions",
     response_model=List[str],
+    dependencies=[
+        Depends(requires_permission(ResourceType.USER, Action.READ))
+    ],
 )
 async def list_user_permissions(
     user_id: uuid.UUID,
