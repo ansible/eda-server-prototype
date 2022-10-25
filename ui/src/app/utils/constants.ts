@@ -1,3 +1,3 @@
 export const APPLICATION_TITLE =
   // eslint-disable-next-line no-undef
-  `${process.env.APPLICATION_NAME  || 'Event driven automation'}`;
+  `${process.env.APPLICATION_NAME || 'Event driven automation'}`;

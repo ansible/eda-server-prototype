@@ -1,15 +1,14 @@
 import * as React from 'react';
-import {mount} from 'enzyme';
-import {Project} from "@app/Project/Project";
-import {MemoryRouter} from "react-router";
-import fetchMock from "jest-fetch-mock";
-import {act} from "react-dom/test-utils";
-import {IntlProvider} from "react-intl";
-import {Route} from "react-router-dom";
-import {DropdownItem, KebabToggle, Tab} from "@patternfly/react-core";
-import {CaretLeftIcon} from "@patternfly/react-icons";
+import { mount } from 'enzyme';
+import { Project } from '@app/Project/Project';
+import { MemoryRouter } from 'react-router';
+import fetchMock from 'jest-fetch-mock';
+import { act } from 'react-dom/test-utils';
+import { IntlProvider } from 'react-intl';
+import { Route } from 'react-router-dom';
+import { DropdownItem, KebabToggle, Tab } from '@patternfly/react-core';
 
-const ComponentWrapper = ({ children, initialEntries=['/dashboard']}) => (
+const ComponentWrapper = ({ children, initialEntries = ['/dashboard'] }) => (
   <IntlProvider locale="en">
     <MemoryRouter initialEntries={initialEntries} keyLength={0} key={'test'}>
       {children}
@@ -23,18 +22,19 @@ describe('Project', () => {
   });
 
   it('should render the Project component tabs', async () => {
-    fetchMock.mockResponse(JSON.stringify({
-          name: 'Project 1',
-          id: 1,
-          url: 'Project 1 Url'
-       })
-    )
+    fetchMock.mockResponse(
+      JSON.stringify({
+        name: 'Project 1',
+        id: 1,
+        url: 'Project 1 Url',
+      })
+    );
     let wrapper;
     await act(async () => {
       wrapper = mount(
         <ComponentWrapper initialEntries={['/project/1']}>
-          <Route path='/project/:id'>
-            <Project/>
+          <Route path="/project/:id">
+            <Project />
           </Route>
         </ComponentWrapper>
       );
@@ -43,23 +43,24 @@ describe('Project', () => {
       wrapper.update();
     });
     expect(wrapper.find(Tab).length).toEqual(3);
-    expect(wrapper.find(Tab).at(0).props().title.props.children[1]).toEqual("Back to Projects");
+    expect(wrapper.find(Tab).at(0).props().title.props.children[1]).toEqual('Back to Projects');
     expect(wrapper.find(Tab).at(1).props().title).toEqual('Details');
   });
 
   it('has a toolbar kebab menu', async () => {
-    fetchMock.mockResponse(JSON.stringify({
+    fetchMock.mockResponse(
+      JSON.stringify({
         name: 'Project 1',
         id: 1,
-        url: 'Project 1 Url'
+        url: 'Project 1 Url',
       })
-    )
+    );
     let wrapper;
     await act(async () => {
       wrapper = mount(
         <ComponentWrapper initialEntries={['/project/1']}>
-          <Route path='/project/:id'>
-            <Project/>
+          <Route path="/project/:id">
+            <Project />
           </Route>
         </ComponentWrapper>
       );
@@ -69,13 +70,11 @@ describe('Project', () => {
     });
     expect(wrapper.find(KebabToggle).length).toEqual(1);
     expect(wrapper.find('.pf-c-dropdown__toggle').length).toEqual(1);
-    wrapper
-      .find('.pf-c-dropdown__toggle')
-      .simulate('click');
+    wrapper.find('.pf-c-dropdown__toggle').simulate('click');
     wrapper.update();
     expect(wrapper.find(DropdownItem).length).toEqual(3);
-    expect(wrapper.find(DropdownItem).at(0).props().component.props.children).toEqual('Edit')
-    expect(wrapper.find(DropdownItem).at(1).props().component.props.children).toEqual('Sync')
-    expect(wrapper.find(DropdownItem).at(2).props().component.props.children).toEqual('Delete')
+    expect(wrapper.find(DropdownItem).at(0).props().component.props.children).toEqual('Edit');
+    expect(wrapper.find(DropdownItem).at(1).props().component.props.children).toEqual('Sync');
+    expect(wrapper.find(DropdownItem).at(2).props().component.props.children).toEqual('Delete');
   });
 });

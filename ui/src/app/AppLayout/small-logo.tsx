@@ -7,12 +7,6 @@ interface IProps {
 
 export class SmallLogo extends React.Component<IProps> {
   render() {
-    return (
-      <img
-        style={{ height: '50px' }}
-        src={SmallLogoImage}
-        alt={this.props.alt}
-      />
-    );
+    return <img style={{ height: '50px' }} src={SmallLogoImage} alt={this.props.alt} />;
   }
 }

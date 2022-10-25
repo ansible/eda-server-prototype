@@ -10,20 +10,20 @@ import {
   StackItem,
   Title,
   ToggleGroup,
-  ToggleGroupItem
+  ToggleGroupItem,
 } from '@patternfly/react-core';
 import { Link } from 'react-router-dom';
-import React, {useState, useEffect} from 'react';
-import {renderRuleTabs} from "@app/Rule/Rule";
+import React, { useState, useEffect } from 'react';
+import { renderRuleTabs } from '@app/Rule/Rule';
 import ReactJsonView from 'react-json-view';
-import AceEditor from "react-ace";
-import "ace-builds/src-noconflict/mode-yaml";
-import "ace-builds/src-noconflict/theme-xcode";
+import AceEditor from 'react-ace';
+import 'ace-builds/src-noconflict/mode-yaml';
+import 'ace-builds/src-noconflict/theme-xcode';
 import styled from 'styled-components';
-import {RuleType} from "@app/RuleSets/RuleSets";
-import {ExtraVarType} from "@app/Vars/Vars";
-import {useIntl} from "react-intl";
-import {fetchRuleVars} from "@app/API/Extravar";
+import { RuleType } from '@app/RuleSets/RuleSets';
+import { ExtraVarType } from '@app/Vars/Vars';
+import { useIntl } from 'react-intl';
+import { fetchRuleVars } from '@app/API/Extravar';
 
 const FocusWrapper = styled.div`
   && + .keyboard-help-text {
@@ -38,22 +38,20 @@ const FocusWrapper = styled.div`
   }
 `;
 
-const RuleDetails: React.FunctionComponent<{rule: RuleType}> = ({ rule }) => {
-
-  const [ruleVars, setRuleVars] = useState<ExtraVarType|undefined>(undefined);
+const RuleDetails: React.FunctionComponent<{ rule: RuleType }> = ({ rule }) => {
+  const [ruleVars, setRuleVars] = useState<ExtraVarType | undefined>(undefined);
   const [varFormat, setVarFormat] = useState('yaml');
   const id = rule?.id;
   const intl = useIntl();
 
   useEffect(() => {
-    rule?.extra_var_id ? fetchRuleVars(rule.extra_var_id)
-      .then(data => setRuleVars(data)) : setRuleVars(undefined);
+    rule?.extra_var_id ? fetchRuleVars(rule.extra_var_id).then((data) => setRuleVars(data)) : setRuleVars(undefined);
   }, [rule]);
 
   const handleToggleVarFormat = (_, event) => {
     const id = event.currentTarget.id;
-    setVarFormat(id );
-  }
+    setVarFormat(id);
+  };
 
   const renderFlexRuleDetails: React.FunctionComponent<RuleType> = (rule) => (
     <Stack hasGutter={true}>
@@ -62,86 +60,100 @@ const RuleDetails: React.FunctionComponent<{rule: RuleType}> = ({ rule }) => {
           <Flex direction={{ default: 'column' }} flex={{ default: 'flex_1' }}>
             <FlexItem>
               <Stack>
-                <StackItem><Title headingLevel="h3">Name</Title></StackItem>
                 <StackItem>
-                  {rule?.name}
+                  <Title headingLevel="h3">Name</Title>
                 </StackItem>
+                <StackItem>{rule?.name}</StackItem>
               </Stack>
             </FlexItem>
             <FlexItem>
               <Stack>
-                <StackItem><Title headingLevel="h3">Action</Title></StackItem>
-                { rule && rule.action && <StackItem>
-                  <Link to={"/jobs"}>{ rule?.action ? Object.keys(rule?.action) : 'Link to action' }</Link>
-                </StackItem> }
+                <StackItem>
+                  <Title headingLevel="h3">Action</Title>
+                </StackItem>
+                {rule && rule.action && (
+                  <StackItem>
+                    <Link to={'/jobs'}>{rule?.action ? Object.keys(rule?.action) : 'Link to action'}</Link>
+                  </StackItem>
+                )}
               </Stack>
             </FlexItem>
             <FlexItem>
               <Stack>
-                <StackItem><Title headingLevel="h3">Last fired date</Title></StackItem>
                 <StackItem>
-                  {rule?.last_fired_date}
+                  <Title headingLevel="h3">Last fired date</Title>
                 </StackItem>
+                <StackItem>{rule?.last_fired_date}</StackItem>
               </Stack>
             </FlexItem>
             <FlexItem>
               <Stack>
-                <StackItem><Title headingLevel="h3">Last modified</Title></StackItem>
                 <StackItem>
-                  {rule?.modified_at}
+                  <Title headingLevel="h3">Last modified</Title>
                 </StackItem>
+                <StackItem>{rule?.modified_at}</StackItem>
               </Stack>
             </FlexItem>
           </Flex>
           <Flex direction={{ default: 'column' }} flex={{ default: 'flex_1' }}>
             <FlexItem>
               <Stack>
-                <StackItem><Title headingLevel="h3">Description</Title></StackItem>
                 <StackItem>
-                  {rule?.description}
+                  <Title headingLevel="h3">Description</Title>
                 </StackItem>
+                <StackItem>{rule?.description}</StackItem>
               </Stack>
             </FlexItem>
             <FlexItem>
               <Stack>
-                <StackItem><Title headingLevel="h3">Project</Title></StackItem>
-                {rule && rule.project_id &&<StackItem>
-                  <Link to={"/project/" + rule?.project_id}>{rule?.project_name || `Project ${rule?.project_id}`}</Link>
-                </StackItem>}
+                <StackItem>
+                  <Title headingLevel="h3">Project</Title>
+                </StackItem>
+                {rule && rule.project_id && (
+                  <StackItem>
+                    <Link to={'/project/' + rule?.project_id}>
+                      {rule?.project_name || `Project ${rule?.project_id}`}
+                    </Link>
+                  </StackItem>
+                )}
               </Stack>
             </FlexItem>
             <FlexItem>
               <Stack>
-                <StackItem><Title headingLevel="h3">Fire count</Title></StackItem>
                 <StackItem>
-                  {rule?.fired_count || 0}
+                  <Title headingLevel="h3">Fire count</Title>
                 </StackItem>
+                <StackItem>{rule?.fired_count || 0}</StackItem>
               </Stack>
             </FlexItem>
           </Flex>
           <Flex direction={{ default: 'column' }} flex={{ default: 'flex_1' }}>
             <FlexItem>
               <Stack>
-                <StackItem><Title headingLevel="h3">Rule set</Title></StackItem>
-                { rule && rule.ruleset && <StackItem>
-                  {<Link to={"/ruleset/" + rule.ruleset.id}>{rule.ruleset.name || rule.ruleset.name}</Link>}
-                </StackItem> }
+                <StackItem>
+                  <Title headingLevel="h3">Rule set</Title>
+                </StackItem>
+                {rule && rule.ruleset && (
+                  <StackItem>
+                    {<Link to={'/ruleset/' + rule.ruleset.id}>{rule.ruleset.name || rule.ruleset.name}</Link>}
+                  </StackItem>
+                )}
               </Stack>
             </FlexItem>
             <FlexItem>
               <Stack>
-                <StackItem><Title headingLevel="h3">Rule type</Title></StackItem>
                 <StackItem>
-                  {rule?.type}
+                  <Title headingLevel="h3">Rule type</Title>
                 </StackItem>
+                <StackItem>{rule?.type}</StackItem>
               </Stack>
             </FlexItem>
             <FlexItem>
               <Stack>
-                <StackItem><Title headingLevel="h3">Created</Title></StackItem>
                 <StackItem>
-                  {rule?.created_at}
+                  <Title headingLevel="h3">Created</Title>
                 </StackItem>
+                <StackItem>{rule?.created_at}</StackItem>
               </Stack>
             </FlexItem>
           </Flex>
@@ -156,18 +168,27 @@ const RuleDetails: React.FunctionComponent<{rule: RuleType}> = ({ rule }) => {
               </GridItem>
               <GridItem span={2}>
                 <ToggleGroup isCompact aria-label="JsonYaml">
-                  <ToggleGroupItem text="YAML" buttonId="yaml" isSelected={varFormat === 'yaml' } onChange={handleToggleVarFormat} />
-                  <ToggleGroupItem text="JSON" buttonId="json" isSelected={varFormat === 'json'} onChange={handleToggleVarFormat} />
+                  <ToggleGroupItem
+                    text="YAML"
+                    buttonId="yaml"
+                    isSelected={varFormat === 'yaml'}
+                    onChange={handleToggleVarFormat}
+                  />
+                  <ToggleGroupItem
+                    text="JSON"
+                    buttonId="json"
+                    isSelected={varFormat === 'json'}
+                    onChange={handleToggleVarFormat}
+                  />
                 </ToggleGroup>
               </GridItem>
             </Grid>
           </StackItem>
           <StackItem>
-            {ruleVars ? ( varFormat === 'json' ?
-                <ReactJsonView displayObjectSize={false}
-                               displayDataTypes={false}
-                               quotesOnKeys={false}
-                               src={ruleVars}/> :
+            {ruleVars ? (
+              varFormat === 'json' ? (
+                <ReactJsonView displayObjectSize={false} displayDataTypes={false} quotesOnKeys={false} src={ruleVars} />
+              ) : (
                 <Card>
                   <FocusWrapper>
                     <AceEditor
@@ -187,12 +208,13 @@ const RuleDetails: React.FunctionComponent<{rule: RuleType}> = ({ rule }) => {
                         focus: false,
                         highlightActiveLine: false,
                         cursorStart: 0,
-                        cursorStyle: undefined
-                      }}/>
+                        cursorStyle: undefined,
+                      }}
+                    />
                   </FocusWrapper>
                 </Card>
-            ) : null
-            }
+              )
+            ) : null}
           </StackItem>
         </Stack>
       </StackItem>
@@ -200,19 +222,17 @@ const RuleDetails: React.FunctionComponent<{rule: RuleType}> = ({ rule }) => {
   );
 
   return (
-  <PageSection page-type={'rule-details'} id={'rule-details'}>
-    { renderRuleTabs(id, intl) }
-    <Stack>
-      <StackItem>
-        <Card>
-          <CardBody>
-            {renderFlexRuleDetails(rule)}
-          </CardBody>
-        </Card>
-      </StackItem>
-    </Stack>
-  </PageSection>
-)
-}
+    <PageSection page-type={'rule-details'} id={'rule-details'}>
+      {renderRuleTabs(id, intl)}
+      <Stack>
+        <StackItem>
+          <Card>
+            <CardBody>{renderFlexRuleDetails(rule)}</CardBody>
+          </Card>
+        </StackItem>
+      </Stack>
+    </PageSection>
+  );
+};
 
 export { RuleDetails };

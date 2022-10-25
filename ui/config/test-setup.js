@@ -1,17 +1,18 @@
 /**
  * @jest-environment jsdom
  */
-import React from 'react'
+import React from 'react';
 import { configure, mount, render, shallow } from 'enzyme';
 import Adapter from '@wojtekmaj/enzyme-adapter-react-17';
-import fetchMock from "jest-fetch-mock";
+import fetchMock from 'jest-fetch-mock';
 
 /**
  * mock fetch
  */
 import 'whatwg-fetch';
 
-import reactIntl from "react-intl";
+import reactIntl from 'react-intl';
+import 'jest-canvas-mock';
 
 /**
  * mock react-intl in tests
@@ -30,7 +31,7 @@ global.fetchMock = fetchMock;
 /**
  * Setup JSDOM
  */
-global.SVGPathElement = function() {};
+global.SVGPathElement = function () {};
 
 global.MutationObserver = class {
   constructor(callback) {}

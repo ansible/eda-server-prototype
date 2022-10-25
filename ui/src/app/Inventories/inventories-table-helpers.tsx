@@ -1,30 +1,27 @@
-import React, {Fragment, useContext} from 'react';
-import {Link} from "react-router-dom";
-import InventoriesTableContext from "@app/Inventories/inventories-table-context";
-import {Checkbox} from "@patternfly/react-core";
-import PropTypes from "prop-types";
+import React, { Fragment, useContext } from 'react';
+import { Link } from 'react-router-dom';
+import InventoriesTableContext from '@app/Inventories/inventories-table-context';
+import { Checkbox } from '@patternfly/react-core';
+import PropTypes from 'prop-types';
 
 export const SelectBox = ({ id }) => {
-  const {
-    selectedInventories,
-    setSelectedInventories
-  } = useContext(InventoriesTableContext);
+  const { selectedInventories, setSelectedInventories } = useContext(InventoriesTableContext);
 
   return (
     <Checkbox
       id={`select-${id}`}
       isChecked={selectedInventories.includes(id)}
-      onChange={() => setSelectedInventories ? setSelectedInventories(id) : ''}
+      onChange={() => (setSelectedInventories ? setSelectedInventories(id) : '')}
     />
   );
 };
 
 SelectBox.propTypes = {
-  id: PropTypes.string.isRequired
+  id: PropTypes.string.isRequired,
 };
 
 export const createRows = (data) =>
-  data.map(({ id, name, source}) => ({
+  data.map(({ id, name, source }) => ({
     id,
     cells: [
       <React.Fragment key={`${id}-checkbox`}>
@@ -33,12 +30,12 @@ export const createRows = (data) =>
       <Fragment key={`[inventory-${id}`}>
         <Link
           to={{
-            pathname: `/inventories/inventory/${id}`
+            pathname: `/inventories/inventory/${id}`,
           }}
         >
           {name}
         </Link>
       </Fragment>,
-      source
-    ]
+      source,
+    ],
   }));

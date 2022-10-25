@@ -7,9 +7,9 @@ import {
   Text,
   TextContent,
   TextVariants,
-  EmptyState
+  EmptyState,
 } from '@patternfly/react-core';
-import {EmptyTable} from "@redhat-cloud-services/frontend-components/EmptyTable";
+import { EmptyTable } from '@redhat-cloud-services/frontend-components/EmptyTable';
 
 export interface TableEmptyState {
   title: ReactNode;
@@ -24,7 +24,7 @@ const TableEmptyState: React.ComponentType<TableEmptyState> = ({
   Icon,
   description,
   PrimaryAction,
-  renderDescription
+  renderDescription,
 }) => (
   <EmptyTable centered aria-label="No records">
     <EmptyState className="pf-u-ml-auto pf-u-mr-auto">
@@ -36,9 +36,7 @@ const TableEmptyState: React.ComponentType<TableEmptyState> = ({
         {description}
         {renderDescription && renderDescription()}
       </EmptyStateBody>
-      <EmptyStateSecondaryActions>
-        {PrimaryAction && <PrimaryAction />}
-      </EmptyStateSecondaryActions>
+      <EmptyStateSecondaryActions>{PrimaryAction && <PrimaryAction />}</EmptyStateSecondaryActions>
     </EmptyState>
   </EmptyTable>
 );
@@ -48,7 +46,7 @@ TableEmptyState.propTypes = {
   Icon: PropTypes.any.isRequired,
   description: PropTypes.string.isRequired,
   PrimaryAction: PropTypes.any,
-  renderDescription: PropTypes.func
+  renderDescription: PropTypes.func,
 };
 
 export default TableEmptyState;

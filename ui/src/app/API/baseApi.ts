@@ -1,11 +1,5 @@
-import axios, { AxiosResponse, AxiosRequestConfig, AxiosInstance } from 'axios';
-import {
-  EDA_API_BASE,
-} from '../utils/constants';
+import axios, { AxiosRequestConfig, AxiosInstance } from 'axios';
 import { stringify } from 'qs';
-
-// @ts-ignore
-import Cookies from 'js-cookie';
 
 export interface ErrorResponse {
   headers?: Headers;
@@ -19,10 +13,9 @@ export interface ServerError {
 
 const createAxiosInstance = () => {
   return axios.create({
-      paramsSerializer: (params) => stringify(params)
-      // headers: { 'X-CSRFToken': Cookies.get('csrftoken') }
-    });
- };
+    paramsSerializer: (params) => stringify(params),
+  });
+};
 
 const axiosInstance: AxiosInstance = createAxiosInstance();
 

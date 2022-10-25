@@ -1,82 +1,85 @@
 /* eslint-disable react/prop-types */
-import React, {useEffect, useState} from 'react';
-import {useHistory, useParams} from 'react-router-dom';
-import {
-  Modal,
-  Button,
-  Text,
-  TextVariants,
-  TextContent,
-  Stack, StackItem
-} from '@patternfly/react-core';
-import {useIntl} from "react-intl";
-import sharedMessages from "../messages/shared.messages";
-import {defaultSettings} from "@app/shared/pagination";
-import {JobType} from "@app/Job/Job";
-import {useDispatch} from "react-redux";
-import {addNotification} from "@redhat-cloud-services/frontend-components-notifications";
-import {fetchJob, removeJob} from "@app/API/Job";
+import React, { useEffect, useState } from 'react';
+import { useHistory, useParams } from 'react-router-dom';
+import { Modal, Button, Text, TextVariants, TextContent, Stack, StackItem } from '@patternfly/react-core';
+import { useIntl } from 'react-intl';
+import sharedMessages from '../messages/shared.messages';
+import { defaultSettings } from '@app/shared/pagination';
+import { JobType } from '@app/Job/Job';
+import { useDispatch } from 'react-redux';
+import { addNotification } from '@redhat-cloud-services/frontend-components-notifications';
+import { fetchJob, removeJob } from '@app/API/Job';
 
 interface IRemoveJob {
-  ids?: Array<string|number>,
-  fetchData?: any,
-  pagination?: PaginationConfiguration,
-  resetSelectedJobs?: any
+  ids?: Array<string | number>;
+  fetchData?: any;
+  pagination?: PaginationConfiguration;
+  resetSelectedJobs?: any;
 }
 
-const RemoveJob: React.ComponentType<IRemoveJob> = ( {ids = [],
-                                             fetchData = null,
-                                             pagination = defaultSettings,
-                                             resetSelectedJobs = null} ) => {
+const RemoveJob: React.ComponentType<IRemoveJob> = ({
+  ids = [],
+  fetchData = null,
+  pagination = defaultSettings,
+  resetSelectedJobs = null,
+}) => {
   const intl = useIntl();
   const dispatch = useDispatch();
   const [job, setJob] = useState<JobType>();
-  const { id } = useParams<{id:string}>();
+  const { id } = useParams<{ id: string }>();
   const { push, goBack } = useHistory();
 
-  const removeId = id ? id : ( !id && ids && ids.length === 1 ) ? ids[0] : undefined;
+  const removeId = id ? id : !id && ids && ids.length === 1 ? ids[0] : undefined;
 
   async function removeJobs(ids) {
-    return Promise.all(
-      ids.map(
-        async (id) => await removeJob(id)
-      )
-    );
+    return Promise.all(ids.map(async (id) => await removeJob(id)));
   }
 
   const onSubmit = () => {
-    if ( !id && !(ids && ids.length > 0 )) {
+    if (!id && !(ids && ids.length > 0)) {
       return;
     }
     (removeId ? removeJob(removeId) : removeJobs(ids))
-    .catch((error) => {
-      push('/jobs');
-      dispatch(
-        addNotification({
-          variant: 'danger',
-          title: intl.formatMessage(sharedMessages.jobRemoveTitle),
-          dismissable: true,
-          description: `${intl.formatMessage(sharedMessages.delete_job_failure)}  ${error}`
-        })
-      );
-    }).then(() => push('/jobs'))
-      .then(() => { if ( !id ) { resetSelectedJobs();} })
-      .then(() => { if(fetchData) { fetchData(pagination) } })
+      .catch((error) => {
+        push('/jobs');
+        dispatch(
+          addNotification({
+            variant: 'danger',
+            title: intl.formatMessage(sharedMessages.jobRemoveTitle),
+            dismissable: true,
+            description: `${intl.formatMessage(sharedMessages.delete_job_failure)}  ${error}`,
+          })
+        );
+      })
+      .then(() => push('/jobs'))
+      .then(() => {
+        if (!id) {
+          resetSelectedJobs();
+        }
+      })
+      .then(() => {
+        if (fetchData) {
+          fetchData(pagination);
+        }
+      });
   };
 
   useEffect(() => {
-    if(!id && !removeId) {
+    if (!id && !removeId) {
       return;
     }
-    fetchJob(id ? id : removeId).then(data => setJob(data))
+    fetchJob(id ? id : removeId).then((data) => setJob(data));
   }, [removeId]);
 
-  return <Modal
-      aria-label={
-        intl.formatMessage(sharedMessages.jobRemoveTitle) as string
-      }
+  return (
+    <Modal
+      aria-label={intl.formatMessage(sharedMessages.jobRemoveTitle) as string}
       titleIconVariant="warning"
-      title={ removeId ? intl.formatMessage(sharedMessages.jobRemoveTitle) : intl.formatMessage(sharedMessages.jobsRemoveTitle)}
+      title={
+        removeId
+          ? intl.formatMessage(sharedMessages.jobRemoveTitle)
+          : intl.formatMessage(sharedMessages.jobsRemoveTitle)
+      }
       isOpen
       variant="small"
       onClose={goBack}
@@ -91,37 +94,37 @@ const RemoveJob: React.ComponentType<IRemoveJob> = ( {ids = [],
         >
           {intl.formatMessage(sharedMessages.delete)}
         </Button>,
-        <Button
-          key="cancel"
-          ouiaId="cancel"
-          variant="link"
-          type="button"
-          onClick={goBack}
-        >
+        <Button key="cancel" ouiaId="cancel" variant="link" type="button" onClick={goBack}>
           {intl.formatMessage(sharedMessages.cancel)}
-        </Button>
+        </Button>,
       ]}
     >
-    <Stack hasGutter>
-      <StackItem>
-        <TextContent>
-          <Text component={TextVariants.p}>
-            { removeId ? intl.formatMessage(sharedMessages.jobRemoveDescription)
-              : intl.formatMessage(sharedMessages.jobsRemoveDescription)}
-          </Text>
-        </TextContent>
-      </StackItem>
-      <StackItem>
-        <TextContent>
-          { removeId ? <Text component={TextVariants.p}>
-            <strong> { job?.name || `Job ${job?.id}` } </strong>
-          </Text> : <Text component={TextVariants.p}>
-            <strong> { `${ids.length} selected`  } </strong>
-          </Text>  }
-        </TextContent>
-      </StackItem>
-    </Stack>
-  </Modal>
+      <Stack hasGutter>
+        <StackItem>
+          <TextContent>
+            <Text component={TextVariants.p}>
+              {removeId
+                ? intl.formatMessage(sharedMessages.jobRemoveDescription)
+                : intl.formatMessage(sharedMessages.jobsRemoveDescription)}
+            </Text>
+          </TextContent>
+        </StackItem>
+        <StackItem>
+          <TextContent>
+            {removeId ? (
+              <Text component={TextVariants.p}>
+                <strong> {job?.name || `Job ${job?.id}`} </strong>
+              </Text>
+            ) : (
+              <Text component={TextVariants.p}>
+                <strong> {`${ids.length} selected`} </strong>
+              </Text>
+            )}
+          </TextContent>
+        </StackItem>
+      </Stack>
+    </Modal>
+  );
 };
 
 export { RemoveJob };

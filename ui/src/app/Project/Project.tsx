@@ -1,56 +1,47 @@
-import {
-  Dropdown, DropdownItem,
-  DropdownPosition,
-  KebabToggle, Level, LevelItem,
-  Title
-} from '@patternfly/react-core';
-import {Link, Route, Switch, useLocation, useParams} from 'react-router-dom';
-import React, {useState, useEffect, Fragment} from 'react';
-import AppTabs from "@app/shared/app-tabs";
+import { Dropdown, DropdownItem, DropdownPosition, KebabToggle, Level, LevelItem, Title } from '@patternfly/react-core';
+import { Link, Route, Switch, useLocation, useParams } from 'react-router-dom';
+import React, { useState, useEffect, Fragment } from 'react';
+import AppTabs from '@app/shared/app-tabs';
 
-import {CaretLeftIcon} from "@patternfly/react-icons";
-import {getTabFromPath} from "@app/utils/utils";
-import {TopToolbar} from "@app/shared/top-toolbar";
-import {ProjectDetails} from "@app/Project/project-details";
-import {ProjectLinks} from "@app/Project/project-links";
-import sharedMessages from "../messages/shared.messages";
-import {useIntl} from "react-intl";
-import {AnyObject, ProjectType, TabItemType} from "@app/shared/types/common-types";
-import {RemoveProject} from "@app/RemoveProject/RemoveProject";
-import {fetchProject} from "@app/API/Project";
+import { CaretLeftIcon } from '@patternfly/react-icons';
+import { getTabFromPath } from '@app/utils/utils';
+import { TopToolbar } from '@app/shared/top-toolbar';
+import { ProjectDetails } from '@app/Project/project-details';
+import { ProjectLinks } from '@app/Project/project-links';
+import sharedMessages from '../messages/shared.messages';
+import { useIntl } from 'react-intl';
+import { AnyObject, ProjectType, TabItemType } from '@app/shared/types/common-types';
+import { RemoveProject } from '@app/RemoveProject/RemoveProject';
+import { fetchProject } from '@app/API/Project';
 
-const buildProjectTabs = (projectId: string, intl: AnyObject) : TabItemType[] => ( [
+const buildProjectTabs = (projectId: string, intl: AnyObject): TabItemType[] => [
   {
     eventKey: 0,
     title: (
       <div>
-        <CaretLeftIcon/>
+        <CaretLeftIcon />
         {intl.formatMessage(sharedMessages.backToProjects)}
       </div>
     ),
-    name: `/projects`
+    name: `/projects`,
   },
-  { eventKey: 1,
-    title: 'Details',
-    name: `/projects/project/${projectId}/details`
-  },
+  { eventKey: 1, title: 'Details', name: `/projects/project/${projectId}/details` },
   {
     eventKey: 2,
     title: 'Links',
     name: `/project/${projectId}/links`,
-  }
-]);
+  },
+];
 
 export const renderProjectTabs = (projectId: string, intl) => {
   const project_tabs = buildProjectTabs(projectId, intl);
-  return <AppTabs tabItems={project_tabs}/>
+  return <AppTabs tabItems={project_tabs} />;
 };
 
 const Project: React.FunctionComponent = () => {
-
   const [project, setProject] = useState<ProjectType>();
   const [isOpen, setOpen] = useState<boolean>(false);
-  const { id } = useParams<{id:string}>();
+  const { id } = useParams<{ id: string }>();
   const intl = useIntl();
 
   const dropdownItems = [
@@ -58,100 +49,86 @@ const Project: React.FunctionComponent = () => {
       aria-label="Edit"
       key="edit-project"
       id="edit-project"
-      component={ <Link to={`/edit-project/${id}`}>
-          {intl.formatMessage(sharedMessages.edit)}
-        </Link>
-      }
+      component={<Link to={`/edit-project/${id}`}>{intl.formatMessage(sharedMessages.edit)}</Link>}
       role="link"
     />,
     <DropdownItem
       aria-label="Sync"
       key="sync-project"
       id="sync-project"
-      component={ <Link to={`/project/${id}/sync`}>
-        {intl.formatMessage(sharedMessages.sync)}
-      </Link>
-      }
+      component={<Link to={`/project/${id}/sync`}>{intl.formatMessage(sharedMessages.sync)}</Link>}
       role="link"
     />,
     <DropdownItem
       aria-label="Delete"
       key="delete-project"
       id="delete-project"
-      component={ <Link to={`/project/${id}/remove`}>
-        {intl.formatMessage(sharedMessages.delete)}
-      </Link>
-      }
+      component={<Link to={`/project/${id}/remove`}>{intl.formatMessage(sharedMessages.delete)}</Link>}
       role="link"
-    />
-  ]
+    />,
+  ];
 
-  const routes = () => <Fragment>
-    <Route exact path="/project/:id/remove"
-           render={ (props: AnyObject) => <RemoveProject {...props}/> }/>
-  </Fragment>;
+  const routes = () => (
+    <Fragment>
+      <Route exact path="/project/:id/remove" render={(props: AnyObject) => <RemoveProject {...props} />} />
+    </Fragment>
+  );
 
   useEffect(() => {
-    fetchProject(id)
-      .then(data => setProject(data));
+    fetchProject(id).then((data) => setProject(data));
   }, []);
   const location = useLocation();
-  const currentTab = project?.id ?
-    getTabFromPath(buildProjectTabs(project.id,intl), location.pathname) :
-    intl.formatMessage(sharedMessages.details);
+  const currentTab = project?.id
+    ? getTabFromPath(buildProjectTabs(project.id, intl), location.pathname)
+    : intl.formatMessage(sharedMessages.details);
   return (
     <React.Fragment>
-      { routes() }
-      <TopToolbar breadcrumbs={[
-        {
-          title: intl.formatMessage(sharedMessages.projects),
-          to: '/projects'
-        },
-        {
-          title: project?.name,
-          key: 'details',
-          to: `/project/${project?.id}/details`
-        },
-        {
-          title: currentTab || intl.formatMessage(sharedMessages.details),
-          key: 'current_tab'
-        }
-      ]
-      }>
+      {routes()}
+      <TopToolbar
+        breadcrumbs={[
+          {
+            title: intl.formatMessage(sharedMessages.projects),
+            to: '/projects',
+          },
+          {
+            title: project?.name,
+            key: 'details',
+            to: `/project/${project?.id}/details`,
+          },
+          {
+            title: currentTab || intl.formatMessage(sharedMessages.details),
+            key: 'current_tab',
+          },
+        ]}
+      >
         <Level>
           <LevelItem>
-            <Title headingLevel={"h2"}>{`${project?.name}`}</Title>
+            <Title headingLevel={'h2'}>{`${project?.name}`}</Title>
           </LevelItem>
           <LevelItem>
             <Dropdown
               isPlain
               onSelect={() => setOpen(false)}
               position={DropdownPosition.right}
-              toggle={
-              <KebabToggle
-                id="project-details-toggle"
-                onToggle={(isOpen) => setOpen(isOpen)}
-              />}
+              toggle={<KebabToggle id="project-details-toggle" onToggle={(isOpen) => setOpen(isOpen)} />}
               isOpen={isOpen}
               dropdownItems={dropdownItems}
-              />
+            />
           </LevelItem>
         </Level>
       </TopToolbar>
       <Switch>
-        { project && <Route exact path="/project/:id/links">
-          <ProjectLinks
-            project={project}
-          />
-        </Route> }
+        {project && (
+          <Route exact path="/project/:id/links">
+            <ProjectLinks project={project} />
+          </Route>
+        )}
         <Route path="/project/:id">
-          <ProjectDetails
-            project={project}
-          />
+          <ProjectDetails project={project} />
         </Route>
       </Switch>
     </React.Fragment>
   );
-}
+};
 
 export { Project };

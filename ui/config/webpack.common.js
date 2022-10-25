@@ -5,8 +5,7 @@ const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 const Dotenv = require('dotenv-webpack');
 const BG_IMAGES_DIRNAME = 'bgimages';
 const ASSET_PATH = process.env.ASSET_PATH || '/eda/';
-module.exports = env => {
-
+module.exports = (env) => {
   return {
     module: {
       rules: [
@@ -18,9 +17,9 @@ module.exports = env => {
               options: {
                 transpileOnly: true,
                 experimentalWatchApi: true,
-              }
-            }
-          ]
+              },
+            },
+          ],
         },
         {
           test: /\.(woff(2)?|ttf|jpg|png|eot|gif|svg)(\?v=\d+\.\d+\.\d+)?$/,
@@ -29,34 +28,33 @@ module.exports = env => {
             filename: 'fonts/[name][ext]',
           },
         },
-      ]
+      ],
     },
     output: {
       filename: '[name].bundle.js',
       path: path.resolve(__dirname, '../dist'),
-      publicPath: ASSET_PATH
+      publicPath: ASSET_PATH,
     },
     plugins: [
       new HtmlWebpackPlugin({
         template: path.resolve(__dirname, '../src', 'index.html'),
         applicationName: 'Event driven automation',
         favicon: 'src/assets/images/favicon.ico',
-
       }),
       new Dotenv({
         systemvars: true,
-        silent: true
-      })
+        silent: true,
+      }),
     ],
     resolve: {
       extensions: ['.js', '.ts', '.tsx', '.jsx'],
       plugins: [
         new TsconfigPathsPlugin({
-          configFile: path.resolve(__dirname, '../tsconfig.json')
-        })
+          configFile: path.resolve(__dirname, '../tsconfig.json'),
+        }),
       ],
       symlinks: false,
-      cacheWithContext: false
-    }
-  }
+      cacheWithContext: false,
+    },
+  };
 };

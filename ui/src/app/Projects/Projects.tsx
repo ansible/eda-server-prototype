@@ -1,22 +1,22 @@
-import {Checkbox, PageSection, Title, ToolbarGroup, ToolbarItem} from '@patternfly/react-core';
-import {Link, Route, useHistory} from 'react-router-dom';
-import React, {useState, useEffect, useReducer, Fragment} from 'react';
+import { PageSection, Title, ToolbarGroup, ToolbarItem } from '@patternfly/react-core';
+import { Link, Route, useHistory } from 'react-router-dom';
+import React, { useState, useEffect, useReducer, Fragment } from 'react';
 import { Button } from '@patternfly/react-core';
-import {TopToolbar} from '../shared/top-toolbar';
+import { TopToolbar } from '../shared/top-toolbar';
 import { PlusCircleIcon } from '@patternfly/react-icons';
 import sharedMessages from '../messages/shared.messages';
 import ProjectsTableContext from './projects-table-context';
-import {TableToolbarView} from "@app/shared/table-toolbar-view";
-import TableEmptyState from "@app/shared/table-empty-state";
-import {useIntl} from "react-intl";
-import {defaultSettings} from "@app/shared/pagination";
-import {NewProject} from "@app/NewProject/NewProject";
-import {EditProject} from "@app/EditProject/EditProject";
-import {createRows} from "@app/Projects/projects-table-helpers";
-import {AnyObject} from "@app/shared/types/common-types";
-import {cellWidth} from "@patternfly/react-table";
-import {RemoveProject} from "@app/RemoveProject/RemoveProject";
-import {listProjects} from "@app/API/Project";
+import { TableToolbarView } from '@app/shared/table-toolbar-view';
+import TableEmptyState from '@app/shared/table-empty-state';
+import { useIntl } from 'react-intl';
+import { defaultSettings } from '@app/shared/pagination';
+import { NewProject } from '@app/NewProject/NewProject';
+import { EditProject } from '@app/EditProject/EditProject';
+import { createRows } from '@app/Projects/projects-table-helpers';
+import { AnyObject } from '@app/shared/types/common-types';
+import { cellWidth } from '@patternfly/react-table';
+import { RemoveProject } from '@app/RemoveProject/RemoveProject';
+import { listProjects } from '@app/API/Project';
 
 interface ProjectType {
   id: string;
@@ -26,32 +26,32 @@ interface ProjectType {
 
 const columns = (intl) => [
   {
-    title: (''),
-    transforms: [cellWidth(10 )]
+    title: '',
+    transforms: [cellWidth(10)],
   },
   {
-    title: intl.formatMessage(sharedMessages.name)
+    title: intl.formatMessage(sharedMessages.name),
   },
   {
-    title: intl.formatMessage(sharedMessages.status)
+    title: intl.formatMessage(sharedMessages.status),
   },
   {
-    title: intl.formatMessage(sharedMessages.type)
+    title: intl.formatMessage(sharedMessages.type),
   },
   {
-    title: intl.formatMessage(sharedMessages.revision)
-  }
+    title: intl.formatMessage(sharedMessages.revision),
+  },
 ];
 
 const prepareChips = (filterValue, intl) =>
   filterValue
     ? [
-      {
-        category: intl.formatMessage(sharedMessages.url),
-        key: 'url',
-        chips: [{ name: filterValue, value: filterValue }]
-      }
-    ]
+        {
+          category: intl.formatMessage(sharedMessages.url),
+          key: 'url',
+          chips: [{ name: filterValue, value: filterValue }],
+        },
+      ]
     : [];
 
 const initialState = (filterValue = '') => ({
@@ -61,11 +61,10 @@ const initialState = (filterValue = '') => ({
   selectedProjects: [],
   selectedAll: false,
   removeModalOpen: false,
-  rows: []
+  rows: [],
 });
 
-const areSelectedAll = (rows: AnyObject[] = [], selected) =>
-  rows.every((row) => selected.includes(row.id));
+const areSelectedAll = (rows: AnyObject[] = [], selected) => rows.every((row) => selected.includes(row.id));
 
 const unique = (value, index, self) => self.indexOf(value) === index;
 
@@ -76,12 +75,12 @@ export const projectsListState = (state, action) => {
       return {
         ...state,
         rows: action.payload,
-        selectedAll: areSelectedAll(action.payload, state.selectedProjects)
+        selectedAll: areSelectedAll(action.payload, state.selectedProjects),
       };
     case 'setFetching':
       return {
         ...state,
-        isFetching: action.payload
+        isFetching: action.payload,
       };
     case 'setFilterValue':
       return { ...state, filterValue: action.payload };
@@ -91,35 +90,30 @@ export const projectsListState = (state, action) => {
         selectedAll: false,
         selectedProjects: state.selectedProjects.includes(action.payload)
           ? state.selectedProjects.filter((id) => id !== action.payload)
-          : [...state.selectedProjects, action.payload]
+          : [...state.selectedProjects, action.payload],
       };
     case 'selectAll':
       return {
         ...state,
-        selectedProjects: [
-          ...state.selectedProjects,
-          ...action.payload
-        ].filter(unique),
-        selectedAll: true
+        selectedProjects: [...state.selectedProjects, ...action.payload].filter(unique),
+        selectedAll: true,
       };
     case 'unselectAll':
       return {
         ...state,
-        selectedProjects: state.selectedProjects.filter(
-          (selected) => !action.payload.includes(selected)
-        ),
-        selectedAll: false
+        selectedProjects: state.selectedProjects.filter((selected) => !action.payload.includes(selected)),
+        selectedAll: false,
       };
     case 'resetSelected':
       return {
         ...state,
         selectedProjects: [],
-        selectedAll: false
+        selectedAll: false,
       };
     case 'setFilteringFlag':
       return {
         ...state,
-        isFiltering: action.payload
+        isFiltering: action.payload,
       };
     case 'clearFilters':
       return { ...state, filterValue: '', isFetching: true };
@@ -136,27 +130,25 @@ const Projects: React.FunctionComponent = () => {
   const [offset, setOffset] = useState(1);
 
   const data = projects;
-  const meta = {count: projects?.length || 0, limit, offset};
-  const [
-    {
-      filterValue,
-      isFetching,
-      isFiltering,
-      selectedProjects,
-      selectedAll,
-      rows
-    },
-    stateDispatch
-  ] = useReducer(projectsListState, initialState());
+  const meta = { count: projects?.length || 0, limit, offset };
+  const [{ filterValue, isFetching, isFiltering, selectedProjects, selectedAll, rows }, stateDispatch] = useReducer(
+    projectsListState,
+    initialState()
+  );
 
-  const setSelectedProjects = (ids: string[]) =>
-    stateDispatch({type: 'select', payload: ids});
+  const setSelectedProjects = (ids: string[]) => stateDispatch({ type: 'select', payload: ids });
 
   const handlePagination = (pagination) => {
-    stateDispatch({type: 'setFetching', payload: true});
-    return listProjects(pagination).then(data => { setProjects(data); stateDispatch({type: 'setRows', payload: createRows(projects)});})
-      .then(() => {stateDispatch({type: 'setFetching', payload: false});})
-      .catch(() => stateDispatch({type: 'setFetching', payload: false}));
+    stateDispatch({ type: 'setFetching', payload: true });
+    return listProjects(pagination)
+      .then((data) => {
+        setProjects(data);
+        stateDispatch({ type: 'setRows', payload: createRows(projects) });
+      })
+      .then(() => {
+        stateDispatch({ type: 'setFetching', payload: false });
+      })
+      .catch(() => stateDispatch({ type: 'setFetching', payload: false }));
   };
 
   useEffect(() => {
@@ -164,42 +156,41 @@ const Projects: React.FunctionComponent = () => {
   }, []);
 
   useEffect(() => {
-    stateDispatch({type: 'setRows', payload: createRows(projects)});
+    stateDispatch({ type: 'setRows', payload: createRows(projects) });
   }, [projects]);
 
   const clearFilters = () => {
-    stateDispatch({type: 'clearFilters'});
+    stateDispatch({ type: 'clearFilters' });
     return handlePagination(meta);
   };
 
   const handleFilterChange = (value) => {
-    !value || value === ''
-      ? clearFilters()
-      : stateDispatch({type: 'setFilterValue', payload: value});
+    !value || value === '' ? clearFilters() : stateDispatch({ type: 'setFilterValue', payload: value });
   };
 
-   const routes = () => <Fragment>
-    <Route
-      exact
-      path={'/projects/new-project'}
-      render={(props: AnyObject) => (
-        <NewProject {...props} />
-      )}
-    />
-    <Route exact path="/projects/edit-project/:id" render={ (props: AnyObject) => <EditProject {...props} /> }/>
-    <Route exact path="/projects/remove"
-            render={ props => <RemoveProject { ...props }
-                                             ids={ selectedProjects }
-                                             fetchData={ handlePagination }
-                                             resetSelectedProjects={() =>
-                                               stateDispatch({ type: 'resetSelected' })
-                                             }/>}/>
-    <Route exact path="/projects/remove/:id"
-           render={ props => <RemoveProject { ...props }
-                                             fetchData={ handlePagination }
-           /> }/>
-  </Fragment>;
-
+  const routes = () => (
+    <Fragment>
+      <Route exact path={'/projects/new-project'} render={(props: AnyObject) => <NewProject {...props} />} />
+      <Route exact path="/projects/edit-project/:id" render={(props: AnyObject) => <EditProject {...props} />} />
+      <Route
+        exact
+        path="/projects/remove"
+        render={(props) => (
+          <RemoveProject
+            {...props}
+            ids={selectedProjects}
+            fetchData={handlePagination}
+            resetSelectedProjects={() => stateDispatch({ type: 'resetSelected' })}
+          />
+        )}
+      />
+      <Route
+        exact
+        path="/projects/remove/:id"
+        render={(props) => <RemoveProject {...props} fetchData={handlePagination} />}
+      />
+    </Fragment>
+  );
 
   const actionResolver = () => [
     {
@@ -207,57 +198,48 @@ const Projects: React.FunctionComponent = () => {
       component: 'button',
       onClick: (_event, _rowId, project) =>
         history.push({
-          pathname: `/edit-project/${project.id}`
-        })
+          pathname: `/edit-project/${project.id}`,
+        }),
     },
     {
       title: intl.formatMessage(sharedMessages.delete),
       component: 'button',
       onClick: (_event, _rowId, project) =>
         history.push({
-          pathname: `/projects/remove/${project.id}`
-        })
-    }
+          pathname: `/projects/remove/${project.id}`,
+        }),
+    },
   ];
 
-  const selectAllFunction = () =>
-      stateDispatch({type: 'selectAll', payload: data.map(( item) =>  item.id)});
+  const selectAllFunction = () => stateDispatch({ type: 'selectAll', payload: data.map((item) => item.id) });
 
-  const unselectAllFunction = () =>
-    stateDispatch({type: 'unselectAll', payload: data.map(( item) =>  item.id)});
+  const unselectAllFunction = () => stateDispatch({ type: 'unselectAll', payload: data.map((item) => item.id) });
 
   const anyProjectsSelected = selectedProjects.length > 0;
 
   const bulkSelectProps = React.useMemo(() => {
-     return {
+    return {
       count: selectedProjects.length || 0,
       items: [
         {
           title: 'Select none (0)',
-          onClick: unselectAllFunction
+          onClick: unselectAllFunction,
         },
         {
           title: `Select all (${projects.length || 0})`,
-          onClick: selectAllFunction
-        }
+          onClick: selectAllFunction,
+        },
       ],
       checked: selectedProjects.length === projects.length,
-      onSelect: (isChecked: boolean) => isChecked ? selectAllFunction() : unselectAllFunction()
+      onSelect: (isChecked: boolean) => (isChecked ? selectAllFunction() : unselectAllFunction()),
     };
-  }, [ selectedProjects.length, projects.length ]);
+  }, [selectedProjects.length, projects.length]);
 
   const toolbarButtons = () => (
     <ToolbarGroup className={`pf-u-pl-lg top-toolbar`}>
       <ToolbarItem>
-        <Link
-          id="add-project-link"
-          to={{pathname: '/new-project'}}
-        >
-          <Button
-            ouiaId={'add-project-link'}
-            variant="primary"
-            aria-label={intl.formatMessage(sharedMessages.add)}
-          >
+        <Link id="add-project-link" to={{ pathname: '/new-project' }}>
+          <Button ouiaId={'add-project-link'} variant="primary" aria-label={intl.formatMessage(sharedMessages.add)}>
             {intl.formatMessage(sharedMessages.addProject)}
           </Button>
         </Link>
@@ -266,14 +248,12 @@ const Projects: React.FunctionComponent = () => {
         <Link
           id="remove-multiple-projects"
           className={anyProjectsSelected ? '' : 'disabled-link'}
-          to={{pathname: '/projects/remove'}}
+          to={{ pathname: '/projects/remove' }}
         >
           <Button
             variant="secondary"
             isDisabled={!anyProjectsSelected}
-            aria-label={intl.formatMessage(
-              sharedMessages.deleteProjectTitle
-            )}
+            aria-label={intl.formatMessage(sharedMessages.deleteProjectTitle)}
           >
             {intl.formatMessage(sharedMessages.delete)}
           </Button>
@@ -285,12 +265,12 @@ const Projects: React.FunctionComponent = () => {
   return (
     <Fragment>
       <TopToolbar>
-        <Title headingLevel={"h2"}>Projects</Title>
+        <Title headingLevel={'h2'}>Projects</Title>
       </TopToolbar>
       <ProjectsTableContext.Provider
         value={{
           selectedProjects,
-          setSelectedProjects
+          setSelectedProjects,
         }}
       >
         <PageSection page-type={'projects-list'} id={'projects_list'}>
@@ -319,16 +299,11 @@ const Projects: React.FunctionComponent = () => {
                       {intl.formatMessage(sharedMessages.clearAllFilters)}
                     </Button>
                   ) : (
-                    <Link
-                      id="create-project-link"
-                      to={{pathname: '/new-project'}}
-                    >
+                    <Link id="create-project-link" to={{ pathname: '/new-project' }}>
                       <Button
                         ouiaId={'create-project-link'}
                         variant="primary"
-                        aria-label={intl.formatMessage(
-                          sharedMessages.addProject
-                        )}
+                        aria-label={intl.formatMessage(sharedMessages.addProject)}
                       >
                         {intl.formatMessage(sharedMessages.addProject)}
                       </Button>
@@ -338,9 +313,7 @@ const Projects: React.FunctionComponent = () => {
                 description={
                   filterValue === ''
                     ? intl.formatMessage(sharedMessages.noprojects_action)
-                    : intl.formatMessage(
-                    sharedMessages.clearAllFiltersDescription
-                    )
+                    : intl.formatMessage(sharedMessages.clearAllFiltersDescription)
                 }
               />
             )}
@@ -349,5 +322,5 @@ const Projects: React.FunctionComponent = () => {
       </ProjectsTableContext.Provider>
     </Fragment>
   );
-}
+};
 export { Projects };

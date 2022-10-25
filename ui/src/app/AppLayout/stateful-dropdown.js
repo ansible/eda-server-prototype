@@ -1,36 +1,24 @@
 import * as React from 'react';
 
-import {
-  Dropdown,
-  DropdownPosition,
-  KebabToggle,
-  DropdownToggle
-} from '@patternfly/react-core';
+import { Dropdown, DropdownPosition, KebabToggle, DropdownToggle } from '@patternfly/react-core';
 
 export class StatefulDropdown extends React.Component {
   static defaultProps = {
     isPlain: true,
-    toggleType: 'kebab'
+    toggleType: 'kebab',
   };
 
   constructor(props) {
     super(props);
     this.state = {
       isOpen: false,
-      selected: undefined
+      selected: undefined,
     };
   }
 
   render() {
     const { isOpen } = this.state;
-    const {
-      items,
-      toggleType,
-      defaultText,
-      position,
-      isPlain,
-      ariaLabel
-    } = this.props;
+    const { items, toggleType, defaultText, position, isPlain, ariaLabel } = this.props;
     return (
       <Dropdown
         onSelect={(e) => this.onSelect(e)}
@@ -55,13 +43,8 @@ export class StatefulDropdown extends React.Component {
         );
       case 'icon':
         return (
-          <DropdownToggle
-            toggleIndicator={null}
-            onToggle={(e) => this.onToggle(e)}
-          >
-            {this.state.selected
-              ? this.state.selected
-              : defaultText || 'Dropdown'}
+          <DropdownToggle toggleIndicator={null} onToggle={(e) => this.onToggle(e)}>
+            {this.state.selected ? this.state.selected : defaultText || 'Dropdown'}
           </DropdownToggle>
         );
       case 'kebab':
@@ -71,7 +54,7 @@ export class StatefulDropdown extends React.Component {
 
   onToggle(isOpen) {
     this.setState({
-      isOpen
+      isOpen,
     });
   }
 
@@ -79,7 +62,7 @@ export class StatefulDropdown extends React.Component {
     this.setState(
       {
         isOpen: !this.state.isOpen,
-        selected: event.currentTarget.value
+        selected: event.currentTarget.value,
       },
       () => {
         if (this.props.onSelect) {
