@@ -23,6 +23,8 @@ const endpoint = 'http://' + getServer() + '/api/projects';
 const EditProject: React.FunctionComponent = () => {
   const history = useHistory();
   const [project, setProject] = useState<ProjectType>({id: '', name: '' });
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+
   const { id } = useParams<{id:string}>();
   const intl = useIntl();
   const dispatch = useDispatch();
@@ -43,8 +45,10 @@ const EditProject: React.FunctionComponent = () => {
   const setScmToken = (scm_token: string) => setProject({...project, scm_token: scm_token} );
 
   const handleSubmit = () => {
+      setIsSubmitting(true);
 			patchData(`${endpoint}/${project.id}`, { name: project.name, description: project.description })
         .then(data => {
+          setIsSubmitting(false);
           history.push(`/project/${data.id}`);
           dispatch(
             addNotification({
@@ -55,6 +59,7 @@ const EditProject: React.FunctionComponent = () => {
             })
           );
         }).catch((error) => {
+        setIsSubmitting(false);
         history.push(`/projects`);
         dispatch(
           addNotification({
@@ -159,7 +164,13 @@ const EditProject: React.FunctionComponent = () => {
             </GridItem>
           </Grid>
           <ActionGroup>
-            <Button variant="primary" onClick={handleSubmit}>Save</Button>
+            <Button
+              variant="primary"
+              onClick={handleSubmit}
+              isLoading={isSubmitting}
+              isDisabled={isSubmitting}>
+              {isSubmitting ? 'Saving ' : 'Save'}
+            </Button>
             <Button variant="link" onClick={() => history.push('/projects')}>Cancel</Button>
           </ActionGroup>
         </Form>

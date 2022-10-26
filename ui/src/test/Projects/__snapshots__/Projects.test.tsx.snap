@@ -216,11 +216,6 @@ exports[`Projects should render the Projects component 1`] = `
                   />
                   <Route
                     exact={true}
-                    path="/projects/edit-project/:id"
-                    render={[Function]}
-                  />
-                  <Route
-                    exact={true}
                     path="/projects/remove/:id"
                     render={[Function]}
                   />
