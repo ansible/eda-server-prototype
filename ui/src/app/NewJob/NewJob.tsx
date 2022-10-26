@@ -52,6 +52,8 @@ const NewJob: React.FunctionComponent = () => {
   const [ validatedPlaybook, setValidatedPlaybook ] = useState<ValidatedOptions>(ValidatedOptions.default);
   const [ validatedInventory, setValidatedInventory ] = useState<ValidatedOptions>(ValidatedOptions.default);
   const [ validatedExtraVar, setValidatedExtraVar ] = useState<ValidatedOptions>(ValidatedOptions.default);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+
   useEffect(() => {
      fetch(endpoint_playbooks, {
        headers: {
@@ -134,12 +136,13 @@ const NewJob: React.FunctionComponent = () => {
     e.preventDefault();
     if ( !validateFields() )
       return;
-
+    setIsSubmitting(true);
     postData(endpoint_job, { name: name,
                          playbook_id: playbook,
                          inventory_id: inventory,
                          extra_var_id: extravar})
       .then(data => {
+        setIsSubmitting(false);
         data?.id ? history.push(`/job/${data.id}`) :
           history.push(`/jobs`);
         dispatch(
@@ -151,6 +154,7 @@ const NewJob: React.FunctionComponent = () => {
           })
         );
       }).catch((error) => {
+      setIsSubmitting(false);
       history.push(`/jobs`);
       dispatch(
         addNotification({
@@ -234,7 +238,14 @@ const NewJob: React.FunctionComponent = () => {
               </FormSelect>
             </FormGroup>
             <ActionGroup>
-              <Button variant="primary" onClick={handleSubmit}>Save</Button>
+              <Button
+                variant="primary"
+                onClick={handleSubmit}
+                isLoading={isSubmitting}
+                isDisabled={isSubmitting}
+              >
+                {isSubmitting ? 'Adding ' : 'Add'}
+              </Button>
               <Button variant="link" onClick={() => history.push('/activations')}> Cancel</Button>
             </ActionGroup>
           </Form>

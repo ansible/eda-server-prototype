@@ -194,7 +194,6 @@ const Projects: React.FunctionComponent = () => {
         <NewProject {...props} />
       )}
     />
-    <Route exact path="/projects/edit-project/:id" render={ (props: AnyObject) => <EditProject {...props} /> }/>
     <Route exact path="/projects/remove/:id"
            render={ props => <RemoveProject { ...props }
                                              fetchData={ handlePagination }

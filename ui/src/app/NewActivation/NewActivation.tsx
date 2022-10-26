@@ -90,6 +90,7 @@ const NewActivation: React.FunctionComponent = () => {
   const [validatedProject, setValidatedProject] = useState<ValidatedOptions>(ValidatedOptions.default);
   const [validatedWorkingDirectory, setValidatedWorkingDirectory] = useState<ValidatedOptions>(ValidatedOptions.default);
   const [validatedExecutionEnvironment, setValidatedExecutionEnvironment] = useState<ValidatedOptions>(ValidatedOptions.default);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   const dispatch = useDispatch();
 
@@ -241,6 +242,7 @@ const NewActivation: React.FunctionComponent = () => {
     if(!validateFields() ) {
       return;
     }
+    setIsSubmitting(true);
     postData(activation_endpoint, { name: name,
                          rulebook_id: ruleset,
                          inventory_id: inventory,
@@ -248,7 +250,7 @@ const NewActivation: React.FunctionComponent = () => {
                          project_id: project,
                          working_directory: workingDirectory,
                          execution_environment: executionEnvironment})
-      .then((data) => { history.push(`/activation/${data.id}`);
+      .then((data) => { setIsSubmitting(false); history.push(`/activation/${data.id}`);
         dispatch(
           addNotification({
             variant: 'success',
@@ -259,6 +261,7 @@ const NewActivation: React.FunctionComponent = () => {
         );
       })
       .catch((error) => {
+        setIsSubmitting(false);
         history.push(`/activations`);
         //TODO - uncomment when the endpoint error is fixed
         /*dispatch(
@@ -472,7 +475,13 @@ const NewActivation: React.FunctionComponent = () => {
 
             </Grid>
             <ActionGroup>
-              <Button variant="primary" onClick={handleSubmit}>Add</Button>
+              <Button
+                variant="primary"
+                onClick={handleSubmit}
+                isLoading={isSubmitting}
+                isDisabled={isSubmitting}>
+                {isSubmitting ? 'Adding ' : 'Add'}
+              </Button>
               <Button variant="link" onClick={() => history.push('/activations')}> Cancel</Button>
             </ActionGroup>
           </Form>

@@ -32,6 +32,7 @@ const NewProject: React.FunctionComponent = () => {
   const [scmCredential, setScmCredential] = useState('');
   const [validatedName, setValidatedName ] = useState<ValidatedOptions>(ValidatedOptions.default);
   const [validatedScmUrl, setValidatedScmUrl ] = useState<ValidatedOptions>(ValidatedOptions.default);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   const intl = useIntl();
   const dispatch = useDispatch();
@@ -75,8 +76,10 @@ const NewProject: React.FunctionComponent = () => {
     if(!validateFields() ) {
       return;
     }
+    setIsSubmitting(true);
     postData(endpoint, { url: scmUrl, name: name, description: description })
 				.then(data => {
+          setIsSubmitting(false);
           history.push(`/project/${data.id}`);
           dispatch(
             addNotification({
@@ -87,6 +90,7 @@ const NewProject: React.FunctionComponent = () => {
             })
           );
 			}).catch((error) => {
+      setIsSubmitting(false);
         history.push(`/projects`);
         dispatch(
           addNotification({
@@ -202,7 +206,13 @@ const NewProject: React.FunctionComponent = () => {
             </GridItem>
           </Grid>
           <ActionGroup>
-            <Button variant="primary" onClick={handleSubmit}>Save</Button>
+            <Button
+              variant="primary"
+              onClick={handleSubmit}
+              isLoading={isSubmitting}
+              isDisabled={isSubmitting}>
+              {isSubmitting ? 'Adding ' : 'Add'}
+            </Button>
             <Button variant="link" onClick={() => history.push('/projects')}>Cancel</Button>
           </ActionGroup>
         </Form>

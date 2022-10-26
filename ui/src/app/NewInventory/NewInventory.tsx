@@ -42,6 +42,7 @@ const NewInventory: React.FunctionComponent = () => {
 
   const [ validatedName, setValidatedName ] = useState<ValidatedOptions>(ValidatedOptions.default);
   const [ validatedInventory, setValidatedInventory ] = useState<ValidatedOptions>(ValidatedOptions.default);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   const validateName = (value) => {
     (!value || value.length < 1 ) ?
@@ -195,7 +196,14 @@ const NewInventory: React.FunctionComponent = () => {
               </StackItem>
               <StackItem>
                 <ActionGroup>
-                  <Button variant="primary" isDisabled={true} onClick={handleSubmit}>Add</Button>
+                  <Button
+                    variant="primary"
+                    isDisabled={true}
+                    onClick={handleSubmit}
+                    isLoading={isSubmitting}
+                  >
+                    {isSubmitting ? 'Adding ' : 'Add'}
+                  </Button>
                   <Button variant="link" onClick={() => history.push('/inventories')}> Cancel</Button>
                 </ActionGroup>
               </StackItem>
