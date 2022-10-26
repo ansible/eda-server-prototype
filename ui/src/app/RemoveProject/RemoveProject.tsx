@@ -19,9 +19,9 @@ import {addNotification} from "@redhat-cloud-services/frontend-components-notifi
 
 interface IRemoveProject {
   ids?: Array<string|number>,
-  fetchData: any,
+  fetchData?: any,
   pagination?: PaginationConfiguration,
-  setSelectedProjects: any
+  setSelectedProjects?: any
 }
 const projectEndpoint = 'http://' + getServer() + '/api/projects';
 
@@ -35,24 +35,22 @@ export const fetchProject = (projectId, pagination=defaultSettings) =>
 }
 
 const RemoveProject: React.ComponentType<IRemoveProject> = ( {ids = [],
-                                             fetchData,
+                                             fetchData = null,
                                              pagination = defaultSettings,
-                                             setSelectedProjects} ) => {
+                                             setSelectedProjects = null} ) => {
   const intl = useIntl();
   const dispatch = useDispatch();
   const [project, setProject] = useState<ProjectType>();
   const { id } = useParams<{id:string}>();
   const { push, goBack } = useHistory();
 
-  const removeProject = async (projectId) =>
-  {
-    await removeData(`${projectEndpoint}/${projectId}`);
-    return fetchData(pagination);
-  }
+  const removeProject = (projectId) => removeData(`${projectEndpoint}/${projectId}`);
 
   const onSubmit = () => {
-    removeProject(id).then(() => push('/projects'))
+    removeProject(id).then(() => { if(fetchData) { fetchData(pagination)} push('/projects');})
     .catch((error) => {
+      if(fetchData) { fetchData(pagination) }
+      push('/projects');
       dispatch(
         addNotification({
           variant: 'danger',

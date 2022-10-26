@@ -1,6 +1,15 @@
-import { PageSection, Title } from '@patternfly/react-core';
-import { Link, useParams } from 'react-router-dom';
-import React, { useState, useEffect } from 'react';
+import {
+  Dropdown,
+  DropdownItem,
+  DropdownPosition,
+  KebabToggle,
+  Level,
+  LevelItem,
+  PageSection,
+  Title
+} from '@patternfly/react-core';
+import {Link, Route, useParams} from 'react-router-dom';
+import React, {useState, useEffect, Fragment} from 'react';
 import Ansi from "ansi-to-react";
 import {
   Card,
@@ -14,6 +23,11 @@ import {
 import styled from 'styled-components';
 import {getServer} from '@app/utils/utils';
 import {TopToolbar} from "@app/shared/top-toolbar";
+import sharedMessages from "../messages/shared.messages";
+import {AnyObject} from "@app/shared/types/common-types";
+import {RemoveProject} from "@app/RemoveProject/RemoveProject";
+import {useIntl} from "react-intl";
+import {RemoveJob} from "@app/RemoveJob/RemoveJob";
 
 export interface JobType {
   id: string;
@@ -27,19 +41,21 @@ const SimpleList = styled(PFSimpleList)`
   white-space: pre-wrap;
 `
 
-const endpoint = 'http://' + getServer() + '/api/job_instance/';
-const event_endpoint = 'http://' + getServer() + '/api/job_instance_events/';
+const endpoint = 'http://' + getServer() + '/api/job_instance';
+const event_endpoint = 'http://' + getServer() + '/api/job_instance_events';
 
 const Job: React.FunctionComponent = () => {
 
   const [job, setJob] = useState<JobType|undefined>(undefined);
   const [stdout, setStdout] = useState<any[]>([]);
   const [newStdout, setNewStdout] = useState<string>('');
+  const [update_client, setUpdateClient] = useState<WebSocket|unknown>({});
+  const [isOpen, setOpen] = useState<boolean>(false);
 
   const { id } = useParams<JobType>();
+  const intl = useIntl();
 
-  const [update_client, setUpdateClient] = useState<WebSocket|unknown>({});
-  useEffect(() => {
+    useEffect(() => {
     const uc = new WebSocket('ws://' + getServer() + '/api/ws-job/' + id);
     setUpdateClient(uc);
     uc.onopen = () => {
@@ -59,13 +75,13 @@ const Job: React.FunctionComponent = () => {
   }, [newStdout]);
 
   useEffect(() => {
-     fetch(endpoint + id, {
+     fetch(`${endpoint}/${id}`, {
        headers: {
          'Content-Type': 'application/json',
        },
      }).then(response => response.json())
     .then(data => setJob(data));
-     fetch(event_endpoint + id, {
+     fetch(`${event_endpoint}/${id}`, {
        headers: {
          'Content-Type': 'application/json',
        },
@@ -73,17 +89,74 @@ const Job: React.FunctionComponent = () => {
     .then(data => setStdout(data));
   }, []);
 
+  const dropdownItems = [
+    <DropdownItem
+      aria-label="Edit"
+      key="edit-job"
+      id="edit-job"
+      component={ <Link to={`/job/${id}/edit`}>
+        {intl.formatMessage(sharedMessages.edit)}
+      </Link>
+      }
+      role="link"
+    />,
+    <DropdownItem
+      aria-label="Launch"
+      key="launch-job"
+      id="launch-job"
+      component={ <Link to={`/job/${id}/launch`}>
+        {intl.formatMessage(sharedMessages.launch)}
+      </Link>
+      }
+      role="link"
+    />,
+    <DropdownItem
+      aria-label="Delete"
+      key="delete-job"
+      id="delete-job"
+      component={ <Link to={`/job/${id}/remove`}>
+        {intl.formatMessage(sharedMessages.delete)}
+      </Link>
+      }
+      role="link"
+    />
+  ]
+
+  const routes = () => <Fragment>
+    <Route exact path="/job/:id/remove"
+           render={ (props: AnyObject) => <RemoveJob {...props}/> }/>
+  </Fragment>;
+
   return (
   <React.Fragment>
+    { routes() }
     <TopToolbar>
-      <Title headingLevel={"h2"}>{`Job ${job?.id}`}</Title>
+      <Level>
+        <LevelItem>
+          <Title headingLevel={"h2"}>{ job?.name || `Job ${job?.id}` }</Title>
+        </LevelItem>
+        <LevelItem>
+          <Dropdown
+            isPlain
+            onSelect={() => setOpen(false)}
+            position={DropdownPosition.right}
+            toggle={
+              <KebabToggle
+                id="job-details-toggle"
+                onToggle={(isOpen) => setOpen(isOpen)}
+              />}
+            isOpen={isOpen}
+            dropdownItems={dropdownItems}
+          />
+        </LevelItem>
+      </Level>
     </TopToolbar>
     <Stack>
       <StackItem>
         <Card>
           <CardTitle>Standard Out</CardTitle>
           <CardBody>
-            {stdout.length !== 0 && (
+            {stdout && stdout.length !== 0 && (
               <SimpleList style={{ whiteSpace: 'pre-wrap' }}>
                 {stdout.map((item, i) => (
                   <SimpleListItem key={i}><Ansi>{item?.stdout}</Ansi></SimpleListItem>

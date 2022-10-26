@@ -151,8 +151,7 @@ const RuleBooks: React.FunctionComponent = () => {
       component: 'button',
       onClick: (_event, _rowId, rulebook) =>
         history.push({
-          pathname: '/disable-rule-book',
-          search: `?rule-set=${rulebook.id}`
+          pathname: `/rulebooks/relaunch/${rulebook?.id}`,
         })
     }
   ];

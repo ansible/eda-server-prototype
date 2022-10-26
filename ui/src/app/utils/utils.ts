@@ -39,7 +39,6 @@ export async function postData(url = '', data = {}) {
   if (response.ok) {
     return response.json()
   }
-  console.log('Debug - response: ', response);
   throw new Error( `${response?.status} - ${response?.statusText}`);
 }
 

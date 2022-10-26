@@ -1,6 +1,6 @@
 import {Button, PageSection, SimpleListItem} from '@patternfly/react-core';
-import {useHistory, useParams} from 'react-router-dom';
-import React, {useEffect, useReducer, useState} from 'react';
+import {Route, useHistory, useParams} from 'react-router-dom';
+import React, {Fragment, useEffect, useReducer, useState} from 'react';
 import {TableToolbarView} from "@app/shared/table-toolbar-view";
 import sharedMessages from "../messages/shared.messages";
 import {cellWidth} from "@patternfly/react-table";
@@ -22,6 +22,9 @@ const columns = (intl) => [
   },
   {
     title: (intl.formatMessage(sharedMessages.fire_count))
+  },
+  {
+    title: (intl.formatMessage(sharedMessages.lastFiredDate))
   }
 ];
 
@@ -85,8 +88,8 @@ const RulebookRulesets: React.FunctionComponent<{rulebook: RuleBookType}> = ({ru
   const [offset, setOffset] = useState(1);
   const [rulesets, setRuleSets] = useState<RuleSetType[]>([]);
 
-  const rulebookId = rulebook?.id;
   const {id} = useParams<{id: string}>();
+  const rulebookId = id || rulebook?.id;
 
   const meta = {count: rulesets?.length || 0, limit, offset};
   const [
@@ -123,6 +126,19 @@ const RulebookRulesets: React.FunctionComponent<{rulebook: RuleBookType}> = ({ru
       ? clearFilters()
       : stateDispatch({type: 'setFilterValue', payload: value});
   };
+
+  const actionResolver = () => [
+    {
+      title: intl.formatMessage(sharedMessages.disable),
+      component: 'button',
+      isDisabled: true,
+      onClick: (_event, _rowId, ruleset) =>
+        history.push({
+          pathname: `/rulebooks/rulebook/${rulebookId}/disable/${ruleset?.id}`
+        })
+    }
+    ];
+
   return (
     <PageSection page-type={'rulebook-rulesets'} id={'rulebook-rulesets'}>
       { renderRuleBookTabs(id, intl) }
@@ -131,6 +147,7 @@ const RulebookRulesets: React.FunctionComponent<{rulebook: RuleBookType}> = ({ru
         rows={rows}
         columns={columns(intl)}
         fetchData={updateRuleSets}
+        actionResolver={actionResolver}
         setLimit={setLimit}
         setOffset={setOffset}
         plural={intl.formatMessage(sharedMessages.rulesets)}

@@ -1,5 +1,5 @@
-import {Title} from '@patternfly/react-core';
-import {Route, Switch, useLocation, useParams} from 'react-router-dom';
+import {Dropdown, DropdownItem, DropdownPosition, KebabToggle, Level, LevelItem, Title} from '@patternfly/react-core';
+import {Link, Route, Switch, useLocation, useParams} from 'react-router-dom';
 import React, { useState, useEffect, Fragment } from 'react';
 import {useIntl} from "react-intl";
 import AppTabs from "@app/shared/app-tabs";
@@ -14,6 +14,7 @@ import {ActivationType} from "@app/Activations/Activations";
 import {JobType} from "@app/Job/Job";
 import {AnyObject, TabItemType} from "@app/shared/types/common-types";
 import sharedMessages from '../messages/shared.messages';
+import {RemoveActivation} from "@app/RemoveActivation/RemoveActivation";
 
 const buildActivationTabs = (activationId: string, intl: AnyObject) : TabItemType[] => ( [
     {
@@ -64,7 +65,7 @@ const Activation: React.FunctionComponent = () => {
   const [websocket_client, setWebsocketClient] = useState<WebSocket|undefined>(undefined);
   const [jobs, setJobs] = useState<JobType[]>([]);
   const [newJob, setNewJob] = useState<JobType|undefined>(undefined);
-
+  const [isOpen, setOpen] = useState<boolean>(false);
   const { id } = useParams<{id: string}>();
   const intl = useIntl();
 
@@ -102,12 +103,63 @@ const Activation: React.FunctionComponent = () => {
       setJobs([...jobs, newJob]);
     }
   }, [newJob]);
+
+  const dropdownItems = [
+    <DropdownItem
+      aria-label="Edit"
+      key="relaunch-activation"
+      id="relaunch-activation"
+      component={ <Link to={`/activation/${id}/relaunch`}>
+        {intl.formatMessage(sharedMessages.relaunch)}
+      </Link>
+      }
+      role="link"
+    />,
+    <DropdownItem
+      aria-label="Restart"
+      key="restart-activation"
+      id="restart-activation"
+      component={ <Link to={`/activation/${id}/restart`}>
+        {intl.formatMessage(sharedMessages.restart)}
+      </Link>
+      }
+      role="link"
+    />,
+    <DropdownItem
+      aria-label="Disable"
+      key="disable-activation"
+      id="disable-activation"
+      component={ <Link to={`/activation/${id}/disable`}>
+        {intl.formatMessage(sharedMessages.disable)}
+      </Link>
+      }
+      role="link"
+    />,
+    <DropdownItem
+      aria-label="Delete"
+      key="delete-activation"
+      id="delete-activation"
+      component={ <Link to={`/activation/${id}/remove`}>
+        {intl.formatMessage(sharedMessages.delete)}
+      </Link>
+      }
+      role="link"
+    />
+  ]
+
+  const routes = () => <Fragment>
+    <Route exact path="/activation/:id/remove"
+           render={ (props: AnyObject) => <RemoveActivation {...props}/> }/>
+  </Fragment>;
+
   const location = useLocation();
   const currentTab = activation?.id ?
     getTabFromPath(buildActivationTabs(activation.id,intl), location.pathname) :
     intl.formatMessage(sharedMessages.details);
+
   return (
     <React.Fragment>
+      { routes() }
       <TopToolbar breadcrumbs={[
         {
           title: intl.formatMessage(sharedMessages.rulebookActivations),
@@ -125,7 +177,25 @@ const Activation: React.FunctionComponent = () => {
         }
       ]
       }>
-        <Title headingLevel={"h2"}>{`${activation?.name}`}</Title>
+        <Level>
+          <LevelItem>
+            <Title headingLevel={"h2"}>{`${activation?.name}`}</Title>
+          </LevelItem>
+          <LevelItem>
+            <Dropdown
+              isPlain
+              onSelect={() => setOpen(false)}
+              position={DropdownPosition.right}
+              toggle={
+                <KebabToggle
+                  id="activation-details-toggle"
+                  onToggle={(isOpen) => setOpen(isOpen)}
+                />}
+              isOpen={isOpen}
+              dropdownItems={dropdownItems}
+            />
+          </LevelItem>
+        </Level>
       </TopToolbar>
       { activation &&
         <Switch>

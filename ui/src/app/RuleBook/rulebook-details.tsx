@@ -63,7 +63,7 @@ const RulebookDetails: React.FunctionComponent<{rulebook: RuleBookType}> = ({ ru
               <Stack>
                 <StackItem><Title headingLevel="h3">{intl.formatMessage(sharedMessages.number_of_rulesets)}</Title></StackItem>
                 <StackItem>
-                  { rulebook?.number_of_rulesets }
+                  { rulebook?.ruleset_count }
                 </StackItem>
               </Stack>
             </FlexItem>
