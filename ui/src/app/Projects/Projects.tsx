@@ -194,15 +194,18 @@ const Projects: React.FunctionComponent = () => {
         <NewProject {...props} />
       )}
     />
+    <Route exact path="/projects/edit-project/:id" render={ (props: AnyObject) => <EditProject {...props} /> }/>
+    <Route exact path="/projects/remove"
+            render={ props => <RemoveProject { ...props }
+                                             ids={ selectedProjects }
+                                             fetchData={ handlePagination }
+                                             resetSelectedProjects={() =>
+                                               stateDispatch({ type: 'resetSelected' })
+                                             }/>}/>
     <Route exact path="/projects/remove/:id"
            render={ props => <RemoveProject { ...props }
                                              fetchData={ handlePagination }
-                                             setSelectedProjects={setSelectedProjects } /> }/>
-    <Route exact path="/projects/remove"
-           render={ props => <RemoveProject { ...props }
-                                             ids={ selectedProjects }
-                                             fetchData={ handlePagination }
-                                             setSelectedProjects={ setSelectedProjects } /> }/>
+           /> }/>
   </Fragment>;
 
 
@@ -226,11 +229,30 @@ const Projects: React.FunctionComponent = () => {
   ];
 
   const selectAllFunction = () =>
-    selectedAll
-      ? stateDispatch({type: 'unselectAll', payload: data.map((wf) => wf.id)})
-      : stateDispatch({type: 'selectAll', payload: data.map((wf) => wf.id)});
+      stateDispatch({type: 'selectAll', payload: data.map(( item) =>  item.id)});
+
+  const unselectAllFunction = () =>
+    stateDispatch({type: 'unselectAll', payload: data.map(( item) =>  item.id)});
 
   const anyProjectsSelected = selectedProjects.length > 0;
+
+  const bulkSelectProps = React.useMemo(() => {
+     return {
+      count: selectedProjects.length || 0,
+      items: [
+        {
+          title: 'Select none (0)',
+          onClick: unselectAllFunction
+        },
+        {
+          title: `Select all (${projects.length || 0})`,
+          onClick: selectAllFunction
+        }
+      ],
+      checked: selectedProjects.length === projects.length,
+      onSelect: (isChecked: boolean) => isChecked ? selectAllFunction() : unselectAllFunction()
+    };
+  }, [ selectedProjects.length, projects.length ]);
 
   const toolbarButtons = () => (
     <ToolbarGroup className={`pf-u-pl-lg top-toolbar`}>
@@ -252,7 +274,7 @@ const Projects: React.FunctionComponent = () => {
         <Link
           id="remove-multiple-projects"
           className={anyProjectsSelected ? '' : 'disabled-link'}
-          to={{pathname: '/projects/remove-projects'}}
+          to={{pathname: '/projects/remove'}}
         >
           <Button
             variant="secondary"
@@ -286,8 +308,8 @@ const Projects: React.FunctionComponent = () => {
             setLimit={setLimit}
             setOffset={setOffset}
             columns={columns(intl)}
+            bulkSelect={bulkSelectProps}
             fetchData={handlePagination}
-
             routes={routes}
             actionResolver={actionResolver}
             plural={intl.formatMessage(sharedMessages.projects)}

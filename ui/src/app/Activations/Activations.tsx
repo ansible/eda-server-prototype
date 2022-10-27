@@ -32,13 +32,15 @@ export interface ActivationType {
   ruleset_name?: string,
   inventory_id?: string,
   inventory_name?: string,
+  number_of_rules?: string,
+  fire_count?: string,
   created_at?: string,
   updated_at?: string
 }
 
 const endpoint = 'http://' + getServer() + '/api/activation_instances';
 
-const columns = (intl, selectedAll, selectAll) => [
+const columns = (intl) => [
   {
     title: (
       ''
@@ -210,12 +212,16 @@ const Activations: React.FunctionComponent = () => {
     <Route exact path="/activations/remove/:id"
            render={ props => <RemoveActivation { ...props }
                                              fetchData={ handlePagination }
-                                             setSelectedActivations={setSelectedActivations } /> }/>
+                                               resetSelectedActivations={() =>
+                                                 stateDispatch({ type: 'resetSelected' })
+                                               } /> }/>
     <Route exact path="/activations/remove"
            render={ props => <RemoveActivation { ...props }
                                              ids={ selectedActivations }
                                              fetchData={ handlePagination }
-                                             setSelectedActivations={ setSelectedActivations } /> }/>
+                                               resetSelectedActivations={() =>
+                                                 stateDispatch({ type: 'resetSelected' })
+                                               } /> }/>
   </Fragment>;
 
 
@@ -255,11 +261,30 @@ const Activations: React.FunctionComponent = () => {
   ];
 
   const selectAllFunction = () =>
-    selectedAll
-      ? stateDispatch({type: 'unselectAll', payload: data.map((wf) => wf.id)})
-      : stateDispatch({type: 'selectAll', payload: data.map((wf) => wf.id)});
+      stateDispatch({type: 'selectAll', payload: data.map((item) => item.id)});
+
+  const unselectAllFunction = () =>
+    stateDispatch({type: 'unselectAll', payload: data.map((item) => item.id)});
 
   const anyActivationsSelected = selectedActivations.length > 0;
+
+  const bulkSelectProps = React.useMemo(() => {
+    return {
+      count: selectedActivations.length || 0,
+      items: [
+        {
+          title: 'Select none (0)',
+          onClick: unselectAllFunction
+        },
+        {
+          title: `Select all (${activations.length || 0})`,
+          onClick: selectAllFunction
+        }
+      ],
+      checked: selectedActivations.length === activations.length,
+      onSelect: (isChecked: boolean) => isChecked ? selectAllFunction() : unselectAllFunction()
+    };
+  }, [ selectedActivations.length, activations.length ]);
 
   const toolbarButtons = () => (
     <ToolbarGroup className={`pf-u-pl-lg top-toolbar`}>
@@ -314,7 +339,8 @@ const Activations: React.FunctionComponent = () => {
             rows={rows}
             setLimit={setLimit}
             setOffset={setOffset}
-            columns={columns(intl, selectedAll, selectAllFunction)}
+            columns={columns(intl)}
+            bulkSelect={bulkSelectProps}
             fetchData={handlePagination}
             routes={routes}
             actionResolver={actionResolver}

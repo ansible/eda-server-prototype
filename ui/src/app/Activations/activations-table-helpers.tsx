@@ -3,6 +3,7 @@ import {Link} from "react-router-dom";
 import ActivationsTableContext from "@app/Activations/activations-table-context";
 import {Checkbox} from "@patternfly/react-core";
 import PropTypes from "prop-types";
+import {ActivationType} from "@app/Activations/Activations";
 
 export const SelectBox = ({ id }) => {
   const {
@@ -23,12 +24,12 @@ SelectBox.propTypes = {
   id: PropTypes.string.isRequired
 };
 
-export const createRows = (data) =>
+export const createRows = (data: ActivationType[]) =>
   data.map(({ id, name, status,  number_of_rules, fire_count}) => ({
     id,
     cells: [
       <React.Fragment key={`${id}-checkbox`}>
-        <SelectBox id={`${id}`} />
+        <SelectBox id={id} />
       </React.Fragment>,
       <Fragment key={`[activation-${id}`}>
         <Link

@@ -16,18 +16,20 @@ import {defaultSettings} from "@app/shared/pagination";
 import {InventoryType} from "@app/Inventories/Inventories";
 import {addNotification} from "@redhat-cloud-services/frontend-components-notifications";
 import {useDispatch} from "react-redux";
+import {fetchProject} from "@app/RemoveProject/RemoveProject";
 
 interface IRemoveInventory {
   ids?: Array<string|number>,
   fetchData: any,
   pagination?: PaginationConfiguration,
-  setSelectedInventories: any
+  resetSelectedInventories?: any
 }
-const inventoryEndpoint = 'http://' + getServer() + '/api/inventory_instance/';
+const inventoryEndpoint = 'http://' + getServer() + '/api/inventory';
 
 export const fetchInventory = (inventoryId, pagination=defaultSettings) =>
 {
-  return fetch(`${inventoryEndpoint}${inventoryId}`, {
+  console.log('Debug - removeInventory: ', inventoryId);
+  return fetch(`${inventoryEndpoint}/${inventoryId}`, {
     headers: {
       'Content-Type': 'application/json',
     },
@@ -35,24 +37,34 @@ export const fetchInventory = (inventoryId, pagination=defaultSettings) =>
 }
 
 const RemoveInventory: React.ComponentType<IRemoveInventory> = ( {ids = [],
-                                             fetchData,
+                                             fetchData = null,
                                              pagination = defaultSettings,
-                                             setSelectedInventories} ) => {
+                                             resetSelectedInventories} ) => {
   const intl = useIntl();
   const dispatch = useDispatch();
   const [inventory, setInventory] = useState<InventoryType>();
   const { id } = useParams<{id:string}>();
   const { push, goBack } = useHistory();
 
-  const removeInventory = async (inventoryId) =>
-  {
-    await removeData(`${inventoryEndpoint}${inventoryId}`);
-    return fetchData(pagination);
+  const removeId = id ? id : ( !id && ids && ids.length === 1 ) ? ids[0] : undefined;
+
+  const removeInventory = (inventoryId) => removeData(`${inventoryEndpoint}/${inventoryId}`);
+
+  async function removeInventories(ids) {
+    return Promise.all(
+      ids.map(
+        async (id) => await removeInventory(id)
+      )
+    );
   }
 
   const onSubmit = () => {
-    removeInventory(id).then(() => push('/inventories'))
+    if ( !id && !(ids && ids.length > 0 )) {
+      return;
+    }
+    (removeId ? removeInventory(removeId) : removeInventories(ids))
     .catch((error) => {
+      push('/inventories');
       dispatch(
         addNotification({
           variant: 'danger',
@@ -61,19 +73,21 @@ const RemoveInventory: React.ComponentType<IRemoveInventory> = ( {ids = [],
           description: `${intl.formatMessage(sharedMessages.delete_inventory_failure)}  ${error}`
         })
       );
-    });
+    }).then(() => push('/inventories'))
+      .then(() => { if ( !id ) { resetSelectedInventories();} })
+      .then(() => { if(fetchData) { fetchData(pagination) } })
   };
 
   useEffect(() => {
-    fetchInventory(id).then(data => setInventory(data))
-  }, []);
+    fetchInventory(id || removeId).then(data => setInventory(data))
+  }, [removeId]);
 
   return <Modal
       aria-label={
         intl.formatMessage(sharedMessages.inventoryRemoveTitle) as string
       }
       titleIconVariant="warning"
-      title={intl.formatMessage(sharedMessages.inventoryRemoveTitle)}
+      title={ removeId ? intl.formatMessage(sharedMessages.inventoryRemoveTitle) : intl.formatMessage(sharedMessages.inventoriesRemoveTitle)}
       isOpen
       variant="small"
       onClose={goBack}
@@ -103,15 +117,18 @@ const RemoveInventory: React.ComponentType<IRemoveInventory> = ( {ids = [],
       <StackItem>
         <TextContent>
           <Text component={TextVariants.p}>
-            {intl.formatMessage(sharedMessages.inventoryRemoveDescription)}
+            { removeId ? intl.formatMessage(sharedMessages.inventoryRemoveDescription)
+              : intl.formatMessage(sharedMessages.inventoriesRemoveDescription)}
           </Text>
         </TextContent>
       </StackItem>
       <StackItem>
         <TextContent>
-          <Text component={TextVariants.p}>
-            <strong>{ inventory?.name }</strong>
-          </Text>
+          { removeId ? <Text component={TextVariants.p}>
+            <strong> { inventory?.name } </strong>
+          </Text> : <Text component={TextVariants.p}>
+            <strong> { `${ids.length} selected`  } </strong>
+          </Text>  }
         </TextContent>
       </StackItem>
     </Stack>

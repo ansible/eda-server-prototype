@@ -28,7 +28,7 @@ export const createRows = (data) =>
     id,
     cells: [
       <React.Fragment key={`${id}-checkbox`}>
-        <SelectBox id={`${id}`} />
+        <SelectBox id={id} />
       </React.Fragment>,
       <Fragment key={`[job-${id}`}>
         <Link

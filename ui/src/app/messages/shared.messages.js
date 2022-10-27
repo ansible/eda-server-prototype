@@ -183,9 +183,17 @@ const sharedMessages = defineMessages({
     id: 'project.removeProject',
     defaultMessage: 'Delete project'
   },
+  projectsRemoveTitle: {
+    id: 'project.removeProjects',
+    defaultMessage: 'Delete selected projects'
+  },
   projectRemoveDescription: {
     id: 'project.removeProjectDescription',
     defaultMessage: 'Are you sure you want to delete the project below?'
+  },
+  projectsRemoveDescription: {
+    id: 'project.removeProjectDescription',
+    defaultMessage: 'Are you sure you want to delete the selected projects?'
   },
   projectPlaceholder: {
     id: 'activation.projectPlaceholder',
@@ -283,9 +291,17 @@ const sharedMessages = defineMessages({
     id: 'activation.removeActivation',
     defaultMessage: 'Delete rulebook activation'
   },
+  activationsRemoveTitle: {
+    id: 'activation.removeActivations',
+    defaultMessage: 'Delete selected rulebook activations'
+  },
   activationRemoveDescription: {
     id: 'activation.removeActivationDescription',
     defaultMessage: 'Are you sure you want to delete the rulebook activation below?'
+  },
+  activationsRemoveDescription: {
+    id: 'activation.removeActivationsDescription',
+    defaultMessage: 'Are you sure you want to delete the selected rulebook activations?'
   },
   activations: {
     id: 'activation.activations',
@@ -503,9 +519,17 @@ const sharedMessages = defineMessages({
     id: 'job.removeJob',
     defaultMessage: 'Delete job'
   },
+  jobsRemoveTitle: {
+    id: 'job.removeJobs',
+    defaultMessage: 'Delete jobs'
+  },
   jobRemoveDescription: {
     id: 'job.removeJobDescription',
     defaultMessage: 'Are you sure you want to delete the job below?'
+  },
+  jobsRemoveDescription: {
+    id: 'job.removeJobsDescription',
+    defaultMessage: 'Are you sure you want to delete the selected jobs?'
   },
   add_job_success: {
     id: 'job.addProjectSuccess',
@@ -547,9 +571,17 @@ const sharedMessages = defineMessages({
     id: 'inventory.removeInventory',
     defaultMessage: 'Delete inventory'
   },
+  inventoriesRemoveTitle: {
+    id: 'inventory.removeInventories',
+    defaultMessage: 'Delete inventories'
+  },
   inventoryRemoveDescription: {
     id: 'inventory.removeInventoryDescription',
     defaultMessage: 'Are you sure you want to delete the inventory below?'
+  },
+  inventoriesRemoveDescription: {
+    id: 'inventory.removeInventoriesDescription',
+    defaultMessage: 'Are you sure you want to delete the selected inventories?'
   },
   addInventory: {
     id: 'inventory.addInventory',
