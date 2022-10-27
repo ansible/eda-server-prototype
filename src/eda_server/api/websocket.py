@@ -274,7 +274,14 @@ async def handle_ansible_rulebook(data: dict, db: AsyncSession):
 
 
 async def handle_jobs(data: dict, db: AsyncSession):
-    query = insert(models.job_instances).values(uuid=data.get("job_id"))
+    query = insert(models.job_instances).values(
+        uuid=data.get("job_id"),
+        name=data.get("name"),
+        action=data.get("action"),
+        ruleset=data.get("ruleset"),
+        hosts=data.get("hosts"),
+        rule=data.get("rule"),
+    )
     result = await db.execute(query)
     await db.commit()
     (job_instance_id,) = result.inserted_primary_key
