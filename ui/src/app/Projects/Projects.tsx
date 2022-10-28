@@ -282,6 +282,7 @@ const Projects: React.FunctionComponent = () => {
             columns={columns(intl)}
             bulkSelect={bulkSelectProps}
             fetchData={handlePagination}
+            pagination={defaultSettings}
             routes={routes}
             actionResolver={actionResolver}
             plural={intl.formatMessage(sharedMessages.projects)}

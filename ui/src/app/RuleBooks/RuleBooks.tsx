@@ -147,6 +147,7 @@ const RuleBooks: React.FunctionComponent = () => {
           rows={rows}
           columns={columns(intl)}
           fetchData={updateRuleBooks}
+          pagination={defaultSettings}
           setLimit={setLimit}
           setOffset={setOffset}
           actionResolver={actionResolver}

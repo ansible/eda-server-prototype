@@ -4,7 +4,7 @@ import { NavLink } from 'react-router-dom';
 import { Breadcrumb, BreadcrumbItem } from '@patternfly/react-core';
 
 const Breadcrumbs = ({ breadcrumbs }) => {
-   return breadcrumbs ? (
+  return breadcrumbs ? (
     <Breadcrumb>
       {breadcrumbs.map(({ to, id, title }, idx) => (
         <BreadcrumbItem key={'title'} isActive={idx === breadcrumbs.length - 1} id={id} title={title}>

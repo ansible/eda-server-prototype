@@ -9,6 +9,8 @@ import {
   FormSelectOption,
   Grid,
   GridItem,
+  Level,
+  LevelItem,
   PageSection,
   TextInput,
   Title,
@@ -18,7 +20,7 @@ import { useHistory } from 'react-router-dom';
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { TopToolbar } from '@app/shared/top-toolbar';
-import { ExclamationCircleIcon } from '@patternfly/react-icons';
+import { ExclamationCircleIcon, SearchIcon } from '@patternfly/react-icons';
 import { useIntl } from 'react-intl';
 import sharedMessages from '../messages/shared.messages';
 import { ExtraVarType } from '@app/Vars/Vars';
@@ -30,6 +32,7 @@ import { listRulebooks } from '@app/API/Rulebook';
 import { listInventories } from '@app/API/Inventory';
 import { listExtraVars } from '@app/API/Extravar';
 import { listProjects } from '@app/API/Project';
+import { InventoriesSelect, InventorySelectType } from '@app/InventoriesSelect/InventoriesSelect';
 
 const CardBody = styled(PFCardBody)`
   white-space: pre-wrap;
@@ -90,10 +93,11 @@ const NewActivation: React.FunctionComponent = () => {
   const [executionEnvironment, setExecutionEnvironment] = useState('');
   const [restartPolicy, setRestartPolicy] = useState('');
   const [ruleset, setRuleSet] = useState('');
-  const [inventory, setInventory] = useState('');
+  const [inventory, setInventory] = useState<InventorySelectType | undefined>(undefined);
   const [extravar, setExtraVar] = useState('');
   const [project, setProject] = useState('');
   const [workingDirectory, setWorkingDirectory] = useState('');
+  const [isInventoryModalOpen, setIsInventoryModalOpen] = useState(false);
 
   const [validatedName, setValidatedName] = useState<ValidatedOptions>(ValidatedOptions.default);
   const [validatedRuleSet, setValidatedRuleSet] = useState<ValidatedOptions>(ValidatedOptions.default);
@@ -244,7 +248,8 @@ const NewActivation: React.FunctionComponent = () => {
     addRulebookActivation({
       name: name,
       rulebook_id: ruleset,
-      inventory_id: inventory,
+      // @ts-ignore
+      inventory_id: inventory.id,
       extra_var_id: extravar,
       project_id: project,
       working_directory: workingDirectory,
@@ -275,9 +280,14 @@ const NewActivation: React.FunctionComponent = () => {
         );*/
       });
   };
-
   return (
     <React.Fragment>
+      <InventoriesSelect
+        isModalOpen={isInventoryModalOpen}
+        setIsModalOpen={setIsInventoryModalOpen}
+        inventory={inventory}
+        setInventory={setInventory}
+      />
       <TopToolbar
         breadcrumbs={[
           {
@@ -335,30 +345,23 @@ const NewActivation: React.FunctionComponent = () => {
                 </GridItem>
                 <GridItem span={4}>
                   <FormGroup
-                    style={{ paddingRight: '30px' }}
                     label="Inventory"
                     fieldId={'activation-inventory'}
                     helperTextInvalid={intl.formatMessage(sharedMessages.selectInventory)}
                     helperTextInvalidIcon={<ExclamationCircleIcon />}
                     validated={validatedInventory}
                   >
-                    <FormSelect
-                      value={inventory}
+                    <TextInput
+                      value={inventory?.name || ''}
+                      iconVariant={inventory?.name || validatedInventory === 'error' ? undefined : 'search'}
+                      type="text"
+                      onClick={() => setIsInventoryModalOpen(true)}
                       placeholder={intl.formatMessage(sharedMessages.inventoryPlaceholder)}
                       onChange={onInventoryChange}
                       onBlur={() => validateInventory(inventory)}
                       validated={validatedInventory}
                       aria-label="FormSelect Input Inventory"
-                    >
-                      {inventories.map((option, index) => (
-                        <FormSelectOption
-                          key={index}
-                          value={option?.id}
-                          label={`${option?.id} ${option?.name}`}
-                          isPlaceholder={option?.id === ''}
-                        />
-                      ))}
-                    </FormSelect>
+                    />
                   </FormGroup>
                 </GridItem>
                 <GridItem span={4}>

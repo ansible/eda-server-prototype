@@ -290,6 +290,7 @@ const Inventories: React.FunctionComponent = () => {
             columns={columns(intl)}
             bulkSelect={bulkSelectProps}
             fetchData={handlePagination}
+            pagination={defaultSettings}
             routes={routes}
             actionResolver={actionResolver}
             plural={intl.formatMessage(sharedMessages.inventories)}
