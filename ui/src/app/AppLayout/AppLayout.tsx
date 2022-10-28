@@ -20,10 +20,10 @@ import Logo from '../../assets/images/logo-large.svg';
 import { SmallLogo } from './small-logo';
 import { APPLICATION_TITLE } from '../utils/constants';
 import { StatefulDropdown } from './stateful-dropdown';
-import { getUser, logoutUser } from '@app/shared/auth';
 import { User } from '@app/shared/types/common-types';
 import { AboutModalWindow } from '@app/AppLayout/about-modal';
 import { NotificationsPortal } from '@redhat-cloud-services/frontend-components-notifications';
+import {getUser, logoutUser} from '@app/API/auth';
 
 interface IAppLayout {
   children: React.ReactNode;
@@ -60,9 +60,9 @@ const AppLayout: React.FunctionComponent<IAppLayout> = ({ children }) => {
   const baseUrl = window.location.href.substr(0, index);
 
   useEffect(() => {
-    getUser()
-      .then((response) => response.json())
-      .then((data) => setUser(data || undefined));
+    getUser().then((data) => {
+      setUser(data.data || undefined);
+    });
   }, []);
 
   if (user) {

@@ -2,7 +2,6 @@ import * as React from 'react';
 import { mount } from 'enzyme';
 import { Activations } from '@app/Activations/Activations';
 import { MemoryRouter } from 'react-router';
-import fetchMock from 'jest-fetch-mock';
 import { act } from 'react-dom/test-utils';
 import { IntlProvider } from 'react-intl';
 import { Route } from 'react-router-dom';
@@ -17,8 +16,8 @@ const ComponentWrapper = ({ children, initialEntries = ['/dashboard'] }) => (
 );
 
 describe('Activations', () => {
-  afterEach(() => {
-    jest.restoreAllMocks();
+  beforeAll(() => {
+    mockApi.reset();
   });
 
   it('should render the Activations component', async () => {

@@ -2,11 +2,11 @@ import * as React from 'react';
 import { mount } from 'enzyme';
 import { Rule } from '@app/Rule/Rule';
 import { MemoryRouter } from 'react-router';
-import fetchMock from 'jest-fetch-mock';
 import { act } from 'react-dom/test-utils';
 import { IntlProvider } from 'react-intl';
 import { Route } from 'react-router-dom';
 import { Tab } from '@patternfly/react-core';
+import { mockApi } from '../__mocks__/baseApi';
 
 const ComponentWrapper = ({ children, initialEntries = ['/dashboard'] }) => (
   <IntlProvider locale="en">
@@ -17,17 +17,15 @@ const ComponentWrapper = ({ children, initialEntries = ['/dashboard'] }) => (
 );
 
 describe('RuleSet', () => {
-  afterEach(() => {
-    jest.restoreAllMocks();
+  beforeAll(() => {
+    mockApi.reset();
   });
 
   it('should render the RuleSet component tabs', async () => {
-    fetchMock.mockResponse(
-      JSON.stringify({
-        name: 'RuleSet 1',
-        id: 1,
-      })
-    );
+    mockApi.onGet(`/api/rules/1`).replyOnce(200, {
+      name: 'Ruleset 1',
+      id: '1',
+    });
     let wrapper;
     await act(async () => {
       wrapper = mount(

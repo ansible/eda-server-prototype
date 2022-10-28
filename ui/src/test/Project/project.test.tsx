@@ -2,11 +2,11 @@ import * as React from 'react';
 import { mount } from 'enzyme';
 import { Project } from '@app/Project/Project';
 import { MemoryRouter } from 'react-router';
-import fetchMock from 'jest-fetch-mock';
 import { act } from 'react-dom/test-utils';
 import { IntlProvider } from 'react-intl';
 import { Route } from 'react-router-dom';
 import { DropdownItem, KebabToggle, Tab } from '@patternfly/react-core';
+import { mockApi } from '../__mocks__/baseApi';
 
 const ComponentWrapper = ({ children, initialEntries = ['/dashboard'] }) => (
   <IntlProvider locale="en">
@@ -17,18 +17,15 @@ const ComponentWrapper = ({ children, initialEntries = ['/dashboard'] }) => (
 );
 
 describe('Project', () => {
-  afterEach(() => {
-    jest.restoreAllMocks();
+  beforeAll(() => {
+    mockApi.reset();
   });
-
   it('should render the Project component tabs', async () => {
-    fetchMock.mockResponse(
-      JSON.stringify({
-        name: 'Project 1',
-        id: 1,
-        url: 'Project 1 Url',
-      })
-    );
+    mockApi.onGet(`/api/projects/1`).replyOnce(200, {
+      name: 'Project 1',
+      id: 1,
+      url: 'Project 1 Url',
+    });
     let wrapper;
     await act(async () => {
       wrapper = mount(
@@ -48,13 +45,11 @@ describe('Project', () => {
   });
 
   it('has a toolbar kebab menu', async () => {
-    fetchMock.mockResponse(
-      JSON.stringify({
-        name: 'Project 1',
-        id: 1,
-        url: 'Project 1 Url',
-      })
-    );
+    mockApi.onGet(`/api/projects/1`).replyOnce(200, {
+      name: 'Project 1',
+      id: 1,
+      url: 'Project 1 Url',
+    });
     let wrapper;
     await act(async () => {
       wrapper = mount(

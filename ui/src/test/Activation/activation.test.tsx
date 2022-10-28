@@ -2,7 +2,6 @@ import * as React from 'react';
 import { mount } from 'enzyme';
 import { Activation } from '@app/Activation/Activation';
 import { MemoryRouter } from 'react-router';
-import fetchMock from 'jest-fetch-mock';
 import { act } from 'react-dom/test-utils';
 import { IntlProvider } from 'react-intl';
 import { Route } from 'react-router-dom';
@@ -19,17 +18,15 @@ const ComponentWrapper = ({ children, initialEntries = ['/dashboard'] }) => (
 );
 
 describe('Activation', () => {
-  beforeEach(() => {
-    mockApi.onGet(`/api/activation_instance_job_instances/1`).replyOnce(200, {
-      data: [],
-    });
-  });
-
-  afterEach(() => {
-    jest.restoreAllMocks();
+  beforeAll(() => {
+    mockApi.reset();
   });
 
   it('should render the Activation component tabs', async () => {
+    mockApi.onGet(`/api/activation_instance_job_instances/1`).replyOnce(200, {
+      data: [],
+    });
+
     mockApi.onGet(`/api/activation_instance/1`).replyOnce(200, {
       data: {
         name: 'Activation 1',
@@ -60,6 +57,10 @@ describe('Activation', () => {
   });
 
   it('should render the Activation details with EDA container image', async () => {
+    mockApi.onGet(`/api/activation_instance_job_instances/1`).replyOnce(200, {
+      data: [],
+    });
+
     mockApi.onGet(`/api/activation_instance/1`).replyOnce(200, {
       data: {
         name: 'Activation 1',
@@ -98,6 +99,10 @@ describe('Activation', () => {
   });
 
   it('has a top toolbar kebab menu ', async () => {
+    mockApi.onGet(`/api/activation_instance_job_instances/1`).replyOnce(200, {
+      data: [],
+    });
+
     mockApi.onGet(`/api/activation_instance/1`).replyOnce(200, {
       data: {
         name: 'Activation 2',

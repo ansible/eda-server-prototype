@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { mount } from 'enzyme';
 import { MemoryRouter } from 'react-router';
-import fetchMock from 'jest-fetch-mock';
 import { act } from 'react-dom/test-utils';
 import { IntlProvider } from 'react-intl';
 import { Modal, Tab } from '@patternfly/react-core';
@@ -10,6 +9,7 @@ import { defaultSettings } from '@app/shared/pagination';
 import store from '../../store';
 import { Provider } from 'react-redux';
 import { Route } from 'react-router-dom';
+import { mockApi } from '../__mocks__/baseApi';
 
 const ComponentWrapper = ({ children, initialEntries = ['/dashboard'] }) => (
   <Provider store={store()}>
@@ -22,18 +22,16 @@ const ComponentWrapper = ({ children, initialEntries = ['/dashboard'] }) => (
 );
 
 describe('RemoveJob', () => {
-  afterEach(() => {
-    jest.restoreAllMocks();
+  beforeAll(() => {
+    mockApi.reset();
   });
 
   it('should render the Remove Job modal', async () => {
-    fetchMock.mockResponse(
-      JSON.stringify({
-        name: 'Job 1',
-        id: 1,
-        stdout: [],
-      })
-    );
+    mockApi.onGet(`/api/job_instance/1`).replyOnce(200, {
+      name: 'Job 1',
+      id: 1,
+      stdout: [],
+    });
     let wrapper;
     await act(async () => {
       wrapper = mount(
@@ -54,13 +52,13 @@ describe('RemoveJob', () => {
   });
 
   it('should render the bulk Remove Job modal', async () => {
-    fetchMock.mockResponse(
-      JSON.stringify({
+    mockApi.onGet(`/api/job_instances`).replyOnce(200, [
+      {
         name: 'Job 1',
         id: 1,
-        url: 'Job 1 Url',
-      })
-    );
+        stdout: [],
+      },
+    ]);
     let wrapper;
     await act(async () => {
       wrapper = mount(

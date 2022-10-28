@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { mount } from 'enzyme';
 import { MemoryRouter } from 'react-router';
-import fetchMock from 'jest-fetch-mock';
 import { act } from 'react-dom/test-utils';
 import { IntlProvider } from 'react-intl';
 import { Modal } from '@patternfly/react-core';
@@ -10,6 +9,7 @@ import { defaultSettings } from '@app/shared/pagination';
 import store from '../../store';
 import { Provider } from 'react-redux';
 import { Route } from 'react-router-dom';
+import { mockApi } from '../__mocks__/baseApi';
 
 const ComponentWrapper = ({ children, initialEntries = ['/dashboard'] }) => (
   <Provider store={store()}>
@@ -22,17 +22,15 @@ const ComponentWrapper = ({ children, initialEntries = ['/dashboard'] }) => (
 );
 
 describe('RemoveInventory', () => {
-  afterEach(() => {
-    jest.restoreAllMocks();
+  beforeAll(() => {
+    mockApi.reset();
   });
 
   it('should render the Remove Inventory modal', async () => {
-    fetchMock.mockResponse(
-      JSON.stringify({
-        name: 'Inventory 1',
-        id: 1,
-      })
-    );
+    mockApi.onGet(`/api/inventory/1`).replyOnce(200, {
+      name: 'Inventory 1',
+      id: 1,
+    });
     let wrapper;
     await act(async () => {
       wrapper = mount(
@@ -53,12 +51,12 @@ describe('RemoveInventory', () => {
   });
 
   it('should render the bulk Remove Inventories modal', async () => {
-    fetchMock.mockResponse(
-      JSON.stringify({
+    mockApi.onGet(`/api/inventories`).replyOnce(200, [
+      {
         name: 'Inventory 1',
         id: 1,
-      })
-    );
+      },
+    ]);
     let wrapper;
     await act(async () => {
       wrapper = mount(
