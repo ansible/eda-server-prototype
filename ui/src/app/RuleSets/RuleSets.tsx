@@ -2,7 +2,6 @@ import { PageSection, Title } from '@patternfly/react-core';
 import { Route, useHistory } from 'react-router-dom';
 import React, { useState, useEffect, useReducer, Fragment } from 'react';
 import { Button } from '@patternfly/react-core';
-import { getServer } from '@app/utils/utils';
 import { TopToolbar } from '../shared/top-toolbar';
 import { PlusCircleIcon } from '@patternfly/react-icons';
 import sharedMessages from '../messages/shared.messages';
@@ -14,6 +13,7 @@ import { defaultSettings } from '@app/shared/pagination';
 import { NewRuleSet } from '@app/NewRuleSet/NewRuleSet';
 import { createRows } from '@app/RuleSets/rule-sets-table-helpers';
 import { AnyObject } from '@app/shared/types/common-types';
+import { listRulesets } from '@app/API/Ruleset';
 
 export interface SourceType {
   id: string;
@@ -55,8 +55,6 @@ export interface RuleSetType {
   rulesets: string;
 }
 
-const endpoint = 'http://' + getServer() + '/api/rulesets';
-
 const columns = (intl) => [
   {
     title: intl.formatMessage(sharedMessages.name),
@@ -89,8 +87,6 @@ const initialState = (filterValue = '') => ({
 
 const areSelectedAll = (rows: RuleSetType[] = [], selected) => rows.every((row) => selected.includes(row.id));
 
-const unique = (value, index, self) => self.indexOf(value) === index;
-
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const RuleSetsListState = (state, action) => {
   switch (action.type) {
@@ -119,22 +115,14 @@ export const RuleSetsListState = (state, action) => {
   }
 };
 
-const fetchRuleSets = (pagination = defaultSettings) =>
-  fetch(endpoint, {
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  });
-
 const RuleSets: React.FunctionComponent = () => {
   const intl = useIntl();
   const history = useHistory();
-  const [RuleSets, setRuleSets] = useState<RuleSetType[]>([]);
+  const [ruleSets, setRuleSets] = useState<RuleSetType[]>([]);
   const [limit, setLimit] = useState(defaultSettings.limit);
   const [offset, setOffset] = useState(1);
 
-  const data = RuleSets;
-  const meta = { count: RuleSets?.length || 0, limit, offset };
+  const meta = { count: ruleSets?.length || 0, limit, offset };
   const [{ filterValue, isFetching, isFiltering, selectedRuleSets, selectedAll, rows }, stateDispatch] = useReducer(
     RuleSetsListState,
     initialState()
@@ -144,18 +132,16 @@ const RuleSets: React.FunctionComponent = () => {
 
   const updateRuleSets = (pagination) => {
     stateDispatch({ type: 'setFetching', payload: true });
-    return fetchRuleSets(pagination)
+    return listRulesets(pagination)
       .then(() => stateDispatch({ type: 'setFetching', payload: false }))
       .catch(() => stateDispatch({ type: 'setFetching', payload: false }));
   };
 
   useEffect(() => {
-    fetchRuleSets()
-      .then((response) => response.json())
-      .then((data) => {
-        setRuleSets(data);
-        stateDispatch({ type: 'setRows', payload: createRows(RuleSets) });
-      });
+    listRulesets().then((data) => {
+      setRuleSets(data.data);
+      stateDispatch({ type: 'setRows', payload: createRows(ruleSets) });
+    });
   }, []);
 
   useEffect(() => {
@@ -163,8 +149,8 @@ const RuleSets: React.FunctionComponent = () => {
   }, []);
 
   useEffect(() => {
-    stateDispatch({ type: 'setRows', payload: createRows(RuleSets) });
-  }, [RuleSets]);
+    stateDispatch({ type: 'setRows', payload: createRows(ruleSets) });
+  }, [ruleSets]);
 
   const clearFilters = () => {
     stateDispatch({ type: 'clearFilters' });
@@ -189,8 +175,7 @@ const RuleSets: React.FunctionComponent = () => {
       component: 'button',
       onClick: (_event, _rowId, ruleset) =>
         history.push({
-          pathname: '/disable-rule-set',
-          search: `?rule-set=${ruleset.id}`,
+          pathname: `/rulesets/${ruleset?.id}/disable`,
         }),
     },
   ];

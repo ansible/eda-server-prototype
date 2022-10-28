@@ -46,15 +46,15 @@ const NewJob: React.FunctionComponent = () => {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   useEffect(() => {
-    listPlaybooks().then((data) => setPlaybooks([...playbooks, ...data]));
+    listPlaybooks().then((data) => setPlaybooks([...playbooks, ...data.data]));
   }, []);
 
   useEffect(() => {
-    listInventories().then((data) => setInventories([...inventories, ...data]));
+    listInventories().then((data) => setInventories([...inventories, ...data.data]));
   }, []);
 
   useEffect(() => {
-    listExtraVars().then((data) => setExtraVars([...extravars, ...data]));
+    listExtraVars().then((data) => setExtraVars([...extravars, ...data.data]));
   }, []);
 
   const validatePlaybook = (value): boolean => {
@@ -118,7 +118,7 @@ const NewJob: React.FunctionComponent = () => {
     })
       .then((data) => {
         setIsSubmitting(false);
-        data?.id ? history.push(`/job/${data.id}`) : history.push(`/jobs`);
+        data?.data?.id ? history.push(`/job/${data?.data?.id}`) : history.push(`/jobs`);
         dispatch(
           addNotification({
             variant: 'success',

@@ -111,12 +111,10 @@ const Rules: React.FunctionComponent = () => {
   };
 
   useEffect(() => {
-    listRules()
-      .then((response) => response.json())
-      .then((data) => {
-        setRules(data);
-        stateDispatch({ type: 'setRows', payload: createRows(rules) });
-      });
+    listRules().then((data) => {
+      setRules(data?.data);
+      stateDispatch({ type: 'setRows', payload: createRows(rules) });
+    });
   }, []);
 
   useEffect(() => {

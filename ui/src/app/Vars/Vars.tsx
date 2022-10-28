@@ -11,8 +11,8 @@ import {
   StackItem,
 } from '@patternfly/react-core';
 import styled from 'styled-components';
-import { getServer } from '@app/utils/utils';
 import { TopToolbar } from '@app/shared/top-toolbar';
+import {listExtraVars} from "@app/API/Extravar";
 
 export interface ExtraVarType {
   id: string;
@@ -26,19 +26,13 @@ const CardBody = styled(PFCardBody)`
 const SimpleList = styled(PFSimpleList)`
   white-space: pre-wrap;
 `;
-const endpoint = 'http://' + getServer() + '/api/extra_vars/';
 
 const Vars: React.FunctionComponent = () => {
   const [extraVars, setVars] = useState<ExtraVarType[]>([]);
 
   useEffect(() => {
-    fetch(endpoint, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-      .then((response) => response.json())
-      .then((data) => setVars(data));
+   listExtraVars()
+      .then((data) => setVars(data.data));
   }, []);
 
   return (

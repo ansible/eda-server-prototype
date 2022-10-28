@@ -54,7 +54,7 @@ const ActivationDetails: React.FunctionComponent<{ activation: ActivationType }>
 
   useEffect(() => {
     activation?.extra_var_id
-      ? fetchRuleVars(activation.extra_var_id).then((data) => setActivationVars(data))
+      ? fetchRuleVars(activation.extra_var_id).then((data) => setActivationVars(data.data))
       : setActivationVars(undefined);
   }, [activation]);
 

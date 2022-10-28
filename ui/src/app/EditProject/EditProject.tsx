@@ -23,7 +23,7 @@ const EditProject: React.FunctionComponent = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    fetchProject(id).then((data) => setProject(data));
+    fetchProject(id).then((data) => setProject(data.data));
   }, []);
 
   const setScmUrl = (url: string) => setProject({ ...project, url: url });
@@ -35,7 +35,7 @@ const EditProject: React.FunctionComponent = () => {
   const handleSubmit = () => {
     updateProject(project)
       .then((data) => {
-        history.push(`/project/${data.id}`);
+        history.push(`/project/${data?.data?.id}`);
         dispatch(
           addNotification({
             variant: 'success',

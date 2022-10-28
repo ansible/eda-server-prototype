@@ -111,19 +111,19 @@ const NewActivation: React.FunctionComponent = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    listRulebooks().then((data) => setRuleSets([...rulesets, ...data]));
+    listRulebooks().then((data) => setRuleSets([...rulesets, ...data.data]));
   }, []);
 
   useEffect(() => {
-    listInventories().then((data) => setInventories([...inventories, ...data]));
+    listInventories().then((data) => setInventories([...inventories, ...data.data]));
   }, []);
 
   useEffect(() => {
-    listExtraVars().then((data) => setExtraVars([...extravars, ...data]));
+    listExtraVars().then((data) => setExtraVars([...extravars, ...data.data]));
   }, []);
 
   useEffect(() => {
-    listProjects().then((data) => setProjects([...projects, ...data]));
+    listProjects().then((data) => setProjects([...projects, ...data.data]));
   }, []);
 
   const validateName = (value): boolean => {
@@ -251,7 +251,7 @@ const NewActivation: React.FunctionComponent = () => {
       execution_environment: executionEnvironment,
     })
       .then((data) => {
-        history.push(`/activation/${data.id}`);
+        history.push(`/activation/${data?.data?.id}`);
         dispatch(
           addNotification({
             variant: 'success',

@@ -1,5 +1,6 @@
-import { getServer, postData, removeData } from '@app/utils/utils';
 import { defaultSettings } from '@app/shared/pagination';
+import { getAxiosInstance } from '@app/API/baseApi';
+import { AxiosResponse } from 'axios';
 
 export interface NewActivationType {
   name: string;
@@ -18,41 +19,29 @@ export interface IRemoveActivation {
   resetSelectedActivations?: any;
 }
 
-const activationEndpoint = 'http://' + getServer() + '/api/activation_instance';
-const activationsEndpoint = 'http://' + getServer() + '/api/activation_instances';
-const activationJobsEndpoint = 'http://' + getServer() + '/api/activation_instance_job_instances';
-const activationLogsEndpoint = 'http://' + getServer() + '/api/activation_instance_logs/?activation_instance_id=';
+const activationEndpoint = '/api/activation_instance';
+const activationsEndpoint = '/api/activation_instances';
+const activationJobsEndpoint = '/api/activation_instance_job_instances';
+const activationLogsEndpoint = '/api/activation_instance_logs/?activation_instance_id=';
 
-export const listActivationJobs = (activationId, pagination = defaultSettings) => {
-  return fetch(`${activationJobsEndpoint}/${activationId}`, {
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  }).then((response) => response.json());
+export const listActivationJobs = (
+  activationId: string | number,
+  pagination = defaultSettings
+): Promise<AxiosResponse> => {
+  return getAxiosInstance().get(`${activationJobsEndpoint}/${activationId}`);
 };
 
-export const fetchActivation = (id) =>
-  fetch(`${activationEndpoint}/${id}`, {
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  }).then((response) => response.json());
+export const fetchActivation = (id: string | number | undefined): Promise<AxiosResponse> =>
+  getAxiosInstance().get(`${activationEndpoint}/${id}`);
 
-export const listActivations = (pagination = defaultSettings) =>
-  fetch(activationsEndpoint, {
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  }).then((response) => response.json());
+export const listActivations = (pagination = defaultSettings): Promise<AxiosResponse> =>
+  getAxiosInstance().get(activationsEndpoint);
 
 export const addRulebookActivation = (activationData: NewActivationType) =>
-  postData(activationEndpoint, activationData);
+  getAxiosInstance().post(activationEndpoint, activationData);
 
-export const removeActivation = (activationId: string | number) => removeData(`${activationEndpoint}/${activationId}`);
+export const removeActivation = (activationId: string | number): Promise<AxiosResponse> =>
+  getAxiosInstance().delete(`${activationEndpoint}/${activationId}`);
 
-export const fetchActivationOutput = (id: string) =>
-  fetch(`${activationLogsEndpoint}${id}`, {
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  });
+export const fetchActivationOutput = (id: string): Promise<AxiosResponse> =>
+  getAxiosInstance().get(`${activationLogsEndpoint}${id}`);

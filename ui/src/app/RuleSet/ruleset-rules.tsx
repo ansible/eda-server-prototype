@@ -1,5 +1,5 @@
 import { Button, PageSection } from '@patternfly/react-core';
-import { useHistory, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import React, { useEffect, useReducer, useState } from 'react';
 import { TableToolbarView } from '@app/shared/table-toolbar-view';
 import sharedMessages from '../messages/shared.messages';
@@ -10,7 +10,7 @@ import { defaultSettings } from '@app/shared/pagination';
 import { createRows } from './rules-table-helpers';
 import { CubesIcon } from '@patternfly/react-icons';
 import { renderRuleSetFileTabs, RuleSetType, RuleType } from '@app/RuleSet/ruleset';
-import { getServer } from '@app/utils/utils';
+import { fetchRulesetRules } from '@app/API/Ruleset';
 
 const columns = (intl) => [
   {
@@ -75,24 +75,12 @@ export const rulesListState = (state, action) => {
       return state;
   }
 };
-const endpoint_rules = 'http://' + getServer() + '/api/rulebook_json/';
-const fetchRulesetRules = (id, pagination = defaultSettings) => {
-  return fetch(`${endpoint_rules}${id}`, {
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  })
-    .then((response) => response.json())
-    .then((data) => (data && data.rulesets && data.rulesets.length > 0 ? data.rulesets[0].rules : []));
-};
 
 const RulesetRules: React.FunctionComponent<{ ruleset: RuleSetType }> = ({ ruleset }) => {
-  const history = useHistory();
   const [limit, setLimit] = useState(defaultSettings.limit);
   const [offset, setOffset] = useState(1);
   const [rules, setRules] = useState<RuleType[]>([]);
 
-  const rulesetId = ruleset?.id;
   const { id } = useParams<{ id: string }>();
 
   const meta = { count: rules?.length || 0, limit, offset };
@@ -102,7 +90,7 @@ const RulesetRules: React.FunctionComponent<{ ruleset: RuleSetType }> = ({ rules
   const updateRules = (pagination) => {
     stateDispatch({ type: 'setFetching', payload: true });
     return fetchRulesetRules(id, pagination)
-      .then((data) => setRules(data))
+      .then((data) => setRules(data?.data))
       .then(() => stateDispatch({ type: 'setFetching', payload: false }))
       .catch(() => stateDispatch({ type: 'setFetching', payload: false }));
   };

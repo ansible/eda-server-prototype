@@ -50,8 +50,6 @@ const initialState = (filterValue = '') => ({
 
 const areSelectedAll = (rows: RuleSetType[] = [], selected) => rows.every((row) => selected.includes(row.id));
 
-const unique = (value, index, self) => self.indexOf(value) === index;
-
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const RuleSetsListState = (state, action) => {
   switch (action.type) {
@@ -104,12 +102,10 @@ const RuleBooks: React.FunctionComponent = () => {
   };
 
   useEffect(() => {
-    listRuleBooks()
-      .then((response) => response.json())
-      .then((data) => {
-        setRuleBooks(data);
-        stateDispatch({ type: 'setRows', payload: createRows(ruleBooks) });
-      });
+    listRuleBooks().then((data) => {
+      setRuleBooks(data?.data);
+      stateDispatch({ type: 'setRows', payload: createRows(ruleBooks) });
+    });
   }, []);
   ``;
   useEffect(() => {
@@ -135,14 +131,10 @@ const RuleBooks: React.FunctionComponent = () => {
       component: 'button',
       onClick: (_event, _rowId, rulebook) =>
         history.push({
-          pathname: `/rulebooks/relaunch/${rulebook?.id}`,
+          pathname: `/rulebooks/${rulebook?.id}/disable`,
         }),
     },
   ];
-
-  const anyRuleBooksSelected = selectedRuleBooks.length > 0;
-
-  const toolbarButtons = () => null;
 
   return (
     <Fragment>

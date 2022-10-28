@@ -68,7 +68,7 @@ const RemoveJob: React.ComponentType<IRemoveJob> = ({
     if (!id && !removeId) {
       return;
     }
-    fetchJob(id ? id : removeId).then((data) => setJob(data));
+    fetchJob(id ? id : removeId).then((data) => setJob(data?.data));
   }, [removeId]);
 
   return (

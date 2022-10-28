@@ -2,11 +2,9 @@ import { Title } from '@patternfly/react-core';
 import { useParams } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
 import { CodeBlock, CodeBlockCode } from '@patternfly/react-core';
-import { getServer } from '@app/utils/utils';
 import { TopToolbar } from '@app/shared/top-toolbar';
 import { ExtraVarType } from '@app/Vars/Vars';
-
-const endpoint = 'http://' + getServer() + '/api/extra_var/';
+import {fetchExtraVar} from "@app/API/Extravar";
 
 const Var: React.FunctionComponent = () => {
   const [extraVar, setVar] = useState<ExtraVarType | undefined>(undefined);
@@ -14,13 +12,8 @@ const Var: React.FunctionComponent = () => {
   const { id } = useParams<ExtraVarType>();
 
   useEffect(() => {
-    fetch(endpoint + id, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-      .then((response) => response.json())
-      .then((data) => setVar(data));
+    fetchExtraVar(id)
+      .then((data) => setVar(data.data));
   }, []);
 
   return (

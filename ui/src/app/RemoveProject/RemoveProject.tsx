@@ -65,7 +65,7 @@ const RemoveProject: React.ComponentType<IRemoveProject> = ({
   };
 
   useEffect(() => {
-    fetchProject(id ? id : removeId).then((data) => setProject(data));
+    fetchProject(id ? id : removeId).then((data) => setProject(data?.data));
   }, [removeId]);
 
   return (

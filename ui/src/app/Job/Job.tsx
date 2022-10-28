@@ -50,8 +50,8 @@ const Job: React.FunctionComponent = () => {
   }, [newStdout]);
 
   useEffect(() => {
-    fetchJob(id).then((data) => setJob(data));
-    fetchJobEvents(id).then((data) => setStdout(data));
+    fetchJob(id).then((data) => setJob(data.data));
+    fetchJobEvents(id).then((data) => setStdout(data.data));
   }, []);
 
   const dropdownItems = [

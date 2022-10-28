@@ -142,7 +142,7 @@ const Projects: React.FunctionComponent = () => {
     stateDispatch({ type: 'setFetching', payload: true });
     return listProjects(pagination)
       .then((data) => {
-        setProjects(data);
+        setProjects(data?.data);
         stateDispatch({ type: 'setRows', payload: createRows(projects) });
       })
       .then(() => {

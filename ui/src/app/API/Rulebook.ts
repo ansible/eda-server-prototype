@@ -1,36 +1,20 @@
-import { getServer } from '@app/utils/utils';
 import { defaultSettings } from '@app/shared/pagination';
+import { AxiosResponse } from 'axios';
+import { getAxiosInstance } from '@app/API/baseApi';
 
-const rulebooksEndpoint = 'http://' + getServer() + '/api/rulebooks';
-const rulebookRulesetsEndpoint = 'http://' + getServer() + '/api/rulebook_json/';
+const rulebooksEndpoint = '/api/rulebooks';
+const rulebookRulesetsEndpoint = '/api/rulebook_json/';
 
-export const listRulebooks = () =>
-  fetch(rulebooksEndpoint, {
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  }).then((response) => response.json());
+export const listRulebooks = (): Promise<AxiosResponse> => getAxiosInstance().get(rulebooksEndpoint);
 
-export const fetchRulebook = (id: string | number) =>
-  fetch(`${rulebooksEndpoint}/${id}`, {
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  }).then((response) => response.json());
+export const fetchRulebook = (id: string | number): Promise<AxiosResponse> =>
+  getAxiosInstance().get(`${rulebooksEndpoint}/${id}`);
 
-export const fetchRulebookRuleSets = (id, pagination = defaultSettings) => {
-  return fetch(`${rulebookRulesetsEndpoint}${id}`, {
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  })
-    .then((response) => response.json())
-    .then((data) => (data ? data.rulesets : []));
+export const fetchRulebookRuleSets = (id: string | number, pagination = defaultSettings): Promise<AxiosResponse> => {
+  return getAxiosInstance()
+    .get(`${rulebookRulesetsEndpoint}${id}`)
+    .then((data) => (data?.data ? data.data.rulesets : []));
 };
 
-export const listRuleBooks = (pagination = defaultSettings) =>
-  fetch(rulebooksEndpoint, {
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  });
+export const listRuleBooks = (pagination = defaultSettings): Promise<AxiosResponse> =>
+  getAxiosInstance().get(rulebooksEndpoint);
