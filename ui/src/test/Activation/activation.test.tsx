@@ -8,6 +8,7 @@ import { IntlProvider } from 'react-intl';
 import { Route } from 'react-router-dom';
 import { DropdownItem, KebabToggle, Tab, Title } from '@patternfly/react-core';
 import { ActivationDetails } from '@app/Activation/activation-details';
+import { mockApi } from '../__mocks__/baseApi';
 
 const ComponentWrapper = ({ children, initialEntries = ['/dashboard'] }) => (
   <IntlProvider locale="en">
@@ -18,21 +19,27 @@ const ComponentWrapper = ({ children, initialEntries = ['/dashboard'] }) => (
 );
 
 describe('Activation', () => {
+  beforeEach(() => {
+    mockApi.onGet(`/api/activation_instance_job_instances/1`).replyOnce(200, {
+      data: [],
+    });
+  });
+
   afterEach(() => {
     jest.restoreAllMocks();
   });
 
   it('should render the Activation component tabs', async () => {
-    fetchMock.mockResponse(
-      JSON.stringify({
+    mockApi.onGet(`/api/activation_instance/1`).replyOnce(200, {
+      data: {
         name: 'Activation 1',
         id: 1,
         ruleset_id: '2',
         ruleset_name: 'Ruleset 1',
         inventory_id: '3',
         inventory_name: 'Inventory 1',
-      })
-    );
+      },
+    });
     let wrapper;
     await act(async () => {
       wrapper = mount(
@@ -53,16 +60,16 @@ describe('Activation', () => {
   });
 
   it('should render the Activation details with EDA container image', async () => {
-    fetchMock.mockResponse(
-      JSON.stringify({
+    mockApi.onGet(`/api/activation_instance/1`).replyOnce(200, {
+      data: {
         name: 'Activation 1',
         id: 1,
         ruleset_id: '2',
         ruleset_name: 'Ruleset 1',
         inventory_id: '3',
         inventory_name: 'Inventory 1',
-      })
-    );
+      },
+    });
     let wrapper;
     await act(async () => {
       wrapper = mount(
@@ -91,16 +98,16 @@ describe('Activation', () => {
   });
 
   it('has a top toolbar kebab menu ', async () => {
-    fetchMock.mockResponse(
-      JSON.stringify({
-        name: 'Activation 1',
+    mockApi.onGet(`/api/activation_instance/1`).replyOnce(200, {
+      data: {
+        name: 'Activation 2',
         id: 1,
         ruleset_id: '2',
         ruleset_name: 'Ruleset 1',
         inventory_id: '3',
         inventory_name: 'Inventory 1',
-      })
-    );
+      },
+    });
     let wrapper;
     await act(async () => {
       wrapper = mount(
