@@ -276,6 +276,61 @@ async def test_read_audit_rule_hosts(client: AsyncClient, db: AsyncSession):
     assert host["status"] == TEST_AUDIT_RULE_JOB_HOST["status"]
 
 
+async def test_list_audit_rules_fired(client: AsyncClient, db: AsyncSession):
+    foreign_keys = await _create_activation_dependent_objects(client, db)
+    await _create_audit_rule(client, db, foreign_keys)
+    await _create_audit_rule(client, db, foreign_keys)
+
+    audit_rules = (await db.execute(sa.select(models.audit_rules))).all()
+    assert len(audit_rules) == 2
+
+    response = await client.get("/api/audit/rules_fired")
+    fired_rules = response.json()
+
+    assert response.status_code == status_codes.HTTP_200_OK
+    assert type(fired_rules) == list
+    assert len(fired_rules) == 2
+    rule = fired_rules[0]
+    assert rule["name"] == TEST_AUDIT_RULE["name"]
+    assert rule["job"] == TEST_AUDIT_RULE_JOB_HOST["task"]
+    assert rule["status"] == TEST_AUDIT_RULE["status"]
+    assert rule["ruleset"] == RULE_NAMES["ruleset_name"]
+    assert fired_rules[0]["fired_date"] > fired_rules[1]["fired_date"]
+
+
+async def test_list_audit_hosts_changed(client: AsyncClient, db: AsyncSession):
+    foreign_keys = await _create_activation_dependent_objects(client, db)
+    await _create_audit_rule(client, db, foreign_keys)
+    await _create_audit_rule(client, db, foreign_keys)
+
+    audit_rules = (await db.execute(sa.select(models.audit_rules))).all()
+    assert len(audit_rules) == 2
+
+    response = await client.get("/api/audit/hosts_changed")
+    fired_rules = response.json()
+
+    assert response.status_code == status_codes.HTTP_200_OK
+    assert type(fired_rules) == list
+    assert len(fired_rules) == 2
+    rule = fired_rules[0]
+    assert rule["host"] == TEST_AUDIT_RULE_JOB_HOST["host"]
+    assert rule["rule"] == TEST_AUDIT_RULE["name"]
+    assert rule["ruleset"] == RULE_NAMES["ruleset_name"]
+    assert fired_rules[0]["fired_date"] > fired_rules[1]["fired_date"]
+
+
+async def test_empty_responses(client: AsyncClient, db: AsyncSession):
+    fired_rules_response = await client.get(
+        "/api/audit/rules_fired",
+    )
+    fired_hosts_response = await client.get(
+        "/api/audit/hosts_changed",
+    )
+
+    assert fired_rules_response.json() == []
+    assert fired_hosts_response.json() == []
+
+
 async def test_audit_rule_404(client: AsyncClient, db: AsyncSession):
     audit_rule_id = 100
     details_response = await client.get(

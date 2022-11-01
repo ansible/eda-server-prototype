@@ -11,6 +11,8 @@ from .activation import (
     RestartPolicy,
 )
 from .audit_rule import (
+    AuditChangedHost,
+    AuditFiredRule,
     AuditRule,
     AuditRuleHost,
     AuditRuleJobInstance,
@@ -66,6 +68,8 @@ __all__ = [
     "AuditRuleJobInstance",
     "AuditRuleJobInstanceEvent",
     "AuditRuleHost",
+    "AuditChangedHost",
+    "AuditFiredRule",
     "ExtraVarsCreate",
     "ExtraVarsRead",
     "ExtraVarsRef",
