@@ -138,13 +138,24 @@ start-events-services() {
 }
 
 db-migrations() {
+  set +e
+  local -i rc=0
+  local alembic_out
   if [[ $(docker inspect --format '{{json .State.Running}}' eda-postgres) = "true" ]]; then
     log-info "Running DB migrations..."
     log-debug "alembic upgrade head"
-    alembic upgrade head
+    alembic_out=$(alembic upgrade head)
+    rc=$?
+    if grep -q 'FAILED: Multiple head revisions are present' <<< "${alembic_out}" ; then
+      alembic_out=$(alembic heads --verbose)
+      log-err "${alembic_out}"
+    fi
   else
     log-warn "eda-postgres service is not running!"
   fi
+
+  set -e
+  return $rc
 }
 
 stop-events-services() {
