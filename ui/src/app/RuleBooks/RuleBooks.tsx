@@ -1,44 +1,42 @@
-import {PageSection, Title} from '@patternfly/react-core';
-import {Route, useHistory} from 'react-router-dom';
-import React, {useState, useEffect, useReducer, Fragment} from 'react';
+import { PageSection, Title } from '@patternfly/react-core';
+import { useHistory } from 'react-router-dom';
+import React, { useState, useEffect, useReducer, Fragment } from 'react';
 import { Button } from '@patternfly/react-core';
-import {getServer} from '@app/utils/utils';
-import {TopToolbar} from '../shared/top-toolbar';
+import { TopToolbar } from '../shared/top-toolbar';
 import { PlusCircleIcon } from '@patternfly/react-icons';
 import sharedMessages from '../messages/shared.messages';
-import {cellWidth} from "@patternfly/react-table";
-import {TableToolbarView} from "@app/shared/table-toolbar-view";
-import TableEmptyState from "@app/shared/table-empty-state";
-import {useIntl} from "react-intl";
-import {defaultSettings} from "@app/shared/pagination";
-import {createRows} from "@app/RuleBooks/rulebooks-table-helpers";
-import {RuleSetType} from "@app/RuleSet/ruleset";
-import {RuleBookType} from "@app/RuleBook/rulebook";
-
-const endpoint = 'http://' + getServer() + '/api/rulebooks';
+import { cellWidth } from '@patternfly/react-table';
+import { TableToolbarView } from '@app/shared/table-toolbar-view';
+import TableEmptyState from '@app/shared/table-empty-state';
+import { useIntl } from 'react-intl';
+import { defaultSettings } from '@app/shared/pagination';
+import { createRows } from '@app/RuleBooks/rulebooks-table-helpers';
+import { RuleSetType } from '@app/RuleSet/ruleset';
+import { RuleBookType } from '@app/RuleBook/rulebook';
+import { listRuleBooks } from '@app/API/Rulebook';
 
 const columns = (intl) => [
   {
     title: intl.formatMessage(sharedMessages.name),
-    transforms: [cellWidth(50)]
+    transforms: [cellWidth(50)],
   },
   {
-    title: intl.formatMessage(sharedMessages.number_of_rulesets)
+    title: intl.formatMessage(sharedMessages.number_of_rulesets),
   },
   {
-    title: intl.formatMessage(sharedMessages.fire_count)
-  }
+    title: intl.formatMessage(sharedMessages.fire_count),
+  },
 ];
 
 const prepareChips = (filterValue, intl) =>
   filterValue
     ? [
-      {
-        category: intl.formatMessage(sharedMessages.name),
-        key: 'url',
-        chips: [{ name: filterValue, value: filterValue }]
-      }
-    ]
+        {
+          category: intl.formatMessage(sharedMessages.name),
+          key: 'url',
+          chips: [{ name: filterValue, value: filterValue }],
+        },
+      ]
     : [];
 
 const initialState = (filterValue = '') => ({
@@ -47,11 +45,10 @@ const initialState = (filterValue = '') => ({
   isFiltering: false,
   selectedRuleBooks: [],
   selectedAll: false,
-  rows: []
+  rows: [],
 });
 
-const areSelectedAll = (rows:RuleSetType[] = [], selected) =>
-  rows.every((row) => selected.includes(row.id));
+const areSelectedAll = (rows: RuleSetType[] = [], selected) => rows.every((row) => selected.includes(row.id));
 
 const unique = (value, index, self) => self.indexOf(value) === index;
 
@@ -62,19 +59,19 @@ export const RuleSetsListState = (state, action) => {
       return {
         ...state,
         rows: action.payload,
-        selectedAll: areSelectedAll(action.payload, state.selectedRuleBooks)
+        selectedAll: areSelectedAll(action.payload, state.selectedRuleBooks),
       };
     case 'setFetching':
       return {
         ...state,
-        isFetching: action.payload
+        isFetching: action.payload,
       };
     case 'setFilterValue':
       return { ...state, filterValue: action.payload };
     case 'setFilteringFlag':
       return {
         ...state,
-        isFiltering: action.payload
+        isFiltering: action.payload,
       };
     case 'clearFilters':
       return { ...state, filterValue: '', isFetching: true };
@@ -82,12 +79,6 @@ export const RuleSetsListState = (state, action) => {
       return state;
   }
 };
-
-const fetchRuleBooks = (pagination = defaultSettings) => fetch(endpoint, {
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
 
 const RuleBooks: React.FunctionComponent = () => {
   const intl = useIntl();
@@ -97,52 +88,45 @@ const RuleBooks: React.FunctionComponent = () => {
   const [offset, setOffset] = useState(1);
 
   const data = ruleBooks;
-  const meta = {count: ruleBooks?.length || 0, limit, offset};
-  const [
-    {
-      filterValue,
-      isFetching,
-      isFiltering,
-      selectedRuleBooks,
-      selectedAll,
-      rows
-    },
-    stateDispatch
-  ] = useReducer(RuleSetsListState, initialState());
+  const meta = { count: ruleBooks?.length || 0, limit, offset };
+  const [{ filterValue, isFetching, isFiltering, selectedRuleBooks, selectedAll, rows }, stateDispatch] = useReducer(
+    RuleSetsListState,
+    initialState()
+  );
 
-  const setSelectedRuleBooks = (id) =>
-    stateDispatch({type: 'select', payload: id});
+  const setSelectedRuleBooks = (id) => stateDispatch({ type: 'select', payload: id });
 
   const updateRuleBooks = (pagination) => {
-    stateDispatch({type: 'setFetching', payload: true});
-    return fetchRuleBooks(pagination)
-      .then(() => stateDispatch({type: 'setFetching', payload: false}))
-      .catch(() => stateDispatch({type: 'setFetching', payload: false}));
+    stateDispatch({ type: 'setFetching', payload: true });
+    return listRuleBooks(pagination)
+      .then(() => stateDispatch({ type: 'setFetching', payload: false }))
+      .catch(() => stateDispatch({ type: 'setFetching', payload: false }));
   };
 
   useEffect(() => {
-    fetchRuleBooks().then(response => response.json())
-      .then(data => { setRuleBooks(data);
-        stateDispatch({type: 'setRows', payload: createRows(ruleBooks)});});
+    listRuleBooks()
+      .then((response) => response.json())
+      .then((data) => {
+        setRuleBooks(data);
+        stateDispatch({ type: 'setRows', payload: createRows(ruleBooks) });
+      });
   }, []);
-``
+  ``;
   useEffect(() => {
     updateRuleBooks(defaultSettings);
   }, []);
 
   useEffect(() => {
-    stateDispatch({type: 'setRows', payload: createRows(ruleBooks)});
+    stateDispatch({ type: 'setRows', payload: createRows(ruleBooks) });
   }, [ruleBooks]);
 
   const clearFilters = () => {
-    stateDispatch({type: 'clearFilters'});
+    stateDispatch({ type: 'clearFilters' });
     return updateRuleBooks(meta);
   };
 
   const handleFilterChange = (value) => {
-    !value || value === ''
-      ? clearFilters()
-      : stateDispatch({type: 'setFilterValue', payload: value});
+    !value || value === '' ? clearFilters() : stateDispatch({ type: 'setFilterValue', payload: value });
   };
 
   const actionResolver = () => [
@@ -152,8 +136,8 @@ const RuleBooks: React.FunctionComponent = () => {
       onClick: (_event, _rowId, rulebook) =>
         history.push({
           pathname: `/rulebooks/relaunch/${rulebook?.id}`,
-        })
-    }
+        }),
+    },
   ];
 
   const anyRuleBooksSelected = selectedRuleBooks.length > 0;
@@ -163,7 +147,7 @@ const RuleBooks: React.FunctionComponent = () => {
   return (
     <Fragment>
       <TopToolbar>
-        <Title headingLevel={"h2"}>Rulebooks</Title>
+        <Title headingLevel={'h2'}>Rulebooks</Title>
       </TopToolbar>
       <PageSection page-type={'rulebooks-list'} id={'rulebooks_list'}>
         <TableToolbarView
@@ -192,9 +176,7 @@ const RuleBooks: React.FunctionComponent = () => {
               description={
                 filterValue === ''
                   ? intl.formatMessage(sharedMessages.norulebooks)
-                  : intl.formatMessage(
-                  sharedMessages.clearAllFiltersDescription
-                  )
+                  : intl.formatMessage(sharedMessages.clearAllFiltersDescription)
               }
             />
           )}
@@ -202,5 +184,5 @@ const RuleBooks: React.FunctionComponent = () => {
       </PageSection>
     </Fragment>
   );
-}
+};
 export { RuleBooks };

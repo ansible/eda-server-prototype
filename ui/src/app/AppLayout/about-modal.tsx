@@ -5,11 +5,11 @@ import {
   TextList,
   TextListItem,
   TextListItemVariants,
-  TextListVariants
+  TextListVariants,
 } from '@patternfly/react-core';
 import Logo from '../../assets/images/logo-masthead.svg';
 import { detect } from 'detect-browser';
-import {User} from "@app/shared/types/common-types";
+import { User } from '@app/shared/types/common-types';
 
 interface IProps {
   isOpen: boolean;
@@ -39,24 +39,12 @@ export const AboutModalWindow = (props: IProps) => {
     >
       <TextContent>
         <TextList component={TextListVariants.dl}>
-          <TextListItem component={TextListItemVariants.dt}>
-            {`User`}
-          </TextListItem>
-          <TextListItem component={TextListItemVariants.dd}>
-            {user?.email}
-          </TextListItem>
-          <TextListItem component={TextListItemVariants.dt}>
-            {`Browser Version`}
-          </TextListItem>
-          <TextListItem component={TextListItemVariants.dd}>
-            {browser?.name + ' ' + browser?.version}
-          </TextListItem>
-          <TextListItem component={TextListItemVariants.dt}>
-            {`Browser OS`}
-          </TextListItem>
-          <TextListItem component={TextListItemVariants.dd}>
-            {browser?.os}
-          </TextListItem>
+          <TextListItem component={TextListItemVariants.dt}>{`User`}</TextListItem>
+          <TextListItem component={TextListItemVariants.dd}>{user?.email}</TextListItem>
+          <TextListItem component={TextListItemVariants.dt}>{`Browser Version`}</TextListItem>
+          <TextListItem component={TextListItemVariants.dd}>{browser?.name + ' ' + browser?.version}</TextListItem>
+          <TextListItem component={TextListItemVariants.dt}>{`Browser OS`}</TextListItem>
+          <TextListItem component={TextListItemVariants.dd}>{browser?.os}</TextListItem>
         </TextList>
       </TextContent>
     </AboutModal>

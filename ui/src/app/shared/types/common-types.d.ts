@@ -14,9 +14,7 @@ export interface ApiMetadata extends AnyObject {
   offset?: number;
 }
 
-export interface ApiCollectionResponse<
-  T /** the type of collection item.*/
-  > {
+export interface ApiCollectionResponse<T /** the type of collection item.*/> {
   data: T[];
   meta: ApiMetadata;
 }
@@ -29,18 +27,18 @@ export interface ActionNotification {
 
 export type NotificationPayload =
   | {
-  type: string;
-  payload: {
-    dismissable: boolean;
-    variant: string;
-    title: string;
-    description: string;
-  };
-}
+      type: string;
+      payload: {
+        dismissable: boolean;
+        variant: string;
+        title: string;
+        description: string;
+      };
+    }
   | {
-  type: string;
-  payload: any;
-};
+      type: string;
+      payload: any;
+    };
 
 export interface SortBy {
   index: number;
@@ -49,9 +47,9 @@ export interface SortBy {
 }
 
 export type User = {
-  first_name?: string,
-  last_name?: string,
-  email: string
+  first_name?: string;
+  last_name?: string;
+  email: string;
 };
 
 export interface ProjectType {
@@ -66,11 +64,14 @@ export interface ProjectType {
   status?: string;
   type?: string;
   revision?: string;
+  vars?: [{ id: string; name: string }];
+  rulesets?: [{ id: string; name: string }];
+  inventories?: [{ id: string; name: string }];
+  playbooks?: [{ id: string; name: string }];
 }
 
 export interface TabItemType {
   eventKey: number;
-  title: string|JSXElement;
+  title: string | JSXElement;
   name: string;
 }
-

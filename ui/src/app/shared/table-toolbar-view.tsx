@@ -1,33 +1,17 @@
 /* eslint-disable react/prop-types */
-import React, {Fragment, ReactNode, SetStateAction} from 'react';
-import {
-  Table,
-  TableHeader,
-  TableBody,
-  IActionsResolver,
-  ISortBy,
-  OnSort,
-  IRow,
-  ICell
-} from '@patternfly/react-table';
-import {
-  defaultSettings,
-  getCurrentPage,
-  getNewPage,
-  PaginationConfiguration
-} from '../shared/pagination';
+import React, { Fragment, ReactNode } from 'react';
+import { Table, TableHeader, TableBody, IActionsResolver, ISortBy, OnSort, IRow, ICell } from '@patternfly/react-table';
+import { defaultSettings, PaginationConfiguration } from '../shared/pagination';
 import { useIntl } from 'react-intl';
-import {
-  PrimaryToolbar
-} from '@redhat-cloud-services/frontend-components/PrimaryToolbar';
+import { PrimaryToolbar } from '@redhat-cloud-services/frontend-components/PrimaryToolbar';
 import sharedMessages from '../messages/shared.messages';
 
 export interface TableToolbarViewProps {
   columns: ICell[];
   toolbarButtons?: () => ReactNode;
   fetchData: (pagination: PaginationConfiguration) => Promise<any | void>;
-  setLimit: any,
-  setOffset: any,
+  setLimit: any;
+  setOffset: any;
   pagination?: PaginationConfiguration;
   plural?: string;
   singular?: string;
@@ -46,11 +30,7 @@ export interface TableToolbarViewProps {
     className?: string;
     items?: {
       title?: string;
-      onClick?: (
-        event: React.MouseEvent<any> | React.KeyboardEvent | MouseEvent,
-        item: any,
-        key: number
-      ) => void;
+      onClick?: (event: React.MouseEvent<any> | React.KeyboardEvent | MouseEvent, item: any, key: number) => void;
     }[];
   };
 }
@@ -73,7 +53,7 @@ export const TableToolbarView: React.ComponentType<TableToolbarViewProps> = ({
   onSort,
   rows,
   ouiaId,
-  bulkSelect= undefined
+  bulkSelect = undefined,
 }) => {
   const intl = useIntl();
 
@@ -89,7 +69,7 @@ export const TableToolbarView: React.ComponentType<TableToolbarViewProps> = ({
       setLimit(size);
       return fetchData({ ...pagination, limit: size });
     },
-    isDisabled: isLoading
+    isDisabled: isLoading,
   };
 
   const renderToolbar = () => (
@@ -99,34 +79,27 @@ export const TableToolbarView: React.ComponentType<TableToolbarViewProps> = ({
       {...(toolbarButtons && {
         actionsConfig: {
           dropdownProps: {
-            position: 'right'
+            position: 'right',
           },
-          actions: [toolbarButtons()]
-        }
+          actions: [toolbarButtons()],
+        },
       })}
       filterConfig={{
         items: [
           {
             label: intl.formatMessage({
               id: 'search',
-              defaultMessage: 'Search'
+              defaultMessage: 'Search',
             }),
             filterValues: {
               id: 'search',
-              placeholder: intl.formatMessage(
-                sharedMessages.search
-              ),
-              'aria-label': intl.formatMessage(
-                sharedMessages.search
-              ),
-              onChange: (
-                _event: React.SyntheticEvent<Element, Event>,
-                value?: string
-              ) => onFilterChange(value),
-              value: filterValue
-            }
-          }
-        ]
+              placeholder: intl.formatMessage(sharedMessages.search),
+              'aria-label': intl.formatMessage(sharedMessages.search),
+              onChange: (_event: React.SyntheticEvent<Element, Event>, value?: string) => onFilterChange(value),
+              value: filterValue,
+            },
+          },
+        ],
       }}
     />
   );
@@ -161,7 +134,7 @@ export const TableToolbarView: React.ComponentType<TableToolbarViewProps> = ({
                 dropDirection: 'up',
                 variant: 'bottom',
                 isCompact: false,
-                className: 'pf-u-pr-0'
+                className: 'pf-u-pr-0',
               }}
             />
           )}

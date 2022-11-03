@@ -4,625 +4,624 @@ const { defineMessages } = require('react-intl');
 const sharedMessages = defineMessages({
   name: {
     id: 'shared.name',
-    defaultMessage: 'Name'
+    defaultMessage: 'Name',
   },
   url: {
     id: 'shared.url',
-    defaultMessage: 'Url'
+    defaultMessage: 'Url',
   },
   add: {
     id: 'shared.add',
-    defaultMessage: 'Add'
+    defaultMessage: 'Add',
   },
   edit: {
     id: 'shared.edit',
-    defaultMessage: 'Edit'
+    defaultMessage: 'Edit',
   },
   delete: {
     id: 'shared.delete',
-    defaultMessage: 'Delete'
+    defaultMessage: 'Delete',
   },
   disable: {
     id: 'shared.disable',
-    defaultMessage: 'Disable'
+    defaultMessage: 'Disable',
   },
   search: {
     id: 'shared.search',
-    defaultMessage: 'Search'
+    defaultMessage: 'Search',
   },
   lastModified: {
     id: 'shared.lastModified',
-    defaultMessage: 'Last modified'
+    defaultMessage: 'Last modified',
   },
   description: {
     id: 'shared.description',
-    defaultMessage: 'Description'
+    defaultMessage: 'Description',
   },
   details: {
     id: 'shared.details',
-    defaultMessage: 'Details'
+    defaultMessage: 'Details',
   },
   created: {
     id: 'shared.created',
-    defaultMessage: 'Created'
+    defaultMessage: 'Created',
   },
   type: {
     id: 'shared.type',
-    defaultMessage: 'Type'
+    defaultMessage: 'Type',
   },
   revision: {
     id: 'shared.revision',
-    defaultMessage: 'Revision'
+    defaultMessage: 'Revision',
   },
   filterByName: {
     id: 'shared.filterByName',
-    defaultMessage: 'Filter by {name}'
+    defaultMessage: 'Filter by {name}',
   },
   noResultsFound: {
     id: 'shared.noResultsFound',
-    defaultMessage: 'No results found'
+    defaultMessage: 'No results found',
   },
   noResult: {
     id: 'shared.noResult',
-    defaultMessage: 'No {results}'
+    defaultMessage: 'No {results}',
   },
   job: {
     id: 'shared.job',
-    defaultMessage: 'Job'
+    defaultMessage: 'Job',
   },
   jobs: {
     id: 'shared.jobs',
-    defaultMessage: 'Jobs'
+    defaultMessage: 'Jobs',
   },
   sync: {
     id: 'shared.sync',
-    defaultMessage: 'Sync'
+    defaultMessage: 'Sync',
   },
   launch: {
     id: 'shared.launch',
-    defaultMessage: 'Launch'
+    defaultMessage: 'Launch',
   },
   relaunch: {
     id: 'shared.relaunch',
-    defaultMessage: 'Relaunch'
+    defaultMessage: 'Relaunch',
   },
   restart: {
     id: 'shared.restart',
-    defaultMessage: 'Restart'
+    defaultMessage: 'Restart',
   },
   addJob: {
     id: 'activation.addJob',
-    defaultMessage: 'Add job'
+    defaultMessage: 'Add job',
   },
   deleteJobTitle: {
     id: 'activation.deleteJob',
-    defaultMessage: 'Delete job'
+    defaultMessage: 'Delete job',
   },
   status: {
     id: 'shared.status',
-    defaultMessage: 'Status'
+    defaultMessage: 'Status',
   },
   cancel: {
     id: 'shared.cancel',
-    defaultMessage: 'Cancel'
+    defaultMessage: 'Cancel',
   },
   rule: {
     id: 'shared.rule',
-    defaultMessage: 'Rule'
+    defaultMessage: 'Rule',
   },
   clearAllFilters: {
     id: 'shared.clearAllFilters',
-    defaultMessage: 'Clear all filters'
+    defaultMessage: 'Clear all filters',
   },
   clearAllFiltersDescription: {
     id: 'shared.clearAllFiltersDescription',
-    defaultMessage:
-      'No results match the filter criteria. Remove all filters or clear all filters to show results.'
+    defaultMessage: 'No results match the filter criteria. Remove all filters or clear all filters to show results.',
   },
   ariaLabel: {
     id: 'shared.ariaLabel',
-    defaultMessage: '{name} table'
+    defaultMessage: '{name} table',
   },
   updatedLabel: {
     id: 'shared.updatedLabel',
-    defaultMessage: 'Updated'
+    defaultMessage: 'Updated',
   },
   allFieldsRequired: {
     id: 'shared.allFieldsRequired',
-    defaultMessage: 'All fields are required'
+    defaultMessage: 'All fields are required',
   },
   output: {
     id: 'shared.output',
-    defaultMessage: 'Output'
+    defaultMessage: 'Output',
   },
   rulebookActivations: {
     id: 'shared.rulebookActivations',
-    defaultMessage: 'Rulebook Activations'
+    defaultMessage: 'Rulebook Activations',
   },
   namePlaceholder: {
     id: 'shared.namePlaceholder',
-    defaultMessage: 'Insert name here'
+    defaultMessage: 'Insert name here',
   },
   descriptionPlaceholder: {
     id: 'shared.descriptionPlaceholder',
-    defaultMessage: 'Insert description here'
+    defaultMessage: 'Insert description here',
   },
   rules: {
     id: 'shared.rules',
-    defaultMessage: 'Rules'
+    defaultMessage: 'Rules',
   },
   sources: {
     id: 'shared.sources',
-    defaultMessage: 'Sources'
+    defaultMessage: 'Sources',
   },
   error: {
     id: 'shared.error',
-    defaultMessage: 'Error'
+    defaultMessage: 'Error',
   },
   project: {
     id: 'project.project',
-    defaultMessage: 'Project'
+    defaultMessage: 'Project',
   },
   projects: {
     id: 'project.projects',
-    defaultMessage: 'Projects'
+    defaultMessage: 'Projects',
   },
   noprojects_action: {
     id: 'project.noprojects_action',
-    defaultMessage: 'Please add a project by using the button below.'
+    defaultMessage: 'Please add a project by using the button below.',
   },
   noprojects_description: {
     id: 'project.noprojects_description',
-    defaultMessage: 'There are currently no projects added for your organization.'
+    defaultMessage: 'There are currently no projects added for your organization.',
   },
   add_new_project: {
     id: 'project.addNewProject',
-    defaultMessage: 'Add new project'
+    defaultMessage: 'Add new project',
   },
   projectRemoveTitle: {
     id: 'project.removeProject',
-    defaultMessage: 'Delete project'
+    defaultMessage: 'Delete project',
   },
   projectsRemoveTitle: {
     id: 'project.removeProjects',
-    defaultMessage: 'Delete selected projects'
+    defaultMessage: 'Delete selected projects',
   },
   projectRemoveDescription: {
     id: 'project.removeProjectDescription',
-    defaultMessage: 'Are you sure you want to delete the project below?'
+    defaultMessage: 'Are you sure you want to delete the project below?',
   },
   projectsRemoveDescription: {
     id: 'project.removeProjectDescription',
-    defaultMessage: 'Are you sure you want to delete the selected projects?'
+    defaultMessage: 'Are you sure you want to delete the selected projects?',
   },
   projectPlaceholder: {
     id: 'activation.projectPlaceholder',
-    defaultMessage: 'Select project'
+    defaultMessage: 'Select project',
   },
   addProject: {
     id: 'project.addProject',
-    defaultMessage: 'Add project'
+    defaultMessage: 'Add project',
   },
   editProject: {
     id: 'project.editProject',
-    defaultMessage: 'Update project'
+    defaultMessage: 'Update project',
   },
   deleteProjectTitle: {
     id: 'project.deleteProject',
-    defaultMessage: 'Delete project'
+    defaultMessage: 'Delete project',
   },
   backToProjects: {
     id: 'project.backToProjects',
-    defaultMessage: 'Back to Projects'
+    defaultMessage: 'Back to Projects',
   },
   project_link: {
-  id: 'project.project_link',
-    defaultMessage: 'Project link'
-},
+    id: 'project.project_link',
+    defaultMessage: 'Project link',
+  },
   scmUrl: {
     id: 'project.scmUrl',
-    defaultMessage: 'SCM URL'
+    defaultMessage: 'SCM URL',
   },
   scmType: {
     id: 'project.scmType',
-    defaultMessage: 'SCM type'
+    defaultMessage: 'SCM type',
   },
   scmCredentials: {
     id: 'project.scmCredentials',
-    defaultMessage: 'SCM Credentials'
+    defaultMessage: 'SCM Credentials',
   },
   scmToken: {
     id: 'project.scmToken',
-    defaultMessage: 'SCM token'
+    defaultMessage: 'SCM token',
   },
   scmUrlPlaceholder: {
     id: 'project.scmUrlPlaceholder',
-    defaultMessage: 'Insert SCM URL here'
+    defaultMessage: 'Insert SCM URL here',
   },
   scmTypePlaceholder: {
     id: 'project.scmTypePlaceholder',
-    defaultMessage: 'SCM Type'
+    defaultMessage: 'SCM Type',
   },
   scmCredentialsPlaceholder: {
     id: 'project.scmCredentialsPlaceholder',
-    defaultMessage: 'Select an SCM Credential'
+    defaultMessage: 'Select an SCM Credential',
   },
   scmTokenPlaceholder: {
     id: 'project.scmTokenPlaceholder',
-    defaultMessage: 'Select an SCM Token'
+    defaultMessage: 'Select an SCM Token',
   },
   add_project_success: {
     id: 'project.addProjectSuccess',
-    defaultMessage: 'Project added successfully'
+    defaultMessage: 'Project added successfully',
   },
   add_project_failure: {
     id: 'project.addProjectFailure',
-    defaultMessage: 'Error adding new project'
+    defaultMessage: 'Error adding new project',
   },
   edit_project_success: {
     id: 'project.editProjectSuccess',
-    defaultMessage: 'Project updated successfully'
+    defaultMessage: 'Project updated successfully',
   },
   edit_project_failure: {
     id: 'project.editProjectFailure',
-    defaultMessage: 'Error updating project'
+    defaultMessage: 'Error updating project',
   },
   delete_project_success: {
     id: 'project.deleteProjectSuccess',
-    defaultMessage: 'Project removed successfully'
+    defaultMessage: 'Project removed successfully',
   },
   delete_project_failure: {
     id: 'project.deleteProjectFailure',
-    defaultMessage: 'Remove project failed'
+    defaultMessage: 'Remove project failed',
   },
   enterProjectName: {
     id: 'project.enterProjectName',
-    defaultMessage: 'Enter project name'
+    defaultMessage: 'Enter project name',
   },
   enterScmUrl: {
     id: 'project.enterScm',
-    defaultMessage: 'Enter SCM URL'
+    defaultMessage: 'Enter SCM URL',
   },
   activation: {
     id: 'activation.activation',
-    defaultMessage: 'Activation'
+    defaultMessage: 'Activation',
   },
   activationRemoveTitle: {
     id: 'activation.removeActivation',
-    defaultMessage: 'Delete rulebook activation'
+    defaultMessage: 'Delete rulebook activation',
   },
   activationsRemoveTitle: {
     id: 'activation.removeActivations',
-    defaultMessage: 'Delete selected rulebook activations'
+    defaultMessage: 'Delete selected rulebook activations',
   },
   activationRemoveDescription: {
     id: 'activation.removeActivationDescription',
-    defaultMessage: 'Are you sure you want to delete the rulebook activation below?'
+    defaultMessage: 'Are you sure you want to delete the rulebook activation below?',
   },
   activationsRemoveDescription: {
     id: 'activation.removeActivationsDescription',
-    defaultMessage: 'Are you sure you want to delete the selected rulebook activations?'
+    defaultMessage: 'Are you sure you want to delete the selected rulebook activations?',
   },
   activations: {
     id: 'activation.activations',
-    defaultMessage: 'Rulebook Activations'
+    defaultMessage: 'Rulebook Activations',
   },
   noactivations_description: {
     id: 'activation.noactivations_description',
-    defaultMessage: 'There are currently no rulebook activations added for your organization.'
+    defaultMessage: 'There are currently no rulebook activations added for your organization.',
   },
   noactivations_action: {
     id: 'activation.noactivations_action',
-    defaultMessage: 'Please add a rulebook activation by using the button below.'
+    defaultMessage: 'Please add a rulebook activation by using the button below.',
   },
   addActivation: {
     id: 'activation.addActivation',
-    defaultMessage: 'Add rulebook activation'
+    defaultMessage: 'Add rulebook activation',
   },
   deleteActivationTitle: {
     id: 'activation.deleteActivation',
-    defaultMessage: 'Delete activation'
+    defaultMessage: 'Delete activation',
   },
   activation_status: {
     id: 'activations.activation_status',
-    defaultMessage: 'Activation status'
+    defaultMessage: 'Activation status',
   },
   enterRulebookActivationName: {
     id: 'activation.enterRulebookActivationName',
-    defaultMessage: 'Enter a rulebook activation name'
+    defaultMessage: 'Enter a rulebook activation name',
   },
   enterRulebookActivationDescription: {
     id: 'activation.enterRulebookActivationDescription',
-    defaultMessage: 'Enter a rulebook activation description'
+    defaultMessage: 'Enter a rulebook activation description',
   },
   selectRuleSet: {
     id: 'activation.selectRulebookActivationName',
-    defaultMessage: 'Select a rule set'
+    defaultMessage: 'Select a rule set',
   },
   selectRestartPolicy: {
     id: 'activation.selectRestartPolicy',
-    defaultMessage: 'Select a restart policy'
+    defaultMessage: 'Select a restart policy',
   },
   selectPlaybook: {
     id: 'job.selectPlaybookName',
-    defaultMessage: 'Select a playbook'
+    defaultMessage: 'Select a playbook',
   },
   selectInventory: {
     id: 'activation.selectInventory',
-    defaultMessage: 'Select an inventory'
+    defaultMessage: 'Select an inventory',
   },
   selectExtraVar: {
     id: 'activation.selectExtraVar',
-    defaultMessage: 'Select extra variables'
+    defaultMessage: 'Select extra variables',
   },
   selectProject: {
     id: 'activation.selectProject',
-    defaultMessage: 'Select project'
+    defaultMessage: 'Select project',
   },
   add_activation_success: {
     id: 'activation.addActivationSuccess',
-    defaultMessage: 'Rulebook activation added successfully'
+    defaultMessage: 'Rulebook activation added successfully',
   },
   add_activation_failure: {
     id: 'activation.addActivationFailure',
-    defaultMessage: 'Error adding new rulebook activation'
+    defaultMessage: 'Error adding new rulebook activation',
   },
   edit_activation_success: {
     id: 'activation.editActivationSuccess',
-    defaultMessage: 'Rulebook activation updated successfully'
+    defaultMessage: 'Rulebook activation updated successfully',
   },
   edit_activation_failure: {
     id: 'activation.editActivationFailure',
-    defaultMessage: 'Error updating the rulebook activation'
+    defaultMessage: 'Error updating the rulebook activation',
   },
   delete_activation_success: {
     id: 'activation.deleteActivationSuccess',
-    defaultMessage: 'Rulebook activation removed successfully'
+    defaultMessage: 'Rulebook activation removed successfully',
   },
   delete_activation_failure: {
     id: 'activation.deleteActivationFailure',
-    defaultMessage: 'Remove rulebook activation failed'
+    defaultMessage: 'Remove rulebook activation failed',
   },
   ruleset: {
     id: 'rulesets.ruleset',
-    defaultMessage: 'Rule set'
+    defaultMessage: 'Rule set',
   },
   rulesets: {
     id: 'rulesets.rulesets',
-    defaultMessage: 'Rule sets'
+    defaultMessage: 'Rule sets',
   },
   norulesets: {
     id: 'rulesets.norulesets',
-    defaultMessage: 'No rule sets'
+    defaultMessage: 'No rule sets',
   },
   number_of_rules: {
     id: 'rulesets.number_of_rules',
-    defaultMessage: 'Number of rules'
+    defaultMessage: 'Number of rules',
   },
   fire_count: {
     id: 'rulesets.fire_count',
-    defaultMessage: 'Fire count'
+    defaultMessage: 'Fire count',
   },
   deleteRuleSetTitle: {
     id: 'rulesets.deleteRuleSet',
-    defaultMessage: 'Delete rule set'
+    defaultMessage: 'Delete rule set',
   },
   backToRuleSets: {
     id: 'ruleset.backToRuleSets',
-    defaultMessage: 'Back to Rule Sets'
+    defaultMessage: 'Back to Rule Sets',
   },
   norulesetrules: {
     id: 'ruleset.norulesetrules',
-    defaultMessage: 'No rules for this rule set'
+    defaultMessage: 'No rules for this rule set',
   },
   norulesetsources: {
     id: 'ruleset.norulesetsources',
-    defaultMessage: 'No sources for this rule set'
+    defaultMessage: 'No sources for this rule set',
   },
   noactivationjobs: {
     id: 'activation.nojobs_description',
-    defaultMessage: 'There are currently no jobs for this rulebook activation.'
+    defaultMessage: 'There are currently no jobs for this rulebook activation.',
   },
   nojobs_description: {
     id: 'common.nojobs_description',
-    defaultMessage: 'There are currently no jobs for your organization.'
+    defaultMessage: 'There are currently no jobs for your organization.',
   },
   nojobs_action: {
     id: 'common.nojobs_action',
-    defaultMessage: 'Please add a job by using the button below.'
+    defaultMessage: 'Please add a job by using the button below.',
   },
   lastFiredDate: {
     id: 'activation.lastFiredDate',
-    defaultMessage: 'Last fired date'
+    defaultMessage: 'Last fired date',
   },
   edaContainerImage: {
     id: 'activation.edaContainerImage',
-    defaultMessage: 'EDA container image'
+    defaultMessage: 'EDA container image',
   },
   edaContainerImagePlaceholder: {
     id: 'activation.edaContainerImagePlaceholder',
-    defaultMessage: 'Insert an EDA container image here'
+    defaultMessage: 'Insert an EDA container image here',
   },
   restartPolicyPlaceholder: {
     id: 'activation.restartPolicyPlaceholder',
-    defaultMessage: 'Select a restart policy'
+    defaultMessage: 'Select a restart policy',
   },
   inventoryPlaceholder: {
     id: 'activation.inventoryPlaceholder',
-    defaultMessage: 'Select an inventory'
+    defaultMessage: 'Select an inventory',
   },
   playbookPlaceholder: {
     id: 'activation.playbookPlaceholder',
-    defaultMessage: 'Select a playbook'
+    defaultMessage: 'Select a playbook',
   },
   ruleSetPlaceholder: {
     id: 'activation.ruleSetPlaceholder',
-    defaultMessage: 'Select a rule set'
+    defaultMessage: 'Select a rule set',
   },
   backToRulebookActivations: {
     id: 'activation.backToRulebookActivations',
-    defaultMessage: 'Back to Rulebook Activations'
+    defaultMessage: 'Back to Rulebook Activations',
   },
   extraVarPlaceholder: {
     id: 'project.extraVarPlaceholder',
-    defaultMessage: 'Select extra variables'
+    defaultMessage: 'Select extra variables',
   },
   action: {
     id: 'rule.action',
-    defaultMessage: 'Action'
+    defaultMessage: 'Action',
   },
   condition: {
     id: 'rule.condition',
-    defaultMessage: 'Condition'
+    defaultMessage: 'Condition',
   },
   backToRules: {
     id: 'rule.backToRules',
-    defaultMessage: 'Back to Rules'
+    defaultMessage: 'Back to Rules',
   },
   workingDirectory: {
     id: 'shared.workingDirectory',
-    defaultMessage: 'Working directory'
+    defaultMessage: 'Working directory',
   },
   workingDirectoryPlaceholder: {
     id: 'shared.workingDirectoryPlaceholder',
-    defaultMessage: 'Working directory'
+    defaultMessage: 'Working directory',
   },
   enterRulebookActivationWorkingDirectory: {
     id: 'activation.enterRulebookActivationWorkingDirectory',
-    defaultMessage: 'Enter a rulebook working directory'
+    defaultMessage: 'Enter a rulebook working directory',
   },
   backToRuleBooks: {
     id: 'rulebook.backToRuleBooks',
-    defaultMessage: 'Back to Rulebooks'
+    defaultMessage: 'Back to Rulebooks',
   },
   rulebooks: {
     id: 'rulebook.rulebooks',
-    defaultMessage: 'Rulebooks'
+    defaultMessage: 'Rulebooks',
   },
   rulebook: {
     id: 'rulebook.rulebook',
-    defaultMessage: 'Rulebook'
+    defaultMessage: 'Rulebook',
   },
   norulebooks: {
     id: 'rulebook.norulebooks',
-    defaultMessage: 'There are currently no rulebooks for your organization'
+    defaultMessage: 'There are currently no rulebooks for your organization',
   },
   norulebookrulesets: {
     id: 'rulebook.norulebookrulesets',
-    defaultMessage: 'No rule sets for this rulebook'
+    defaultMessage: 'No rule sets for this rulebook',
   },
   number_of_rulesets: {
     id: 'rulebook.number_of_ruesets',
-    defaultMessage: 'Number of rulesets'
+    defaultMessage: 'Number of rulesets',
   },
   jobRemoveTitle: {
     id: 'job.removeJob',
-    defaultMessage: 'Delete job'
+    defaultMessage: 'Delete job',
   },
   jobsRemoveTitle: {
     id: 'job.removeJobs',
-    defaultMessage: 'Delete jobs'
+    defaultMessage: 'Delete jobs',
   },
   jobRemoveDescription: {
     id: 'job.removeJobDescription',
-    defaultMessage: 'Are you sure you want to delete the job below?'
+    defaultMessage: 'Are you sure you want to delete the job below?',
   },
   jobsRemoveDescription: {
     id: 'job.removeJobsDescription',
-    defaultMessage: 'Are you sure you want to delete the selected jobs?'
+    defaultMessage: 'Are you sure you want to delete the selected jobs?',
   },
   add_job_success: {
     id: 'job.addProjectSuccess',
-    defaultMessage: 'Job added successfully'
+    defaultMessage: 'Job added successfully',
   },
   add_job_failure: {
     id: 'job.addJobFailure',
-    defaultMessage: 'Error adding new job'
+    defaultMessage: 'Error adding new job',
   },
   delete_job_success: {
     id: 'job.deleteJobSuccess',
-    defaultMessage: 'Job removed successfully'
+    defaultMessage: 'Job removed successfully',
   },
   delete_job_failure: {
     id: 'job.deleteJobFailure',
-    defaultMessage: 'Remove job failed'
+    defaultMessage: 'Remove job failed',
   },
   inventory: {
     id: 'inventory.inventory',
-    defaultMessage: 'Inventory'
+    defaultMessage: 'Inventory',
   },
   inventories: {
     id: 'inventory.inventories',
-    defaultMessage: 'Inventories'
+    defaultMessage: 'Inventories',
   },
   noinventories_action: {
     id: 'inventory.noinventories_action',
-    defaultMessage: 'Please add an inventory by using the button below.'
+    defaultMessage: 'Please add an inventory by using the button below.',
   },
   noinventories_description: {
     id: 'inventory.noinventories_description',
-    defaultMessage: 'There are currently no inventories added for your organization.'
+    defaultMessage: 'There are currently no inventories added for your organization.',
   },
   add_new_inventory: {
     id: 'inventory.addNewInventory',
-    defaultMessage: 'Add new inventory'
+    defaultMessage: 'Add new inventory',
   },
   inventoryRemoveTitle: {
     id: 'inventory.removeInventory',
-    defaultMessage: 'Delete inventory'
+    defaultMessage: 'Delete inventory',
   },
   inventoriesRemoveTitle: {
     id: 'inventory.removeInventories',
-    defaultMessage: 'Delete inventories'
+    defaultMessage: 'Delete inventories',
   },
   inventoryRemoveDescription: {
     id: 'inventory.removeInventoryDescription',
-    defaultMessage: 'Are you sure you want to delete the inventory below?'
+    defaultMessage: 'Are you sure you want to delete the inventory below?',
   },
   inventoriesRemoveDescription: {
     id: 'inventory.removeInventoriesDescription',
-    defaultMessage: 'Are you sure you want to delete the selected inventories?'
+    defaultMessage: 'Are you sure you want to delete the selected inventories?',
   },
   addInventory: {
     id: 'inventory.addInventory',
-    defaultMessage: 'Add inventory'
+    defaultMessage: 'Add inventory',
   },
   deleteInventoryTitle: {
     id: 'inventory.deleteInventory',
-    defaultMessage: 'Delete inventory'
+    defaultMessage: 'Delete inventory',
   },
   backToInventories: {
     id: 'project.backToInventories',
-    defaultMessage: 'Back to Inventories'
+    defaultMessage: 'Back to Inventories',
   },
   source_of_inventory: {
     id: 'inventory.source_of_inventory',
-    defaultMessage: 'Source of inventory'
+    defaultMessage: 'Source of inventory',
   },
   enterInventoryName: {
     id: 'inventory.enterInventoryName',
-    defaultMessage: 'Enter an inventory name'
+    defaultMessage: 'Enter an inventory name',
   },
   enterInventoryDescription: {
     id: 'inventory.enterInventoryDescription',
-    defaultMessage: 'Enter an inventory description'
+    defaultMessage: 'Enter an inventory description',
   },
   add_inventory_success: {
     id: 'inventory.addInventorySuccess',
-    defaultMessage: 'Inventory added successfully'
+    defaultMessage: 'Inventory added successfully',
   },
   add_inventory_failure: {
     id: 'inventory.addInventoryFailure',
-    defaultMessage: 'Error adding new inventory'
+    defaultMessage: 'Error adding new inventory',
   },
   delete_inventory_success: {
     id: 'inventory.deleteInventorySuccess',
-    defaultMessage: 'Inventory removed successfully'
+    defaultMessage: 'Inventory removed successfully',
   },
   delete_inventory_failure: {
     id: 'inventory.deleteInventoryFailure',
-    defaultMessage: 'Remove inventory failed'
-  }
+    defaultMessage: 'Remove inventory failed',
+  },
 });
 
 export default sharedMessages;

@@ -1,5 +1,5 @@
 import React, { Fragment } from 'react';
-import {Link} from "react-router-dom";
+import { Link } from 'react-router-dom';
 
 export const createRows = (data) =>
   data.map(({ id, name, type }) => ({
@@ -8,12 +8,12 @@ export const createRows = (data) =>
       <Fragment key={`[sources-${id}`}>
         <Link
           to={{
-            pathname: `/sources/${id}`
+            pathname: `/sources/${id}`,
           }}
         >
           {name || id}
         </Link>
       </Fragment>,
-      type
-    ]
+      type,
+    ],
   }));

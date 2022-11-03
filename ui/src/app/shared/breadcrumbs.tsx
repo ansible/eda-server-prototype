@@ -4,13 +4,10 @@ import { NavLink } from 'react-router-dom';
 import { Breadcrumb, BreadcrumbItem } from '@patternfly/react-core';
 
 const Breadcrumbs = ({ breadcrumbs }) =>
-  breadcrumbs ? (<Breadcrumb>
+  breadcrumbs ? (
+    <Breadcrumb>
       {breadcrumbs.map(({ to, id, title }, idx) => (
-        <BreadcrumbItem
-          key={'title'}
-          isActive={idx === breadcrumbs.length - 1}
-          id={id}
-        >
+        <BreadcrumbItem key={'title'} isActive={idx === breadcrumbs.length - 1} id={id}>
           {(to && (
             <NavLink isActive={() => false} exact to={to}>
               {title}
@@ -26,9 +23,9 @@ Breadcrumbs.propTypes = {
   breadcrumbs: PropTypes.arrayOf(
     PropTypes.shape({
       title: PropTypes.string.isRequired,
-      to: PropTypes.string
+      to: PropTypes.string,
     })
-  )
+  ),
 };
 
 export default Breadcrumbs;

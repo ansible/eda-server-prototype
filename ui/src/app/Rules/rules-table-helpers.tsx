@@ -1,14 +1,14 @@
 import React, { Fragment } from 'react';
-import {Link} from "react-router-dom";
+import { Link } from 'react-router-dom';
 
 export const createRows = (data) =>
-  data.map(({ id, name, ruleset, action, last_fired_at}) => ({
+  data.map(({ id, name, ruleset, action, last_fired_at }) => ({
     id,
     cells: [
       <Fragment key={`[rule-${id}`}>
         <Link
           to={{
-            pathname: `/rule/${id}`
+            pathname: `/rule/${id}`,
           }}
         >
           {name}
@@ -17,13 +17,13 @@ export const createRows = (data) =>
       <Fragment key={`[ruleset-${id}`}>
         <Link
           to={{
-            pathname: `/ruleset/${ruleset?.id}`
+            pathname: `/ruleset/${ruleset?.id}`,
           }}
         >
           {ruleset?.name || `Ruleset ${ruleset?.id}`}
         </Link>
       </Fragment>,
       action,
-      last_fired_at
-    ]
+      last_fired_at,
+    ],
   }));

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {NavLink, useLocation} from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 import {
   Nav,
   NavList,
@@ -11,19 +11,19 @@ import {
   SkipToContent,
   PageHeaderTools,
   DropdownItem,
-  NavGroup
+  NavGroup,
 } from '@patternfly/react-core';
 import { routes, IAppRoute, IAppRouteGroup } from '../routes';
-import {ExternalLinkAltIcon, QuestionCircleIcon } from '@patternfly/react-icons';
-import {useEffect, useState} from 'react';
+import { ExternalLinkAltIcon, QuestionCircleIcon } from '@patternfly/react-icons';
+import { useEffect, useState } from 'react';
 import Logo from '../../assets/images/logo-large.svg';
 import { SmallLogo } from './small-logo';
 import { APPLICATION_TITLE } from '../utils/constants';
 import { StatefulDropdown } from './stateful-dropdown';
-import {getUser, logoutUser} from '@app/shared/auth';
-import {User} from "@app/shared/types/common-types";
-import {AboutModalWindow} from "@app/AppLayout/about-modal";
-import {NotificationsPortal} from "@redhat-cloud-services/frontend-components-notifications";
+import { getUser, logoutUser } from '@app/shared/auth';
+import { User } from '@app/shared/types/common-types';
+import { AboutModalWindow } from '@app/AppLayout/about-modal';
+import { NotificationsPortal } from '@redhat-cloud-services/frontend-components-notifications';
 
 interface IAppLayout {
   children: React.ReactNode;
@@ -61,8 +61,8 @@ const AppLayout: React.FunctionComponent<IAppLayout> = ({ children }) => {
 
   useEffect(() => {
     getUser()
-      .then(response => response.json())
-      .then(data => setUser(data || undefined));
+      .then((response) => response.json())
+      .then((data) => setUser(data || undefined));
   }, []);
 
   if (user) {
@@ -74,43 +74,33 @@ const AppLayout: React.FunctionComponent<IAppLayout> = ({ children }) => {
   }
 
   const userDropdownItems = [
-      <DropdownItem isDisabled key="username">
-        Username: {user?.email || ''}
-      </DropdownItem>,
-      <DropdownItem
-        key="logout"
-        aria-label={'logout'}
-        onClick={() =>
-          logoutUser().then(() => {
-            setUser(undefined);
-            window.location.replace(
-              baseUrl
-            );
-          })
-        }
-      >
-        {`Logout`}
-      </DropdownItem>
-    ];
-
-  const docsDropdownItems = [
-    <DropdownItem
-      key="customer_support"
-      href="https://access.redhat.com/support"
-      target="_blank"
-    >
-      Customer Support <ExternalLinkAltIcon />
+    <DropdownItem isDisabled key="username">
+      Username: {user?.email || ''}
     </DropdownItem>,
     <DropdownItem
-      key="training"
-      href="https://www.ansible.com/resources/webinars-training"
-      target="_blank"
+      key="logout"
+      aria-label={'logout'}
+      onClick={() =>
+        logoutUser().then(() => {
+          setUser(undefined);
+          window.location.replace(baseUrl);
+        })
+      }
     >
+      {`Logout`}
+    </DropdownItem>,
+  ];
+
+  const docsDropdownItems = [
+    <DropdownItem key="customer_support" href="https://access.redhat.com/support" target="_blank">
+      Customer Support <ExternalLinkAltIcon />
+    </DropdownItem>,
+    <DropdownItem key="training" href="https://www.ansible.com/resources/webinars-training" target="_blank">
       Training <ExternalLinkAltIcon />
     </DropdownItem>,
     <DropdownItem key="about" onClick={() => setAboutModalVisible(true)}>
       {`About`}
-    </DropdownItem>
+    </DropdownItem>,
   ];
 
   const onNavToggle = () => setIsNavOpen(!isNavOpen);
@@ -133,7 +123,6 @@ const AppLayout: React.FunctionComponent<IAppLayout> = ({ children }) => {
               items={userDropdownItems}
               toggleType="dropdown"
             />
-
           </div>
         </PageHeaderTools>
       }
@@ -163,30 +152,29 @@ const AppLayout: React.FunctionComponent<IAppLayout> = ({ children }) => {
 
   const Navigation = (
     <Nav id="nav-primary-simple" theme="dark">
-      <NavGroup title={APPLICATION_TITLE}/>
+      <NavGroup title={APPLICATION_TITLE} />
       <NavList id="nav-list-simple">
-        {routes && routes.map(
-          (route, idx) => route.label && (!route.routes ? renderNavItem(route, idx) : renderNavGroup(route, idx))
-        )}
+        {routes &&
+          routes.map(
+            (route, idx) => route.label && (!route.routes ? renderNavItem(route, idx) : renderNavGroup(route, idx))
+          )}
       </NavList>
     </Nav>
   );
 
-  const Sidebar = (
-    <PageSidebar
-      theme="dark"
-      nav={Navigation}
-      isNavOpen={isMobileView ? isNavOpenMobile : isNavOpen} />
-  );
+  const Sidebar = <PageSidebar theme="dark" nav={Navigation} isNavOpen={isMobileView ? isNavOpenMobile : isNavOpen} />;
 
   const pageId = 'primary-app-container';
 
   const PageSkipToContent = (
-    <SkipToContent onClick={(event) => {
-      event.preventDefault();
-      const primaryContentContainer = document.getElementById(pageId);
-      primaryContentContainer && primaryContentContainer.focus();
-    }} href={`#${pageId}`}>
+    <SkipToContent
+      onClick={(event) => {
+        event.preventDefault();
+        const primaryContentContainer = document.getElementById(pageId);
+        primaryContentContainer && primaryContentContainer.focus();
+      }}
+      href={`#${pageId}`}
+    >
       Skip to Content
     </SkipToContent>
   );
@@ -196,7 +184,8 @@ const AppLayout: React.FunctionComponent<IAppLayout> = ({ children }) => {
       header={headerNav()}
       sidebar={Sidebar}
       onPageResize={onPageResize}
-      skipToContent={PageSkipToContent}>
+      skipToContent={PageSkipToContent}
+    >
       {aboutModalVisible && aboutModal()}
       <NotificationsPortal />
       {children}

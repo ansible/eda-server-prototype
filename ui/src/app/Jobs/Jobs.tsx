@@ -1,20 +1,21 @@
-import {Checkbox, PageSection, Title, ToolbarGroup, ToolbarItem} from '@patternfly/react-core';
-import {Link, Route, useHistory} from 'react-router-dom';
-import React, {useState, useEffect, useReducer, Fragment} from 'react';
+import { PageSection, Title, ToolbarGroup, ToolbarItem } from '@patternfly/react-core';
+import { Link, Route, useHistory } from 'react-router-dom';
+import React, { useState, useEffect, useReducer, Fragment } from 'react';
 import { Button } from '@patternfly/react-core';
-import {getServer} from '@app/utils/utils';
-import {TopToolbar} from "@app/shared/top-toolbar";
+import { getServer } from '@app/utils/utils';
+import { TopToolbar } from '@app/shared/top-toolbar';
 import { PlusCircleIcon } from '@patternfly/react-icons';
 import sharedMessages from '../messages/shared.messages';
-import {cellWidth} from "@patternfly/react-table";
+import { cellWidth } from '@patternfly/react-table';
 import JobsTableContext from './jobs-table-context';
-import {TableToolbarView} from "@app/shared/table-toolbar-view";
-import TableEmptyState from "@app/shared/table-empty-state";
-import {useIntl} from "react-intl";
-import {defaultSettings} from "@app/shared/pagination";
-import {NewJob} from "@app/NewJob/NewJob";
-import {createRows} from "@app/Jobs/jobs-table-helpers";
-import {RemoveJob} from "@app/RemoveJob/RemoveJob";
+import { TableToolbarView } from '@app/shared/table-toolbar-view';
+import TableEmptyState from '@app/shared/table-empty-state';
+import { useIntl } from 'react-intl';
+import { defaultSettings } from '@app/shared/pagination';
+import { NewJob } from '@app/NewJob/NewJob';
+import { createRows } from '@app/Jobs/jobs-table-helpers';
+import { RemoveJob } from '@app/RemoveJob/RemoveJob';
+import { listJobs } from '@app/API/Job';
 
 interface JobType {
   id: string;
@@ -24,31 +25,29 @@ interface JobType {
 interface JobRowType {
   id: string;
   name?: string;
-  isChecked: boolean
+  isChecked: boolean;
 }
-
-const endpoint = 'http://' + getServer() + '/api/job_instances';
 
 const columns = (intl) => [
   {
-    title: (''),
-    transforms: [cellWidth(10 )]
+    title: '',
+    transforms: [cellWidth(10)],
   },
   {
-  title: (intl.formatMessage(sharedMessages.name)),
-    transforms: [cellWidth(80 )]
-  }
+    title: intl.formatMessage(sharedMessages.name),
+    transforms: [cellWidth(80)],
+  },
 ];
 
 const prepareChips = (filterValue, intl) =>
   filterValue
     ? [
-      {
-        category: intl.formatMessage(sharedMessages.name),
-        key: 'name',
-        chips: [{ name: filterValue, value: filterValue }]
-      }
-    ]
+        {
+          category: intl.formatMessage(sharedMessages.name),
+          key: 'name',
+          chips: [{ name: filterValue, value: filterValue }],
+        },
+      ]
     : [];
 
 const initialState = (filterValue = '') => ({
@@ -57,11 +56,10 @@ const initialState = (filterValue = '') => ({
   isFiltering: false,
   selectedJobs: [],
   selectedAll: false,
-  rows: []
+  rows: [],
 });
 
-const areSelectedAll = (rows:JobRowType[] = [], selected) =>
-  rows.every((row) => selected.includes(row.id));
+const areSelectedAll = (rows: JobRowType[] = [], selected) => rows.every((row) => selected.includes(row.id));
 
 const unique = (value, index, self) => self.indexOf(value) === index;
 
@@ -72,12 +70,12 @@ export const jobsListState = (state, action) => {
       return {
         ...state,
         rows: action.payload,
-        selectedAll: areSelectedAll(action.payload, state.selectedJobs)
+        selectedAll: areSelectedAll(action.payload, state.selectedJobs),
       };
     case 'setFetching':
       return {
         ...state,
-        isFetching: action.payload
+        isFetching: action.payload,
       };
     case 'setFilterValue':
       return { ...state, filterValue: action.payload };
@@ -87,35 +85,30 @@ export const jobsListState = (state, action) => {
         selectedAll: false,
         selectedJobs: state.selectedJobs.includes(action.payload)
           ? state.selectedJobs.filter((id) => id !== action.payload)
-          : [...state.selectedJobs, action.payload]
+          : [...state.selectedJobs, action.payload],
       };
     case 'selectAll':
       return {
         ...state,
-        selectedJobs: [
-          ...state.selectedJobs,
-          ...action.payload
-        ].filter(unique),
-        selectedAll: true
+        selectedJobs: [...state.selectedJobs, ...action.payload].filter(unique),
+        selectedAll: true,
       };
     case 'unselectAll':
       return {
         ...state,
-        selectedJobs: state.selectedJobs.filter(
-          (selected) => !action.payload.includes(selected)
-        ),
-        selectedAll: false
+        selectedJobs: state.selectedJobs.filter((selected) => !action.payload.includes(selected)),
+        selectedAll: false,
       };
     case 'resetSelected':
       return {
         ...state,
         selectedJobs: [],
-        selectedAll: false
+        selectedAll: false,
       };
     case 'setFilteringFlag':
       return {
         ...state,
-        isFiltering: action.payload
+        isFiltering: action.payload,
       };
     case 'clearFilters':
       return { ...state, filterValue: '', isFetching: true };
@@ -124,42 +117,34 @@ export const jobsListState = (state, action) => {
   }
 };
 
-const fetchJobs = (pagination = defaultSettings) => fetch(endpoint, {
-  headers: {
-    'Content-Type': 'application/json',
-  },
-}).then(response => response.json());
-
 const Jobs: React.FunctionComponent = () => {
   const intl = useIntl();
   const history = useHistory();
   const [jobs, setJobs] = useState<JobType[]>([]);
-  const [newJob, setNewJob] = useState<JobType>({id:''});
+  const [newJob, setNewJob] = useState<JobType>({ id: '' });
   const [limit, setLimit] = useState(defaultSettings.limit);
   const [offset, setOffset] = useState(1);
 
   const data = jobs;
-  const meta = {count: jobs?.length || 0, limit, offset};
-  const [
-    {
-      filterValue,
-      isFetching,
-      isFiltering,
-      selectedJobs,
-      selectedAll,
-      rows
-    },
-    stateDispatch
-  ] = useReducer(jobsListState, initialState());
+  const meta = { count: jobs?.length || 0, limit, offset };
+  const [{ filterValue, isFetching, isFiltering, selectedJobs, selectedAll, rows }, stateDispatch] = useReducer(
+    jobsListState,
+    initialState()
+  );
 
-  const setSelectedJobs = (id: string) =>
-    stateDispatch({type: 'select', payload: id});
+  const setSelectedJobs = (id: string) => stateDispatch({ type: 'select', payload: id });
 
   const handlePagination = (pagination) => {
-    stateDispatch({type: 'setFetching', payload: true});
-    return fetchJobs(pagination).then(data => { setJobs(data); stateDispatch({type: 'setRows', payload: createRows(jobs)});})
-      .then(() => {stateDispatch({type: 'setFetching', payload: false});})
-      .catch(() => stateDispatch({type: 'setFetching', payload: false}));
+    stateDispatch({ type: 'setFetching', payload: true });
+    return listJobs(pagination)
+      .then((data) => {
+        setJobs(data);
+        stateDispatch({ type: 'setRows', payload: createRows(jobs) });
+      })
+      .then(() => {
+        stateDispatch({ type: 'setFetching', payload: false });
+      })
+      .catch(() => stateDispatch({ type: 'setFetching', payload: false }));
   };
 
   useEffect(() => {
@@ -167,11 +152,10 @@ const Jobs: React.FunctionComponent = () => {
   }, []);
 
   useEffect(() => {
-    stateDispatch({type: 'setRows', payload: createRows(jobs)});
+    stateDispatch({ type: 'setRows', payload: createRows(jobs) });
   }, [jobs]);
 
-
-  const [update_client, setUpdateClient] = useState<WebSocket|unknown>({});
+  const [update_client, setUpdateClient] = useState<WebSocket | unknown>({});
   useEffect(() => {
     const uc = new WebSocket('ws://' + getServer() + '/api/ws-jobs/');
     setUpdateClient(uc);
@@ -184,38 +168,36 @@ const Jobs: React.FunctionComponent = () => {
       if (messageType === 'Job') {
         setNewJob(data);
       }
-    }
+    };
   }, []);
 
   const clearFilters = () => {
-    stateDispatch({type: 'clearFilters'});
+    stateDispatch({ type: 'clearFilters' });
     return handlePagination(meta);
   };
 
   const handleFilterChange = (value) => {
-    !value || value === ''
-      ? clearFilters()
-      : stateDispatch({type: 'setFilterValue', payload: value});
+    !value || value === '' ? clearFilters() : stateDispatch({ type: 'setFilterValue', payload: value });
   };
 
   const routes = () => (
     <Fragment>
+      <Route exact path={'/new-job'}>
+        <NewJob />
+      </Route>
       <Route
         exact
-        path={'/new-job'}>
-        <NewJob/>
-      </Route>
-      <Route exact path="/jobs/remove"
-             render={ props => <RemoveJob { ...props }
-                                              ids={ selectedJobs }
-                                              fetchData={ handlePagination }
-                                              resetSelectedJobs={() =>
-                                                stateDispatch({ type: 'resetSelected' })
-                                              }/>}/>
-      <Route exact path="/jobs/remove/:id"
-             render={ props => <RemoveJob { ...props }
-                                              fetchData={ handlePagination }
-             /> }/>
+        path="/jobs/remove"
+        render={(props) => (
+          <RemoveJob
+            {...props}
+            ids={selectedJobs}
+            fetchData={handlePagination}
+            resetSelectedJobs={() => stateDispatch({ type: 'resetSelected' })}
+          />
+        )}
+      />
+      <Route exact path="/jobs/remove/:id" render={(props) => <RemoveJob {...props} fetchData={handlePagination} />} />
     </Fragment>
   );
 
@@ -225,16 +207,14 @@ const Jobs: React.FunctionComponent = () => {
       component: 'button',
       onClick: (_event, _rowId, job) =>
         history.push({
-          pathname: `/jobs/remove/${job.id}`
-        })
-    }
+          pathname: `/jobs/remove/${job.id}`,
+        }),
+    },
   ];
 
-  const selectAllFunction = () =>
-      stateDispatch({type: 'selectAll', payload: data.map(( item) =>  item.id)});
+  const selectAllFunction = () => stateDispatch({ type: 'selectAll', payload: data.map((item) => item.id) });
 
-  const unselectAllFunction = () =>
-    stateDispatch({type: 'unselectAll', payload: data.map(( item) =>  item.id)});
+  const unselectAllFunction = () => stateDispatch({ type: 'unselectAll', payload: data.map((item) => item.id) });
 
   const anyJobsSelected = selectedJobs.length > 0;
 
@@ -244,30 +224,23 @@ const Jobs: React.FunctionComponent = () => {
       items: [
         {
           title: 'Select none (0)',
-          onClick: unselectAllFunction
+          onClick: unselectAllFunction,
         },
         {
           title: `Select all (${jobs.length || 0})`,
-          onClick: selectAllFunction
-        }
+          onClick: selectAllFunction,
+        },
       ],
       checked: selectedJobs.length === jobs.length,
-      onSelect: (isChecked: boolean) => isChecked ? selectAllFunction() : unselectAllFunction()
+      onSelect: (isChecked: boolean) => (isChecked ? selectAllFunction() : unselectAllFunction()),
     };
-  }, [ selectedJobs.length, jobs.length ]);
+  }, [selectedJobs.length, jobs.length]);
 
   const toolbarButtons = () => (
     <ToolbarGroup className={`pf-u-pl-lg top-toolbar`}>
       <ToolbarItem>
-        <Link
-          id="add-job-link"
-          to={{pathname: '/new-job'}}
-        >
-          <Button
-            ouiaId={'add-job-link'}
-            variant="primary"
-            aria-label={intl.formatMessage(sharedMessages.add)}
-          >
+        <Link id="add-job-link" to={{ pathname: '/new-job' }}>
+          <Button ouiaId={'add-job-link'} variant="primary" aria-label={intl.formatMessage(sharedMessages.add)}>
             {intl.formatMessage(sharedMessages.add)}
           </Button>
         </Link>
@@ -276,14 +249,12 @@ const Jobs: React.FunctionComponent = () => {
         <Link
           id="remove-multiple-jobs"
           className={anyJobsSelected ? '' : 'disabled-link'}
-          to={{pathname: '/jobs/remove'}}
+          to={{ pathname: '/jobs/remove' }}
         >
           <Button
             variant="secondary"
             isDisabled={!anyJobsSelected}
-            aria-label={intl.formatMessage(
-              sharedMessages.deleteJobTitle
-            )}
+            aria-label={intl.formatMessage(sharedMessages.deleteJobTitle)}
           >
             {intl.formatMessage(sharedMessages.delete)}
           </Button>
@@ -295,12 +266,12 @@ const Jobs: React.FunctionComponent = () => {
   return (
     <Fragment>
       <TopToolbar>
-        <Title headingLevel={"h2"}>Jobs</Title>
+        <Title headingLevel={'h2'}>Jobs</Title>
       </TopToolbar>
       <JobsTableContext.Provider
         value={{
           selectedJobs,
-          setSelectedJobs
+          setSelectedJobs,
         }}
       >
         <PageSection>
@@ -329,16 +300,11 @@ const Jobs: React.FunctionComponent = () => {
                       {intl.formatMessage(sharedMessages.clearAllFilters)}
                     </Button>
                   ) : (
-                    <Link
-                      id="create-job-link"
-                      to={{pathname: '/new-job'}}
-                    >
+                    <Link id="create-job-link" to={{ pathname: '/new-job' }}>
                       <Button
                         ouiaId={'create-job-link'}
                         variant="primary"
-                        aria-label={intl.formatMessage(
-                          sharedMessages.addJob
-                        )}
+                        aria-label={intl.formatMessage(sharedMessages.addJob)}
                       >
                         {intl.formatMessage(sharedMessages.addJob)}
                       </Button>
@@ -348,9 +314,7 @@ const Jobs: React.FunctionComponent = () => {
                 description={
                   filterValue === ''
                     ? intl.formatMessage(sharedMessages.nojobs_action)
-                    : intl.formatMessage(
-                    sharedMessages.clearAllFiltersDescription
-                    )
+                    : intl.formatMessage(sharedMessages.clearAllFiltersDescription)
                 }
               />
             )}
@@ -359,5 +323,5 @@ const Jobs: React.FunctionComponent = () => {
       </JobsTableContext.Provider>
     </Fragment>
   );
-}
+};
 export { Jobs };

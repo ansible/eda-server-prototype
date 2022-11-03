@@ -1,5 +1,5 @@
 import React, { Fragment } from 'react';
-import {Link} from "react-router-dom";
+import { Link } from 'react-router-dom';
 
 export const createRows = (data) =>
   data.map(({ id, name, rule_count }) => ({
@@ -8,12 +8,12 @@ export const createRows = (data) =>
       <Fragment key={`[rule-set-${id}`}>
         <Link
           to={{
-            pathname: `/ruleset/${id}`
+            pathname: `/ruleset/${id}`,
           }}
         >
           {name}
         </Link>
       </Fragment>,
-      rule_count
-    ]
+      rule_count,
+    ],
   }));

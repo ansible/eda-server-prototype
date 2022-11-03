@@ -25,14 +25,14 @@ import { Playbooks } from '@app/Playbooks/Playbooks';
 import { Playbook } from '@app/Playbook/Playbook';
 import { NotFound } from '@app/NotFound/NotFound';
 import { useDocumentTitle } from '@app/utils/useDocumentTitle';
-import {ActivationStdout} from "@app/Activation/activation-stdout";
-import {RulesetSources} from "@app/RuleSet/ruleset-sources";
-import {RulesetDetails} from "@app/RuleSet/ruleset-details";
-import {RulesetRules} from "@app/RuleSet/ruleset-rules";
+import { ActivationStdout } from '@app/Activation/activation-stdout';
+import { RulesetSources } from '@app/RuleSet/ruleset-sources';
+import { RulesetDetails } from '@app/RuleSet/ruleset-details';
+import { RulesetRules } from '@app/RuleSet/ruleset-rules';
 import { Rules } from '@app/Rules/Rules';
 import { Rule } from '@app/Rule/Rule';
-import {Fragment} from "react";
-import {NewInventory} from "@app/NewInventory/NewInventory";
+import { Fragment } from 'react';
+import { NewInventory } from '@app/NewInventory/NewInventory';
 
 export interface IAppRoute {
   label?: string; // Excluding the label will exclude the route from the nav sidebar in AppLayout
@@ -225,7 +225,7 @@ const routes: AppRouteConfig[] = [
     exact: true,
     path: '/playbook/:id',
     title: 'Playbook',
-  }
+  },
 ];
 
 const RouteWithTitleUpdates = ({ component: Component, title, ...rest }: IAppRoute) => {
@@ -235,7 +235,7 @@ const RouteWithTitleUpdates = ({ component: Component, title, ...rest }: IAppRou
     return <Component {...rest} {...routeProps} />;
   }
 
-  return <Route render={routeWithTitle} {...rest}/>;
+  return <Route render={routeWithTitle} {...rest} />;
 };
 
 const PageNotFound = ({ title }: { title: string }) => {
@@ -252,7 +252,7 @@ const AppRoutes = (): React.ReactElement => {
   return (
     <Fragment>
       <Switch>
-        {flattenedRoutes.map(({path, exact, component, title, isAsync}, idx) => (
+        {flattenedRoutes.map(({ path, exact, component, title, isAsync }, idx) => (
           <RouteWithTitleUpdates
             path={path}
             exact={exact}
@@ -262,10 +262,10 @@ const AppRoutes = (): React.ReactElement => {
             isAsync={isAsync}
           />
         ))}
-        <PageNotFound title="404 Page Not Found"/>
+        <PageNotFound title="404 Page Not Found" />
       </Switch>
     </Fragment>
   );
-}
+};
 
 export { AppRoutes, routes };

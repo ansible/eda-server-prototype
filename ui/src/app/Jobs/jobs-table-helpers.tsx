@@ -2,25 +2,22 @@ import React, { Fragment, useContext } from 'react';
 import PropTypes from 'prop-types';
 import { Checkbox } from '@patternfly/react-core';
 import JobsTableContext from './jobs-table-context';
-import {Link} from "react-router-dom";
+import { Link } from 'react-router-dom';
 
 export const SelectBox = ({ id }) => {
-  const {
-    selectedJobs,
-    setSelectedJobs
-  } = useContext(JobsTableContext);
+  const { selectedJobs, setSelectedJobs } = useContext(JobsTableContext);
 
   return (
     <Checkbox
       id={`select-${id}`}
       isChecked={selectedJobs.includes(id)}
-      onChange={() => setSelectedJobs ? setSelectedJobs(id) : ''}
+      onChange={() => (setSelectedJobs ? setSelectedJobs(id) : '')}
     />
   );
 };
 
 SelectBox.propTypes = {
-  id: PropTypes.string.isRequired
+  id: PropTypes.string.isRequired,
 };
 
 export const createRows = (data) =>
@@ -33,11 +30,11 @@ export const createRows = (data) =>
       <Fragment key={`[job-${id}`}>
         <Link
           to={{
-            pathname: `/job/${id}`
+            pathname: `/job/${id}`,
           }}
         >
           {id}
         </Link>
-      </Fragment>
-    ]
+      </Fragment>,
+    ],
   }));

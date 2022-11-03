@@ -1,17 +1,17 @@
 import * as React from 'react';
-import {mount} from 'enzyme';
-import {MemoryRouter} from "react-router";
-import fetchMock from "jest-fetch-mock";
-import {act} from "react-dom/test-utils";
-import {IntlProvider} from "react-intl";
-import {Modal, Tab} from "@patternfly/react-core";
-import {RemoveJob} from "@app/RemoveJob/RemoveJob";
-import {defaultSettings} from "@app/shared/pagination";
-import store from "../../store";
-import {Provider} from "react-redux";
-import {Route} from "react-router-dom";
+import { mount } from 'enzyme';
+import { MemoryRouter } from 'react-router';
+import fetchMock from 'jest-fetch-mock';
+import { act } from 'react-dom/test-utils';
+import { IntlProvider } from 'react-intl';
+import { Modal, Tab } from '@patternfly/react-core';
+import { RemoveJob } from '@app/RemoveJob/RemoveJob';
+import { defaultSettings } from '@app/shared/pagination';
+import store from '../../store';
+import { Provider } from 'react-redux';
+import { Route } from 'react-router-dom';
 
-const ComponentWrapper = ({ children, initialEntries=['/dashboard']}) => (
+const ComponentWrapper = ({ children, initialEntries = ['/dashboard'] }) => (
   <Provider store={store()}>
     <IntlProvider locale="en">
       <MemoryRouter initialEntries={initialEntries} keyLength={0} key={'test'}>
@@ -27,18 +27,19 @@ describe('RemoveJob', () => {
   });
 
   it('should render the Remove Job modal', async () => {
-    fetchMock.mockResponse(JSON.stringify({
-          name: 'Job 1',
-          id: 1,
-          url: 'Job 1 Url'
-       })
-    )
+    fetchMock.mockResponse(
+      JSON.stringify({
+        name: 'Job 1',
+        id: 1,
+        stdout: [],
+      })
+    );
     let wrapper;
     await act(async () => {
       wrapper = mount(
         <ComponentWrapper initialEntries={['/jobs/remove/1']}>
-          <Route path='/jobs/remove/:id'>
-            <RemoveJob fetchData={()=>[]} pagination={defaultSettings} resetSelectedJobs={()=>[]}/>
+          <Route path="/jobs/remove/:id">
+            <RemoveJob fetchData={() => []} pagination={defaultSettings} resetSelectedJobs={() => []} />
           </Route>
         </ComponentWrapper>
       );
@@ -47,23 +48,29 @@ describe('RemoveJob', () => {
       wrapper.update();
     });
 
-    expect(wrapper.find(Modal).at(0).props().title).toEqual("Delete job");
+    expect(wrapper.find(Modal).at(0).props().title).toEqual('Delete job');
     expect(wrapper.find('Text').at(0).props().children).toEqual('Are you sure you want to delete the job below?');
     expect(wrapper.find('Text').at(1).props().children.props.children.at(1)).toEqual('Job 1');
   });
 
   it('should render the bulk Remove Job modal', async () => {
-    fetchMock.mockResponse(JSON.stringify({
+    fetchMock.mockResponse(
+      JSON.stringify({
         name: 'Job 1',
         id: 1,
-        url: 'Job 1 Url'
+        url: 'Job 1 Url',
       })
-    )
+    );
     let wrapper;
     await act(async () => {
       wrapper = mount(
         <ComponentWrapper initialEntries={['/jobs/remove/1']}>
-          <RemoveJob ids={[1,2,3,4,5,6]} fetchData={()=>[]} pagination={defaultSettings} resetSelectedJobs={()=>[]}/>
+          <RemoveJob
+            ids={[1, 2, 3, 4, 5, 6]}
+            fetchData={() => []}
+            pagination={defaultSettings}
+            resetSelectedJobs={() => []}
+          />
         </ComponentWrapper>
       );
     });
@@ -71,8 +78,8 @@ describe('RemoveJob', () => {
       wrapper.update();
     });
 
-    expect(wrapper.find(Modal).at(0).props().title).toEqual("Delete jobs");
+    expect(wrapper.find(Modal).at(0).props().title).toEqual('Delete jobs');
     expect(wrapper.find('Text').at(0).props().children).toEqual('Are you sure you want to delete the selected jobs?');
     expect(wrapper.find('Text').at(1).props().children.props.children.at(1)).toEqual('6 selected');
   });
-})
+});

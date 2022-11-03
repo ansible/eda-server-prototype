@@ -13,21 +13,21 @@ import store from '../store';
 
 const App: React.FunctionComponent = () => (
   <React.Fragment>
-  <GlobalStyle />
+    <GlobalStyle />
     <IntlProvider locale="en">
       <Provider store={store()}>
         <Router basename="/eda">
           <Switch>
             <Route path="/" exact={true}>
-               <Login />
+              <Login />
             </Route>
             <Route>
               <AppLayout>
                 <AppRoutes />
               </AppLayout>
             </Route>
-            </Switch>
-          </Router>
+          </Switch>
+        </Router>
       </Provider>
     </IntlProvider>
   </React.Fragment>

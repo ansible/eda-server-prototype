@@ -13,7 +13,7 @@ interface InternalStringObject {
 
 declare enum SortByDirection {
   asc = 'asc',
-  desc = 'desc'
+  desc = 'desc',
 }
 
 interface InternalApiMetadata {
@@ -55,10 +55,7 @@ type ReducerHandler<T> = (state: T, action: ReduxAction) => T;
 interface ReducerHandlerObject {
   [key: string]: ReducerHandler<any>;
 }
-type InternalReducerHash<T> = (
-  reducerHash: ReducerHandlerObject,
-  initialState: InternalAnyObject
-) => ReducerHandler<T>;
+type InternalReducerHash<T> = (reducerHash: ReducerHandlerObject, initialState: InternalAnyObject) => ReducerHandler<T>;
 
 interface NotificationConfig {
   variant: 'success' | 'info' | 'error';
@@ -86,10 +83,7 @@ declare module '@redhat-cloud-services/frontend-components/DateFormat' {
 
 declare module '@redhat-cloud-services/frontend-components-utilities/ReducerRegistry' {
   export type ApplyReducerHash<T> = InternalReducerHash<T>;
-  export function applyReducerHash<T>(
-    reducer: ReducerHandlerObject,
-    initialState: T
-  ): ReducerHandler<T>;
+  export function applyReducerHash<T>(reducer: ReducerHandlerObject, initialState: T): ReducerHandler<T>;
 
   class ReducerRegistry {
     store: InternalAnyObject;
@@ -111,9 +105,7 @@ declare module '@redhat-cloud-services/frontend-components-notifications/redux' 
   const notificationsPrefix = '@@INSIGHTS-CORE/NOTIFICATIONS/';
   export const ADD_NOTIFICATION = `${notificationsPrefix}ADD_NOTIFICATION`;
   export const CLEAR_NOTIFICATIONS = `${notificationsPrefix}CLEAR_NOTIFICATIONS`;
-  export type AddNotification = (
-    notification: NotificationConfig
-  ) => {
+  export type AddNotification = (notification: NotificationConfig) => {
     type: string;
   };
   export const addNotification: AddNotification;
@@ -140,12 +132,8 @@ declare module '@redhat-cloud-services/frontend-components-notifications/notific
 
   type NotificationMiddleware = (
     store: InternalAnyObject
-  ) => (
-    next: InternalDispatch<any>
-  ) => (action: InternalAction) => InternalAction;
-  export const createNotificationsMiddleware: (
-    options: NotificationsMiddlewareOptions
-  ) => NotificationMiddleware;
+  ) => (next: InternalDispatch<any>) => (action: InternalAction) => InternalAction;
+  export const createNotificationsMiddleware: (options: NotificationsMiddlewareOptions) => NotificationMiddleware;
 
   export default createNotificationsMiddleware;
 }
@@ -158,10 +146,7 @@ declare module '@redhat-cloud-services/frontend-components/PrimaryToolbar' {
   interface TextInputProps {
     value?: string;
     placeholder?: string;
-    onChange?: (
-      event: React.SyntheticEvent<Element, Event>,
-      value?: string
-    ) => void;
+    onChange?: (event: React.SyntheticEvent<Element, Event>, value?: string) => void;
   }
 
   interface Chip {
@@ -189,26 +174,15 @@ declare module '@redhat-cloud-services/frontend-components/PrimaryToolbar' {
       | { category: string; type?: string; chips: Chip | Chip[] }[]
       | Chip
       | Chip[];
-    onDelete?: (
-      event: React.MouseEvent<Element, MouseEvent>,
-      chip: Chip[],
-      clearAll?: boolean
-    ) => void;
+    onDelete?: (event: React.MouseEvent<Element, MouseEvent>, chip: Chip[], clearAll?: boolean) => void;
   }
 
   export interface FilterValues extends Omit<TextInputProps, 'onChange'> {
     id?: string;
     placeholder?: string;
     'aria-label'?: string;
-    value?:
-      | string
-      | string[]
-      | { label?: React.ReactNode; value?: string }
-      | { [key: string]: any };
-    onChange?: (
-      event: React.SyntheticEvent<Element, Event>,
-      value?: string
-    ) => void;
+    value?: string | string[] | { label?: React.ReactNode; value?: string } | { [key: string]: any };
+    onChange?: (event: React.SyntheticEvent<Element, Event>, value?: string) => void;
     items?: { value: string; label: React.ReactNode }[];
   }
 
@@ -232,10 +206,7 @@ declare module '@redhat-cloud-services/frontend-components/PrimaryToolbar' {
     pagination?: { [key: string]: any };
     sortByConfig?: {
       direction: SortByDirection;
-      onSortChange: (
-        event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-        direction: SortByDirection
-      ) => void;
+      onSortChange: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>, direction: SortByDirection) => void;
     };
     activeFiltersConfig?: ActiveFiltersConfig;
     filterConfig?: FilterConfig;
@@ -245,18 +216,11 @@ declare module '@redhat-cloud-services/frontend-components/PrimaryToolbar' {
       className?: string;
       items?: {
         title?: string;
-        onClick?: (
-          event: React.MouseEvent<any> | React.KeyboardEvent | MouseEvent,
-          item: any,
-          key: number
-        ) => void;
+        onClick?: (event: React.MouseEvent<any> | React.KeyboardEvent | MouseEvent, item: any, key: number) => void;
       }[];
       checked?: boolean;
       id?: string;
-      onSelect?: (
-        checked: boolean,
-        event: React.FormEvent<HTMLInputElement>
-      ) => void;
+      onSelect?: (checked: boolean, event: React.FormEvent<HTMLInputElement>) => void;
       toggleProps?: { [key: string]: any };
     };
     toggleIsExpanded?: () => void;

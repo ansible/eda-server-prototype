@@ -1,38 +1,33 @@
 import { Title } from '@patternfly/react-core';
 import { useParams } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
-import { CodeBlock, CodeBlockCode  } from '@patternfly/react-core';
-import {getServer} from '@app/utils/utils';
-import {TopToolbar} from "@app/shared/top-toolbar";
-import {InventoryType} from "@app/RuleSets/RuleSets";
-
-const endpoint = 'http://' + getServer() + '/api/inventory/';
+import { CodeBlock, CodeBlockCode } from '@patternfly/react-core';
+import { TopToolbar } from '@app/shared/top-toolbar';
+import { InventoryType } from '@app/RuleSets/RuleSets';
+import { fetchInventory } from '@app/API/Inventory';
 
 const Inventory: React.FunctionComponent = () => {
+  const [inventory, setInventory] = useState<InventoryType | undefined>(undefined);
 
-  const [inventory, setInventory] = useState<InventoryType|undefined>(undefined);
-
-  const { id } =  useParams<Record<string, string | undefined>>()
+  const { id } = useParams<Record<string, string | undefined>>();
 
   useEffect(() => {
-     fetch(endpoint + id, {
-       headers: {
-         'Content-Type': 'application/json',
-       },
-     }).then(response => response.json())
-    .then(data => setInventory(data));
-  }, []);
+    if (!id) {
+      return;
+    }
+    fetchInventory(id).then((data) => setInventory(data));
+  }, [id]);
 
   return (
-  <React.Fragment>
-    <TopToolbar>
-      <Title headingLevel={"h2"}>Inventory</Title>
-    </TopToolbar>
-    <CodeBlock>
-      <CodeBlockCode id="code-content">{inventory?.inventory}</CodeBlockCode>
-    </CodeBlock>
-  </React.Fragment>
-)
-}
+    <React.Fragment>
+      <TopToolbar>
+        <Title headingLevel={'h2'}>Inventory</Title>
+      </TopToolbar>
+      <CodeBlock>
+        <CodeBlockCode id="code-content">{inventory?.inventory}</CodeBlockCode>
+      </CodeBlock>
+    </React.Fragment>
+  );
+};
 
 export { Inventory };

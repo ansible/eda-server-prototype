@@ -6,7 +6,7 @@ interface IJobsTableContext {
 }
 
 const defaultState = {
-  selectedJobs: []
+  selectedJobs: [],
 };
 
 const JobsTableContext = createContext<IJobsTableContext>({ selectedJobs: [] });
