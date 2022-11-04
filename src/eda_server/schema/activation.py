@@ -3,7 +3,7 @@ from typing import Optional
 
 from pydantic import BaseModel, Field, StrictStr
 
-from eda_server.db.models.activation import ExecutionEnvironment, RestartPolicy
+from eda_server.db.models.activation import RestartPolicy
 
 from .extra_vars import ExtraVarsRef
 from .inventory import InventoryRef
@@ -19,7 +19,7 @@ class ActivationCreate(BaseModel):
     restart_policy: RestartPolicy = RestartPolicy.ON_FAILURE
     is_enabled: bool = True
     extra_var_id: int = Field(None, nullable=True)
-    execution_environment: ExecutionEnvironment = ExecutionEnvironment.DOCKER
+    execution_environment: StrictStr = "quay.io/aizquier/ansible-rulebook"
     working_directory: StrictStr = ""
     project_id: Optional[int]
 
@@ -35,7 +35,7 @@ class ActivationRead(BaseModel):
     status: StrictStr  # TODO: will need to add enum
     is_enabled: bool
     working_directory: StrictStr
-    execution_environment: ExecutionEnvironment
+    execution_environment: StrictStr
     rulebook: RulebookRef
     inventory: InventoryRef
     extra_var: ExtraVarsRef = Field(None, nullable=True)
@@ -58,7 +58,7 @@ class ActivationInstanceCreate(BaseModel):
     inventory_id: int
     extra_var_id: int
     working_directory: StrictStr
-    execution_environment: StrictStr
+    execution_environment: StrictStr = "quay.io/aizquier/ansible-rulebook"
     project_id: Optional[int]
 
 
