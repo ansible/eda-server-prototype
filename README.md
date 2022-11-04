@@ -58,14 +58,20 @@ Install Ansible and `ansible.eda` collection:
 pip install ansible
 ansible-galaxy collection install ansible.eda
 ```
+### 3. Set up env variables
+  Set up the following env variable(s) when testing/running local dev env
 
-### 3. Services
+```shell
+export EDA_DEPLOYMENT_TYPE=local
+```
+
+### 4. Services
 
 **Note:**
   Instead of running the below `task` steps individually, you can execute all tasks with `task dev:all:start` and then follow the steps in the
   [Accessing the UI](#6-accessing-the-ui) section.
 
-You need to start up a PostgreSQL database sever:
+Start up a PostgreSQL database sever:
 
 ```shell
 task dev:services:start
@@ -77,13 +83,13 @@ Then run database migrations:
 task dev:run:migrations
 ```
 
-### 4. Start api server
+### 5. Start api server
 
 ```shell
 task dev:api:start
 ```
 
-### 5. User interface
+### 6. User interface
 
 Build UI files:
 
@@ -91,7 +97,7 @@ Build UI files:
 task dev:ui:start
 ```
 
-### 6. Accessing the UI
+### 7. Accessing the UI
 
 1. Create a dev superuser account
   Defaults: user: dev_user@redhat.com, password: none2tuff
