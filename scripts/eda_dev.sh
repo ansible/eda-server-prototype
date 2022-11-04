@@ -169,14 +169,17 @@ stop-events-services() {
 }
 
 clean-events-services() {
+  local _volume_name="eda-server_postgres_data"
+
   log-info "Cleaning up EDA Services (postgres)"
   if docker images --format '{{.Repository}}' postgres| grep postgres > /dev/null 2>&1; then
     log-debug "docker rmi -f postgres:13"
     docker rmi -f postgres:13 > /dev/null 2>&1
   fi
-  if docker volume inspect -f '{{.Name}}' eda_server_postgres_data| grep eda_server_postgres_data > /dev/null 2>&1; then
-    log-debug "docker volume rm eda_server_postgres_data"
-    docker volume rm eda_server_postgres_data > /dev/null 2>&1
+
+  if docker volume inspect -f '{{.Name}}' "${_volume_name}"| grep "${_volume_name}"> /dev/null 2>&1; then
+    log-debug "docker volume rm $_volume_name"
+    docker volume rm "${_volume_name}" > /dev/null 2>&1
   fi
 }
 
