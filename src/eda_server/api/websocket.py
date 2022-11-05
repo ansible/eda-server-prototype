@@ -1,3 +1,4 @@
+import asyncio
 import base64
 import json
 import logging
@@ -230,6 +231,10 @@ async def get_job_instance_id(uuid: str, db: AsyncSession):
     return job_instance.id
 
 
+bulk_job_instance_events = asyncio.Queue()
+bulk_job_instance_hosts = asyncio.Queue()
+
+
 async def handle_ansible_rulebook(data: dict, db: AsyncSession):
     event_data = data.get("event", {})
     if event_data.get("stdout"):
@@ -253,20 +258,19 @@ async def handle_ansible_rulebook(data: dict, db: AsyncSession):
             json.dumps(["Stdout", {"stdout": event_data.get("stdout")}]),
         )
 
-    return
-
     created = event_data.get("created")
     if created:
         created = datetime.strptime(created, "%Y-%m-%dT%H:%M:%S.%f")
 
-    query = insert(models.job_instance_events).values(
-        job_uuid=event_data.get("job_id"),
-        counter=event_data.get("counter"),
-        stdout=event_data.get("stdout"),
-        type=event_data.get("event"),
-        created_at=created,
+    await bulk_job_instance_events.put(
+        dict(
+            job_uuid=event_data.get("job_id"),
+            counter=event_data.get("counter"),
+            stdout=event_data.get("stdout"),
+            type=event_data.get("event"),
+            created_at=created,
+        )
     )
-    await db.execute(query)
 
     event = event_data.get("event")
     if event and event in [item.value for item in host_status_map]:
@@ -281,17 +285,36 @@ async def handle_ansible_rulebook(data: dict, db: AsyncSession):
         if event == "runner_on_ok" and data.get("res", {}).get("changed"):
             status = "changed"
 
-        query = insert(models.job_instance_hosts).values(
-            job_uuid=event_data.get("job_id"),
-            host=host,
-            playbook=playbook,
-            play=play,
-            task=task,
-            status=status,
+        await bulk_job_instance_hosts.put(
+            dict(
+                job_uuid=event_data.get("job_id"),
+                host=host,
+                playbook=playbook,
+                play=play,
+                task=task,
+                status=status,
+            )
+        )
+
+    if (
+        bulk_job_instance_events.qsize() >= 1000
+        or bulk_job_instance_hosts.qsize() >= 1000
+    ):
+        query = insert(models.job_instance_events).values(
+            [
+                await bulk_job_instance_events.get()
+                for i in range(bulk_job_instance_events.qsize())
+            ]
         )
         await db.execute(query)
-
-    await db.commit()
+        query = insert(models.job_instance_hosts).values(
+            [
+                await bulk_job_instance_hosts.get()
+                for i in range(bulk_job_instance_hosts.qsize())
+            ]
+        )
+        await db.execute(query)
+        await db.commit()
 
 
 async def handle_jobs(data: dict, db: AsyncSession):
