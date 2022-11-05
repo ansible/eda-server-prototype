@@ -35,6 +35,7 @@ services:
     environment:
       - EDA_HOST=0.0.0.0
       - EDA_DATABASE_URL=postgresql+asyncpg://postgres:secret@postgres/eda_server
+      - EDA_LOG_LEVEL=INFO
     depends_on:
       postgres:
         condition: service_healthy

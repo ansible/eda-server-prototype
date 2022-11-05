@@ -8,4 +8,5 @@ uvicorn
 websockets  # TODO(cutwater): Check if this is dependency is necessary
 environs
 aiodocker
+aiocache
 ansible-rulebook

@@ -3,6 +3,7 @@ import json
 import logging
 from datetime import datetime
 from enum import Enum
+from aiocache import cached, Cache
 
 from fastapi import APIRouter, Depends
 from sqlalchemy import cast, insert, select
@@ -220,19 +221,39 @@ async def handle_workers(websocket: WebSocket, data: dict, db: AsyncSession):
         )
 
 
+@cached(cache=Cache.MEMORY)
+async def get_job_instance_id(uuid: str, db: AsyncSession):
+    query = select(models.job_instances).where(
+        models.job_instances.c.uuid == uuid
+    )
+    job_instance = (await db.execute(query)).first()
+    return job_instance.id
+
+
 async def handle_ansible_rulebook(data: dict, db: AsyncSession):
     event_data = data.get("event", {})
     if event_data.get("stdout"):
-        query = select(models.job_instances).where(
-            models.job_instances.c.uuid == event_data.get("job_id")
+        job_instance_id = await get_job_instance_id(
+            event_data.get("job_id"), db
         )
-        result = await db.execute(query)
-        job_instance_id = result.first().job_instance_id
+        await updatemanager.broadcast(
+            f"/job_instance/{job_instance_id}",
+            json.dumps(
+                {
+                    "type": "AnsibleEvent",
+                    "data": base64.b64encode(
+                        event_data.get("stdout").encode()
+                    ).decode(),
+                }
+            ),
+        )
 
         await updatemanager.broadcast(
             f"/job_instance/{job_instance_id}",
             json.dumps(["Stdout", {"stdout": event_data.get("stdout")}]),
         )
+
+    return
 
     created = event_data.get("created")
     if created:
