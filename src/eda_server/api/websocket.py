@@ -300,21 +300,35 @@ async def handle_ansible_rulebook(data: dict, db: AsyncSession):
         bulk_job_instance_events.qsize() >= 1000
         or bulk_job_instance_hosts.qsize() >= 1000
     ):
-        query = insert(models.job_instance_events).values(
-            [
-                await bulk_job_instance_events.get()
-                for i in range(bulk_job_instance_events.qsize())
-            ]
-        )
-        await db.execute(query)
-        query = insert(models.job_instance_hosts).values(
-            [
-                await bulk_job_instance_hosts.get()
-                for i in range(bulk_job_instance_hosts.qsize())
-            ]
-        )
-        await db.execute(query)
-        await db.commit()
+        await insert_job_instance_events(bulk_job_instance_events, db)
+        await insert_job_instance_hosts(bulk_job_instance_hosts, db)
+
+
+async def insert_job_instance_events(
+    bulk_job_instance_events: asyncio.Queue, db: AsyncSession
+):
+
+    query = insert(models.job_instance_events).values(
+        [
+            await bulk_job_instance_events.get()
+            for i in range(bulk_job_instance_events.qsize())
+        ]
+    )
+    await db.execute(query)
+    await db.commit()
+
+
+async def insert_job_instance_hosts(
+    bulk_job_instance_hosts: asyncio.Queue, db: AsyncSession
+):
+    query = insert(models.job_instance_hosts).values(
+        [
+            await bulk_job_instance_hosts.get()
+            for i in range(bulk_job_instance_hosts.qsize())
+        ]
+    )
+    await db.execute(query)
+    await db.commit()
 
 
 async def handle_jobs(data: dict, db: AsyncSession):
