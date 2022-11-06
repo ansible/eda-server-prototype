@@ -4,14 +4,13 @@ from fastapi import APIRouter, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from eda_server.api import router as api_router
-from eda_server.config import load_settings
-from eda_server.db.dependency import get_db_session_factory
-from eda_server.db.provider import DatabaseProvider
-
 from eda_server.api.websocket import (
     bulk_job_instance_events,
     bulk_job_instance_hosts,
 )
+from eda_server.config import load_settings
+from eda_server.db.dependency import get_db_session_factory
+from eda_server.db.provider import DatabaseProvider
 
 ALLOWED_ORIGINS = [
     "http://localhost",

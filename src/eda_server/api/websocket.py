@@ -4,8 +4,8 @@ import json
 import logging
 from datetime import datetime
 from enum import Enum
-from aiocache import cached, Cache
 
+from aiocache import Cache, cached
 from fastapi import APIRouter, Depends
 from sqlalchemy import cast, insert, select
 from sqlalchemy.dialects import postgresql
@@ -13,11 +13,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import sessionmaker
 from starlette.websockets import WebSocket, WebSocketDisconnect
 
+from eda_server.batch import Batcher
 from eda_server.db import models
 from eda_server.db.dependency import get_db_session_factory
 from eda_server.db.utils.lostream import PGLargeObject
 from eda_server.managers import secretsmanager, updatemanager
-from eda_server.batch import Batcher
 
 logger = logging.getLogger("eda_server")
 
