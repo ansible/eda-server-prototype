@@ -294,13 +294,13 @@ async def handle_ansible_rulebook(
         created = datetime.strptime(created, "%Y-%m-%dT%H:%M:%S.%f")
 
     await bulk_job_instance_events.queue.put(
-        dict(
-            job_uuid=event_data.get("job_id"),
-            counter=event_data.get("counter"),
-            stdout=event_data.get("stdout"),
-            type=event_data.get("event"),
-            created_at=created,
-        )
+        {
+            "job_uuid": event_data.get("job_id"),
+            "counter": event_data.get("counter"),
+            "stdout": event_data.get("stdout"),
+            "type": event_data.get("event"),
+            "created_at": "created",
+        }
     )
 
     event = event_data.get("event")
@@ -317,14 +317,14 @@ async def handle_ansible_rulebook(
             status = "changed"
 
         await bulk_job_instance_hosts.queue.put(
-            dict(
-                job_uuid=event_data.get("job_id"),
-                host=host,
-                playbook=playbook,
-                play=play,
-                task=task,
-                status=status,
-            )
+            {
+                "job_uuid": event_data.get("job_id"),
+                "host": host,
+                "playbook": playbook,
+                "play": play,
+                "task": task,
+                "status": status,
+            }
         )
 
 
