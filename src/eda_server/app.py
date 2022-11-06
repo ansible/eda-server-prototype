@@ -8,6 +8,11 @@ from eda_server.config import load_settings
 from eda_server.db.dependency import get_db_session_factory
 from eda_server.db.provider import DatabaseProvider
 
+from eda_server.api.websocket import (
+    bulk_job_instance_events,
+    bulk_job_instance_hosts,
+)
+
 ALLOWED_ORIGINS = [
     "http://localhost",
     "http://localhost:8080",
@@ -49,6 +54,15 @@ def setup_database(app: FastAPI) -> None:
     ] = lambda: provider.session_factory
 
 
+def setup_batcher(app: FastAPI) -> None:
+    bulk_job_instance_events.start(
+        app.dependency_overrides[get_db_session_factory]
+    )
+    bulk_job_instance_hosts.start(
+        app.dependency_overrides[get_db_session_factory]
+    )
+
+
 def configure_logging(app):
     settings = app.state.settings
     log_level = settings.log_level.upper()
@@ -75,5 +89,6 @@ def create_app() -> FastAPI:
     setup_routes(app)
 
     setup_database(app)
+    setup_batcher(app)
 
     return app

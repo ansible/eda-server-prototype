@@ -17,6 +17,7 @@ from eda_server.db import models
 from eda_server.db.dependency import get_db_session_factory
 from eda_server.db.utils.lostream import PGLargeObject
 from eda_server.managers import secretsmanager, updatemanager
+from eda_server.batch import Batcher
 
 logger = logging.getLogger("eda_server")
 
@@ -76,7 +77,7 @@ async def websocket_endpoint2(
                 elif data_type == "Job":
                     await handle_jobs(data, db)
                 elif data_type == "AnsibleEvent":
-                    await handle_ansible_rulebook(data, db)
+                    await handle_ansible_rulebook(data, db, db_session_factory)
                 elif data_type == "Action":
                     await handle_actions(data, db)
     except WebSocketDisconnect:
@@ -231,11 +232,41 @@ async def get_job_instance_id(uuid: str, db: AsyncSession):
     return job_instance.id
 
 
-bulk_job_instance_events = asyncio.Queue()
-bulk_job_instance_hosts = asyncio.Queue()
+async def insert_job_instance_events(
+    bulk_job_instance_events: asyncio.Queue, db_session_factory
+):
+    async with db_session_factory() as db:
+        query = insert(models.job_instance_events).values(
+            [
+                await bulk_job_instance_events.get()
+                for i in range(bulk_job_instance_events.qsize())
+            ]
+        )
+        await db.execute(query)
+        await db.commit()
 
 
-async def handle_ansible_rulebook(data: dict, db: AsyncSession):
+async def insert_job_instance_hosts(
+    bulk_job_instance_hosts: asyncio.Queue, db_session_factory
+):
+    async with db_session_factory() as db:
+        query = insert(models.job_instance_hosts).values(
+            [
+                await bulk_job_instance_hosts.get()
+                for i in range(bulk_job_instance_hosts.qsize())
+            ]
+        )
+        await db.execute(query)
+        await db.commit()
+
+
+bulk_job_instance_events = Batcher(insert_job_instance_events)
+bulk_job_instance_hosts = Batcher(insert_job_instance_hosts)
+
+
+async def handle_ansible_rulebook(
+    data: dict, db: AsyncSession, db_session_factory
+):
     event_data = data.get("event", {})
     if event_data.get("stdout"):
         job_instance_id = await get_job_instance_id(
@@ -262,7 +293,7 @@ async def handle_ansible_rulebook(data: dict, db: AsyncSession):
     if created:
         created = datetime.strptime(created, "%Y-%m-%dT%H:%M:%S.%f")
 
-    await bulk_job_instance_events.put(
+    await bulk_job_instance_events.queue.put(
         dict(
             job_uuid=event_data.get("job_id"),
             counter=event_data.get("counter"),
@@ -285,7 +316,7 @@ async def handle_ansible_rulebook(data: dict, db: AsyncSession):
         if event == "runner_on_ok" and data.get("res", {}).get("changed"):
             status = "changed"
 
-        await bulk_job_instance_hosts.put(
+        await bulk_job_instance_hosts.queue.put(
             dict(
                 job_uuid=event_data.get("job_id"),
                 host=host,
@@ -295,40 +326,6 @@ async def handle_ansible_rulebook(data: dict, db: AsyncSession):
                 status=status,
             )
         )
-
-    if (
-        bulk_job_instance_events.qsize() >= 1000
-        or bulk_job_instance_hosts.qsize() >= 1000
-    ):
-        await insert_job_instance_events(bulk_job_instance_events, db)
-        await insert_job_instance_hosts(bulk_job_instance_hosts, db)
-
-
-async def insert_job_instance_events(
-    bulk_job_instance_events: asyncio.Queue, db: AsyncSession
-):
-
-    query = insert(models.job_instance_events).values(
-        [
-            await bulk_job_instance_events.get()
-            for i in range(bulk_job_instance_events.qsize())
-        ]
-    )
-    await db.execute(query)
-    await db.commit()
-
-
-async def insert_job_instance_hosts(
-    bulk_job_instance_hosts: asyncio.Queue, db: AsyncSession
-):
-    query = insert(models.job_instance_hosts).values(
-        [
-            await bulk_job_instance_hosts.get()
-            for i in range(bulk_job_instance_hosts.qsize())
-        ]
-    )
-    await db.execute(query)
-    await db.commit()
 
 
 async def handle_jobs(data: dict, db: AsyncSession):
