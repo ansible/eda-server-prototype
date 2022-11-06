@@ -77,7 +77,7 @@ async def websocket_endpoint2(
                 elif data_type == "Job":
                     await handle_jobs(data, db)
                 elif data_type == "AnsibleEvent":
-                    await handle_ansible_rulebook(data, db, db_session_factory)
+                    await handle_ansible_rulebook(data, db)
                 elif data_type == "Action":
                     await handle_actions(data, db)
     except WebSocketDisconnect:
@@ -264,9 +264,7 @@ bulk_job_instance_events = Batcher(insert_job_instance_events)
 bulk_job_instance_hosts = Batcher(insert_job_instance_hosts)
 
 
-async def handle_ansible_rulebook(
-    data: dict, db: AsyncSession, db_session_factory
-):
+async def handle_ansible_rulebook(data: dict, db: AsyncSession):
     event_data = data.get("event", {})
     if event_data.get("stdout"):
         job_instance_id = await get_job_instance_id(
@@ -299,7 +297,7 @@ async def handle_ansible_rulebook(
             "counter": event_data.get("counter"),
             "stdout": event_data.get("stdout"),
             "type": event_data.get("event"),
-            "created_at": "created",
+            "created_at": created,
         }
     )
 

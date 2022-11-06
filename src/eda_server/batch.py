@@ -6,7 +6,7 @@ logger = logging.getLogger("eda_server.batch")
 
 
 class Batcher:
-    def __init__(self, processor_fn, max_batch_size=1000, batch_timeout=60):
+    def __init__(self, processor_fn, max_batch_size=1000, batch_timeout=10):
         self.queue = asyncio.Queue()
         self.max_batch_size = max_batch_size
         self.batch_timeout = batch_timeout
