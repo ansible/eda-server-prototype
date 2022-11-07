@@ -11,7 +11,6 @@ from fastapi.responses import JSONResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from eda_server import schema
-from eda_server.auth import requires_permission
 from eda_server.config import Settings, get_settings
 from eda_server.db import models
 from eda_server.db.dependency import get_db_session, get_db_session_factory
@@ -20,7 +19,6 @@ from eda_server.db.utils.lostream import PGLargeObject, decode_bytes_buff
 from eda_server.managers import updatemanager
 from eda_server.messages import ActivationErrorMessage
 from eda_server.ruleset import activate_rulesets, inactivate_rulesets
-from eda_server.types import Action, ResourceType
 
 logger = logging.getLogger("eda_server")
 
@@ -33,9 +31,6 @@ router = APIRouter(tags=["activations"])
     "/api/activations",
     response_model=schema.ActivationBaseRead,
     operation_id="create_activation",
-    dependencies=[
-        Depends(requires_permission(ResourceType.ACTIVATION, Action.CREATE)),
-    ],
 )
 async def create_activation(
     activation: schema.ActivationCreate,
@@ -82,9 +77,6 @@ async def create_activation(
     "/api/activations/{activation_id}",
     response_model=schema.ActivationRead,
     operation_id="show_activation",
-    dependencies=[
-        Depends(requires_permission(ResourceType.ACTIVATION, Action.READ)),
-    ],
 )
 async def read_activation(
     activation_id: int, db: AsyncSession = Depends(get_db_session)
@@ -146,9 +138,6 @@ async def read_activation(
     "/api/activations",
     response_model=List[schema.ActivationRead],
     operation_id="list_activations",
-    dependencies=[
-        Depends(requires_permission(ResourceType.ACTIVATION, Action.READ)),
-    ],
 )
 async def list_activations(
     db: AsyncSession = Depends(get_db_session),
@@ -168,9 +157,6 @@ async def list_activations(
     "/api/activations/{activation_id}",
     response_model=schema.ActivationBaseRead,
     operation_id="update_activation",
-    dependencies=[
-        Depends(requires_permission(ResourceType.ACTIVATION, Action.UPDATE)),
-    ],
 )
 async def update_activation(
     activation_id: int,
@@ -216,9 +202,6 @@ async def update_activation(
     "/api/activations/{activation_id}",
     status_code=status.HTTP_204_NO_CONTENT,
     operation_id="delete_activation",
-    dependencies=[
-        Depends(requires_permission(ResourceType.ACTIVATION, Action.DELETE)),
-    ],
 )
 async def delete_activation(
     activation_id: int, db: AsyncSession = Depends(get_db_session)
@@ -270,13 +253,6 @@ async def read_output(proc, activation_instance_id, db_session_factory):
         }
     },
     operation_id="create_activation_instance",
-    dependencies=[
-        Depends(
-            requires_permission(
-                ResourceType.ACTIVATION_INSTANCE, Action.CREATE
-            )
-        ),
-    ],
 )
 async def create_activation_instance(
     a: schema.ActivationInstanceCreate,
@@ -355,32 +331,16 @@ async def create_activation_instance(
     return {**a.dict(), "id": id_}
 
 
-# FIXME(cutwater): The URL is not related to activation instances.
-# TODO(cutwater): Maybe should be "activation_instance:deactivate"
-@router.post(
-    "/api/deactivate",
-    operation_id="deactivate_activation_instance",
-    dependencies=[
-        Depends(
-            requires_permission(
-                ResourceType.ACTIVATION_INSTANCE, Action.UPDATE
-            )
-        ),
-    ],
-)
+@router.post("/api/deactivate", operation_id="deactivate_activation_instance")
 async def deactivate(activation_instance_id: int):
     await inactivate_rulesets(activation_instance_id)
+    return
 
 
 @router.get(
     "/api/activation_instances",
     response_model=List[schema.ActivationInstanceBaseRead],
     operation_id="list_activation_instances",
-    dependencies=[
-        Depends(
-            requires_permission(ResourceType.ACTIVATION_INSTANCE, Action.READ)
-        ),
-    ],
 )
 async def list_activation_instances(
     db: AsyncSession = Depends(get_db_session),
@@ -394,11 +354,6 @@ async def list_activation_instances(
     "/api/activation_instance/{activation_instance_id}",
     response_model=schema.ActivationInstanceRead,
     operation_id="read_activation_instance",
-    dependencies=[
-        Depends(
-            requires_permission(ResourceType.ACTIVATION_INSTANCE, Action.READ)
-        ),
-    ],
 )
 async def read_activation_instance(
     activation_instance_id: int, db: AsyncSession = Depends(get_db_session)
@@ -429,13 +384,6 @@ async def read_activation_instance(
     "/api/activation_instance/{activation_instance_id}",
     status_code=status.HTTP_204_NO_CONTENT,
     operation_id="delete_activation_instance",
-    dependencies=[
-        Depends(
-            requires_permission(
-                ResourceType.ACTIVATION_INSTANCE, Action.DELETE
-            )
-        ),
-    ],
 )
 async def delete_activation_instance(
     activation_instance_id: int, db: AsyncSession = Depends(get_db_session)
@@ -454,15 +402,11 @@ async def delete_activation_instance(
     "/api/activation_instance_logs",
     operation_id="list_activation_instance_logs",
     response_model=List[schema.ActivationLog],
-    dependencies=[
-        Depends(
-            requires_permission(ResourceType.ACTIVATION_INSTANCE, Action.READ)
-        ),
-    ],
 )
 async def stream_activation_instance_logs(
     activation_instance_id: int,
     db: AsyncSession = Depends(get_db_session),
+    settings: Settings = Depends(get_settings),
 ):
     query = sa.select(models.activation_instances.c.large_data_id).where(
         models.activation_instances.c.id == activation_instance_id
@@ -487,11 +431,6 @@ async def stream_activation_instance_logs(
     "/api/activation_instance_job_instances/{activation_instance_id}",
     response_model=List[schema.ActivationInstanceJobInstance],
     operation_id="list_activation_instance_job_instances",
-    dependencies=[
-        Depends(
-            requires_permission(ResourceType.ACTIVATION_INSTANCE, Action.READ)
-        ),
-    ],
 )
 async def list_activation_instance_job_instances(
     activation_instance_id: int, db: AsyncSession = Depends(get_db_session)

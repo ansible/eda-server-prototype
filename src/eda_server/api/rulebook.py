@@ -6,11 +6,9 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from eda_server import schema
-from eda_server.auth import requires_permission
 from eda_server.db import models
 from eda_server.db.dependency import get_db_session
 from eda_server.project import insert_rulebook_related_data
-from eda_server.types import Action, ResourceType
 
 router = APIRouter(tags=["rulebooks"])
 
@@ -24,9 +22,6 @@ router = APIRouter(tags=["rulebooks"])
     "/api/rules",
     response_model=List[schema.Rule],
     operation_id="list_rules",
-    dependencies=[
-        Depends(requires_permission(ResourceType.RULEBOOK, Action.READ)),
-    ],
 )
 async def list_rules(db: AsyncSession = Depends(get_db_session)):
     query = (
@@ -62,9 +57,6 @@ async def list_rules(db: AsyncSession = Depends(get_db_session)):
     "/api/rules/{rule_id}",
     response_model=schema.Rule,
     operation_id="read_rule",
-    dependencies=[
-        Depends(requires_permission(ResourceType.RULEBOOK, Action.READ)),
-    ],
 )
 async def read_rule(rule_id: int, db: AsyncSession = Depends(get_db_session)):
     query = (
@@ -158,9 +150,6 @@ BASE_RULESET_SELECT = (
     "/api/rulesets",
     response_model=List[schema.Ruleset],
     operation_id="list_rulesets",
-    dependencies=[
-        Depends(requires_permission(ResourceType.RULEBOOK, Action.READ)),
-    ],
 )
 async def list_rulesets(db: AsyncSession = Depends(get_db_session)):
     cur = await db.execute(BASE_RULESET_SELECT)
@@ -172,9 +161,6 @@ async def list_rulesets(db: AsyncSession = Depends(get_db_session)):
     "/api/rulesets/{ruleset_id}",
     response_model=schema.RulesetDetail,
     operation_id="read_ruleset",
-    dependencies=[
-        Depends(requires_permission(ResourceType.RULEBOOK, Action.READ)),
-    ],
 )
 async def get_ruleset(
     ruleset_id: int, db: AsyncSession = Depends(get_db_session)
@@ -215,13 +201,7 @@ rulebook_fire_count = (
 ).cte("rulebook_fire_count")
 
 
-@router.post(
-    "/api/rulebooks",
-    operation_id="create_rulebook",
-    dependencies=[
-        Depends(requires_permission(ResourceType.RULEBOOK, Action.CREATE)),
-    ],
-)
+@router.post("/api/rulebooks", operation_id="create_rulebook")
 async def create_rulebook(
     rulebook: schema.RulebookCreate, db: AsyncSession = Depends(get_db_session)
 ):
@@ -244,9 +224,6 @@ async def create_rulebook(
     "/api/rulebooks",
     operation_id="list_rulebooks",
     response_model=List[schema.RulebookList],
-    dependencies=[
-        Depends(requires_permission(ResourceType.RULEBOOK, Action.READ)),
-    ],
 )
 async def list_rulebooks(db: AsyncSession = Depends(get_db_session)):
     query = (
@@ -278,9 +255,6 @@ async def list_rulebooks(db: AsyncSession = Depends(get_db_session)):
     "/api/rulebooks/{rulebook_id}",
     operation_id="read_rulebook",
     response_model=schema.RulebookRead,
-    dependencies=[
-        Depends(requires_permission(ResourceType.RULEBOOK, Action.READ)),
-    ],
 )
 async def read_rulebook(
     rulebook_id: int, db: AsyncSession = Depends(get_db_session)
@@ -320,11 +294,7 @@ async def read_rulebook(
 
 
 @router.get(
-    "/api/rulebook_json/{rulebook_id}",
-    operation_id="read_rulebook_json",
-    dependencies=[
-        Depends(requires_permission(ResourceType.RULEBOOK, Action.READ)),
-    ],
+    "/api/rulebook_json/{rulebook_id}", operation_id="read_rulebook_json"
 )
 async def read_rulebook_json(
     rulebook_id: int, db: AsyncSession = Depends(get_db_session)
@@ -366,9 +336,6 @@ async def read_rulebook_json(
     "/api/rulebooks/{rulebook_id}/rulesets",
     operation_id="list_rulebook_rulesets",
     response_model=List[schema.RulebookRulesetList],
-    dependencies=[
-        Depends(requires_permission(ResourceType.RULEBOOK, Action.READ)),
-    ],
 )
 async def list_rulebook_rulesets(
     rulebook_id: int, db: AsyncSession = Depends(get_db_session)
