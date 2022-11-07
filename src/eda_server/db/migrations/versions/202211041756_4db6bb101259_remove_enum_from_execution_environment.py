@@ -1,7 +1,7 @@
 """Remove enum from execution_environment.
 
 Revision ID: 4db6bb101259
-Revises: f592f6ef1e3a
+Revises: c703cd56f6b0
 Create Date: 2022-11-04 17:56:23.742473+00:00
 
 """
@@ -11,7 +11,7 @@ from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
 revision = "4db6bb101259"
-down_revision = "f592f6ef1e3a"
+down_revision = "c703cd56f6b0"
 branch_labels = None
 depends_on = None
 
