@@ -20,6 +20,7 @@ RESOURCE_TYPES = [
     "activation_instance",
     "audit_rule",
     "job",
+    "user",
     "task",
 ]
 ADD_RESOURCE_TYPE_QUERY = """\
