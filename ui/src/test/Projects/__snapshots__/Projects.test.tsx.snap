@@ -142,6 +142,14 @@ exports[`Projects should render the Projects component 1`] = `
                   isLoading={false}
                   onFilterChange={[Function]}
                   ouiaId="projects-table"
+                  pagination={
+                    {
+                      "count": 0,
+                      "filter": "",
+                      "limit": 50,
+                      "offset": 0,
+                    }
+                  }
                   plural="Projects"
                   renderEmptyState={[Function]}
                   routes={[Function]}

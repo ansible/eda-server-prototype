@@ -1,0 +1,685 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`InventoriesSelect should render the InventoriesSelect component 1`] = `
+<ComponentWrapper
+  initialEntries={
+    [
+      "/InventoriesSelect",
+    ]
+  }
+>
+  <IntlProvider
+    defaultFormats={{}}
+    defaultLocale="en"
+    fallbackOnEmptyString={true}
+    formats={{}}
+    locale="en"
+    messages={{}}
+    onError={[Function]}
+    onWarn={[Function]}
+    textComponent={Symbol(react.fragment)}
+  >
+    <MemoryRouter
+      initialEntries={
+        [
+          "/InventoriesSelect",
+        ]
+      }
+      key="test"
+      keyLength={0}
+    >
+      <Router
+        history={
+          {
+            "action": "POP",
+            "block": [Function],
+            "canGo": [Function],
+            "createHref": [Function],
+            "entries": [
+              {
+                "hash": "",
+                "pathname": "/InventoriesSelect",
+                "search": "",
+                "state": undefined,
+              },
+            ],
+            "go": [Function],
+            "goBack": [Function],
+            "goForward": [Function],
+            "index": 0,
+            "length": 1,
+            "listen": [Function],
+            "location": {
+              "hash": "",
+              "pathname": "/InventoriesSelect",
+              "search": "",
+              "state": undefined,
+            },
+            "push": [Function],
+            "replace": [Function],
+          }
+        }
+      >
+        <Route
+          path="/InventoriesSelect"
+        >
+          <InventoriesSelect
+            isModalOpen={true}
+            setInventory={[Function]}
+            setIsModalOpen={[Function]}
+          >
+            <Modal
+              actions={
+                [
+                  <Button
+                    onClick={[Function]}
+                    variant="primary"
+                  >
+                    Select
+                  </Button>,
+                  <Button
+                    onClick={[Function]}
+                    variant="link"
+                  >
+                    Cancel
+                  </Button>,
+                ]
+              }
+              appendTo={[Function]}
+              aria-describedby=""
+              aria-label=""
+              aria-labelledby=""
+              className=""
+              hasNoBodyWrapper={false}
+              isOpen={true}
+              onClose={[Function]}
+              ouiaSafe={true}
+              showClose={true}
+              title="Select an inventory"
+              titleIconVariant={null}
+              titleLabel=""
+              variant="medium"
+            >
+              <Portal
+                containerInfo={
+                  <div>
+                    <div
+                      class="pf-c-backdrop"
+                    >
+                      <div
+                        class="pf-l-bullseye"
+                      >
+                        <div
+                          aria-describedby="pf-modal-part-2"
+                          aria-labelledby="pf-modal-part-1"
+                          aria-modal="true"
+                          class="pf-c-modal-box pf-m-md"
+                          data-ouia-component-id="OUIA-Generated-Modal-medium-1"
+                          data-ouia-component-type="PF4/ModalContent"
+                          data-ouia-safe="true"
+                          id="pf-modal-part-0"
+                          role="dialog"
+                        >
+                          <button
+                            aria-disabled="false"
+                            aria-label="Close"
+                            class="pf-c-button pf-m-plain"
+                            data-ouia-component-id="OUIA-Generated-Modal-medium-1-ModalBoxCloseButton"
+                            data-ouia-component-type="PF4/Button"
+                            data-ouia-safe="true"
+                            type="button"
+                          >
+                            <svg
+                              aria-hidden="true"
+                              fill="currentColor"
+                              height="1em"
+                              role="img"
+                              style="vertical-align: -0.125em;"
+                              viewBox="0 0 352 512"
+                              width="1em"
+                            >
+                              <path
+                                d="M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.07c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z"
+                              />
+                            </svg>
+                          </button>
+                          <header
+                            class="pf-c-modal-box__header"
+                          >
+                            <h1
+                              class="pf-c-modal-box__title"
+                              id="pf-modal-part-1"
+                            >
+                              
+                              <span
+                                class="pf-c-modal-box__title-text"
+                              >
+                                Select an inventory
+                              </span>
+                            </h1>
+                          </header>
+                          <div
+                            class="pf-c-modal-box__body"
+                            id="pf-modal-part-2"
+                          >
+                            <div
+                              aria-label="No records"
+                              class="ins-c-table__empty is-centered"
+                            >
+                               
+                              <div
+                                class="pf-c-empty-state pf-u-ml-auto pf-u-mr-auto"
+                              >
+                                <div
+                                  class="pf-c-empty-state__content"
+                                >
+                                  <svg
+                                    aria-hidden="true"
+                                    class="pf-c-empty-state__icon"
+                                    fill="currentColor"
+                                    height="1em"
+                                    role="img"
+                                    style="vertical-align: -0.125em;"
+                                    viewBox="0 0 512 512"
+                                    width="1em"
+                                  >
+                                    <path
+                                      d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm144 276c0 6.6-5.4 12-12 12h-92v92c0 6.6-5.4 12-12 12h-56c-6.6 0-12-5.4-12-12v-92h-92c-6.6 0-12-5.4-12-12v-56c0-6.6 5.4-12 12-12h92v-92c0-6.6 5.4-12 12-12h56c6.6 0 12 5.4 12 12v92h92c6.6 0 12 5.4 12 12v56z"
+                                    />
+                                  </svg>
+                                  <div
+                                    class="pf-c-content"
+                                  >
+                                    <h1
+                                      class=""
+                                      data-ouia-component-id="OUIA-Generated-Text-1"
+                                      data-ouia-component-type="PF4/Text"
+                                      data-ouia-safe="true"
+                                      data-pf-content="true"
+                                    >
+                                      There are currently no inventories added for your organization.
+                                    </h1>
+                                  </div>
+                                  <div
+                                    class="pf-c-empty-state__body"
+                                  >
+                                    Please add an inventory by using the button below.
+                                  </div>
+                                  <div
+                                    class="pf-c-empty-state__secondary"
+                                  >
+                                    <a
+                                      href="/new-inventory"
+                                      id="create-inventory-link"
+                                    >
+                                      <button
+                                        aria-disabled="false"
+                                        aria-label="Add inventory"
+                                        class="pf-c-button pf-m-primary"
+                                        data-ouia-component-id="create-inventory-link"
+                                        data-ouia-component-type="PF4/Button"
+                                        data-ouia-safe="true"
+                                        type="button"
+                                      >
+                                        Add inventory
+                                      </button>
+                                    </a>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <footer
+                            class="pf-c-modal-box__footer"
+                          >
+                            <button
+                              aria-disabled="false"
+                              class="pf-c-button pf-m-primary"
+                              data-ouia-component-id="OUIA-Generated-Button-primary-1"
+                              data-ouia-component-type="PF4/Button"
+                              data-ouia-safe="true"
+                              type="button"
+                            >
+                              Select
+                            </button>
+                            <button
+                              aria-disabled="false"
+                              class="pf-c-button pf-m-link"
+                              data-ouia-component-id="OUIA-Generated-Button-link-1"
+                              data-ouia-component-type="PF4/Button"
+                              data-ouia-safe="true"
+                              type="button"
+                            >
+                              Cancel
+                            </button>
+                          </footer>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                }
+              >
+                <ModalContent
+                  actions={
+                    [
+                      <Button
+                        onClick={[Function]}
+                        variant="primary"
+                      >
+                        Select
+                      </Button>,
+                      <Button
+                        onClick={[Function]}
+                        variant="link"
+                      >
+                        Cancel
+                      </Button>,
+                    ]
+                  }
+                  aria-describedby=""
+                  aria-label=""
+                  aria-labelledby=""
+                  boxId="pf-modal-part-0"
+                  className=""
+                  descriptorId="pf-modal-part-2"
+                  hasNoBodyWrapper={false}
+                  isOpen={true}
+                  labelId="pf-modal-part-1"
+                  onClose={[Function]}
+                  ouiaId="OUIA-Generated-Modal-medium-1"
+                  ouiaSafe={true}
+                  showClose={true}
+                  title="Select an inventory"
+                  titleIconVariant={null}
+                  titleLabel=""
+                  variant="medium"
+                >
+                  <Backdrop>
+                    <div
+                      className="pf-c-backdrop"
+                    >
+                      <ForwardRef
+                        active={true}
+                        className="pf-l-bullseye"
+                        focusTrapOptions={
+                          {
+                            "clickOutsideDeactivates": true,
+                            "tabbableOptions": {
+                              "displayCheck": "none",
+                            },
+                          }
+                        }
+                      >
+                        <FocusTrap
+                          active={true}
+                          className="pf-l-bullseye"
+                          focusTrapOptions={
+                            {
+                              "clickOutsideDeactivates": true,
+                              "tabbableOptions": {
+                                "displayCheck": "none",
+                              },
+                            }
+                          }
+                          innerRef={null}
+                          paused={false}
+                          preventScrollOnDeactivate={false}
+                        >
+                          <div
+                            className="pf-l-bullseye"
+                          >
+                            <ModalBox
+                              aria-describedby="pf-modal-part-2"
+                              aria-label=""
+                              aria-labelledby="pf-modal-part-1"
+                              className=""
+                              data-ouia-component-id="OUIA-Generated-Modal-medium-1"
+                              data-ouia-component-type="PF4/ModalContent"
+                              data-ouia-safe={true}
+                              id="pf-modal-part-0"
+                              style={{}}
+                              variant="medium"
+                            >
+                              <div
+                                aria-describedby="pf-modal-part-2"
+                                aria-label={null}
+                                aria-labelledby="pf-modal-part-1"
+                                aria-modal="true"
+                                className="pf-c-modal-box pf-m-md"
+                                data-ouia-component-id="OUIA-Generated-Modal-medium-1"
+                                data-ouia-component-type="PF4/ModalContent"
+                                data-ouia-safe={true}
+                                id="pf-modal-part-0"
+                                role="dialog"
+                                style={{}}
+                              >
+                                <ModalBoxCloseButton
+                                  onClose={[Function]}
+                                  ouiaId="OUIA-Generated-Modal-medium-1"
+                                >
+                                  <Button
+                                    aria-label="Close"
+                                    className=""
+                                    onClick={[Function]}
+                                    ouiaId="OUIA-Generated-Modal-medium-1-ModalBoxCloseButton"
+                                    variant="plain"
+                                  >
+                                    <ButtonBase
+                                      aria-label="Close"
+                                      className=""
+                                      innerRef={null}
+                                      onClick={[Function]}
+                                      ouiaId="OUIA-Generated-Modal-medium-1-ModalBoxCloseButton"
+                                      variant="plain"
+                                    >
+                                      <button
+                                        aria-disabled={false}
+                                        aria-label="Close"
+                                        className="pf-c-button pf-m-plain"
+                                        data-ouia-component-id="OUIA-Generated-Modal-medium-1-ModalBoxCloseButton"
+                                        data-ouia-component-type="PF4/Button"
+                                        data-ouia-safe={true}
+                                        disabled={false}
+                                        onClick={[Function]}
+                                        role={null}
+                                        type="button"
+                                      >
+                                        <TimesIcon
+                                          color="currentColor"
+                                          noVerticalAlign={false}
+                                          size="sm"
+                                        >
+                                          <svg
+                                            aria-hidden={true}
+                                            aria-labelledby={null}
+                                            fill="currentColor"
+                                            height="1em"
+                                            role="img"
+                                            style={
+                                              {
+                                                "verticalAlign": "-0.125em",
+                                              }
+                                            }
+                                            viewBox="0 0 352 512"
+                                            width="1em"
+                                          >
+                                            <path
+                                              d="M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.07c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z"
+                                            />
+                                          </svg>
+                                        </TimesIcon>
+                                      </button>
+                                    </ButtonBase>
+                                  </Button>
+                                </ModalBoxCloseButton>
+                                <ModalBoxHeader
+                                  help={null}
+                                >
+                                  <header
+                                    className="pf-c-modal-box__header"
+                                  >
+                                    <ModalBoxTitle
+                                      id="pf-modal-part-1"
+                                      title="Select an inventory"
+                                      titleIconVariant={null}
+                                      titleLabel=""
+                                    >
+                                      <h1
+                                        className="pf-c-modal-box__title"
+                                        id="pf-modal-part-1"
+                                      >
+                                        <span
+                                          className="pf-c-modal-box__title-text"
+                                        >
+                                          Select an inventory
+                                        </span>
+                                      </h1>
+                                    </ModalBoxTitle>
+                                  </header>
+                                </ModalBoxHeader>
+                                <ModalBoxBody
+                                  id="pf-modal-part-2"
+                                >
+                                  <div
+                                    className="pf-c-modal-box__body"
+                                    id="pf-modal-part-2"
+                                  >
+                                    <TableToolbarView
+                                      columns={
+                                        [
+                                          {
+                                            "title": "",
+                                            "transforms": [
+                                              [Function],
+                                            ],
+                                          },
+                                        ]
+                                      }
+                                      fetchData={[Function]}
+                                      isLoading={false}
+                                      ouiaId="inventories-table"
+                                      plural="Inventories"
+                                      renderEmptyState={[Function]}
+                                      rows={[]}
+                                      singular="Inventory"
+                                    >
+                                      <TableEmptyState
+                                        Icon={[Function]}
+                                        PrimaryAction={[Function]}
+                                        description="Please add an inventory by using the button below."
+                                        title="There are currently no inventories added for your organization."
+                                      >
+                                        <EmptyTable
+                                          aria-label="No records"
+                                          centered={true}
+                                        >
+                                          <div
+                                            aria-label="No records"
+                                            className="ins-c-table__empty is-centered"
+                                          >
+                                             
+                                            <EmptyState
+                                              className="pf-u-ml-auto pf-u-mr-auto"
+                                            >
+                                              <div
+                                                className="pf-c-empty-state pf-u-ml-auto pf-u-mr-auto"
+                                              >
+                                                <div
+                                                  className="pf-c-empty-state__content"
+                                                >
+                                                  <EmptyStateIcon
+                                                    icon={[Function]}
+                                                  >
+                                                    <PlusCircleIcon
+                                                      aria-hidden="true"
+                                                      className="pf-c-empty-state__icon"
+                                                      color="currentColor"
+                                                      noVerticalAlign={false}
+                                                      size="sm"
+                                                    >
+                                                      <svg
+                                                        aria-hidden="true"
+                                                        aria-labelledby={null}
+                                                        className="pf-c-empty-state__icon"
+                                                        fill="currentColor"
+                                                        height="1em"
+                                                        role="img"
+                                                        style={
+                                                          {
+                                                            "verticalAlign": "-0.125em",
+                                                          }
+                                                        }
+                                                        viewBox="0 0 512 512"
+                                                        width="1em"
+                                                      >
+                                                        <path
+                                                          d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm144 276c0 6.6-5.4 12-12 12h-92v92c0 6.6-5.4 12-12 12h-56c-6.6 0-12-5.4-12-12v-92h-92c-6.6 0-12-5.4-12-12v-56c0-6.6 5.4-12 12-12h92v-92c0-6.6 5.4-12 12-12h56c6.6 0 12 5.4 12 12v92h92c6.6 0 12 5.4 12 12v56z"
+                                                        />
+                                                      </svg>
+                                                    </PlusCircleIcon>
+                                                  </EmptyStateIcon>
+                                                  <TextContent>
+                                                    <div
+                                                      className="pf-c-content"
+                                                    >
+                                                      <Text
+                                                        component="h1"
+                                                      >
+                                                        <h1
+                                                          className=""
+                                                          data-ouia-component-id="OUIA-Generated-Text-1"
+                                                          data-ouia-component-type="PF4/Text"
+                                                          data-ouia-safe={true}
+                                                          data-pf-content={true}
+                                                        >
+                                                          There are currently no inventories added for your organization.
+                                                        </h1>
+                                                      </Text>
+                                                    </div>
+                                                  </TextContent>
+                                                  <EmptyStateBody>
+                                                    <div
+                                                      className="pf-c-empty-state__body"
+                                                    >
+                                                      Please add an inventory by using the button below.
+                                                    </div>
+                                                  </EmptyStateBody>
+                                                  <EmptyStateSecondaryActions>
+                                                    <div
+                                                      className="pf-c-empty-state__secondary"
+                                                    >
+                                                      <PrimaryAction>
+                                                        <Link
+                                                          id="create-inventory-link"
+                                                          to={
+                                                            {
+                                                              "pathname": "/new-inventory",
+                                                            }
+                                                          }
+                                                        >
+                                                          <LinkAnchor
+                                                            href="/new-inventory"
+                                                            id="create-inventory-link"
+                                                            navigate={[Function]}
+                                                          >
+                                                            <a
+                                                              href="/new-inventory"
+                                                              id="create-inventory-link"
+                                                              onClick={[Function]}
+                                                            >
+                                                              <Button
+                                                                aria-label="Add inventory"
+                                                                ouiaId="create-inventory-link"
+                                                                variant="primary"
+                                                              >
+                                                                <ButtonBase
+                                                                  aria-label="Add inventory"
+                                                                  innerRef={null}
+                                                                  ouiaId="create-inventory-link"
+                                                                  variant="primary"
+                                                                >
+                                                                  <button
+                                                                    aria-disabled={false}
+                                                                    aria-label="Add inventory"
+                                                                    className="pf-c-button pf-m-primary"
+                                                                    data-ouia-component-id="create-inventory-link"
+                                                                    data-ouia-component-type="PF4/Button"
+                                                                    data-ouia-safe={true}
+                                                                    disabled={false}
+                                                                    role={null}
+                                                                    type="button"
+                                                                  >
+                                                                    Add inventory
+                                                                  </button>
+                                                                </ButtonBase>
+                                                              </Button>
+                                                            </a>
+                                                          </LinkAnchor>
+                                                        </Link>
+                                                      </PrimaryAction>
+                                                    </div>
+                                                  </EmptyStateSecondaryActions>
+                                                </div>
+                                              </div>
+                                            </EmptyState>
+                                          </div>
+                                        </EmptyTable>
+                                      </TableEmptyState>
+                                    </TableToolbarView>
+                                  </div>
+                                </ModalBoxBody>
+                                <ModalBoxFooter>
+                                  <footer
+                                    className="pf-c-modal-box__footer"
+                                  >
+                                    <Button
+                                      key="confirm"
+                                      onClick={[Function]}
+                                      variant="primary"
+                                    >
+                                      <ButtonBase
+                                        innerRef={null}
+                                        onClick={[Function]}
+                                        variant="primary"
+                                      >
+                                        <button
+                                          aria-disabled={false}
+                                          aria-label={null}
+                                          className="pf-c-button pf-m-primary"
+                                          data-ouia-component-id="OUIA-Generated-Button-primary-1"
+                                          data-ouia-component-type="PF4/Button"
+                                          data-ouia-safe={true}
+                                          disabled={false}
+                                          onClick={[Function]}
+                                          role={null}
+                                          type="button"
+                                        >
+                                          Select
+                                        </button>
+                                      </ButtonBase>
+                                    </Button>
+                                    <Button
+                                      key="cancel"
+                                      onClick={[Function]}
+                                      variant="link"
+                                    >
+                                      <ButtonBase
+                                        innerRef={null}
+                                        onClick={[Function]}
+                                        variant="link"
+                                      >
+                                        <button
+                                          aria-disabled={false}
+                                          aria-label={null}
+                                          className="pf-c-button pf-m-link"
+                                          data-ouia-component-id="OUIA-Generated-Button-link-1"
+                                          data-ouia-component-type="PF4/Button"
+                                          data-ouia-safe={true}
+                                          disabled={false}
+                                          onClick={[Function]}
+                                          role={null}
+                                          type="button"
+                                        >
+                                          Cancel
+                                        </button>
+                                      </ButtonBase>
+                                    </Button>
+                                  </footer>
+                                </ModalBoxFooter>
+                              </div>
+                            </ModalBox>
+                          </div>
+                        </FocusTrap>
+                      </ForwardRef>
+                    </div>
+                  </Backdrop>
+                </ModalContent>
+              </Portal>
+            </Modal>
+          </InventoriesSelect>
+        </Route>
+      </Router>
+    </MemoryRouter>
+  </IntlProvider>
+</ComponentWrapper>
+`;

@@ -116,6 +116,14 @@ exports[`RuleSets should render the RuleSets component 1`] = `
                   isLoading={false}
                   onFilterChange={[Function]}
                   ouiaId="RuleSets-table"
+                  pagination={
+                    {
+                      "count": 0,
+                      "filter": "",
+                      "limit": 50,
+                      "offset": 0,
+                    }
+                  }
                   plural="Rule sets"
                   renderEmptyState={[Function]}
                   routes={[Function]}

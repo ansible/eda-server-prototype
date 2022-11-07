@@ -9,8 +9,6 @@ import {
   FormSelectOption,
   Grid,
   GridItem,
-  Level,
-  LevelItem,
   PageSection,
   TextInput,
   Title,
@@ -20,7 +18,7 @@ import { useHistory } from 'react-router-dom';
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { TopToolbar } from '@app/shared/top-toolbar';
-import { ExclamationCircleIcon, SearchIcon } from '@patternfly/react-icons';
+import { ExclamationCircleIcon } from '@patternfly/react-icons';
 import { useIntl } from 'react-intl';
 import sharedMessages from '../messages/shared.messages';
 import { ExtraVarType } from '@app/Vars/Vars';
@@ -29,7 +27,6 @@ import { addNotification } from '@redhat-cloud-services/frontend-components-noti
 import { useDispatch } from 'react-redux';
 import { addRulebookActivation } from '@app/API/Activation';
 import { listRulebooks } from '@app/API/Rulebook';
-import { listInventories } from '@app/API/Inventory';
 import { listExtraVars } from '@app/API/Extravar';
 import { listProjects } from '@app/API/Project';
 import { InventoriesSelect, InventorySelectType } from '@app/InventoriesSelect/InventoriesSelect';
@@ -54,12 +51,6 @@ const NewActivation: React.FunctionComponent = () => {
     {
       id: '',
       name: intl.formatMessage(sharedMessages.ruleSetPlaceholder),
-    },
-  ]);
-  const [inventories, setInventories] = useState<InventoryType[]>([
-    {
-      id: '',
-      name: intl.formatMessage(sharedMessages.inventoryPlaceholder),
     },
   ]);
   const [extravars, setExtraVars] = useState<ExtraVarType[]>([
@@ -116,10 +107,6 @@ const NewActivation: React.FunctionComponent = () => {
 
   useEffect(() => {
     listRulebooks().then((data) => setRuleSets([...rulesets, ...data.data]));
-  }, []);
-
-  useEffect(() => {
-    listInventories().then((data) => setInventories([...inventories, ...data.data]));
   }, []);
 
   useEffect(() => {

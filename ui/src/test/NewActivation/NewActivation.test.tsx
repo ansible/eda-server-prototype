@@ -26,7 +26,7 @@ describe('NewActivation', () => {
   });
 
   it('should render the NewActivation form', async () => {
-    mockApi.onGet(`/api/rulebooks`).replyOnce(200, [
+   mockApi.onGet(`/api/rulebooks`).replyOnce(200, [
       { id: '1', name: 'RuleBook 1' },
       { id: '2', name: 'RuleBook 2' },
       { id: '3', name: 'RuleBook 3' },
@@ -34,10 +34,6 @@ describe('NewActivation', () => {
     mockApi.onGet(`/api/extra_vars`).replyOnce(200, [
       { id: '1', name: 'Var 1' },
       { id: '2', name: 'Var 2' },
-    ]);
-    mockApi.onGet(`/api/inventories`).replyOnce(200, [
-      { id: '1', name: 'Inventory 1' },
-      { id: '2', name: 'Inventory 2' },
     ]);
     mockApi.onGet(`/api/projects`).replyOnce(200, [
       { id: '1', name: 'Project 1', url: 'Url1' },
