@@ -10,10 +10,12 @@ from fastapi.exceptions import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from eda_server import schema
+from eda_server.auth import requires_permission
 from eda_server.db import models
 from eda_server.db.dependency import get_db_session, get_db_session_factory
 from eda_server.managers import taskmanager
 from eda_server.ruleset import run_job, write_job_events
+from eda_server.types import Action, ResourceType
 
 logger = logging.getLogger("eda_server")
 
@@ -26,6 +28,7 @@ router = APIRouter(tags=["jobs"])
     "/api/job_instances/",
     response_model=List[schema.JobInstanceBaseRead],
     operation_id="list_job_instances",
+    dependencies=[Depends(requires_permission(ResourceType.JOB, Action.READ))],
 )
 async def list_job_instances(db: AsyncSession = Depends(get_db_session)):
     query = sa.select(models.job_instances)
@@ -37,6 +40,9 @@ async def list_job_instances(db: AsyncSession = Depends(get_db_session)):
     "/api/job_instance/",
     response_model=schema.JobInstanceRead,
     operation_id="create_job_instance",
+    dependencies=[
+        Depends(requires_permission(ResourceType.JOB, Action.CREATE))
+    ],
 )
 async def create_job_instance(
     j: schema.JobInstanceCreate,
@@ -95,6 +101,7 @@ async def create_job_instance(
     "/api/job_instance/{job_instance_id}",
     response_model=schema.JobInstanceBaseRead,
     operation_id="read_job_instance",
+    dependencies=[Depends(requires_permission(ResourceType.JOB, Action.READ))],
 )
 async def read_job_instance(
     job_instance_id: int, db: AsyncSession = Depends(get_db_session)
@@ -110,6 +117,9 @@ async def read_job_instance(
     "/api/job_instance/{job_instance_id}",
     status_code=status.HTTP_204_NO_CONTENT,
     operation_id="delete_job_instance",
+    dependencies=[
+        Depends(requires_permission(ResourceType.JOB, Action.DELETE))
+    ],
 )
 async def delete_job_instance(
     job_instance_id: int, db: AsyncSession = Depends(get_db_session)
@@ -127,6 +137,7 @@ async def delete_job_instance(
 @router.get(
     "/api/job_instance_events/{job_instance_id}",
     operation_id="read_job_instance_events",
+    dependencies=[Depends(requires_permission(ResourceType.JOB, Action.READ))],
 )
 async def read_job_instance_events(
     job_instance_id: int, db: AsyncSession = Depends(get_db_session)
