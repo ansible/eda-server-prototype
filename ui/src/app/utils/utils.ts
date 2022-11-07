@@ -1,4 +1,5 @@
 import { TabItemType } from '@app/shared/types/common-types';
+import {useEffect, useRef} from "react";
 
 export function accessibleRouteChangeHandler() {
   return window.setTimeout(() => {
@@ -68,4 +69,12 @@ export function getServer() {
 export const getTabFromPath = (tabs: TabItemType[], path: string): string | undefined => {
   const currentTab = tabs.find((tabItem) => tabItem.name.split('/').pop() === path.split('/').pop());
   return currentTab?.title;
+};
+
+export const usePrevious = <T extends unknown>(value: T): T | undefined => {
+  const ref = useRef<T>();
+  useEffect(() => {
+    ref.current = value;
+  });
+  return ref.current;
 };

@@ -30,6 +30,7 @@ import { listRulebooks } from '@app/API/Rulebook';
 import { listExtraVars } from '@app/API/Extravar';
 import { listProjects } from '@app/API/Project';
 import { InventoriesSelect, InventorySelectType } from '@app/InventoriesSelect/InventoriesSelect';
+import { usePrevious } from '@app/utils/utils';
 
 const CardBody = styled(PFCardBody)`
   white-space: pre-wrap;
@@ -169,11 +170,13 @@ const NewActivation: React.FunctionComponent = () => {
       return true;
     }
   };
+  const prevInventory = usePrevious(inventory);
 
-  const onInventoryChange = (value) => {
-    setInventory(value);
-    validateInventory(value);
-  };
+  useEffect(() => {
+    if (!isInventoryModalOpen && inventory !== prevInventory) {
+      validateInventory(inventory);
+    }
+  }, [isInventoryModalOpen]);
 
   const validateExtraVar = (value): boolean => {
     if (!value || value.length < 1) {
@@ -332,6 +335,7 @@ const NewActivation: React.FunctionComponent = () => {
                 </GridItem>
                 <GridItem span={4}>
                   <FormGroup
+                    style={{ paddingRight: '30px' }}
                     label="Inventory"
                     fieldId={'activation-inventory'}
                     helperTextInvalid={intl.formatMessage(sharedMessages.selectInventory)}
@@ -344,7 +348,6 @@ const NewActivation: React.FunctionComponent = () => {
                       type="text"
                       onClick={() => setIsInventoryModalOpen(true)}
                       placeholder={intl.formatMessage(sharedMessages.inventoryPlaceholder)}
-                      onChange={onInventoryChange}
                       onBlur={() => validateInventory(inventory)}
                       validated={validatedInventory}
                       aria-label="FormSelect Input Inventory"
