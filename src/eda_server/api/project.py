@@ -6,7 +6,6 @@ from fastapi import APIRouter, Depends, HTTPException, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from eda_server import schema
-from eda_server.auth import requires_permission
 from eda_server.db.dependency import get_db_session
 from eda_server.db.models.project import (
     extra_vars,
@@ -16,7 +15,6 @@ from eda_server.db.models.project import (
 )
 from eda_server.db.models.rulebook import rulebooks
 from eda_server.project import GitCommandFailed, import_project
-from eda_server.types import Action, ResourceType
 
 router = APIRouter()
 
@@ -36,9 +34,6 @@ async def project_by_name_exists_or_404(db: AsyncSession, project_name: str):
     response_model=List[schema.ProjectList],
     operation_id="list_projects",
     tags=["projects"],
-    dependencies=[
-        Depends(requires_permission(ResourceType.PROJECT, Action.READ))
-    ],
 )
 async def list_projects(db: AsyncSession = Depends(get_db_session)):
     query = sa.select(projects.c.id, projects.c.url, projects.c.name)
@@ -52,9 +47,6 @@ async def list_projects(db: AsyncSession = Depends(get_db_session)):
     operation_id="create_project",
     status_code=status.HTTP_201_CREATED,
     tags=["projects"],
-    dependencies=[
-        Depends(requires_permission(ResourceType.PROJECT, Action.CREATE))
-    ],
 )
 async def create_project(
     data: schema.ProjectCreate, db: AsyncSession = Depends(get_db_session)
@@ -80,9 +72,6 @@ async def create_project(
     response_model=schema.ProjectDetail,
     operation_id="read_project",
     tags=["projects"],
-    dependencies=[
-        Depends(requires_permission(ResourceType.PROJECT, Action.READ))
-    ],
 )
 async def read_project(
     project_id: int, db: AsyncSession = Depends(get_db_session)
@@ -138,9 +127,6 @@ async def read_project(
     response_model=schema.ProjectRead,
     operation_id="update_project",
     tags=["projects"],
-    dependencies=[
-        Depends(requires_permission(ResourceType.PROJECT, Action.UPDATE))
-    ],
 )
 async def update_project(
     project_id: int,
@@ -198,9 +184,6 @@ async def update_project(
     status_code=status.HTTP_204_NO_CONTENT,
     operation_id="delete_project",
     tags=["projects"],
-    dependencies=[
-        Depends(requires_permission(ResourceType.PROJECT, Action.DELETE))
-    ],
 )
 async def delete_project(
     project_id: int, db: AsyncSession = Depends(get_db_session)
@@ -218,9 +201,6 @@ async def delete_project(
     response_model=List[schema.PlaybookRead],
     operation_id="list_playbooks",
     tags=["playbooks"],
-    dependencies=[
-        Depends(requires_permission(ResourceType.PLAYBOOK, Action.READ))
-    ],
 )
 async def list_playbooks(db: AsyncSession = Depends(get_db_session)):
     query = sa.select(playbooks)
@@ -233,9 +213,6 @@ async def list_playbooks(db: AsyncSession = Depends(get_db_session)):
     response_model=schema.PlaybookRead,
     operation_id="read_playbook",
     tags=["playbooks"],
-    dependencies=[
-        Depends(requires_permission(ResourceType.PLAYBOOK, Action.READ))
-    ],
 )
 async def read_playbook(
     playbook_id: int, db: AsyncSession = Depends(get_db_session)
@@ -255,9 +232,6 @@ async def read_playbook(
     response_model=List[schema.InventoryRead],
     operation_id="list_inventories",
     tags=["inventories"],
-    dependencies=[
-        Depends(requires_permission(ResourceType.INVENTORY, Action.READ))
-    ],
 )
 async def list_inventories(db: AsyncSession = Depends(get_db_session)):
     query = sa.select(inventories)
@@ -270,9 +244,6 @@ async def list_inventories(db: AsyncSession = Depends(get_db_session)):
     response_model=schema.InventoryRead,
     operation_id="read_inventory",
     tags=["inventories"],
-    dependencies=[
-        Depends(requires_permission(ResourceType.INVENTORY, Action.READ))
-    ],
 )
 async def read_inventory(
     inventory_id: int, db: AsyncSession = Depends(get_db_session)
@@ -292,9 +263,6 @@ async def read_inventory(
     response_model=schema.InventoryRead,
     operation_id="create_inventory",
     tags=["inventories"],
-    dependencies=[
-        Depends(requires_permission(ResourceType.INVENTORY, Action.CREATE))
-    ],
 )
 async def create_inventory(
     i: schema.InventoryCreate, db: AsyncSession = Depends(get_db_session)
@@ -311,9 +279,6 @@ async def create_inventory(
     response_model=List[schema.ExtraVarsRead],
     operation_id="list_extra_vars",
     tags=["extra vars"],
-    dependencies=[
-        Depends(requires_permission(ResourceType.EXTRA_VAR, Action.READ))
-    ],
 )
 async def list_extra_vars(db: AsyncSession = Depends(get_db_session)):
     query = sa.select(extra_vars)
@@ -326,9 +291,6 @@ async def list_extra_vars(db: AsyncSession = Depends(get_db_session)):
     response_model=schema.ExtraVarsRead,
     operation_id="read_extra_var",
     tags=["extra vars"],
-    dependencies=[
-        Depends(requires_permission(ResourceType.EXTRA_VAR, Action.READ))
-    ],
 )
 async def read_extra_var(
     extra_var_id: int, db: AsyncSession = Depends(get_db_session)
@@ -348,9 +310,6 @@ async def read_extra_var(
     response_model=schema.ExtraVarsRead,
     operation_id="create_extra_vars",
     tags=["extra vars"],
-    dependencies=[
-        Depends(requires_permission(ResourceType.EXTRA_VAR, Action.CREATE))
-    ],
 )
 async def create_extra_vars(
     e: schema.ExtraVarsCreate, db: AsyncSession = Depends(get_db_session)

@@ -1,5 +1,4 @@
 import datetime
-from unittest import mock
 
 import sqlalchemy as sa
 from fastapi import status as status_codes
@@ -7,7 +6,6 @@ from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from eda_server.db import models
-from eda_server.types import Action, ResourceType
 
 TEST_AUDIT_RULE = {
     "name": "test-audit-rule",
@@ -68,7 +66,9 @@ RULE_NAMES = {
 }
 
 
-async def _create_activation_dependent_objects(db: AsyncSession):
+async def _create_activation_dependent_objects(
+    client: AsyncClient, db: AsyncSession
+):
     (extra_var_id,) = (
         await db.execute(
             sa.insert(models.extra_vars).values(
@@ -169,7 +169,9 @@ async def _create_activation_dependent_objects(db: AsyncSession):
     return foreign_keys
 
 
-async def _create_audit_rule(db: AsyncSession, foreign_keys):
+async def _create_audit_rule(
+    client: AsyncClient, db: AsyncSession, foreign_keys
+):
 
     (audit_rule_id,) = (
         await db.execute(
@@ -189,11 +191,9 @@ async def _create_audit_rule(db: AsyncSession, foreign_keys):
     return audit_rule_id
 
 
-async def test_read_audit_rule_jobs(
-    client: AsyncClient, db: AsyncSession, check_permission_spy: mock.Mock
-):
-    foreign_keys = await _create_activation_dependent_objects(db)
-    audit_rule_id = await _create_audit_rule(db, foreign_keys)
+async def test_read_audit_rule_jobs(client: AsyncClient, db: AsyncSession):
+    foreign_keys = await _create_activation_dependent_objects(client, db)
+    audit_rule_id = await _create_audit_rule(client, db, foreign_keys)
 
     audit_rules = (await db.execute(sa.select(models.audit_rules))).all()
     assert len(audit_rules) == 1
@@ -208,16 +208,11 @@ async def test_read_audit_rule_jobs(
     job = audit_jobs[0]
     assert job["id"] == foreign_keys["job_instance_id"]
     assert job["status"] == TEST_AUDIT_RULE["status"]
-    check_permission_spy.assert_called_once_with(
-        mock.ANY, mock.ANY, ResourceType.AUDIT_RULE, Action.READ
-    )
 
 
-async def test_read_audit_details(
-    client: AsyncClient, db: AsyncSession, check_permission_spy: mock.Mock
-):
-    foreign_keys = await _create_activation_dependent_objects(db)
-    audit_rule_id = await _create_audit_rule(db, foreign_keys)
+async def test_read_audit_details(client: AsyncClient, db: AsyncSession):
+    foreign_keys = await _create_activation_dependent_objects(client, db)
+    audit_rule_id = await _create_audit_rule(client, db, foreign_keys)
     audit_rules = (await db.execute(sa.select(models.audit_rules))).all()
     assert len(audit_rules) == 1
 
@@ -238,16 +233,11 @@ async def test_read_audit_details(
         "name": RULE_NAMES["ruleset_name"],
     }
     assert audit_rule["definition"] == TEST_AUDIT_RULE["definition"]
-    check_permission_spy.assert_called_once_with(
-        mock.ANY, mock.ANY, ResourceType.AUDIT_RULE, Action.READ
-    )
 
 
-async def test_read_audit_rule_events(
-    client: AsyncClient, db: AsyncSession, check_permission_spy: mock.Mock
-):
-    foreign_keys = await _create_activation_dependent_objects(db)
-    audit_rule_id = await _create_audit_rule(db, foreign_keys)
+async def test_read_audit_rule_events(client: AsyncClient, db: AsyncSession):
+    foreign_keys = await _create_activation_dependent_objects(client, db)
+    audit_rule_id = await _create_audit_rule(client, db, foreign_keys)
     audit_rules = (await db.execute(sa.select(models.audit_rules))).all()
     assert len(audit_rules) == 1
 
@@ -265,16 +255,11 @@ async def test_read_audit_rule_events(
         job_event["increment_counter"] == TEST_AUDIT_RULE_JOB_EVENT["counter"]
     )
     assert job_event["name"] == TEST_AUDIT_RULE["name"]
-    check_permission_spy.assert_called_once_with(
-        mock.ANY, mock.ANY, ResourceType.AUDIT_RULE, Action.READ
-    )
 
 
-async def test_read_audit_rule_hosts(
-    client: AsyncClient, db: AsyncSession, check_permission_spy: mock.Mock
-):
-    foreign_keys = await _create_activation_dependent_objects(db)
-    audit_rule_id = await _create_audit_rule(db, foreign_keys)
+async def test_read_audit_rule_hosts(client: AsyncClient, db: AsyncSession):
+    foreign_keys = await _create_activation_dependent_objects(client, db)
+    audit_rule_id = await _create_audit_rule(client, db, foreign_keys)
     audit_rules = (await db.execute(sa.select(models.audit_rules))).all()
     assert len(audit_rules) == 1
 
@@ -289,12 +274,9 @@ async def test_read_audit_rule_hosts(
     assert host["id"] == foreign_keys["job_instance_host_id"]
     assert host["name"] == TEST_AUDIT_RULE_JOB_HOST["host"]
     assert host["status"] == TEST_AUDIT_RULE_JOB_HOST["status"]
-    check_permission_spy.assert_called_once_with(
-        mock.ANY, mock.ANY, ResourceType.AUDIT_RULE, Action.READ
-    )
 
 
-async def test_audit_rule_404(client: AsyncClient):
+async def test_audit_rule_404(client: AsyncClient, db: AsyncSession):
     audit_rule_id = 100
     details_response = await client.get(
         f"/api/audit/rule/{audit_rule_id}/details",

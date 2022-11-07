@@ -4,11 +4,9 @@ from unittest import mock
 import sqlalchemy as sa
 from fastapi import status as status_codes
 from httpx import AsyncClient
-from sqlalchemy import func
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from eda_server.db import models
-from eda_server.types import Action, ResourceType
 
 TEST_PROJECT = {
     "url": "https://git.example.com/sample/test-project",
@@ -45,67 +43,76 @@ TEST_RULEBOOK = """
 TEST_PLAYBOOK = TEST_RULEBOOK
 
 
-async def test_delete_project(
-    client: AsyncClient, db: AsyncSession, check_permission_spy: mock.Mock
-):
+async def test_create_delete_project(client: AsyncClient, db: AsyncSession):
     query = sa.insert(models.projects).values(
         url=TEST_PROJECT["url"],
         name=TEST_PROJECT["name"],
         description=TEST_PROJECT["description"],
     )
     result = await db.execute(query)
-    (project_id,) = result.inserted_primary_key
+
+    (inserted_project_id,) = result.inserted_primary_key
 
     query = sa.insert(models.extra_vars).values(
         name="vars.yml",
         extra_var=TEST_EXTRA_VAR,
-        project_id=project_id,
+        project_id=inserted_project_id,
     )
     await db.execute(query)
 
     query = sa.insert(models.inventories).values(
         name="inventory.yml",
         inventory=TEST_INVENTORY,
-        project_id=project_id,
+        project_id=inserted_project_id,
     )
     await db.execute(query)
 
     query = sa.insert(models.rulebooks).values(
         name="ruleset.yml",
         rulesets=TEST_RULEBOOK,
-        project_id=project_id,
+        project_id=inserted_project_id,
     )
     await db.execute(query)
 
     query = sa.insert(models.playbooks).values(
         name="hello.yml",
         playbook=TEST_PLAYBOOK,
-        project_id=project_id,
+        project_id=inserted_project_id,
     )
     await db.execute(query)
-    await db.commit()
 
-    response = await client.delete(f"/api/projects/{project_id}")
+    projects = (await db.execute(sa.select(models.projects))).all()
+    assert len(projects) == 1
+
+    extra_vars = (await db.execute(sa.select(models.extra_vars))).all()
+    assert len(extra_vars) == 1
+
+    inventories = (await db.execute(sa.select(models.inventories))).all()
+    assert len(inventories) == 1
+
+    rulebooks = (await db.execute(sa.select(models.rulebooks))).all()
+    assert len(rulebooks) == 1
+
+    playbooks = (await db.execute(sa.select(models.playbooks))).all()
+    assert len(playbooks) == 1
+
+    response = await client.delete(f"/api/projects/{projects[0].id}")
     assert response.status_code == status_codes.HTTP_204_NO_CONTENT
-    assert 0 == await db.scalar(
-        sa.select(func.count()).select_from(models.projects)
-    )
-    assert 0 == await db.scalar(
-        sa.select(func.count()).select_from(models.extra_vars)
-    )
-    assert 0 == await db.scalar(
-        sa.select(func.count()).select_from(models.inventories)
-    )
-    assert 0 == await db.scalar(
-        sa.select(func.count()).select_from(models.rulebooks)
-    )
-    assert 0 == await db.scalar(
-        sa.select(func.count()).select_from(models.playbooks)
-    )
 
-    check_permission_spy.assert_called_once_with(
-        mock.ANY, mock.ANY, ResourceType.PROJECT, Action.DELETE
-    )
+    projects = (await db.execute(sa.select(models.projects))).all()
+    assert len(projects) == 0
+
+    extra_vars = (await db.execute(sa.select(models.extra_vars))).all()
+    assert len(extra_vars) == 0
+
+    inventories = (await db.execute(sa.select(models.inventories))).all()
+    assert len(inventories) == 0
+
+    rulebooks = (await db.execute(sa.select(models.rulebooks))).all()
+    assert len(rulebooks) == 0
+
+    playbooks = (await db.execute(sa.select(models.playbooks))).all()
+    assert len(playbooks) == 0
 
 
 async def test_delete_project_not_found(client: AsyncClient):
@@ -122,7 +129,6 @@ async def test_create_project(
     tempfile: mock.Mock(),
     client: AsyncClient,
     db: AsyncSession,
-    check_permission_spy: mock.Mock,
 ):
     tempfile.return_value.__enter__.return_value = "/tmp/test-create-project"
     found_hash = hashlib.sha1(b"test").hexdigest()
@@ -148,12 +154,11 @@ async def test_create_project(
     sync_project.assert_called_once_with(
         db, project["id"], project["large_data_id"], "/tmp/test-create-project"
     )
-    check_permission_spy.assert_called_once_with(
-        mock.ANY, mock.ANY, ResourceType.PROJECT, Action.CREATE
-    )
 
 
-async def test_create_project_bad_entity(client: AsyncClient):
+async def test_create_project_bad_entity(
+    client: AsyncClient, db: AsyncSession
+):
     bad_project = {
         "url": None,
         "name": "Test Name",
@@ -213,9 +218,7 @@ async def test_create_project_missing_name(client: AsyncClient):
     assert response.status_code == status_codes.HTTP_422_UNPROCESSABLE_ENTITY
 
 
-async def test_read_project(
-    client: AsyncClient, db: AsyncSession, check_permission_spy: mock.Mock
-):
+async def test_get_project(client: AsyncClient, db: AsyncSession):
     query = sa.insert(models.projects).values(
         url=TEST_PROJECT["url"],
         name=TEST_PROJECT["name"],
@@ -234,12 +237,9 @@ async def test_read_project(
     data = response.json()
     assert data["name"] == TEST_PROJECT["name"]
     assert data["url"] == TEST_PROJECT["url"]
-    check_permission_spy.assert_called_once_with(
-        mock.ANY, mock.ANY, ResourceType.PROJECT, Action.READ
-    )
 
 
-async def test_read_project_not_found(client: AsyncClient, db: AsyncSession):
+async def test_get_project_not_found(client: AsyncClient, db: AsyncSession):
 
     query = sa.insert(models.projects).values(
         url=TEST_PROJECT["url"],
@@ -254,9 +254,8 @@ async def test_read_project_not_found(client: AsyncClient, db: AsyncSession):
     assert response.status_code == status_codes.HTTP_404_NOT_FOUND
 
 
-async def test_update_project(
-    client: AsyncClient, db: AsyncSession, check_permission_spy: mock.Mock
-):
+async def test_edit_project(client: AsyncClient, db: AsyncSession):
+
     query = sa.insert(models.projects).values(
         url=TEST_PROJECT["url"],
         name=TEST_PROJECT["name"],
@@ -279,12 +278,9 @@ async def test_update_project(
     data = response.json()
     assert data["name"] == "new test name"
     assert data["url"] == TEST_PROJECT["url"]
-    check_permission_spy.assert_called_once_with(
-        mock.ANY, mock.ANY, ResourceType.PROJECT, Action.UPDATE
-    )
 
 
-async def test_update_project_missing(client: AsyncClient):
+async def test_edit_project_missing(client: AsyncClient, db: AsyncSession):
 
     response = await client.patch(
         "/api/projects/-1",
@@ -294,7 +290,7 @@ async def test_update_project_missing(client: AsyncClient):
     assert response.status_code == status_codes.HTTP_404_NOT_FOUND
 
 
-async def test_update_project_bad_name(client: AsyncClient):
+async def test_edit_project_bad_name(client: AsyncClient, db: AsyncSession):
 
     response = await client.patch(
         "/api/projects/1",
@@ -304,9 +300,7 @@ async def test_update_project_bad_name(client: AsyncClient):
     assert response.status_code == status_codes.HTTP_422_UNPROCESSABLE_ENTITY
 
 
-async def test_update_project_unique_name(
-    client: AsyncClient, db: AsyncSession
-):
+async def test_edit_project_unique_name(client: AsyncClient, db: AsyncSession):
 
     test_projects_values = [
         {
@@ -370,9 +364,7 @@ async def test_update_project_unique_name(
     assert data["detail"] == expected_msg
 
 
-async def test_list_projects(
-    client: AsyncClient, db: AsyncSession, check_permission_spy: mock.Mock
-):
+async def test_get_projects(client: AsyncClient, db: AsyncSession):
 
     test_project_two = {
         "url": "https://github.com/benthomasson/eda-project",
@@ -401,6 +393,3 @@ async def test_list_projects(
     assert len(data) == 2
     assert data[0]["name"] == TEST_PROJECT["name"]
     assert data[1]["url"] == test_project_two["url"]
-    check_permission_spy.assert_called_once_with(
-        mock.ANY, mock.ANY, ResourceType.PROJECT, Action.READ
-    )
