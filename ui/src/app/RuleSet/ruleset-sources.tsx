@@ -11,7 +11,7 @@ import { createRows } from './sources-table-helpers';
 import { CubesIcon } from '@patternfly/react-icons';
 import { renderRuleSetFileTabs, RuleSetType } from '@app/RuleSet/ruleset';
 import { SourceType } from '@app/RuleSets/RuleSets';
-import { getServer } from '@app/utils/utils';
+import {fetchRulesetSources} from "@app/API/Ruleset";
 
 const columns = (intl) => [
   {
@@ -67,16 +67,6 @@ export const sourcesListState = (state, action) => {
       return state;
   }
 };
-const endpoint_sources = 'http://' + getServer() + '/api/rulebook_json/';
-const fetchRulesetSources = (id, pagination = defaultSettings) => {
-  return fetch(`${endpoint_sources}${id}`, {
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  })
-    .then((response) => response.json())
-    .then((data) => (data && data.rulesets && data.rulesets.length > 0 ? data.rulesets[0].sources : []));
-};
 
 const RulesetSources: React.FunctionComponent<{ ruleset: RuleSetType }> = ({ ruleset }) => {
   const history = useHistory();
@@ -84,7 +74,6 @@ const RulesetSources: React.FunctionComponent<{ ruleset: RuleSetType }> = ({ rul
   const [offset, setOffset] = useState(1);
   const [sources, setSources] = useState<SourceType[]>([]);
 
-  const rulesetId = ruleset?.id;
   const { id } = useParams<{ id: string }>();
 
   const meta = { count: sources?.length || 0, limit, offset };
@@ -94,7 +83,7 @@ const RulesetSources: React.FunctionComponent<{ ruleset: RuleSetType }> = ({ rul
   const updateSources = (pagination) => {
     stateDispatch({ type: 'setFetching', payload: true });
     return fetchRulesetSources(id, pagination)
-      .then((data) => setSources(data))
+      .then((data) => setSources(data?.data))
       .then(() => stateDispatch({ type: 'setFetching', payload: false }))
       .catch(() => stateDispatch({ type: 'setFetching', payload: false }));
   };

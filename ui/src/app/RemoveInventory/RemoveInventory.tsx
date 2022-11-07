@@ -68,7 +68,7 @@ const RemoveInventory: React.ComponentType<IRemoveInventory> = ({
     if (!id && !removeId) {
       return;
     }
-    fetchInventory(id ? id : removeId).then((data) => setInventory(data));
+    fetchInventory(id ? id : removeId).then((data) => setInventory(data?.data));
   }, [removeId]);
 
   return (

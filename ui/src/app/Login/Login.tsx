@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { LoginForm, LoginPage } from '@patternfly/react-core';
 import { ExclamationCircleIcon } from '@patternfly/react-icons';
 import { useHistory } from 'react-router-dom';
-import { getServer } from '@app/utils/utils';
 import Logo from '../../assets/images/logo-masthead.svg';
+import { loginUser } from '@app/API/auth';
 
 function Login(props) {
   const history = useHistory();
@@ -40,14 +40,8 @@ function Login(props) {
         formBodyItems.push(encodedKey + '=' + encodedValue);
       }
       const formBody = formBodyItems.join('&');
-      fetch('http://' + getServer() + '/api/auth/jwt/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
-        },
-        body: formBody,
-      }).then((response) => {
-        if (!response.ok) {
+      loginUser(formBody).then((response) => {
+        if (!(response.statusText === 'OK')) {
           setIsValidUsername(false);
           setIsValidPassword(false);
           setShowHelperText(true);

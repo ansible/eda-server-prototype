@@ -2,10 +2,10 @@ import * as React from 'react';
 import { mount } from 'enzyme';
 import { Activations } from '@app/Activations/Activations';
 import { MemoryRouter } from 'react-router';
-import fetchMock from 'jest-fetch-mock';
 import { act } from 'react-dom/test-utils';
 import { IntlProvider } from 'react-intl';
 import { Route } from 'react-router-dom';
+import { mockApi } from '../__mocks__/baseApi';
 
 const ComponentWrapper = ({ children, initialEntries = ['/dashboard'] }) => (
   <IntlProvider locale="en">
@@ -16,18 +16,16 @@ const ComponentWrapper = ({ children, initialEntries = ['/dashboard'] }) => (
 );
 
 describe('Activations', () => {
-  afterEach(() => {
-    jest.restoreAllMocks();
+  beforeAll(() => {
+    mockApi.reset();
   });
 
   it('should render the Activations component', async () => {
-    fetchMock.mockResponse(
-      JSON.stringify([
-        { id: '1', name: 'Activation 1' },
-        { id: '2', name: 'Activation 2' },
-        { id: '3', name: 'Activation 3' },
-      ])
-    );
+    mockApi.onGet(`/api/activation_instances`).replyOnce(200, [
+      { id: '1', name: 'Activation 1' },
+      { id: '2', name: 'Activation 2' },
+      { id: '3', name: 'Activation 3' },
+    ]);
 
     let wrapper;
     await act(async () => {

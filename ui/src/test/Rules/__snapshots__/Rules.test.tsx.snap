@@ -484,7 +484,7 @@ exports[`Rules should render the Rules component 1`] = `
                                       data-ouia-component-id="CompactPagination"
                                       data-ouia-component-type="PF4/Pagination"
                                       data-ouia-safe={true}
-                                      id="pagination-options-menu-2"
+                                      id="pagination-options-menu-4"
                                     >
                                       <div
                                         className="pf-c-pagination__total-items"
@@ -641,7 +641,7 @@ exports[`Rules should render the Rules component 1`] = `
                                               aria-haspopup={true}
                                               firstIndex={0}
                                               getMenuRef={[Function]}
-                                              id="pf-dropdown-toggle-id-2"
+                                              id="pf-dropdown-toggle-id-4"
                                               isDisabled={false}
                                               isOpen={false}
                                               isPlain={true}
@@ -687,10 +687,10 @@ exports[`Rules should render the Rules component 1`] = `
                                                         aria-haspopup="listbox"
                                                         aria-label="Items per page"
                                                         class="  pf-c-options-menu__toggle-button"
-                                                        data-ouia-component-id="OUIA-Generated-DropdownToggle-2"
+                                                        data-ouia-component-id="OUIA-Generated-DropdownToggle-1"
                                                         data-ouia-component-type="PF4/DropdownToggle"
                                                         data-ouia-safe="true"
-                                                        id="pagination-options-menu-toggle-2"
+                                                        id="pagination-options-menu-toggle-4"
                                                         type="button"
                                                       >
                                                         <span
@@ -751,7 +751,7 @@ exports[`Rules should render the Rules component 1`] = `
                                                   aria-haspopup="listbox"
                                                   aria-label="Items per page"
                                                   className="pf-c-options-menu__toggle-button"
-                                                  id="pagination-options-menu-toggle-2"
+                                                  id="pagination-options-menu-toggle-4"
                                                   isDisabled={0}
                                                   isOpen={false}
                                                   onEnter={[Function]}
@@ -788,10 +788,10 @@ exports[`Rules should render the Rules component 1`] = `
                                                             aria-haspopup="listbox"
                                                             aria-label="Items per page"
                                                             class="  pf-c-options-menu__toggle-button"
-                                                            data-ouia-component-id="OUIA-Generated-DropdownToggle-2"
+                                                            data-ouia-component-id="OUIA-Generated-DropdownToggle-1"
                                                             data-ouia-component-type="PF4/DropdownToggle"
                                                             data-ouia-safe="true"
-                                                            id="pagination-options-menu-toggle-2"
+                                                            id="pagination-options-menu-toggle-4"
                                                             type="button"
                                                           >
                                                             <span
@@ -822,11 +822,11 @@ exports[`Rules should render the Rules component 1`] = `
                                                     aria-label="Items per page"
                                                     bubbleEvent={false}
                                                     className="pf-c-options-menu__toggle-button"
-                                                    data-ouia-component-id="OUIA-Generated-DropdownToggle-2"
+                                                    data-ouia-component-id="OUIA-Generated-DropdownToggle-1"
                                                     data-ouia-component-type="PF4/DropdownToggle"
                                                     data-ouia-safe={true}
                                                     getMenuRef={null}
-                                                    id="pagination-options-menu-toggle-2"
+                                                    id="pagination-options-menu-toggle-4"
                                                     isActive={false}
                                                     isDisabled={0}
                                                     isOpen={false}
@@ -868,10 +868,10 @@ exports[`Rules should render the Rules component 1`] = `
                                                               aria-haspopup="listbox"
                                                               aria-label="Items per page"
                                                               class="  pf-c-options-menu__toggle-button"
-                                                              data-ouia-component-id="OUIA-Generated-DropdownToggle-2"
+                                                              data-ouia-component-id="OUIA-Generated-DropdownToggle-1"
                                                               data-ouia-component-type="PF4/DropdownToggle"
                                                               data-ouia-safe="true"
-                                                              id="pagination-options-menu-toggle-2"
+                                                              id="pagination-options-menu-toggle-4"
                                                               type="button"
                                                             >
                                                               <span
@@ -903,11 +903,11 @@ exports[`Rules should render the Rules component 1`] = `
                                                       aria-haspopup="listbox"
                                                       aria-label="Items per page"
                                                       className="  pf-c-options-menu__toggle-button"
-                                                      data-ouia-component-id="OUIA-Generated-DropdownToggle-2"
+                                                      data-ouia-component-id="OUIA-Generated-DropdownToggle-1"
                                                       data-ouia-component-type="PF4/DropdownToggle"
                                                       data-ouia-safe={true}
                                                       disabled={0}
-                                                      id="pagination-options-menu-toggle-2"
+                                                      id="pagination-options-menu-toggle-4"
                                                       onClick={[Function]}
                                                       onKeyDown={[Function]}
                                                       type="button"
@@ -1000,7 +1000,7 @@ exports[`Rules should render the Rules component 1`] = `
                                                   aria-label="Go to previous page"
                                                   className="pf-c-button pf-m-plain pf-m-disabled"
                                                   data-action="previous"
-                                                  data-ouia-component-id="OUIA-Generated-Button-plain-3"
+                                                  data-ouia-component-id="OUIA-Generated-Button-plain-1"
                                                   data-ouia-component-type="PF4/Button"
                                                   data-ouia-safe={true}
                                                   disabled={true}
@@ -1060,7 +1060,7 @@ exports[`Rules should render the Rules component 1`] = `
                                                   aria-label="Go to next page"
                                                   className="pf-c-button pf-m-plain pf-m-disabled"
                                                   data-action="next"
-                                                  data-ouia-component-id="OUIA-Generated-Button-plain-4"
+                                                  data-ouia-component-id="OUIA-Generated-Button-plain-2"
                                                   data-ouia-component-type="PF4/Button"
                                                   data-ouia-safe={true}
                                                   disabled={true}
@@ -1115,7 +1115,7 @@ exports[`Rules should render the Rules component 1`] = `
                                 {
                                   "current": <div
                                     class="pf-c-toolbar__expandable-content"
-                                    id="ins-primary-data-toolbar-expandable-content-2"
+                                    id="ins-primary-data-toolbar-expandable-content-4"
                                   >
                                     <div
                                       class="pf-c-toolbar__group"
@@ -1123,13 +1123,13 @@ exports[`Rules should render the Rules component 1`] = `
                                   </div>,
                                 }
                               }
-                              id="ins-primary-data-toolbar-expandable-content-2"
+                              id="ins-primary-data-toolbar-expandable-content-4"
                               isExpanded={false}
                               showClearFiltersButton={false}
                             >
                               <div
                                 className="pf-c-toolbar__expandable-content"
-                                id="ins-primary-data-toolbar-expandable-content-2"
+                                id="ins-primary-data-toolbar-expandable-content-4"
                               >
                                 <ForwardRef>
                                   <ToolbarGroupWithRef

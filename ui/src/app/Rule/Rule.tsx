@@ -43,7 +43,7 @@ const Rule: React.FunctionComponent = () => {
   const intl = useIntl();
 
   useEffect(() => {
-    fetchRule(id).then((data) => setRule(data));
+    fetchRule(id).then((data) => setRule(data?.data));
   }, []);
 
   const location = useLocation();

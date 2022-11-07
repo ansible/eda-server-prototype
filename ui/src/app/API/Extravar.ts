@@ -1,19 +1,14 @@
-import { getServer } from '@app/utils/utils';
+import { getAxiosInstance } from '@app/API/baseApi';
+import { AxiosResponse } from 'axios';
 
-const extravarsEndpoint = 'http://' + getServer() + '/api/extra_vars';
-const extravarEndpoint = 'http://' + getServer() + '/api/extra_var';
+const extravarsEndpoint = '/api/extra_vars';
+const extravarEndpoint = '/api/extra_var';
 
-export const listExtraVars = () =>
-  fetch(extravarsEndpoint, {
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  }).then((response) => response.json());
+export const listExtraVars = (): Promise<AxiosResponse> => getAxiosInstance().get(extravarsEndpoint);
 
-export const fetchRuleVars = (varname) => {
-  return fetch(`${extravarEndpoint}/${varname}`, {
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  }).then((response) => response.json());
+export const fetchRuleVars = (varname: string): Promise<AxiosResponse> => {
+  return getAxiosInstance().get(`${extravarEndpoint}/${varname}`);
 };
+
+export const fetchExtraVar = (id: string | number): Promise<AxiosResponse> =>
+  getAxiosInstance().get(`${extravarEndpoint}/${id}`);

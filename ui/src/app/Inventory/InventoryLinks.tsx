@@ -15,7 +15,7 @@ const Inventory: React.FunctionComponent = () => {
     if (!id) {
       return;
     }
-    fetchInventory(id).then((data) => setInventory(data));
+    fetchInventory(id).then((data) => setInventory(data.data));
   }, [id]);
 
   return (

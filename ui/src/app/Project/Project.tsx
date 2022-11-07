@@ -75,7 +75,7 @@ const Project: React.FunctionComponent = () => {
   );
 
   useEffect(() => {
-    fetchProject(id).then((data) => setProject(data));
+    fetchProject(id).then((data) => setProject(data.data));
   }, []);
   const location = useLocation();
   const currentTab = project?.id

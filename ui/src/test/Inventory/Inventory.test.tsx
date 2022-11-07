@@ -2,11 +2,11 @@ import * as React from 'react';
 import { mount } from 'enzyme';
 import { Inventory } from '@app/Inventory/inventory';
 import { MemoryRouter } from 'react-router';
-import fetchMock from 'jest-fetch-mock';
 import { act } from 'react-dom/test-utils';
 import { IntlProvider } from 'react-intl';
 import { Route } from 'react-router-dom';
 import { DropdownItem, KebabToggle, Tab } from '@patternfly/react-core';
+import { mockApi } from '../__mocks__/baseApi';
 
 const ComponentWrapper = ({ children, initialEntries = ['/dashboard'] }) => (
   <IntlProvider locale="en">
@@ -17,18 +17,16 @@ const ComponentWrapper = ({ children, initialEntries = ['/dashboard'] }) => (
 );
 
 describe('Inventory', () => {
-  afterEach(() => {
-    jest.restoreAllMocks();
+  beforeAll(() => {
+    mockApi.reset();
   });
 
   it('should render the Inventory component tabs', async () => {
-    fetchMock.mockResponse(
-      JSON.stringify({
-        name: 'Inventory 1',
-        id: 1,
-        inventory: 'inventory content',
-      })
-    );
+    mockApi.onGet(`/api/inventory/1`).replyOnce(200, {
+      name: 'Inventory 1',
+      id: 1,
+      inventory: 'inventory content',
+    });
     let wrapper;
     await act(async () => {
       wrapper = mount(
@@ -48,13 +46,11 @@ describe('Inventory', () => {
   });
 
   it('has a top toolbar kebab menu', async () => {
-    fetchMock.mockResponse(
-      JSON.stringify({
-        name: 'Inventory 1',
-        id: 1,
-        inventory: 'inventory content',
-      })
-    );
+    mockApi.onGet(`/api/inventory/1`).replyOnce(200, {
+      name: 'Inventory 1',
+      id: 1,
+      inventory: 'inventory content',
+    });
     let wrapper;
     await act(async () => {
       wrapper = mount(

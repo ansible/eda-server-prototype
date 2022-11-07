@@ -144,7 +144,6 @@ const routes: AppRouteConfig[] = [
   },
   {
     component: RuleSets,
-    exact: true,
     label: 'Rule Sets',
     path: '/rulesets',
     title: 'Rule Sets',

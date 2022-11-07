@@ -4,13 +4,14 @@ import React, { useState, useEffect } from 'react';
 import { useIntl } from 'react-intl';
 import AppTabs from '@app/shared/app-tabs';
 import { CaretLeftIcon } from '@patternfly/react-icons';
-import { getServer, getTabFromPath } from '@app/utils/utils';
+import { getTabFromPath } from '@app/utils/utils';
 import { TopToolbar } from '@app/shared/top-toolbar';
 import { RulesetRules } from '@app/RuleSet/ruleset-rules';
 import { RulesetDetails } from '@app/RuleSet/ruleset-details';
 import { RulesetSources } from '@app/RuleSet/ruleset-sources';
 import sharedMessages from '../messages/shared.messages';
 import { AnyObject } from '@app/shared/types/common-types';
+import { fetchRuleset } from '@app/API/Ruleset';
 
 interface TabItemType {
   eventKey: number;
@@ -65,22 +66,13 @@ export const renderRuleSetFileTabs = (rulesetId: string, intl) => {
   return <AppTabs tabItems={ruleset_tabs} />;
 };
 
-const endpoint_ruleset = 'http://' + getServer() + '/api/rulesets';
-const endpoint_rulebook_json = 'http://' + getServer() + '/api/rulebook_json';
-
 const RuleSet: React.FunctionComponent = () => {
   const [ruleset, setRuleSet] = useState<RuleSetType | undefined>(undefined);
   const { id } = useParams<{ id: string }>();
   const intl = useIntl();
 
   useEffect(() => {
-    fetch(`${endpoint_ruleset}/${id}`, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-      .then((response) => response.json())
-      .then((data) => setRuleSet(data));
+    fetchRuleset(id).then((data) => setRuleSet(data.data));
   }, []);
 
   const location = useLocation();

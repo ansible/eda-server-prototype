@@ -155,7 +155,7 @@ const Activations: React.FunctionComponent = () => {
     stateDispatch({ type: 'setFetching', payload: true });
     return listActivations(pagination)
       .then((data) => {
-        setActivations(data);
+        setActivations(data.data);
         stateDispatch({ type: 'setRows', payload: createRows(activations) });
       })
       .then(() => {

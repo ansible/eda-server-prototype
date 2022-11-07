@@ -55,7 +55,7 @@ const ProjectLinks: React.FunctionComponent<{ project: ProjectType | undefined }
                 <SimpleList style={{ whiteSpace: 'pre-wrap' }}>
                   {project.inventories.map((item, i) => (
                     <SimpleListItem key={i}>
-                      <Link to={'/inventory/' + item.id}>{item.name} </Link>
+                      <Link to={'/inventories/inventory/' + item.id}>{item.name} </Link>
                     </SimpleListItem>
                   ))}
                 </SimpleList>

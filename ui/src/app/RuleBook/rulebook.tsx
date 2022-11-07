@@ -60,7 +60,7 @@ const RuleBook: React.FunctionComponent = () => {
   const intl = useIntl();
 
   useEffect(() => {
-    fetchRulebook(id).then((data) => setRuleBook(data));
+    fetchRulebook(id).then((data) => setRuleBook(data?.data));
   }, []);
 
   const location = useLocation();

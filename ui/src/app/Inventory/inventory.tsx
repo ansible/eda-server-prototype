@@ -53,7 +53,7 @@ const Inventory: React.FunctionComponent = () => {
   const intl = useIntl();
 
   useEffect(() => {
-    fetchInventory(id).then((data) => setInventory(data));
+    fetchInventory(id).then((data) => setInventory(data.data));
   }, []);
 
   const location = useLocation();

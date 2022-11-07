@@ -146,7 +146,7 @@ const Inventories: React.FunctionComponent = () => {
     stateDispatch({ type: 'setFetching', payload: true });
     return listInventories(pagination)
       .then((data) => {
-        setInventories(data);
+        setInventories(data.data);
         stateDispatch({ type: 'setRows', payload: createRows(inventories) });
       })
       .then(() => {

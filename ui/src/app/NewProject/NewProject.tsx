@@ -72,7 +72,7 @@ const NewProject: React.FunctionComponent = () => {
     addProject({ url: scmUrl, name: name, description: description })
       .then((data) => {
         setIsSubmitting(false);
-        history.push(`/project/${data.id}`);
+        history.push(`/project/${data?.data?.id}`);
         dispatch(
           addNotification({
             variant: 'success',

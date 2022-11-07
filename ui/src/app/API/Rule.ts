@@ -1,19 +1,12 @@
-import { getServer } from '@app/utils/utils';
 import { defaultSettings } from '@app/shared/pagination';
+import { AxiosResponse } from 'axios';
+import { getAxiosInstance } from '@app/API/baseApi';
 
-const rulesEndpoint = 'http://' + getServer() + '/api/rules';
+const rulesEndpoint = '/api/rules';
 
-export const fetchRule = (ruleId, pagination = defaultSettings) => {
-  return fetch(`${rulesEndpoint}/${ruleId}`, {
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  }).then((response) => response.json());
+export const fetchRule = (ruleId: string | number, pagination = defaultSettings): Promise<AxiosResponse> => {
+  return getAxiosInstance().get(`${rulesEndpoint}/${ruleId}`);
 };
 
-export const listRules = (pagination = defaultSettings) =>
-  fetch(rulesEndpoint, {
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  });
+export const listRules = (pagination = defaultSettings): Promise<AxiosResponse> =>
+  getAxiosInstance().get(rulesEndpoint);

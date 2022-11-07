@@ -1,11 +1,8 @@
 import { defaultSettings } from '@app/shared/pagination';
-import { getServer } from '@app/utils/utils';
+import { AxiosResponse } from 'axios';
+import { getAxiosInstance } from '@app/API/baseApi';
 
-const playbooksEndpoint = 'http://' + getServer() + '/api/playbooks/';
+const playbooksEndpoint = '/api/playbooks';
 
-export const listPlaybooks = (pagination = defaultSettings) =>
-  fetch(playbooksEndpoint, {
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  }).then((response) => response.json());
+export const listPlaybooks = (pagination = defaultSettings): Promise<AxiosResponse> =>
+  getAxiosInstance().get(playbooksEndpoint);

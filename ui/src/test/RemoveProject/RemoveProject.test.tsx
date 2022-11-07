@@ -1,15 +1,15 @@
 import * as React from 'react';
 import { mount } from 'enzyme';
 import { MemoryRouter } from 'react-router';
-import fetchMock from 'jest-fetch-mock';
 import { act } from 'react-dom/test-utils';
 import { IntlProvider } from 'react-intl';
-import { Modal, Tab } from '@patternfly/react-core';
+import { Modal } from '@patternfly/react-core';
 import { RemoveProject } from '@app/RemoveProject/RemoveProject';
 import { defaultSettings } from '@app/shared/pagination';
 import store from '../../store';
 import { Provider } from 'react-redux';
 import { Route } from 'react-router-dom';
+import { mockApi } from '../__mocks__/baseApi';
 
 const ComponentWrapper = ({ children, initialEntries = ['/dashboard'] }) => (
   <Provider store={store()}>
@@ -22,18 +22,16 @@ const ComponentWrapper = ({ children, initialEntries = ['/dashboard'] }) => (
 );
 
 describe('RemoveProject', () => {
-  afterEach(() => {
-    jest.restoreAllMocks();
+  beforeAll(() => {
+    mockApi.reset();
   });
 
   it('should render the Remove Project modal', async () => {
-    fetchMock.mockResponse(
-      JSON.stringify({
-        name: 'Project 1',
-        id: 1,
-        url: 'Project 1 Url',
-      })
-    );
+    mockApi.onGet(`/api/projects/1`).replyOnce(200, {
+      name: 'Project 1',
+      id: 1,
+      url: 'Project 1 Url',
+    });
     let wrapper;
     await act(async () => {
       wrapper = mount(
@@ -54,13 +52,11 @@ describe('RemoveProject', () => {
   });
 
   it('should render the bulk Remove Project modal', async () => {
-    fetchMock.mockResponse(
-      JSON.stringify({
-        name: 'Project 1',
-        id: 1,
-        url: 'Project 1 Url',
-      })
-    );
+    mockApi.onGet(`/api/projects/1`).replyOnce(200, {
+      name: 'Project 1',
+      id: 1,
+      url: 'Project 1 Url',
+    });
     let wrapper;
     await act(async () => {
       wrapper = mount(

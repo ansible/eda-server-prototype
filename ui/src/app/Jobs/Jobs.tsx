@@ -138,7 +138,7 @@ const Jobs: React.FunctionComponent = () => {
     stateDispatch({ type: 'setFetching', payload: true });
     return listJobs(pagination)
       .then((data) => {
-        setJobs(data);
+        setJobs(data.data);
         stateDispatch({ type: 'setRows', payload: createRows(jobs) });
       })
       .then(() => {

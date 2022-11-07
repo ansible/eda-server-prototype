@@ -45,7 +45,9 @@ const RuleDetails: React.FunctionComponent<{ rule: RuleType }> = ({ rule }) => {
   const intl = useIntl();
 
   useEffect(() => {
-    rule?.extra_var_id ? fetchRuleVars(rule.extra_var_id).then((data) => setRuleVars(data)) : setRuleVars(undefined);
+    rule?.extra_var_id
+      ? fetchRuleVars(rule.extra_var_id).then((data) => setRuleVars(data?.data))
+      : setRuleVars(undefined);
   }, [rule]);
 
   const handleToggleVarFormat = (_, event) => {

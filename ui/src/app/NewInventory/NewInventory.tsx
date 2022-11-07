@@ -76,7 +76,7 @@ const NewInventory: React.FunctionComponent = () => {
     validateFields();
     addInventory({ name: name, description: description, inventory: inventory })
       .then((data) => {
-        data?.id ? history.push(`/inventory/${data.id}`) : history.push(`/inventories`);
+        data?.data?.id ? history.push(`/inventory/${data?.data?.id}`) : history.push(`/inventories`);
         dispatch(
           addNotification({
             variant: 'success',
@@ -190,8 +190,8 @@ const NewInventory: React.FunctionComponent = () => {
                 </StackItem>
                 <StackItem>
                   <ActionGroup>
-                    <Button variant="primary" isDisabled={true} onClick={handleSubmit}>
-                      Add
+                    <Button variant="primary" isDisabled={true} onClick={handleSubmit} isLoading={isSubmitting}>
+                      {isSubmitting ? 'Adding ' : 'Add'}
                     </Button>
                     <Button variant="link" onClick={() => history.push('/inventories')}>
                       {' '}

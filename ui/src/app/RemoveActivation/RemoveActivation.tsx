@@ -63,7 +63,10 @@ const RemoveActivation: React.ComponentType<IRemoveActivation> = ({
   };
 
   useEffect(() => {
-    fetchActivation(id || removeId).then((data) => setActivation(data));
+    if (!id && !removeId) {
+      return;
+    }
+    fetchActivation(id || removeId).then((data) => setActivation(data.data));
   }, [removeId]);
 
   return (

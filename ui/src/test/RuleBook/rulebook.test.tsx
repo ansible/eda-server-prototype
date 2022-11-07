@@ -1,14 +1,14 @@
 import * as React from 'react';
-import {mount} from 'enzyme';
-import {RuleBook} from "@app/RuleBook/rulebook";
-import {MemoryRouter} from "react-router";
-import fetchMock from "jest-fetch-mock";
-import {act} from "react-dom/test-utils";
-import {IntlProvider} from "react-intl";
-import {Route} from "react-router-dom";
-import {DropdownItem, KebabToggle, Tab} from "@patternfly/react-core";
+import { mount } from 'enzyme';
+import { RuleBook } from '@app/RuleBook/rulebook';
+import { MemoryRouter } from 'react-router';
+import { act } from 'react-dom/test-utils';
+import { IntlProvider } from 'react-intl';
+import { Route } from 'react-router-dom';
+import { DropdownItem, KebabToggle, Tab } from '@patternfly/react-core';
+import { mockApi } from '../__mocks__/baseApi';
 
-const ComponentWrapper = ({ children, initialEntries=['/dashboard']}) => (
+const ComponentWrapper = ({ children, initialEntries = ['/dashboard'] }) => (
   <IntlProvider locale="en">
     <MemoryRouter initialEntries={initialEntries} keyLength={0} key={'test'}>
       {children}
@@ -17,24 +17,23 @@ const ComponentWrapper = ({ children, initialEntries=['/dashboard']}) => (
 );
 
 describe('RuleBook', () => {
-  afterEach(() => {
-    jest.restoreAllMocks();
+  beforeAll(() => {
+    mockApi.reset();
   });
 
   it('should render the RuleBook component tabs', async () => {
-    fetchMock.mockResponse(JSON.stringify({
-          name: 'RuleBook 1',
-          id: 1,
-          project: {id: '1', name: 'Project 1'},
-          rulesets: {id: '1', name: 'Project 1'}
-      })
-    )
+    mockApi.onGet(`/api/rulebooks/1`).replyOnce(200, {
+      name: 'RuleBook 1',
+      id: 1,
+      project: { id: '1', name: 'Project 1' },
+      rulesets: { id: '1', name: 'Ruleset 1' },
+    });
     let wrapper;
     await act(async () => {
       wrapper = mount(
         <ComponentWrapper initialEntries={['/rulebooks/rulebook/1']}>
-          <Route path='/rulebooks/rulebook/:id'>
-            <RuleBook/>
+          <Route path="/rulebooks/rulebook/:id">
+            <RuleBook />
           </Route>
         </ComponentWrapper>
       );
@@ -49,19 +48,18 @@ describe('RuleBook', () => {
   });
 
   it('has a top toolbar kebabmenu', async () => {
-    fetchMock.mockResponse(JSON.stringify({
-        name: 'RuleBook 1',
-        id: 1,
-        project: {id: '1', name: 'Project 1'},
-        rulesets: {id: '1', name: 'Project 1'}
-      })
-    )
+    mockApi.onGet(`/api/rulebooks/1`).replyOnce(200, {
+      name: 'RuleBook 1',
+      id: 1,
+      project: { id: '1', name: 'Project 1' },
+      rulesets: [{ id: '1', name: 'Ruleset 1' }],
+    });
     let wrapper;
     await act(async () => {
       wrapper = mount(
         <ComponentWrapper initialEntries={['/rulebooks/rulebook/1']}>
-          <Route path='/rulebooks/rulebook/:id'>
-            <RuleBook/>
+          <Route path="/rulebooks/rulebook/:id">
+            <RuleBook />
           </Route>
         </ComponentWrapper>
       );
@@ -71,12 +69,9 @@ describe('RuleBook', () => {
     });
     expect(wrapper.find(KebabToggle).length).toEqual(1);
     expect(wrapper.find('.pf-c-dropdown__toggle').length).toEqual(1);
-    wrapper
-      .find('.pf-c-dropdown__toggle')
-      .simulate('click');
+    wrapper.find('.pf-c-dropdown__toggle').simulate('click');
     wrapper.update();
     expect(wrapper.find(DropdownItem).length).toEqual(1);
-    expect(wrapper.find(DropdownItem).at(0).props().component.props.children).toEqual('Disable')
+    expect(wrapper.find(DropdownItem).at(0).props().component.props.children).toEqual('Disable');
   });
-
 });

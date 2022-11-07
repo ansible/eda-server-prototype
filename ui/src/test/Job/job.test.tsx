@@ -2,11 +2,11 @@ import * as React from 'react';
 import { mount } from 'enzyme';
 import { Job } from '@app/Job/Job';
 import { MemoryRouter } from 'react-router';
-import fetchMock from 'jest-fetch-mock';
 import { act } from 'react-dom/test-utils';
 import { IntlProvider } from 'react-intl';
 import { Route } from 'react-router-dom';
 import { DropdownItem, KebabToggle, Tab } from '@patternfly/react-core';
+import { mockApi } from '../__mocks__/baseApi';
 
 const ComponentWrapper = ({ children, initialEntries = ['/dashboard'] }) => (
   <IntlProvider locale="en">
@@ -17,20 +17,22 @@ const ComponentWrapper = ({ children, initialEntries = ['/dashboard'] }) => (
 );
 
 describe('Job', () => {
-  afterEach(() => {
-    jest.restoreAllMocks();
+  beforeAll(() => {
+    mockApi.reset();
   });
 
   it('has a top toolbar kebab menu', async () => {
-    fetchMock.mockResponse(
-      JSON.stringify([
-        {
-          name: 'Job 1',
-          id: 1,
-          stdout: [],
-        },
-      ])
-    );
+    mockApi.onGet(`/api/job_instance/1`).replyOnce(200, {
+      name: 'Job 1',
+      id: 1,
+      stdout: [],
+    });
+
+    mockApi.onGet(`/api/job_instance_events/1`).replyOnce(200, {
+      name: 'Event 1',
+      id: 1,
+    });
+
     let wrapper;
     await act(async () => {
       wrapper = mount(

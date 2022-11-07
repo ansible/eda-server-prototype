@@ -2,10 +2,10 @@ import * as React from 'react';
 import { mount } from 'enzyme';
 import { Inventories } from '@app/Inventories/Inventories';
 import { MemoryRouter } from 'react-router';
-import fetchMock from 'jest-fetch-mock';
 import { act } from 'react-dom/test-utils';
 import { IntlProvider } from 'react-intl';
 import { Route } from 'react-router-dom';
+import { mockApi } from '../__mocks__/baseApi';
 
 const ComponentWrapper = ({ children, initialEntries = ['/dashboard'] }) => (
   <IntlProvider locale="en">
@@ -16,18 +16,16 @@ const ComponentWrapper = ({ children, initialEntries = ['/dashboard'] }) => (
 );
 
 describe('Inventories', () => {
-  afterEach(() => {
-    jest.restoreAllMocks();
+  beforeAll(() => {
+    mockApi.reset();
   });
 
   it('should render the Inventories component', async () => {
-    fetchMock.mockResponse(
-      JSON.stringify([
-        { id: '1', name: 'Inventory 1' },
-        { id: '2', name: 'Inventory 2' },
-        { id: '3', name: 'Inventory 3' },
-      ])
-    );
+    mockApi.onGet(`/api/inventories`).replyOnce(200, [
+      { id: '1', name: 'Inventory 1' },
+      { id: '2', name: 'Inventory 2' },
+      { id: '3', name: 'Inventory 3' },
+    ]);
 
     let wrapper;
     await act(async () => {

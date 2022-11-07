@@ -55,11 +55,11 @@ const Activation: React.FunctionComponent = () => {
   const intl = useIntl();
 
   useEffect(() => {
-    fetchActivation(id).then((data) => setActivation(data));
+    fetchActivation(id).then((data) => setActivation(data.data));
   }, []);
 
   useEffect(() => {
-    listActivationJobs(id).then((data) => setJobs(data));
+    listActivationJobs(id).then((data) => setJobs(data.data));
   }, []);
 
   const [update_client, setUpdateClient] = useState<WebSocket | unknown>({});
