@@ -3,6 +3,7 @@ from typing import List
 import sqlalchemy as sa
 from fastapi import APIRouter, Depends, status
 from fastapi.exceptions import HTTPException
+from sqlalchemy import desc
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from eda_server import schema
@@ -186,4 +187,102 @@ async def list_audit_rule_events(
                 "timestamp": row["created_at"],
             }
         )
+    return response
+
+
+@router.get(
+    "/api/audit/rules_fired",
+    response_model=List[schema.AuditFiredRule],
+    operation_id="list_audit_rules_fired",
+)
+async def list_audit_rules_fired(db: AsyncSession = Depends(get_db_session)):
+    query = (
+        sa.select(
+            models.audit_rules.c.name.label("rule_name"),
+            models.job_instance_hosts.c.task.label("job_name"),
+            models.audit_rules.c.status.label("status"),
+            models.rulesets.c.name.label("ruleset_name"),
+            models.audit_rules.c.fired_date.label("fired_date"),
+        )
+        .select_from(
+            models.audit_rules.join(
+                models.rulesets,
+                models.rulesets.c.id == models.audit_rules.c.ruleset_id,
+            )
+            .join(
+                models.job_instances,
+                models.audit_rules.c.job_instance_id
+                == models.job_instances.c.id,
+            )
+            .join(
+                models.job_instance_hosts,
+                models.job_instance_hosts.c.job_uuid
+                == models.job_instances.c.uuid,
+            )
+        )
+        .order_by(desc(models.audit_rules.c.fired_date))
+    )
+
+    response = []
+
+    rows = (await db.execute(query)).all()
+    for row in rows:
+        response.append(
+            {
+                "name": row["rule_name"],
+                "job": row["job_name"],
+                "status": row["status"],
+                "ruleset": row["ruleset_name"],
+                "fired_date": row["fired_date"],
+            }
+        )
+
+    return response
+
+
+@router.get(
+    "/api/audit/hosts_changed",
+    response_model=List[schema.AuditChangedHost],
+    operation_id="list_audit_hosts_changed",
+)
+async def list_audit_hosts_changed(db: AsyncSession = Depends(get_db_session)):
+    query = (
+        sa.select(
+            models.job_instance_hosts.c.host.label("host"),
+            models.audit_rules.c.name.label("rule_name"),
+            models.rulesets.c.name.label("ruleset_name"),
+            models.audit_rules.c.fired_date.label("fired_date"),
+        )
+        .select_from(
+            models.audit_rules.join(
+                models.rulesets,
+                models.rulesets.c.id == models.audit_rules.c.ruleset_id,
+            )
+            .join(
+                models.job_instances,
+                models.audit_rules.c.job_instance_id
+                == models.job_instances.c.id,
+            )
+            .join(
+                models.job_instance_hosts,
+                models.job_instance_hosts.c.job_uuid
+                == models.job_instances.c.uuid,
+            )
+        )
+        .order_by(desc(models.audit_rules.c.fired_date))
+    )
+
+    response = []
+
+    rows = (await db.execute(query)).all()
+    for row in rows:
+        response.append(
+            {
+                "host": row["host"],
+                "rule": row["rule_name"],
+                "ruleset": row["ruleset_name"],
+                "fired_date": row["fired_date"],
+            }
+        )
+
     return response
