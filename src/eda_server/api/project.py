@@ -51,18 +51,15 @@ async def list_projects(db: AsyncSession = Depends(get_db_session)):
 async def create_project(
     data: schema.ProjectCreate, db: AsyncSession = Depends(get_db_session)
 ):
-    # Close a transaction before the project is cloned.
-    async with db.begin():
-        await project_by_name_exists_or_404(db, data.name)
+    await project_by_name_exists_or_404(db, data.name)
 
-    async with db.begin():
-        try:
-            project = await import_project(db, data)
-        except GitCommandFailed:
-            raise HTTPException(
-                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                detail="Cannot clone repository.",
-            )
+    try:
+        project = await import_project(db, data)
+    except GitCommandFailed:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Cannot clone repository.",
+        )
 
     return project
 

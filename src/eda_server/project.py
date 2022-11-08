@@ -117,6 +117,8 @@ async def import_project(db: AsyncSession, data: ProjectCreate):
             description=data.description,
         )
         await sync_project(db, project.id, project.large_data_id, repo_dir)
+        await db.commit()
+
         return project
 
 
