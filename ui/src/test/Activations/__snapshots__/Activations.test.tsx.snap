@@ -465,7 +465,7 @@ exports[`Activations should render the Activations component 1`] = `
                                                   </DropdownItem>,
                                                 ]
                                               }
-                                              isFlipEnabled={false}
+                                              isFlipEnabled={true}
                                               isGrouped={false}
                                               isOpen={false}
                                               isPlain={false}
@@ -499,6 +499,7 @@ exports[`Activations should render the Activations component 1`] = `
                                                   }
                                                 />
                                               }
+                                              zIndex={9999}
                                             >
                                               <div
                                                 className="pf-c-dropdown ins-c-bulk-select"
@@ -1115,7 +1116,7 @@ exports[`Activations should render the Activations component 1`] = `
                                             />,
                                           ]
                                         }
-                                        isFlipEnabled={false}
+                                        isFlipEnabled={true}
                                         isGrouped={false}
                                         isOpen={false}
                                         isPlain={true}
@@ -1129,6 +1130,7 @@ exports[`Activations should render the Activations component 1`] = `
                                             onToggle={[Function]}
                                           />
                                         }
+                                        zIndex={9999}
                                       >
                                         <div
                                           className="pf-c-dropdown pf-m-align-right"
@@ -1341,14 +1343,14 @@ exports[`Activations should render the Activations component 1`] = `
                                       }
                                     }
                                     variant="top"
-                                    widgetId="pagination-options-menu"
+                                    widgetId="options-menu"
                                   >
                                     <div
                                       className="pf-c-pagination pf-m-compact"
                                       data-ouia-component-id="CompactPagination"
                                       data-ouia-component-type="PF4/Pagination"
                                       data-ouia-safe={true}
-                                      id="pagination-options-menu-4"
+                                      id="options-menu-top-pagination"
                                     >
                                       <div
                                         className="pf-c-pagination__total-items"
@@ -1413,7 +1415,7 @@ exports[`Activations should render the Activations component 1`] = `
                                         }
                                         perPageSuffix="per page"
                                         toggleTemplate={[Function]}
-                                        widgetId="pagination-options-menu"
+                                        widgetId="options-menu-top"
                                       >
                                         <DropdownWithContext
                                           autoFocus={true}
@@ -1468,7 +1470,7 @@ exports[`Activations should render the Activations component 1`] = `
                                               </DropdownItem>,
                                             ]
                                           }
-                                          isFlipEnabled={false}
+                                          isFlipEnabled={true}
                                           isGrouped={false}
                                           isOpen={false}
                                           isPlain={true}
@@ -1492,7 +1494,7 @@ exports[`Activations should render the Activations component 1`] = `
                                               perPageComponent="div"
                                               showToggle={true}
                                               toggleTemplate={[Function]}
-                                              widgetId="pagination-options-menu"
+                                              widgetId="options-menu-top"
                                             />
                                           }
                                         >
@@ -1554,7 +1556,7 @@ exports[`Activations should render the Activations component 1`] = `
                                                         data-ouia-component-id="OUIA-Generated-DropdownToggle-2"
                                                         data-ouia-component-type="PF4/DropdownToggle"
                                                         data-ouia-safe="true"
-                                                        id="pagination-options-menu-toggle-4"
+                                                        id="options-menu-top-toggle"
                                                         type="button"
                                                       >
                                                         <span
@@ -1582,7 +1584,7 @@ exports[`Activations should render the Activations component 1`] = `
                                               perPageComponent="div"
                                               showToggle={true}
                                               toggleTemplate={[Function]}
-                                              widgetId="pagination-options-menu"
+                                              widgetId="options-menu-top"
                                             >
                                               <div
                                                 className="pf-c-options-menu__toggle pf-m-plain pf-m-text"
@@ -1615,7 +1617,7 @@ exports[`Activations should render the Activations component 1`] = `
                                                   aria-haspopup="listbox"
                                                   aria-label="Items per page"
                                                   className="pf-c-options-menu__toggle-button"
-                                                  id="pagination-options-menu-toggle-4"
+                                                  id="options-menu-top-toggle"
                                                   isDisabled={0}
                                                   isOpen={false}
                                                   onEnter={[Function]}
@@ -1655,7 +1657,7 @@ exports[`Activations should render the Activations component 1`] = `
                                                             data-ouia-component-id="OUIA-Generated-DropdownToggle-2"
                                                             data-ouia-component-type="PF4/DropdownToggle"
                                                             data-ouia-safe="true"
-                                                            id="pagination-options-menu-toggle-4"
+                                                            id="options-menu-top-toggle"
                                                             type="button"
                                                           >
                                                             <span
@@ -1690,7 +1692,7 @@ exports[`Activations should render the Activations component 1`] = `
                                                     data-ouia-component-type="PF4/DropdownToggle"
                                                     data-ouia-safe={true}
                                                     getMenuRef={null}
-                                                    id="pagination-options-menu-toggle-4"
+                                                    id="options-menu-top-toggle"
                                                     isActive={false}
                                                     isDisabled={0}
                                                     isOpen={false}
@@ -1735,7 +1737,7 @@ exports[`Activations should render the Activations component 1`] = `
                                                               data-ouia-component-id="OUIA-Generated-DropdownToggle-2"
                                                               data-ouia-component-type="PF4/DropdownToggle"
                                                               data-ouia-safe="true"
-                                                              id="pagination-options-menu-toggle-4"
+                                                              id="options-menu-top-toggle"
                                                               type="button"
                                                             >
                                                               <span
@@ -1771,7 +1773,7 @@ exports[`Activations should render the Activations component 1`] = `
                                                       data-ouia-component-type="PF4/DropdownToggle"
                                                       data-ouia-safe={true}
                                                       disabled={0}
-                                                      id="pagination-options-menu-toggle-4"
+                                                      id="options-menu-top-toggle"
                                                       onClick={[Function]}
                                                       onKeyDown={[Function]}
                                                       type="button"
@@ -6466,7 +6468,7 @@ exports[`Activations should render the Activations component 1`] = `
                                                                         </DropdownItem>,
                                                                       ]
                                                                     }
-                                                                    isFlipEnabled={false}
+                                                                    isFlipEnabled={true}
                                                                     isGrouped={false}
                                                                     isOpen={false}
                                                                     isPlain={true}
@@ -6480,6 +6482,7 @@ exports[`Activations should render the Activations component 1`] = `
                                                                         onToggle={[Function]}
                                                                       />
                                                                     }
+                                                                    zIndex={9999}
                                                                   >
                                                                     <div
                                                                       className="pf-c-dropdown pf-m-align-right"
@@ -7660,7 +7663,7 @@ exports[`Activations should render the Activations component 1`] = `
                                                                         </DropdownItem>,
                                                                       ]
                                                                     }
-                                                                    isFlipEnabled={false}
+                                                                    isFlipEnabled={true}
                                                                     isGrouped={false}
                                                                     isOpen={false}
                                                                     isPlain={true}
@@ -7674,6 +7677,7 @@ exports[`Activations should render the Activations component 1`] = `
                                                                         onToggle={[Function]}
                                                                       />
                                                                     }
+                                                                    zIndex={9999}
                                                                   >
                                                                     <div
                                                                       className="pf-c-dropdown pf-m-align-right"
@@ -8854,7 +8858,7 @@ exports[`Activations should render the Activations component 1`] = `
                                                                         </DropdownItem>,
                                                                       ]
                                                                     }
-                                                                    isFlipEnabled={false}
+                                                                    isFlipEnabled={true}
                                                                     isGrouped={false}
                                                                     isOpen={false}
                                                                     isPlain={true}
@@ -8868,6 +8872,7 @@ exports[`Activations should render the Activations component 1`] = `
                                                                         onToggle={[Function]}
                                                                       />
                                                                     }
+                                                                    zIndex={9999}
                                                                   >
                                                                     <div
                                                                       className="pf-c-dropdown pf-m-align-right"
