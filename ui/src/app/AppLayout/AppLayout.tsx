@@ -23,7 +23,7 @@ import { StatefulDropdown } from './stateful-dropdown';
 import { User } from '@app/shared/types/common-types';
 import { AboutModalWindow } from '@app/AppLayout/about-modal';
 import { NotificationsPortal } from '@redhat-cloud-services/frontend-components-notifications';
-import {getUser, logoutUser} from '@app/API/auth';
+import { getUser, logoutUser } from '@app/API/auth';
 
 interface IAppLayout {
   children: React.ReactNode;
