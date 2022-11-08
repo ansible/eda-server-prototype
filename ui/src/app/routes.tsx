@@ -33,6 +33,7 @@ import { Rules } from '@app/Rules/Rules';
 import { Rule } from '@app/Rule/Rule';
 import { Fragment } from 'react';
 import { NewInventory } from '@app/NewInventory/NewInventory';
+import { AuditView } from '@app/AuditView/AuditView';
 
 export interface IAppRoute {
   label?: string; // Excluding the label will exclude the route from the nav sidebar in AppLayout
@@ -52,6 +53,7 @@ export interface IAppRouteGroup {
 }
 
 export type AppRouteConfig = IAppRoute | IAppRouteGroup;
+
 const routes: AppRouteConfig[] = [
   {
     component: Dashboard,
@@ -61,169 +63,181 @@ const routes: AppRouteConfig[] = [
     title: 'Main Dashboard',
   },
   {
-    component: Projects,
-    label: 'Projects',
-    path: '/projects',
-    title: 'Projects',
+    label: 'Management',
+    routes: [
+      {
+        component: Projects,
+        label: 'Projects',
+        path: '/projects',
+        title: 'Projects',
+      },
+      {
+        component: Project,
+        path: '/project/:id',
+        title: 'Project',
+      },
+      {
+        component: NewProject,
+        path: '/new-project/',
+        title: 'NewProject',
+      },
+      {
+        component: EditProject,
+        path: '/edit-project/:id',
+        title: 'EditProject',
+      },
+      {
+        component: Activations,
+        label: 'Rulebook Activations',
+        path: '/activations',
+        title: 'Rulebook Activations',
+      },
+      {
+        component: Activation,
+        path: '/activation/:id',
+        title: 'Activation',
+      },
+      {
+        component: ActivationJobs,
+        exact: true,
+        path: '/activation/:id/jobs',
+        title: 'Activation Jobs',
+      },
+      {
+        component: ActivationDetails,
+        exact: true,
+        path: '/activation/:id/details',
+        title: 'Activation Details',
+      },
+      {
+        component: ActivationStdout,
+        exact: true,
+        path: '/activation/:id/stdout',
+        title: 'Output',
+      },
+      {
+        component: NewActivation,
+        path: '/new-activation/',
+        title: 'New Activation',
+      },
+      {
+        component: Jobs,
+        label: 'Jobs',
+        path: '/jobs',
+        title: 'Jobs',
+      },
+      {
+        component: Job,
+        path: '/job/:id',
+        title: 'Job',
+      },
+      {
+        component: NewJob,
+        path: '/new-job/',
+        title: 'NewJob',
+      },
+      {
+        component: RuleBook,
+        path: '/rulebooks/rulebook/:id',
+        title: 'RuleBook',
+      },
+      {
+        component: RuleBooks,
+        label: 'Rulebooks',
+        path: '/rulebooks',
+        title: 'Rulebooks',
+      },
+      {
+        component: RuleSets,
+        label: 'Rule Sets',
+        path: '/rulesets',
+        title: 'Rule Sets',
+      },
+      {
+        component: RuleSet,
+        path: '/ruleset/:id',
+        title: 'RuleSet',
+      },
+      {
+        component: RulesetRules,
+        exact: true,
+        path: '/ruleset/:id/rules',
+        title: 'Rules',
+      },
+      {
+        component: RulesetDetails,
+        exact: true,
+        path: '/ruleset/:id/details',
+        title: 'Details',
+      },
+      {
+        component: RulesetSources,
+        exact: true,
+        path: '/ruleset/:id/sources',
+        title: 'Sources',
+      },
+      {
+        component: Rules,
+        exact: true,
+        label: 'Rules',
+        path: '/rules',
+        title: 'Rules',
+      },
+      {
+        component: Rule,
+        path: '/rule/:id',
+        title: 'Rule',
+      },
+      {
+        component: Inventory,
+        path: '/inventories/inventory/:id',
+        title: 'Inventory',
+      },
+      {
+        component: Inventories,
+        label: 'Inventories',
+        path: '/inventories',
+        title: 'Inventories',
+      },
+      {
+        component: NewInventory,
+        path: '/new-inventory/',
+        title: 'New Inventory',
+      },
+      {
+        component: Vars,
+        exact: true,
+        label: 'Extra Vars',
+        path: '/vars',
+        title: 'Extra Vars',
+      },
+      {
+        component: Var,
+        exact: true,
+        path: '/var/:id',
+        title: 'Var',
+      },
+      {
+        component: Playbooks,
+        exact: true,
+        label: 'Playbooks',
+        path: '/playbooks',
+        title: 'Playbooks',
+      },
+      {
+        component: Playbook,
+        exact: true,
+        path: '/playbook/:id',
+        title: 'Playbook',
+      },
+    ],
   },
   {
-    component: Project,
-    path: '/project/:id',
-    title: 'Project',
-  },
-  {
-    component: NewProject,
-    path: '/new-project/',
-    title: 'NewProject',
-  },
-  {
-    component: EditProject,
-    path: '/edit-project/:id',
-    title: 'EditProject',
-  },
-  {
-    component: Activations,
-    label: 'Rulebook Activations',
-    path: '/activations',
-    title: 'Rulebook Activations',
-  },
-  {
-    component: Activation,
-    path: '/activation/:id',
-    title: 'Activation',
-  },
-  {
-    component: ActivationJobs,
+    component: AuditView,
     exact: true,
-    path: '/activation/:id/jobs',
-    title: 'Activation Jobs',
-  },
-  {
-    component: ActivationDetails,
-    exact: true,
-    path: '/activation/:id/details',
-    title: 'Activation Details',
-  },
-  {
-    component: ActivationStdout,
-    exact: true,
-    path: '/activation/:id/stdout',
-    title: 'Output',
-  },
-  {
-    component: NewActivation,
-    path: '/new-activation/',
-    title: 'New Activation',
-  },
-  {
-    component: Jobs,
-    label: 'Jobs',
-    path: '/jobs',
-    title: 'Jobs',
-  },
-  {
-    component: Job,
-    path: '/job/:id',
-    title: 'Job',
-  },
-  {
-    component: NewJob,
-    path: '/new-job/',
-    title: 'NewJob',
-  },
-  {
-    component: RuleBook,
-    path: '/rulebooks/rulebook/:id',
-    title: 'RuleBook',
-  },
-  {
-    component: RuleBooks,
-    label: 'Rulebooks',
-    path: '/rulebooks',
-    title: 'Rulebooks',
-  },
-  {
-    component: RuleSets,
-    label: 'Rule Sets',
-    path: '/rulesets',
-    title: 'Rule Sets',
-  },
-  {
-    component: RuleSet,
-    path: '/ruleset/:id',
-    title: 'RuleSet',
-  },
-  {
-    component: RulesetRules,
-    exact: true,
-    path: '/ruleset/:id/rules',
-    title: 'Rules',
-  },
-  {
-    component: RulesetDetails,
-    exact: true,
-    path: '/ruleset/:id/details',
-    title: 'Details',
-  },
-  {
-    component: RulesetSources,
-    exact: true,
-    path: '/ruleset/:id/sources',
-    title: 'Sources',
-  },
-  {
-    component: Rules,
-    exact: true,
-    label: 'Rules',
-    path: '/rules',
-    title: 'Rules',
-  },
-  {
-    component: Rule,
-    path: '/rule/:id',
-    title: 'Rule',
-  },
-  {
-    component: Inventory,
-    path: '/inventories/inventory/:id',
-    title: 'Inventory',
-  },
-  {
-    component: Inventories,
-    label: 'Inventories',
-    path: '/inventories',
-    title: 'Inventories',
-  },
-  {
-    component: NewInventory,
-    path: '/new-inventory/',
-    title: 'New Inventory',
-  },
-  {
-    component: Vars,
-    exact: true,
-    label: 'Extra Vars',
-    path: '/vars',
-    title: 'Extra Vars',
-  },
-  {
-    component: Var,
-    exact: true,
-    path: '/var/:id',
-    title: 'Var',
-  },
-  {
-    component: Playbooks,
-    exact: true,
-    label: 'Playbooks',
-    path: '/playbooks',
-    title: 'Playbooks',
-  },
-  {
-    component: Playbook,
-    exact: true,
-    path: '/playbook/:id',
-    title: 'Playbook',
+    label: 'Audit View',
+    path: '/audit',
+    title: 'Audit View',
   },
 ];
 
