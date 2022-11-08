@@ -69,14 +69,7 @@ Minikube is the recommemded method for Mac OS users
 - [kustomize](https://kubectl.docs.kubernetes.io/installation/kustomize/)
 - [minikube](https://minikube.sigs.k8s.io/docs/start/)
 - [Taskfile](https://taskfile.dev/installation/#binary)
-- bash, version 5.1.* or above
-
-**NOTE for Mac OS users**
-Mac OS ships a very old version of bash. It must be updated:
-
-```sh
-brew install bash
-```
+- bash, version 3.* or above
 
 ## Deployment
 
