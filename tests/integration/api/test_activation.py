@@ -5,7 +5,7 @@ from sqlalchemy import func
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from eda_server.db import models
-from eda_server.db.models.activation import ExecutionEnvironment, RestartPolicy
+from eda_server.db.models.activation import RestartPolicy
 from eda_server.db.utils.lostream import PGLargeObject
 
 TEST_ACTIVATION = {
@@ -18,7 +18,7 @@ TEST_ACTIVATION = {
     "restart_policy": RestartPolicy.ON_FAILURE.value,
     "is_enabled": True,
     "working_directory": "/tmp",
-    "execution_environment": ExecutionEnvironment.DOCKER.value,
+    "execution_environment": "quay.io/aizquier/ansible-rulebook",
     "project_id": 1,
 }
 

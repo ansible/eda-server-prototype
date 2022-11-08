@@ -14,7 +14,6 @@ from eda_server import schema
 from eda_server.config import Settings, get_settings
 from eda_server.db import models
 from eda_server.db.dependency import get_db_session, get_db_session_factory
-from eda_server.db.models.activation import ExecutionEnvironment
 from eda_server.db.utils.lostream import PGLargeObject, decode_bytes_buff
 from eda_server.managers import updatemanager
 from eda_server.messages import ActivationErrorMessage
@@ -36,18 +35,6 @@ async def create_activation(
     activation: schema.ActivationCreate,
     db: AsyncSession = Depends(get_db_session),
 ):
-    if (
-        activation.execution_environment == ExecutionEnvironment.LOCAL
-        and not activation.working_directory
-    ):
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail=(
-                "If Execution Environment is 'local', "
-                "Working Directory is required."
-            ),
-        )
-
     query = sa.insert(models.activations).values(
         name=activation.name,
         description=activation.description,

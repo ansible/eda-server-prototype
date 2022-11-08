@@ -19,13 +19,6 @@ class RestartPolicy(str, Enum):
     NEVER = "never"
 
 
-class ExecutionEnvironment(str, Enum):
-    DOCKER = "docker"
-    PODMAN = "podman"
-    K8S = "k8s"
-    LOCAL = "local"
-
-
 activations = sa.Table(
     "activation",
     metadata,
@@ -38,17 +31,7 @@ activations = sa.Table(
     sa.Column("name", sa.String, nullable=False),
     sa.Column("description", sa.String),
     sa.Column("working_directory", sa.String),
-    sa.Column(
-        "execution_environment",
-        sa.Enum(
-            ExecutionEnvironment,
-            name="execution_environment_enum",
-            values_callable=lambda x: [e.value for e in x],
-        ),
-        default=ExecutionEnvironment.DOCKER,
-        server_default=ExecutionEnvironment.DOCKER.value,
-        nullable=False,
-    ),
+    sa.Column("execution_environment", sa.String),
     sa.Column(
         "rulebook_id",
         sa.ForeignKey("rulebook.id", ondelete="CASCADE"),
