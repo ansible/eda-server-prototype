@@ -8,7 +8,7 @@ check_vars() {
     local _var_names=("$@")
 
     for var_name in "${_var_names[@]}"; do
-        if  [[ -v $var_name ]]; then
+        if  [[ -z "$var_name" ]]; then
           log-debug "${var_name}=${!var_name}"
         else
           log-err "Environment variable $var_name is not set! Unable to continue."

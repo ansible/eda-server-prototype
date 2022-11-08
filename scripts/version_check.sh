@@ -20,7 +20,7 @@ help() {
 }
 
 CMD=${1:-help}
-GOLDEN_VERSION="${2:-5}"
+GOLDEN_VERSION="${2:-3}"
 
 check_version() {
   local _current_version="${1}"
