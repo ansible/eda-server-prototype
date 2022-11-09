@@ -23,8 +23,8 @@ class JobInstanceRead(BaseModel):
     ruleset: Optional[StrictStr]
     rule: Optional[StrictStr]
     hosts: Optional[StrictStr]
-    status: StrictStr
-    fired_date: datetime
+    status: Optional[StrictStr]
+    fired_date: Optional[datetime]
 
 
 class JobInstanceEventsRead(BaseModel):

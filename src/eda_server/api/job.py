@@ -28,7 +28,18 @@ router = APIRouter(tags=["jobs"])
     operation_id="list_job_instances",
 )
 async def list_job_instances(db: AsyncSession = Depends(get_db_session)):
-    query = sa.select(models.job_instances)
+    query = (
+        sa.select(
+            models.job_instances,
+            models.audit_rules.c.fired_date,
+            models.audit_rules.c.status,
+        )
+        .select_from(models.job_instances)
+        .outerjoin(
+            models.audit_rules,
+            models.audit_rules.c.job_instance_id == models.job_instances.c.id,
+        )
+    )
     result = await db.execute(query)
     return result.all()
 
@@ -99,9 +110,18 @@ async def create_job_instance(
 async def read_job_instance(
     job_instance_id: int, db: AsyncSession = Depends(get_db_session)
 ):
-    query = sa.select(models.job_instances).where(
-        models.job_instances.c.id == job_instance_id
-    )
+    query = (
+        sa.select(
+            models.job_instances,
+            models.audit_rules.c.fired_date,
+            models.audit_rules.c.status,
+        )
+        .select_from(models.job_instances)
+        .outerjoin(
+            models.audit_rules,
+            models.audit_rules.c.job_instance_id == models.job_instances.c.id,
+        )
+    ).where(models.job_instances.c.id == job_instance_id)
     result = await db.execute(query)
     return result.first()
 

@@ -435,15 +435,8 @@ async def list_activation_instance_job_instances(
             models.audit_rules.c.status,
         )
         .select_from(models.job_instances)
-        .join(
-            models.activation_instance_job_instances,
-            models.activation_instance_job_instances.c.job_instance_id
-            == models.job_instances.c.id,
-        )
-        .outerjoin(
-            models.audit_rules,
-            models.audit_rules.c.activation_instance_id == models.job_instances.c.id,
-        )
+        .join(models.activation_instance_job_instances)
+        .outerjoin(models.audit_rules)
         .where(
             models.activation_instance_job_instances.c.activation_instance_id
             == activation_instance_id
@@ -451,5 +444,5 @@ async def list_activation_instance_job_instances(
     )
 
     result = await db.execute(query)
-    print(result.all())
+
     return result.all()
