@@ -118,21 +118,21 @@ audit_rules = sa.Table(
     ),
     sa.Column(
         "rule_id",
-        sa.ForeignKey("rule.id"),
+        sa.ForeignKey("rule.id", ondelete="CASCADE"),
         nullable=False,
     ),
     sa.Column(
         "ruleset_id",
-        sa.ForeignKey("ruleset.id"),
+        sa.ForeignKey("ruleset.id", ondelete="CASCADE"),
         nullable=False,
     ),
     sa.Column(
         "activation_instance_id",
-        sa.ForeignKey("activation_instance.id"),
+        sa.ForeignKey("activation_instance.id", ondelete="CASCADE"),
         nullable=False,
     ),
     sa.Column(
         "job_instance_id",
-        sa.ForeignKey("job_instance.id"),
+        sa.ForeignKey("job_instance.id", ondelete="CASCADE"),
     ),
 )
