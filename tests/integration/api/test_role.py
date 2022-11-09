@@ -29,8 +29,6 @@ async def admin_user(db: AsyncSession):
 def app(app: FastAPI, admin_user: models.User):
     with override_dependencies(app, {current_active_user: lambda: admin_user}):
         yield app
-from eda_server.users import UserDatabase, current_active_user
-from tests.utils.app import override_dependencies
 
 
 async def test_create_role(client: AsyncClient, db: AsyncSession):

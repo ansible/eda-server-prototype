@@ -7,9 +7,8 @@ import sqlalchemy as sa
 import sqlalchemy.future
 from sqlalchemy.ext.asyncio import AsyncConnection
 
-
 BASE_DIR = [
-    p for p in pathlib.Path(__file__).parents if p.parts[-1] == 'tests'
+    p for p in pathlib.Path(__file__).parents if p.parts[-1] == "tests"
 ][0].parent
 ALEMBIC_INI = BASE_DIR / "alembic.ini"
 

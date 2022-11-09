@@ -5,7 +5,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from eda_server.db import models
 
-
 TEST_RULESETS_SIMPLE = """
 ---
 - name: Test simple 001
@@ -58,8 +57,8 @@ async def test_create_rulebook(client: AsyncClient, db: AsyncSession):
     ruleset = rulesets[0]
     assert ruleset["rulebook_id"] == data["id"]
     assert (
-        ruleset["name"].startswith("Test simple ") and
-        ruleset["name"][-3:].isdigit()
+        ruleset["name"].startswith("Test simple ")
+        and ruleset["name"][-3:].isdigit()
     )
 
     rules = (await db.execute(sa.select(models.rules))).all()
@@ -67,6 +66,27 @@ async def test_create_rulebook(client: AsyncClient, db: AsyncSession):
     rule = rules[0]
     assert rule["ruleset_id"] == ruleset["id"]
     assert rule["action"] == {"debug": None}
+
+
+async def test_list_rulebooks(client: AsyncClient, db: AsyncSession):
+    response = await client.post(
+        "/api/rulebooks",
+        json={
+            "name": "test-ruleset-0110.yml",
+            "rulesets": TEST_RULESETS_SIMPLE,
+        },
+    )
+
+    assert response.status_code == status_codes.HTTP_200_OK
+
+    rulebook = response.json()
+    response = await client.get("/api/rulebooks")
+    assert response.status_code == status_codes.HTTP_200_OK
+    data = response.json()
+    assert isinstance(data, list)
+    assert len(data) > 0
+    assert data[0]["id"] == rulebook["id"]
+    assert data[0]["ruleset_count"] > 0
 
 
 async def test_list_rulebook_rulesets(client: AsyncClient, db: AsyncSession):
@@ -81,15 +101,11 @@ async def test_list_rulebook_rulesets(client: AsyncClient, db: AsyncSession):
     assert response.status_code == status_codes.HTTP_200_OK
 
     rulebook = response.json()
-    response = await client.get(
-        f"/api/rulebooks/{rulebook['id']}/rulesets"
-    )
+    response = await client.get(f"/api/rulebooks/{rulebook['id']}/rulesets")
     rulebook_rulesets = response.json()
 
     r_ct = (
-        sa.select(
-            sa.func.count().label("rule_count")
-        )
+        sa.select(sa.func.count().label("rule_count"))
         .select_from(models.rules)
         .filter(models.rules.c.ruleset_id == models.rulesets.c.id)
         .subquery()
@@ -98,9 +114,7 @@ async def test_list_rulebook_rulesets(client: AsyncClient, db: AsyncSession):
     rulesets = (
         await db.execute(
             sa.select(
-                models.rulesets.c.id,
-                models.rulesets.c.name,
-                r_ct.c.rule_count
+                models.rulesets.c.id, models.rulesets.c.name, r_ct.c.rule_count
             )
             .select_from(models.rulesets)
             .outerjoin(r_ct, sa.true())

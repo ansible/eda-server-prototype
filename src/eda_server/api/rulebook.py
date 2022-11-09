@@ -241,8 +241,7 @@ async def list_ruleset_rules(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Ruleset not found"
         )
-    response = [rsrl._asdict() for rsrl in ruleset_rules]
-    return response
+    return ruleset_rules.all()
 
 
 # There used to be a separate query for rulesets/<id>/sources, but that data
@@ -287,7 +286,7 @@ async def create_rulebook(
     await insert_rulebook_related_data(db, new_rulebook.id, rulebook_data)
     await db.commit()
 
-    return new_rulebook._asdict()
+    return new_rulebook
 
 
 @router.get(
@@ -296,8 +295,8 @@ async def create_rulebook(
     response_model=List[schema.RulebookList],
 )
 async def list_rulebooks(db: AsyncSession = Depends(get_db_session)):
-    rulebooks = rsql.list_rulebooks(db)
-    return [rb._asdict() for rb in rulebooks]
+    rulebooks = await rsql.list_rulebooks(db)
+    return rulebooks.all()
 
 
 @router.get(
@@ -343,6 +342,21 @@ async def list_rulebook_rulesets(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Rulebook Rulesets Not Found.",
         )
+    rr_counts = await rsql.get_rulebook_ruleset_indexed_fired_counts(
+        db, rulebook_id
+    )
 
-    result = [rbrs._asdict() for rbrs in rulebook_rulesets]
-    return result
+    response = []
+    for ruleset in rulebook_rulesets:
+        resp_obj = ruleset._asdict()
+        resp_obj["source_types"] = [
+            src["type"] for src in (resp_obj["sources"] or [])
+        ]
+        resp_obj["fired_stats"] = await build_object_list_totals(
+            rr_counts, ruleset.id
+        )
+        response.append(resp_obj)
+
+    return response
+
+    return rulebook_rulesets.all()

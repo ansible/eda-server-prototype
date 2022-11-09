@@ -1,20 +1,16 @@
 import os
-import pytest
+from collections import namedtuple
+from datetime import datetime, timezone
+from typing import List
+
 import sqlalchemy as sa
 import yaml
-from collections import namedtuple
-from datetime import datetime, date, timezone
 from dateutil.parser import parse as dtparse
-from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
-from typing import List
-from types import MethodType
 
-from eda_server.db import models
-from eda_server.db.sql import base as bsql
-from eda_server.db.sql import rulebook as rsql
 from eda_server import project as bl_prj
-
+from eda_server.db import models
+from eda_server.db.sql import base as bsql, rulebook as rsql
 
 TEST_RULESET_SIMPLE = """
 ---
@@ -46,7 +42,7 @@ DBTestData = namedtuple(
         "inventory",
         "activation_instances",
         "audit_rules",
-    )
+    ),
 )
 
 
@@ -55,20 +51,16 @@ MAX_FIRED_DATE = datetime(2022, 10, 4, 22, 21, 57, 672699, tzinfo=timezone.utc)
 
 
 def test_build_ruleset_fire_count_query():
-    query = rsql.build_object_fire_counts_query(
-        rsql.AuditGrouping.RULESET
-    )
-    query_str = str(query).lower().replace(os.linesep, ' ')
+    query = rsql.build_object_fire_counts_query(rsql.AuditGrouping.RULESET)
+    query_str = str(query).lower().replace(os.linesep, " ")
     assert isinstance(query, sa.sql.Select)
     assert " a_ar.ruleset_id" in query_str
     assert " grouping sets" in query_str
 
 
 def test_build_rule_fire_count_query():
-    query = rsql.build_object_fire_counts_query(
-        rsql.AuditGrouping.RULE
-    )
-    query_str = str(query).lower().replace(os.linesep, ' ')
+    query = rsql.build_object_fire_counts_query(rsql.AuditGrouping.RULE)
+    query_str = str(query).lower().replace(os.linesep, " ")
     assert isinstance(query, sa.sql.Select)
     assert " a_ar.rule_id" in query_str
     assert " grouping sets" in query_str
@@ -78,20 +70,20 @@ def test_build_ruleset_id_fire_count_query():
     query = rsql.build_object_fire_counts_query(
         rsql.AuditGrouping.RULESET, object_id=1
     )
-    query_str = str(query).lower().replace(os.linesep, ' ')
+    query_str = str(query).lower().replace(os.linesep, " ")
     assert " a_ar.ruleset_id" in query_str
     assert " grouping sets" in query_str
     assert " a_ar.ruleset_id = :ruleset_id_1" in query_str
 
 
 async def test_get_fire_counts_data(db: AsyncSession):
-    test_data = await init_test_data(db)
+    await init_test_data(db)
     res = (
         await rsql.get_fired_counts(
             db,
             rsql.AuditGrouping.RULESET,
             window_start=MIN_FIRED_DATE,
-            window_end=MAX_FIRED_DATE
+            window_end=MAX_FIRED_DATE,
         )
     ).all()
     ruleset_ids = {rec.ruleset_id for rec in res}
@@ -113,14 +105,12 @@ async def test_get_fire_counts_data(db: AsyncSession):
 
 async def test_get_ruleset_fire_counts_data(db: AsyncSession):
     test_data = await init_test_data(db)
-    cur = (
-        await rsql.get_fired_counts(
-            db,
-            rsql.AuditGrouping.RULESET,
-            test_data.audit_rules[0].ruleset_id,
-            window_start=MIN_FIRED_DATE,
-            window_end=MAX_FIRED_DATE
-        )
+    cur = await rsql.get_fired_counts(
+        db,
+        rsql.AuditGrouping.RULESET,
+        test_data.audit_rules[0].ruleset_id,
+        window_start=MIN_FIRED_DATE,
+        window_end=MAX_FIRED_DATE,
     )
     res = cur.all()
     ruleset_ids = {rec.ruleset_id for rec in res if rec.ruleset_id is not None}
@@ -142,13 +132,13 @@ async def test_get_ruleset_fire_counts_data(db: AsyncSession):
 
 
 async def test_index_fire_counts_data(db: AsyncSession):
-    test_data = await init_test_data(db)
+    await init_test_data(db)
     res = (
         await rsql.get_fired_counts(
             db,
             rsql.AuditGrouping.RULESET,
             window_start=MIN_FIRED_DATE,
-            window_end=MAX_FIRED_DATE
+            window_end=MAX_FIRED_DATE,
         )
     ).all()
     idx_res = await rsql.index_grouped_objects(res, rsql.AuditGrouping.RULESET)
@@ -167,14 +157,12 @@ async def test_index_fire_counts_data(db: AsyncSession):
 
 
 async def test_get_indexed_fire_counts_data(db: AsyncSession):
-    test_data = await init_test_data(db)
-    res = (
-        await rsql.get_indexed_fired_counts(
-            db,
-            rsql.AuditGrouping.RULESET,
-            window_start=MIN_FIRED_DATE,
-            window_end=MAX_FIRED_DATE
-        )
+    await init_test_data(db)
+    res = await rsql.get_indexed_fired_counts(
+        db,
+        rsql.AuditGrouping.RULESET,
+        window_start=MIN_FIRED_DATE,
+        window_end=MAX_FIRED_DATE,
     )
     assert isinstance(res, dict)
     expected = {
@@ -192,7 +180,7 @@ async def test_get_indexed_fire_counts_data(db: AsyncSession):
 
 def test_build_ruleset_base_query():
     query = rsql.build_ruleset_base_query()
-    query_str = str(query).lower().replace(os.linesep, ' ')
+    query_str = str(query).lower().replace(os.linesep, " ")
     assert isinstance(query, sa.sql.Select)
     assert " a_rs.id" in query_str
     assert " rule_count" in query_str
@@ -212,7 +200,7 @@ async def test_get_ruleset_base_data(db: AsyncSession):
 
 
 async def test_get_ruleset_base_no_data(db: AsyncSession):
-    test_data = await init_test_data(db)
+    await init_test_data(db)
     query = rsql.build_ruleset_base_query(-1)
     res = await bsql.execute_get_result(db, query)
     assert res is None
@@ -220,7 +208,7 @@ async def test_get_ruleset_base_no_data(db: AsyncSession):
 
 async def test_get_rulesets_base_no_data(db: AsyncSession):
     query = rsql.build_ruleset_base_query()
-    res = (await bsql.execute_get_result(db, query))
+    res = await bsql.execute_get_result(db, query)
     assert res is None
 
 
@@ -247,22 +235,16 @@ async def test_process_ruleset_sources(db: AsyncSession):
     await bl_prj.insert_rulebook_related_data(
         db, rulebooks[1].id, rulebook_data
     )
-    ruleset = (
-        await bsql.get_object(
-            db,
-            models.rulesets,
-            filters=models.rulesets.c.rulebook_id == rulebooks[1].id
-        )
+    ruleset = await bsql.get_object(
+        db,
+        models.rulesets,
+        filters=models.rulesets.c.rulebook_id == rulebooks[1].id,
     )
     assert ruleset is not None
     assert ruleset.name == "Test simple"
     assert len(ruleset.sources) == 2
-    rule = (
-        await bsql.get_object(
-            db,
-            models.rules,
-            filters=models.rules.c.ruleset_id == ruleset.id
-        )
+    rule = await bsql.get_object(
+        db, models.rules, filters=models.rules.c.ruleset_id == ruleset.id
     )
     assert rule is not None
     assert rule.name == "Test simple rule 1"
@@ -272,12 +254,13 @@ async def test_process_ruleset_sources(db: AsyncSession):
 #  Test Data
 # -------------------------------------------------------------------------
 
+
 async def insert_project(db: AsyncSession) -> sa.engine.Row:
     vals = {
-        'git_hash': '',
-        'url': '',
-        'name': 'proj-1',
-        'description': "",
+        "git_hash": "",
+        "url": "",
+        "name": "proj-1",
+        "description": "",
     }
     project = (
         await bsql.insert_object(
@@ -288,12 +271,14 @@ async def insert_project(db: AsyncSession) -> sa.engine.Row:
     return project
 
 
-async def insert_rulebooks(db: AsyncSession, project: sa.engine.Row) -> sa.engine.Row:
+async def insert_rulebooks(
+    db: AsyncSession, project: sa.engine.Row
+) -> sa.engine.Row:
     vals = [
         {
-            'name': 'rulebook-1',
-            'project_id': project.id,
-            'rulesets': None,
+            "name": "rulebook-1",
+            "project_id": project.id,
+            "rulesets": None,
         },
         {
             "name": "rulebook-2",
@@ -310,11 +295,52 @@ async def insert_rulebooks(db: AsyncSession, project: sa.engine.Row) -> sa.engin
     return rulebooks
 
 
-async def insert_ruleset(db: AsyncSession, rulebook: sa.engine.Row) -> sa.engine.Row:
+async def insert_ruleset(
+    db: AsyncSession, rulebook: sa.engine.Row
+) -> sa.engine.Row:
     vals = [
-        {'rulebook_id': rulebook.id, 'name': 'ruleset-1', "sources": [{"type": "amqp", "config": {"port": 433}, "source": "example.ansible.amqp"}]},
-        {'rulebook_id': rulebook.id, 'name': 'ruleset-2', "sources": [{"type": "webhook", "config": {"url": "https://api.example.com/v1/action-hook"}, "source": "example.ansible.webhook"}]},
-        {'rulebook_id': rulebook.id, 'name': 'ruleset-63', "sources": [{"type": "webhook", "config": {"url": "https://api.example.com/v1/action-hook"}, "source": "example.ansible.webhook"}, {"type": "sensor", "config": {"interrupt": "0xA235"}, "source": "example.sensor"}]},
+        {
+            "rulebook_id": rulebook.id,
+            "name": "ruleset-1",
+            "sources": [
+                {
+                    "type": "amqp",
+                    "config": {"port": 433},
+                    "source": "example.ansible.amqp",
+                }
+            ],
+        },
+        {
+            "rulebook_id": rulebook.id,
+            "name": "ruleset-2",
+            "sources": [
+                {
+                    "type": "webhook",
+                    "config": {
+                        "url": "https://api.example.com/v1/action-hook"
+                    },
+                    "source": "example.ansible.webhook",
+                }
+            ],
+        },
+        {
+            "rulebook_id": rulebook.id,
+            "name": "ruleset-63",
+            "sources": [
+                {
+                    "type": "webhook",
+                    "config": {
+                        "url": "https://api.example.com/v1/action-hook"
+                    },
+                    "source": "example.ansible.webhook",
+                },
+                {
+                    "type": "sensor",
+                    "config": {"interrupt": "0xA235"},
+                    "source": "example.sensor",
+                },
+            ],
+        },
     ]
     rulesets = (
         await bsql.insert_object(
@@ -325,16 +351,18 @@ async def insert_ruleset(db: AsyncSession, rulebook: sa.engine.Row) -> sa.engine
     return rulesets
 
 
-async def insert_rule(db: AsyncSession, rulesets: List[sa.engine.Row]) -> sa.engine.Row:
+async def insert_rule(
+    db: AsyncSession, rulesets: List[sa.engine.Row]
+) -> sa.engine.Row:
     vals = [
-        {'ruleset_id': rulesets[0].id, 'name': 'rule-1', 'action': {}},
-        {'ruleset_id': rulesets[1].id, 'name': 'rule-2', 'action': {}},
-        {'ruleset_id': rulesets[2].id, 'name': 'rule-23', 'action': {}},
-        {'ruleset_id': rulesets[0].id, 'name': 'rule-11', 'action': {}},
-        {'ruleset_id': rulesets[0].id, 'name': 'rule-12', 'action': {}},
-        {'ruleset_id': rulesets[0].id, 'name': 'rule-13', 'action': {}},
-        {'ruleset_id': rulesets[0].id, 'name': 'rule-14', 'action': {}},
-        {'ruleset_id': rulesets[0].id, 'name': 'rule-15', 'action': {}},
+        {"ruleset_id": rulesets[0].id, "name": "rule-1", "action": {}},
+        {"ruleset_id": rulesets[1].id, "name": "rule-2", "action": {}},
+        {"ruleset_id": rulesets[2].id, "name": "rule-23", "action": {}},
+        {"ruleset_id": rulesets[0].id, "name": "rule-11", "action": {}},
+        {"ruleset_id": rulesets[0].id, "name": "rule-12", "action": {}},
+        {"ruleset_id": rulesets[0].id, "name": "rule-13", "action": {}},
+        {"ruleset_id": rulesets[0].id, "name": "rule-14", "action": {}},
+        {"ruleset_id": rulesets[0].id, "name": "rule-15", "action": {}},
     ]
     rules = (
         await bsql.insert_object(
@@ -345,8 +373,10 @@ async def insert_rule(db: AsyncSession, rulesets: List[sa.engine.Row]) -> sa.eng
     return rules
 
 
-async def insert_inventory(db: AsyncSession, project: sa.engine.Row) -> sa.engine.Row:
-    vals = {'name': 'inventory-1', 'project_id': project.id}
+async def insert_inventory(
+    db: AsyncSession, project: sa.engine.Row
+) -> sa.engine.Row:
+    vals = {"name": "inventory-1", "project_id": project.id}
     inventory = (
         await bsql.insert_object(
             db, models.inventories, values=vals, returning=[models.inventories]
@@ -362,14 +392,33 @@ async def insert_activation_instance(
     inventory: sa.engine.Row,
 ) -> List[sa.engine.Row]:
     vals = [
-        {"name": "act-inst-1", "rulebook_id": rulebook.id, "inventory_id": inventory.id},
-        {"name": "act-inst-2", "rulebook_id": rulebook.id, "inventory_id": inventory.id},
-        {"name": "act-inst-3", "rulebook_id": rulebook.id, "inventory_id": inventory.id},
-        {"name": "act-inst-4", "rulebook_id": rulebook.id, "inventory_id": inventory.id},
+        {
+            "name": "act-inst-1",
+            "rulebook_id": rulebook.id,
+            "inventory_id": inventory.id,
+        },
+        {
+            "name": "act-inst-2",
+            "rulebook_id": rulebook.id,
+            "inventory_id": inventory.id,
+        },
+        {
+            "name": "act-inst-3",
+            "rulebook_id": rulebook.id,
+            "inventory_id": inventory.id,
+        },
+        {
+            "name": "act-inst-4",
+            "rulebook_id": rulebook.id,
+            "inventory_id": inventory.id,
+        },
     ]
     activation_instance = (
         await bsql.insert_object(
-            db, models.activation_instances, values=vals, returning=[models.activation_instances]
+            db,
+            models.activation_instances,
+            values=vals,
+            returning=[models.activation_instances],
         )
     ).all()
 
@@ -383,18 +432,150 @@ async def insert_audit_rule(
     activation_instances: List[sa.engine.Row],
 ) -> List[sa.engine.Row]:
     vals = [
-        {'name': 'rule-1', 'description': '', 'status': 'success', 'fired_date': dtparse('2022-10-02T20:21:57.672699+00:00'), 'created_at': dtparse('2022-10-04T20:21:57.672699+00:00'), 'definition': {}, 'rule_id': rules[0].id, 'ruleset_id': rulesets[0].id, 'activation_instance_id': activation_instances[0].id, 'job_instance_id': None},
-        {'name': 'rule-1', 'description': '', 'status': 'success', 'fired_date': dtparse('2022-10-03T20:21:57.672699+00:00'), 'created_at': dtparse('2022-10-04T20:21:57.672699+00:00'), 'definition': {}, 'rule_id': rules[0].id, 'ruleset_id': rulesets[0].id, 'activation_instance_id': activation_instances[0].id, 'job_instance_id': None},
-        {'name': 'rule-1', 'description': '', 'status': 'success', 'fired_date': dtparse('2022-10-03T20:21:57.672699+00:00'), 'created_at': dtparse('2022-10-04T20:21:57.672699+00:00'), 'definition': {}, 'rule_id': rules[0].id, 'ruleset_id': rulesets[0].id, 'activation_instance_id': activation_instances[1].id, 'job_instance_id': None},
-        {'name': 'rule-2', 'description': '', 'status': 'fail', 'fired_date': dtparse('2022-10-04T19:21:57.672699+00:00'), 'created_at': dtparse('2022-10-04T20:21:57.672699+00:00'), 'definition': {}, 'rule_id': rules[1].id, 'ruleset_id': rulesets[1].id, 'activation_instance_id': activation_instances[2].id, 'job_instance_id': None},
-        {'name': 'rule-2', 'description': '', 'status': 'fail', 'fired_date': dtparse('2022-10-04T19:51:57.672699+00:00'), 'created_at': dtparse('2022-10-04T20:21:57.672699+00:00'), 'definition': {}, 'rule_id': rules[1].id, 'ruleset_id': rulesets[1].id, 'activation_instance_id': activation_instances[2].id, 'job_instance_id': None},
-        {'name': 'rule-2', 'description': '', 'status': 'running', 'fired_date': dtparse('2022-10-04T20:21:57.672699+00:00'), 'created_at': dtparse('2022-10-04T20:21:57.672699+00:00'), 'definition': {}, 'rule_id': rules[1].id, 'ruleset_id': rulesets[1].id, 'activation_instance_id': activation_instances[2].id, 'job_instance_id': None},
-        {'name': 'rule-10', 'description': '', 'status': 'success', 'fired_date': dtparse('2022-09-28T20:21:57.672699+00:00'), 'created_at': dtparse('2022-10-04T20:21:57.672699+00:00'), 'definition': {}, 'rule_id': rules[2].id, 'ruleset_id': rulesets[2].id, 'activation_instance_id': activation_instances[3].id, 'job_instance_id': None},
-        {'name': 'rule-10', 'description': '', 'status': 'success', 'fired_date': dtparse('2022-09-29T20:21:57.672699+00:00'), 'created_at': dtparse('2022-10-04T20:21:57.672699+00:00'), 'definition': {}, 'rule_id': rules[2].id, 'ruleset_id': rulesets[2].id, 'activation_instance_id': activation_instances[3].id, 'job_instance_id': None},
-        {'name': 'rule-10', 'description': '', 'status': 'success', 'fired_date': dtparse('2022-09-30T20:21:57.672699+00:00'), 'created_at': dtparse('2022-10-04T20:21:57.672699+00:00'), 'definition': {}, 'rule_id': rules[2].id, 'ruleset_id': rulesets[2].id, 'activation_instance_id': activation_instances[3].id, 'job_instance_id': None},
-        {'name': 'rule-10', 'description': '', 'status': 'success', 'fired_date': dtparse('2022-10-01T20:21:57.672699+00:00'), 'created_at': dtparse('2022-10-04T20:21:57.672699+00:00'), 'definition': {}, 'rule_id': rules[2].id, 'ruleset_id': rulesets[2].id, 'activation_instance_id': activation_instances[3].id, 'job_instance_id': None},
-        {'name': 'rule-10', 'description': '', 'status': 'success', 'fired_date': dtparse('2022-10-02T20:21:57.672699+00:00'), 'created_at': dtparse('2022-10-04T20:21:57.672699+00:00'), 'definition': {}, 'rule_id': rules[2].id, 'ruleset_id': rulesets[2].id, 'activation_instance_id': activation_instances[3].id, 'job_instance_id': None},
-        {'name': 'rule-10', 'description': '', 'status': 'success', 'fired_date': dtparse('2022-10-03T20:21:57.672699+00:00'), 'created_at': dtparse('2022-10-04T20:21:57.672699+00:00'), 'definition': {}, 'rule_id': rules[2].id, 'ruleset_id': rulesets[2].id, 'activation_instance_id': activation_instances[3].id, 'job_instance_id': None},
+        {
+            "name": "rule-1",
+            "description": "",
+            "status": "success",
+            "fired_date": dtparse("2022-10-02T20:21:57.672699+00:00"),
+            "created_at": dtparse("2022-10-04T20:21:57.672699+00:00"),
+            "definition": {},
+            "rule_id": rules[0].id,
+            "ruleset_id": rulesets[0].id,
+            "activation_instance_id": activation_instances[0].id,
+            "job_instance_id": None,
+        },
+        {
+            "name": "rule-1",
+            "description": "",
+            "status": "success",
+            "fired_date": dtparse("2022-10-03T20:21:57.672699+00:00"),
+            "created_at": dtparse("2022-10-04T20:21:57.672699+00:00"),
+            "definition": {},
+            "rule_id": rules[0].id,
+            "ruleset_id": rulesets[0].id,
+            "activation_instance_id": activation_instances[0].id,
+            "job_instance_id": None,
+        },
+        {
+            "name": "rule-1",
+            "description": "",
+            "status": "success",
+            "fired_date": dtparse("2022-10-03T20:21:57.672699+00:00"),
+            "created_at": dtparse("2022-10-04T20:21:57.672699+00:00"),
+            "definition": {},
+            "rule_id": rules[0].id,
+            "ruleset_id": rulesets[0].id,
+            "activation_instance_id": activation_instances[1].id,
+            "job_instance_id": None,
+        },
+        {
+            "name": "rule-2",
+            "description": "",
+            "status": "fail",
+            "fired_date": dtparse("2022-10-04T19:21:57.672699+00:00"),
+            "created_at": dtparse("2022-10-04T20:21:57.672699+00:00"),
+            "definition": {},
+            "rule_id": rules[1].id,
+            "ruleset_id": rulesets[1].id,
+            "activation_instance_id": activation_instances[2].id,
+            "job_instance_id": None,
+        },
+        {
+            "name": "rule-2",
+            "description": "",
+            "status": "fail",
+            "fired_date": dtparse("2022-10-04T19:51:57.672699+00:00"),
+            "created_at": dtparse("2022-10-04T20:21:57.672699+00:00"),
+            "definition": {},
+            "rule_id": rules[1].id,
+            "ruleset_id": rulesets[1].id,
+            "activation_instance_id": activation_instances[2].id,
+            "job_instance_id": None,
+        },
+        {
+            "name": "rule-2",
+            "description": "",
+            "status": "running",
+            "fired_date": dtparse("2022-10-04T20:21:57.672699+00:00"),
+            "created_at": dtparse("2022-10-04T20:21:57.672699+00:00"),
+            "definition": {},
+            "rule_id": rules[1].id,
+            "ruleset_id": rulesets[1].id,
+            "activation_instance_id": activation_instances[2].id,
+            "job_instance_id": None,
+        },
+        {
+            "name": "rule-10",
+            "description": "",
+            "status": "success",
+            "fired_date": dtparse("2022-09-28T20:21:57.672699+00:00"),
+            "created_at": dtparse("2022-10-04T20:21:57.672699+00:00"),
+            "definition": {},
+            "rule_id": rules[2].id,
+            "ruleset_id": rulesets[2].id,
+            "activation_instance_id": activation_instances[3].id,
+            "job_instance_id": None,
+        },
+        {
+            "name": "rule-10",
+            "description": "",
+            "status": "success",
+            "fired_date": dtparse("2022-09-29T20:21:57.672699+00:00"),
+            "created_at": dtparse("2022-10-04T20:21:57.672699+00:00"),
+            "definition": {},
+            "rule_id": rules[2].id,
+            "ruleset_id": rulesets[2].id,
+            "activation_instance_id": activation_instances[3].id,
+            "job_instance_id": None,
+        },
+        {
+            "name": "rule-10",
+            "description": "",
+            "status": "success",
+            "fired_date": dtparse("2022-09-30T20:21:57.672699+00:00"),
+            "created_at": dtparse("2022-10-04T20:21:57.672699+00:00"),
+            "definition": {},
+            "rule_id": rules[2].id,
+            "ruleset_id": rulesets[2].id,
+            "activation_instance_id": activation_instances[3].id,
+            "job_instance_id": None,
+        },
+        {
+            "name": "rule-10",
+            "description": "",
+            "status": "success",
+            "fired_date": dtparse("2022-10-01T20:21:57.672699+00:00"),
+            "created_at": dtparse("2022-10-04T20:21:57.672699+00:00"),
+            "definition": {},
+            "rule_id": rules[2].id,
+            "ruleset_id": rulesets[2].id,
+            "activation_instance_id": activation_instances[3].id,
+            "job_instance_id": None,
+        },
+        {
+            "name": "rule-10",
+            "description": "",
+            "status": "success",
+            "fired_date": dtparse("2022-10-02T20:21:57.672699+00:00"),
+            "created_at": dtparse("2022-10-04T20:21:57.672699+00:00"),
+            "definition": {},
+            "rule_id": rules[2].id,
+            "ruleset_id": rulesets[2].id,
+            "activation_instance_id": activation_instances[3].id,
+            "job_instance_id": None,
+        },
+        {
+            "name": "rule-10",
+            "description": "",
+            "status": "success",
+            "fired_date": dtparse("2022-10-03T20:21:57.672699+00:00"),
+            "created_at": dtparse("2022-10-04T20:21:57.672699+00:00"),
+            "definition": {},
+            "rule_id": rules[2].id,
+            "ruleset_id": rulesets[2].id,
+            "activation_instance_id": activation_instances[3].id,
+            "job_instance_id": None,
+        },
     ]
     rules = (
         await bsql.insert_object(
@@ -411,8 +592,12 @@ async def init_test_data(db):
     rulesets = await insert_ruleset(db, rulebooks[0])
     rules = await insert_rule(db, rulesets)
     inventory = await insert_inventory(db, project)
-    activation_instances = await insert_activation_instance(db, rulebooks[0], inventory)
-    audit_rules = await insert_audit_rule(db, rulesets, rules, activation_instances)
+    activation_instances = await insert_activation_instance(
+        db, rulebooks[0], inventory
+    )
+    audit_rules = await insert_audit_rule(
+        db, rulesets, rules, activation_instances
+    )
 
     return DBTestData(
         project,

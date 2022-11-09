@@ -173,6 +173,8 @@ def build_rule_count_subquery(
     *,
     window_start: Optional[datetime.datetime] = None,
     window_end: Optional[datetime.datetime] = None,
+    select_from: Optional[sa.sql.TableClause] = a_audit_rule,
+    filters: Optional[sa.sql.ColumnElement] = None,
 ) -> sa.sql.Select:
     now = datetime.datetime.utcnow().replace(tzinfo=datetime.timezone.utc)
     if window_start is None:
@@ -192,7 +194,7 @@ def build_rule_count_subquery(
 
     rules_fired_count_sub = sa.select(
         *query_parts["raw_select_cols"]
-    ).select_from(a_audit_rule)
+    ).select_from(select_from)
 
     rules_fired_count_sub = rules_fired_count_sub.filter(
         a_audit_rule.c.fired_date.between(window_start, window_end)
@@ -201,6 +203,11 @@ def build_rule_count_subquery(
     if object_id is not None:
         rules_fired_count_sub = rules_fired_count_sub.filter(
             AUDIT_GROUPING[grouping] == object_id
+        )
+
+    if filters is not None:
+        rules_fired_count_sub = rules_fired_count_sub.filter(
+            filters
         )
 
     rules_fired_count_sub = rules_fired_count_sub.group_by(
@@ -329,6 +336,37 @@ def build_object_fire_counts_query(
     return rule_fired_counts_query
 
 
+def build_rulebook_rulesets_fire_counts_query(
+    rulebook_id: int,
+    *,
+    window_start: Optional[datetime.datetime] = None,
+    window_end: Optional[datetime.datetime] = None,
+) -> sa.sql.Select:
+    query_parts = get_count_cols_and_grouping(AuditGrouping.RULESET)
+    rb_rs_count_subquery = (
+        build_rule_count_subquery(
+            AuditGrouping.RULESET,
+            query_parts,
+            object_id=None,
+            window_start=window_start,
+            window_end=window_end,
+            select_from=(
+                a_audit_rule.outerjoin(
+                    a_ruleset, a_ruleset.c.id == a_audit_rule.c.ruleset_id
+                )
+            ),
+            filters=(a_ruleset.c.rulebook_id == rulebook_id),
+        )
+    )
+
+    rb_rs_fired_counts_query = build_labeled_count_query(
+        AuditGrouping.RULESET, rb_rs_count_subquery
+    )
+
+    return rb_rs_fired_counts_query
+
+
+
 # ------------------------------------
 #   Primary Public Functions for getting fired counts for ruleset, rule
 # ------------------------------------
@@ -406,6 +444,39 @@ async def get_indexed_fired_counts(
         window_end=window_end,
     )
     indexed = await index_grouped_objects(cur, grouping)
+    return indexed
+
+
+async def get_rulebook_ruleset_fired_counts(
+    db: AsyncSession,
+    rulebook_id: int,
+    *,
+    window_start: Optional[datetime.datetime] = None,
+    window_end: Optional[datetime.datetime] = None,
+) -> sa.engine.CursorResult:
+    rb_rs_fired_stats_query = build_rulebook_rulesets_fire_counts_query(
+        rulebook_id,
+        window_start=window_start,
+        window_end=window_end,
+    )
+    cur = await bsql.execute_get_results(db, rb_rs_fired_stats_query)
+    return cur
+
+
+async def get_rulebook_ruleset_indexed_fired_counts(
+    db: AsyncSession,
+    rulebook_id: int,
+    *,
+    window_start: Optional[datetime.datetime] = None,
+    window_end: Optional[datetime.datetime] = None,
+) -> Dict:
+    cur = await get_rulebook_ruleset_fired_counts(
+        db,
+        rulebook_id,
+        window_start=window_start,
+        window_end=window_end,
+    )
+    indexed = await index_grouped_objects(cur, AuditGrouping.RULESET)
     return indexed
 
 
@@ -512,7 +583,9 @@ async def create_rulebook(
     return new_rulebook
 
 
-def build_rulebook_base_query(object_id: Optional[int]) -> sa.sql.Select:
+def build_rulebook_base_query(
+    object_id: Optional[int] = None,
+) -> sa.sql.Select:
     ruleset_lat = sa.orm.aliased(models.rulesets, name="ruleset_lat")
     subq_select_exprs = [sa.func.count().label("ruleset_count")]
     subq_filters = ruleset_lat.c.rulebook_id == a_rulebook.c.id

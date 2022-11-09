@@ -1,9 +1,7 @@
 import os
-import pytest
+
 import sqlalchemy as sa
-from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
-from starlette import status as status_codes
 
 from eda_server.db import models
 from eda_server.db.sql import base as bsql
@@ -19,9 +17,9 @@ async def test_build_select_query():
         filters=models.audit_rules.c.rule_id.is_not(None),
         group_by=[models.audit_rules.c.ruleset_id],
         having=sa.func.count() > 1,
-        order_by=[sa.desc(sa.text("rule_count"))]
+        order_by=[sa.desc(sa.text("rule_count"))],
     )
-    query_str = str(query).lower().replace(os.linesep, ' ')
+    query_str = str(query).lower().replace(os.linesep, " ")
 
     assert isinstance(query, sa.sql.Select)
     assert " count(*) as rule_count" in query_str
@@ -37,9 +35,9 @@ async def test_build_insert_query():
     ins = bsql.build_insert(
         models.projects,
         values={"name": proj_name},
-        returning=[models.projects]
+        returning=[models.projects],
     )
-    ins_str = str(ins).lower().replace(os.linesep, ' ')
+    ins_str = str(ins).lower().replace(os.linesep, " ")
 
     assert isinstance(ins, sa.sql.Insert)
     assert " into project" in ins_str
@@ -111,7 +109,7 @@ async def test_insert_object_select(db: AsyncSession):
         values=[
             {"name": "test-insert-object-select"},
             {"name": "another-test-insert-object-select"},
-        ]
+        ],
     )
     cur = await bsql.insert_object(
         db,
@@ -120,9 +118,9 @@ async def test_insert_object_select(db: AsyncSession):
             select_from=models.projects,
             select_cols=[
                 (
-                    models.projects.c.name + "|" + sa.func.cast(
-                        models.projects.c.id, sa.Text
-                    )
+                    models.projects.c.name
+                    + "|"
+                    + sa.func.cast(models.projects.c.id, sa.Text)
                 ).label("name")
             ],
         ),
@@ -134,4 +132,4 @@ async def test_insert_object_select(db: AsyncSession):
     for rec in res:
         assert isinstance(rec, sa.engine.Row)
         assert hasattr(rec, "id")
-        assert rec.name.split('|')[-1].isdigit()
+        assert rec.name.split("|")[-1].isdigit()

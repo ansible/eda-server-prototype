@@ -6,9 +6,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from eda_server.db import models
 from eda_server.db.models.activation import RestartPolicy
-from eda_server.db.utils.lostream import PGLargeObject
 from eda_server.db.sql import base as bsql
-
+from eda_server.db.utils.lostream import PGLargeObject
 
 TEST_ACTIVATION = {
     "name": "test-activation",
@@ -56,7 +55,7 @@ async def _create_activation_dependent_objects(db: AsyncSession):
         await bsql.insert_object(
             db,
             models.extra_vars,
-            values={"name": "vars.yml", "extra_var": TEST_EXTRA_VAR}
+            values={"name": "vars.yml", "extra_var": TEST_EXTRA_VAR},
         )
     ).inserted_primary_key
 
@@ -64,7 +63,7 @@ async def _create_activation_dependent_objects(db: AsyncSession):
         await bsql.insert_object(
             db,
             models.inventories,
-            values={"name": "inventory.yml", "inventory": TEST_INVENTORY}
+            values={"name": "inventory.yml", "inventory": TEST_INVENTORY},
         )
     ).inserted_primary_key
 
@@ -72,7 +71,7 @@ async def _create_activation_dependent_objects(db: AsyncSession):
         await bsql.insert_object(
             db,
             models.rulebooks,
-            values={"name": "ruleset.yml", "rulesets": TEST_RULEBOOK}
+            values={"name": "ruleset.yml", "rulesets": TEST_RULEBOOK},
         )
     ).inserted_primary_key
 
@@ -96,12 +95,14 @@ async def _create_activation(db: AsyncSession, foreign_keys: dict):
                 "status": TEST_ACTIVATION["status"],
                 "rulebook_id": foreign_keys["rulebook_id"],
                 "inventory_id": foreign_keys["inventory_id"],
-                "execution_environment": TEST_ACTIVATION["execution_environment"],
+                "execution_environment": TEST_ACTIVATION[
+                    "execution_environment"
+                ],
                 "working_directory": TEST_ACTIVATION["working_directory"],
                 "restart_policy": TEST_ACTIVATION["restart_policy"],
                 "is_enabled": TEST_ACTIVATION["is_enabled"],
                 "extra_var_id": foreign_keys["extra_var_id"],
-            }
+            },
         )
     ).inserted_primary_key
 

@@ -27,17 +27,6 @@ async def admin_user(db: AsyncSession):
 
 
 @pytest.fixture
-async def admin_user(db: AsyncSession):
-    return await UserDatabase(db).create(
-        {
-            "email": "admin@example.com",
-            "hashed_password": "",
-            "is_superuser": True,
-        }
-    )
-
-
-@pytest.fixture
 async def test_user(db: AsyncSession):
     return await UserDatabase(db).create(
         {

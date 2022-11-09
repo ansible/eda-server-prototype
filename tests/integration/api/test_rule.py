@@ -1,14 +1,13 @@
-import sqlalchemy as sa
 from collections import namedtuple
 from datetime import datetime, timedelta, timezone
+from typing import Tuple
+
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status as status_codes
-from typing import Tuple
 
 from eda_server.db import models
 from eda_server.db.sql import base as bsql
-
 
 TEST_RULESET_SIMPLE = """
 ---
@@ -36,17 +35,17 @@ DBTestData = namedtuple(
         "inventory",
         "activation_instance",
         "audit_rules",
-    )
+    ),
 )
 
 
-async def _create_rules(db: AsyncSession, intervals: Tuple[int, int]=(5, 6)):
+async def _create_rules(db: AsyncSession, intervals: Tuple[int, int] = (5, 6)):
     project = (
         await bsql.insert_object(
             db,
             models.projects,
             values={"name": "project--test-ruleset-1.yml"},
-            returning=[models.projects.c.id, models.projects.c.name]
+            returning=[models.projects.c.id, models.projects.c.name],
         )
     ).one()
 
@@ -59,7 +58,7 @@ async def _create_rules(db: AsyncSession, intervals: Tuple[int, int]=(5, 6)):
                 "rulesets": TEST_RULESET_SIMPLE,
                 "project_id": project.id,
             },
-            returning=[models.rulebooks.c.id, models.rulebooks.c.name]
+            returning=[models.rulebooks.c.id, models.rulebooks.c.name],
         )
     ).one()
 
@@ -77,7 +76,7 @@ async def _create_rules(db: AsyncSession, intervals: Tuple[int, int]=(5, 6)):
                         "source": "range",
                         "config": {"limit": 5},
                     }
-                ]
+                ],
             },
             returning=[
                 models.rulesets.c.id,
@@ -86,7 +85,7 @@ async def _create_rules(db: AsyncSession, intervals: Tuple[int, int]=(5, 6)):
                 models.rulesets.c.created_at,
                 models.rulesets.c.modified_at,
                 models.rulesets.c.sources,
-            ]
+            ],
         )
     ).one()
 
@@ -111,7 +110,7 @@ async def _create_rules(db: AsyncSession, intervals: Tuple[int, int]=(5, 6)):
                 models.rules.c.name,
                 models.rules.c.action,
                 models.rules.c.ruleset_id,
-            ]
+            ],
         )
     ).all()
 
@@ -120,7 +119,7 @@ async def _create_rules(db: AsyncSession, intervals: Tuple[int, int]=(5, 6)):
             db,
             models.inventories,
             values={"name": "tst-inv-1", "project_id": project.id},
-            returning=[models.inventories]
+            returning=[models.inventories],
         )
     ).one()
 
@@ -133,7 +132,7 @@ async def _create_rules(db: AsyncSession, intervals: Tuple[int, int]=(5, 6)):
                 "rulebook_id": rulebook.id,
                 "inventory_id": inventory.id,
             },
-            returning=[models.activation_instances]
+            returning=[models.activation_instances],
         )
     ).one()
 
@@ -143,28 +142,38 @@ async def _create_rules(db: AsyncSession, intervals: Tuple[int, int]=(5, 6)):
             models.audit_rules,
             values=[
                 {
-                    'name': rules[0].name,
-                    'description': '',
-                    'status': 'success',
-                    'fired_date': datetime.utcnow().replace(tzinfo=timezone.utc) - timedelta(days=intervals[0]),
-                    'created_at': datetime.utcnow().replace(tzinfo=timezone.utc),
-                    'definition': rules[0].action,
-                    'rule_id': rules[0].id,
-                    'ruleset_id': ruleset.id,
-                    'activation_instance_id': activation_instance.id,
-                    'job_instance_id': None
+                    "name": rules[0].name,
+                    "description": "",
+                    "status": "success",
+                    "fired_date": datetime.utcnow().replace(
+                        tzinfo=timezone.utc
+                    )
+                    - timedelta(days=intervals[0]),
+                    "created_at": datetime.utcnow().replace(
+                        tzinfo=timezone.utc
+                    ),
+                    "definition": rules[0].action,
+                    "rule_id": rules[0].id,
+                    "ruleset_id": ruleset.id,
+                    "activation_instance_id": activation_instance.id,
+                    "job_instance_id": None,
                 },
                 {
-                    'name': rules[1].name,
-                    'description': '',
-                    'status': 'success',
-                    'fired_date': datetime.utcnow().replace(tzinfo=timezone.utc) - timedelta(days=intervals[1]),
-                    'created_at': datetime.utcnow().replace(tzinfo=timezone.utc),
-                    'definition': rules[1].action,
-                    'rule_id': rules[1].id,
-                    'ruleset_id': ruleset.id,
-                    'activation_instance_id': activation_instance.id,
-                    'job_instance_id': None
+                    "name": rules[1].name,
+                    "description": "",
+                    "status": "success",
+                    "fired_date": datetime.utcnow().replace(
+                        tzinfo=timezone.utc
+                    )
+                    - timedelta(days=intervals[1]),
+                    "created_at": datetime.utcnow().replace(
+                        tzinfo=timezone.utc
+                    ),
+                    "definition": rules[1].action,
+                    "rule_id": rules[1].id,
+                    "ruleset_id": ruleset.id,
+                    "activation_instance_id": activation_instance.id,
+                    "job_instance_id": None,
                 },
             ],
             returning=[models.audit_rules],
@@ -173,7 +182,15 @@ async def _create_rules(db: AsyncSession, intervals: Tuple[int, int]=(5, 6)):
 
     await db.commit()
 
-    return DBTestData(project, rulebook, ruleset, rules, inventory, activation_instance, audit_rules)
+    return DBTestData(
+        project,
+        rulebook,
+        ruleset,
+        rules,
+        inventory,
+        activation_instance,
+        audit_rules,
+    )
 
 
 async def test_list_rules(client: AsyncClient, db: AsyncSession):
@@ -243,8 +260,7 @@ async def test_read_rule(client: AsyncClient, db: AsyncSession):
     }
     for exp_key in expected:
         assert expected[exp_key] == data[exp_key]
-    import sys
-    print(data["fired_stats"])
+
     assert len(data["fired_stats"]) > 0
     for fs in data["fired_stats"]:
         assert fs["total_type"] == "date_status_object"
@@ -270,7 +286,7 @@ async def test_list_rulesets(client: AsyncClient, db: AsyncSession):
             "rule_count": len(rules),
             "created_at": ruleset.created_at.isoformat(),
             "modified_at": ruleset.created_at.isoformat(),
-            "source_types": ['range'],
+            "source_types": ["range"],
             "fired_stats": [
                 {
                     "total_type": "status",
@@ -286,9 +302,7 @@ async def test_list_rulesets(client: AsyncClient, db: AsyncSession):
     ]
 
 
-async def test_list_rulesets_no_stats(
-    client: AsyncClient, db: AsyncSession
-):
+async def test_list_rulesets_no_stats(client: AsyncClient, db: AsyncSession):
     test_data = await _create_rules(db, (40, 41))
     ruleset = test_data.ruleset
     rules = test_data.rules
@@ -302,11 +316,10 @@ async def test_list_rulesets_no_stats(
             "rule_count": len(rules),
             "created_at": ruleset.created_at.isoformat(),
             "modified_at": ruleset.created_at.isoformat(),
-            "source_types": ['range'],
+            "source_types": ["range"],
             "fired_stats": [],
         }
     ]
-
 
 
 async def test_read_ruleset(client: AsyncClient, db: AsyncSession):
@@ -328,19 +341,14 @@ async def test_read_ruleset(client: AsyncClient, db: AsyncSession):
                 "name": "range",
                 "type": "range",
                 "source": "range",
-                "config": {
-                    "limit": 5
-                }
+                "config": {"limit": 5},
             }
         ],
         "rulebook": {
             "id": rulebook.id,
             "name": rulebook.name,
         },
-        "project": {
-            "id": project.id,
-            "name": project.name
-        },
+        "project": {"id": project.id, "name": project.name},
     }
 
     response = await client.get(f"/api/rulesets/{ruleset.id}")
@@ -353,7 +361,10 @@ async def test_read_ruleset(client: AsyncClient, db: AsyncSession):
     assert len(respj["fired_stats"]) == 2
     for fs in respj["fired_stats"]:
         assert fs["total_type"] == "date_status_object"
-        assert fs["fired_date"] in (str(aud_rul[0].fired_date.date()), str(aud_rul[1].fired_date.date()))
+        assert fs["fired_date"] in (
+            str(aud_rul[0].fired_date.date()),
+            str(aud_rul[1].fired_date.date()),
+        )
         assert fs["object_status"] in (aud_rul[0].status, aud_rul[1].status)
         assert fs["object_status_total"] == 1
         assert fs["date_status_total"] == 1
