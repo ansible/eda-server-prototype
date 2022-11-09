@@ -1,6 +1,4 @@
-"""
-Generalized simple query builders and executors.
-"""
+"""Generalized simple query builders and executors."""
 from typing import List, Optional, Union
 
 import sqlalchemy as sa
@@ -15,13 +13,15 @@ async def execute(
     db: AsyncSession, sql: sa.sql.Executable
 ) -> sa.engine.CursorResult:
     """
+    Function execute
+
     Execute a query and return the created cursor.
     Parameters:
         db:     AsyncSession: Database connection
         sql:    sa.sql.Executable: Query object
     Returns:
         sa.engine.CursorResult: Cursor returned from execution
-    """
+    """  # noqa D401
     cur = await db.execute(sql)
     return cur
 
@@ -30,6 +30,8 @@ async def execute_get_result(
     db: AsyncSession, sql: sa.sql.Executable
 ) -> sa.engine.Row:
     """
+    Function execute_get_result
+
     Execute a query and return the one-record result or None.
     Parameters:
         db:     AsyncSession: Database connection
@@ -37,7 +39,7 @@ async def execute_get_result(
     Returns:
         sa.engine.Row: Record from cursor
         None: No record returned
-    """
+    """  # noqa D401
     cur = await execute(db, sql)
     return cur.one_or_none()
 
@@ -45,7 +47,11 @@ async def execute_get_result(
 async def execute_get_results(
     db: AsyncSession, sql: sa.sql.Executable
 ) -> sa.engine.CursorResult:
-    """Semantic duplicate of 'execute'"""
+    """
+    Function execute_get_results
+
+    Semantic duplicate of 'execute'
+    """  # noqa D401
     return await execute(db, sql)
 
 
@@ -66,6 +72,8 @@ def build_object_query(
     order_by: Optional[List[sa.sql.ColumnElement]] = None,
 ) -> sa.sql.Executable:
     """
+    Function build_object_query
+
     Builds a select query and returns an Executable object instance.
     Parameters:
         select_from:    sqlalchemy.sql.Selectable:
@@ -86,7 +94,7 @@ def build_object_query(
                         order results.
         Returns:
             sqlalchemy.sql.Executable: The resulting query object.
-    """
+    """  # noqa D401
     if select_cols is None:
         select_cols = [select_from]
 
@@ -123,6 +131,8 @@ async def get_object(
     order_by: Optional[List[sa.sql.ColumnElement]] = None,
 ) -> Union[sa.engine.Row, None]:
     """
+    Function get_object
+
     Builds and executes a query and returns an expected one-record result
     or None.
     Parameters:
@@ -146,7 +156,7 @@ async def get_object(
         Returns:
             sqlalchemy.engine.Row:  The resulting one record from the query.
             None                    No record returned
-    """
+    """  # noqa D401
     return await execute_get_result(
         db,
         build_object_query(
@@ -173,6 +183,8 @@ async def get_objects(
     order_by: Optional[List[sa.sql.ColumnElement]] = None,
 ) -> sa.engine.CursorResult:
     """
+    Function get_objects
+
     Builds and executes a query and returns the resulting cursor.
     Parameters:
         db:             AsyncSession. The database connection
@@ -194,7 +206,7 @@ async def get_objects(
                         order results.
         Returns:
             sqlalchemy.engine.CursorResult:  The resulting cursor
-    """
+    """  # noqa D401
     return await execute_get_results(
         db,
         build_object_query(
@@ -223,6 +235,8 @@ def build_insert(
     ] = None,
 ) -> sa.sql.Insert:
     """
+    Function build_insert
+
     Builds an insert query and returns the Insert object.
     Data can be specified as a single dict, a list of dict
     or a Select object.
@@ -241,7 +255,7 @@ def build_insert(
                         be returned from the insert action.
         Returns:
             sqlalchemy.sql.Insert:  The insert query
-    """
+    """  # noqa D401
     ins = sa.insert(insert_into)
     if values is not None:
         ins = ins.values(values)
@@ -269,6 +283,8 @@ async def insert_object(
     ] = None,
 ) -> sa.engine.CursorResult:
     """
+    Function insert_object
+
     Build and execute an insert query and returns the Insert object.
     Data can be specified as a single dict, a list of dict
     or a Select object.
@@ -287,7 +303,7 @@ async def insert_object(
                         be returned from the insert action.
         Returns:
             sqlalchemy.sql.Insert:  The insert query
-    """
+    """  # noqa D401
     ins = build_insert(
         insert_into, values=values, select=select, returning=returning
     )

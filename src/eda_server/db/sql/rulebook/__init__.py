@@ -1,6 +1,4 @@
-"""
-Query builders and executors for rule, ruleset, rulebook endpoints.
-"""
+"""Query builders and executors for rule, ruleset, rulebook endpoints."""
 import datetime
 import enum
 from typing import Dict, List, Optional, Tuple, Union
@@ -65,13 +63,6 @@ AUDIT_GROUPING = {
 
 
 def build_ruleset_base_query(object_id: Optional[int] = None) -> sa.sql.Select:
-    """
-    Builds the base query for ruleset list and detail endpoints.
-    Parameters:
-        object_id: Optional[int]  - The specific ruleset id for which to query
-    Returns:
-        sqlalchemy.sql.Select  -  The resulting Select object
-    """
     rule_lat = sa.orm.aliased(models.rules, name="rule_lat")
     subq_select_exprs = [sa.func.count().label("rule_count")]
     subq_filters = rule_lat.c.ruleset_id == a_ruleset.c.id
@@ -118,17 +109,6 @@ def build_ruleset_base_query(object_id: Optional[int] = None) -> sa.sql.Select:
 # will also build the grouping sets for those columns
 # The return object is a dict
 def get_count_cols_and_grouping(grouping: AuditGrouping) -> Dict:
-    """
-    Builds selected column expressions for ruleset and rule counts.
-    The granularity (ruleset, rule) is controlled by the AuditGrouping enum
-    used. This query will also build a grouping set group values.
-    Parameters:
-        grouping: AuditGrouping  - The grouping granularity needed in the
-                                   audit_rules table.
-    Returns:
-        Dict  -  Dictionary for consistent access of each query component.
-    """
-
     grouping_column = AUDIT_GROUPING[grouping]
 
     raw_select_cols = [
@@ -194,29 +174,6 @@ def build_rule_count_subquery(
     window_start: Optional[datetime.datetime] = None,
     window_end: Optional[datetime.datetime] = None,
 ) -> sa.sql.Select:
-    """
-    Builds a subquery that will be utilized to get the counts for one or more
-    rulesets or rules (controlled by the grouping parameter) for a defined
-    start, end (tz-aware) datetime window. If no window is given, the default
-    is to use:
-        end = utcnow() at utc
-        start = date_trunc(day, end - timedelta(days=30)))
-    Parameters:
-        grouping: AuditGrouping  - The grouping granularity needed in the
-                                   audit_rules table.
-        query_parts: Dict  - The output from get_count_cols_and_grouping
-        objectg_id: Optional[int]  - The specific rule/ruleset id for which
-                                     to query
-        window_start: Optional[datetime.datetime]
-                                  - The start of the datetime window
-                                    This should include the timezone
-        window_end: Optional[datetime.datetime]
-                                  - The end of the datetime window
-                                    This should include the timezone
-    Returns:
-        sqlalchemy.sql.Select  -  The resulting Select subquery
-    """
-
     now = datetime.datetime.utcnow().replace(tzinfo=datetime.timezone.utc)
     if window_start is None:
         window_start = datetime.datetime(
@@ -257,18 +214,6 @@ def get_row_type_case_conditions(
     grouping: AuditGrouping,
     rules_fired_count_sub: sa.sql.Executable,
 ) -> List[Tuple[sa.sql.elements.WrapsColumnExpression, str]]:
-    """
-    Builds the case conditions that will apply a row type label to the
-    grouped set output of the subquery.
-    Parameters:
-        grouping: AuditGrouping  - The grouping granularity needed in the
-                                   audit_rules table.
-        rules_fired_count_sub: sqlalchemy.sql.Executable
-                                   - The output from build_rule_count_subquery
-    Returns:
-        List[Tuple[sa.sql.elements.WrapsColumnExpression, str]]
-                                  -  The case expressions
-    """
     grouping_column = AUDIT_GROUPING[grouping]
     cases = [
         (
@@ -344,16 +289,6 @@ def build_labeled_count_query(
     grouping: AuditGrouping,
     rules_fired_count_sub: sa.sql.Executable,
 ) -> sa.sql.Executable:
-    """
-    Builds outer query that will label the set-grouped data from the subquery.
-    Parameters:
-        grouping: AuditGrouping  - The grouping granularity needed in the
-                                   audit_rules table.
-        rules_fired_count_sub: sqlalchemy.sql.Executable
-                                   - The output from build_rule_count_subquery
-    Returns:
-        sqlachemy.sql.Executable  - The resulting query
-    """
     case_label_expr = get_row_type_case_conditions(
         grouping, rules_fired_count_sub
     )
@@ -378,28 +313,6 @@ def build_object_fire_counts_query(
     window_start: Optional[datetime.datetime] = None,
     window_end: Optional[datetime.datetime] = None,
 ) -> sa.sql.Select:
-    """
-    Builds the final select query to get the counts for one or more
-    rulesets or rules (controlled by the grouping parameter) for a defined
-    start, end (tz-aware) datetime window. If no window is given, the default
-    is to use:
-        end = utcnow() at utc
-        start = date_trunc(day, end - timedelta(days=30)))
-    Parameters:
-        grouping: AuditGrouping  - The grouping granularity needed in the
-                                   audit_rules table.
-        rules_fired_count_sub: sqlalchemy.sql.Executable
-                                   - The output from build_rule_count_subquery
-        window_start: Optional[datetime.datetime]
-                                  - The start of the datetime window
-                                    This should include the timezone
-        window_end: Optional[datetime.datetime]
-                                  - The end of the datetime window
-                                    This should include the timezone
-    Returns:
-        List[Tuple[sa.sql.elements.WrapsColumnExpression, str]]
-                                  -  The case expressions
-    """
     query_parts = get_count_cols_and_grouping(grouping)
     rule_count_subquery = build_rule_count_subquery(
         grouping,
@@ -429,23 +342,6 @@ async def get_fired_counts(
     window_start: Optional[datetime.datetime] = None,
     window_end: Optional[datetime.datetime] = None,
 ) -> sa.engine.CursorResult:
-    """
-    Build and execute the query to get the grouped counts from the
-    audit_rules table for one or more rulesets or rules.
-    Parameters:
-        db: AsyncSession        - database connection
-        grouping: AuditGrouping  - The grouping granularity needed in the
-                                   audit_rules table.
-        object_id: Optional[int]  - The specific ruleset id for which to query
-        window_start: Optional[datetime.datetime]
-                                  - The start of the datetime window
-                                    This should include the timezone
-        window_end: Optional[datetime.datetime]
-                                  - The end of the datetime window
-                                    This should include the timezone
-    Returns:
-        sa.engine.CursorResult    -  The resulting cursor from the execution
-    """
     rule_fired_stats_query = build_object_fire_counts_query(
         grouping,
         object_id=object_id,
@@ -460,18 +356,6 @@ async def index_grouped_objects(
     cur: Union[sa.engine.CursorResult, List[sa.engine.Row]],
     grouping: AuditGrouping,
 ) -> Dict:
-    """
-    Create a dict version of the grouped results keyed by row_type and the
-    grouping set col values.
-    Parameters:
-        cur: Union[sa.engine.CursorResult, List[sa.engine.Row]]
-                                - Iterable of the data returned by
-                                  get_fired_counts
-        grouping: AuditGrouping  - The grouping granularity needed in the
-                                   audit_rules table.
-    Returns:
-        Dict     -  The resulting data index
-    """
     grouped_column = AUDIT_GROUPING[grouping]
     counts = {}
     for rec in cur:
@@ -514,22 +398,6 @@ async def get_indexed_fired_counts(
     window_start: Optional[datetime.datetime] = None,
     window_end: Optional[datetime.datetime] = None,
 ) -> Dict:
-    """
-    Get and index the grouped fire-count data.
-    Parameters:
-        db: AsyncSession        - database connection
-        grouping: AuditGrouping  - The grouping granularity needed in the
-                                   audit_rules table.
-        object_id: Optional[int]  - The specific ruleset id for which to query
-        window_start: Optional[datetime.datetime]
-                                  - The start of the datetime window
-                                    This should include the timezone
-        window_end: Optional[datetime.datetime]
-                                  - The end of the datetime window
-                                    This should include the timezone
-    Returns:
-        Dict     -  The resulting data index
-    """
     cur = await get_fired_counts(
         db,
         grouping,
@@ -543,39 +411,37 @@ async def get_indexed_fired_counts(
 
 async def list_rulesets(db: AsyncSession) -> sa.engine.CursorResult:
     query = build_ruleset_base_query()
-    return (await bsql.execute_get_results(db, query))
+    return await bsql.execute_get_results(db, query)
 
 
-async def get_ruleset(db:AsyncSession, ruleset_id: int) -> sa.engine.Row:
+async def get_ruleset(db: AsyncSession, ruleset_id: int) -> sa.engine.Row:
     query = build_ruleset_base_query(ruleset_id)
-    return (await bsql.execute_get_result(db, query))
+    return await bsql.execute_get_result(db, query)
 
 
-async def get_ruleset_counts(db: AsyncSession, ruleset_id: Optional[int] = None) -> Dict:
+async def get_ruleset_counts(
+    db: AsyncSession, ruleset_id: Optional[int] = None
+) -> Dict:
     ruleset_counts = await get_indexed_fired_counts(
         db, AuditGrouping.RULESET, ruleset_id
     )
     return ruleset_counts
 
 
-async def list_ruleset_rules(db: AsyncSession, ruleset_id) -> sa.engine.CursorResult:
+async def list_ruleset_rules(
+    db: AsyncSession, ruleset_id: int
+) -> sa.engine.CursorResult:
     query = build_rule_base_query()
-    query = query.filter(a_rule.ruleset_id == ruleset_id)
-    return (await bsql.execute_get_results(db, query))
+    query = query.filter(a_rule.c.ruleset_id == ruleset_id)
+    return await bsql.execute_get_results(db, query)
 
 
 # ------------------------------------
 #   Query builders for rules
 # ------------------------------------
 
+
 def build_rule_base_query(object_id: Optional[int] = None) -> sa.sql.Select:
-    """
-    Builds the base query for rule list and detail endpoints.
-    Parameters:
-        object_id: Optional[int]  - The specific rule id for which to query
-    Returns:
-        sqlalchemy.sql.Select  -  The resulting Select object
-    """
     select_exprs = [
         a_rule,
         sa.func.jsonb_build_object(
@@ -589,12 +455,8 @@ def build_rule_base_query(object_id: Optional[int] = None) -> sa.sql.Select:
         ).label("project"),
     ]
     select_from = (
-        a_rule.outerjoin(
-            a_ruleset, a_ruleset.c.id == a_rule.c.ruleset_id
-        )
-        .outerjoin(
-            a_rulebook, a_rulebook.c.id == a_ruleset.c.rulebook_id
-        )
+        a_rule.outerjoin(a_ruleset, a_ruleset.c.id == a_rule.c.ruleset_id)
+        .outerjoin(a_rulebook, a_rulebook.c.id == a_ruleset.c.rulebook_id)
         .outerjoin(a_project, a_project.c.id == a_rulebook.c.project_id)
     )
 
@@ -612,15 +474,17 @@ def build_rule_base_query(object_id: Optional[int] = None) -> sa.sql.Select:
 
 async def list_rules(db: AsyncSession) -> sa.engine.CursorResult:
     query = build_rule_base_query()
-    return (await bsql.execute_get_results(db, query))
+    return await bsql.execute_get_results(db, query)
 
 
-async def get_rule(db:AsyncSession, rule_id: int) -> sa.engine.Row:
+async def get_rule(db: AsyncSession, rule_id: int) -> sa.engine.Row:
     query = build_rule_base_query(rule_id)
-    return (await bsql.execute_get_result(db, query))
+    return await bsql.execute_get_result(db, query)
 
 
-async def get_rule_counts(db: AsyncSession, rule_id: Optional[int] = None) -> Dict:
+async def get_rule_counts(
+    db: AsyncSession, rule_id: Optional[int] = None
+) -> Dict:
     rule_counts = await get_indexed_fired_counts(
         db, AuditGrouping.RULE, rule_id
     )
@@ -631,20 +495,11 @@ async def get_rule_counts(db: AsyncSession, rule_id: Optional[int] = None) -> Di
 #   Query builders, actions for rulebooks
 # ------------------------------------
 
+
 async def create_rulebook(
     db: AsyncSession,
     rulebook_rec: Dict,
 ) -> sa.engine.Row:
-    """
-    Create a rulebook record from the record dict values.
-    Parameters:
-        db: AsyncSession  - Database connection
-        rulebook_rec: Dict  - Data record. Keys must match
-                              table columns
-    Returns:
-        sqlalchemy.engine.Row: The created record as returned
-                               from the database.
-    """
     try:
         new_rulebook = (
             await bsql.insert_object(
@@ -658,13 +513,6 @@ async def create_rulebook(
 
 
 def build_rulebook_base_query(object_id: Optional[int]) -> sa.sql.Select:
-    """
-    Build the rulebook base query for list and detail select
-    Parameters:
-        object_id: Optional[int]  - The specific rulebook id for which to query
-    Returns:
-        sqlalchemy.sql.Select  -  The resulting Select object
-    """
     ruleset_lat = sa.orm.aliased(models.rulesets, name="ruleset_lat")
     subq_select_exprs = [sa.func.count().label("ruleset_count")]
     subq_filters = ruleset_lat.c.rulebook_id == a_rulebook.c.id
@@ -685,12 +533,9 @@ def build_rulebook_base_query(object_id: Optional[int]) -> sa.sql.Select:
             "id", a_project.c.id, "name", a_project.c.name
         ).label("project"),
     ]
-    select_from = (
-        a_rulebook.outerjoin(
-            a_project, a_project.c.id == a_rulebook.c.project_id
-        )
-        .outerjoin(lat_count_subq, sa.true())
-    )
+    select_from = a_rulebook.outerjoin(
+        a_project, a_project.c.id == a_rulebook.c.project_id
+    ).outerjoin(lat_count_subq, sa.true())
 
     if object_id is not None:
         filters = a_rulebook.c.id == object_id
@@ -706,21 +551,25 @@ def build_rulebook_base_query(object_id: Optional[int]) -> sa.sql.Select:
 
 async def list_rulebooks(db: AsyncSession) -> sa.engine.CursorResult:
     query = build_rulebook_base_query()
-    return (await bsql.execute_get_results(db, query))
+    return await bsql.execute_get_results(db, query)
 
 
-async def get_rulebook(db:AsyncSession, rulebook_id: int) -> sa.engine.Row:
+async def get_rulebook(db: AsyncSession, rulebook_id: int) -> sa.engine.Row:
     query = build_rulebook_base_query(rulebook_id)
-    return (await bsql.execute_get_result(db, query))
+    return await bsql.execute_get_result(db, query)
 
 
-async def list_rulebook_rulesets(db:AsyncSession, rulebook_id: int) -> sa.engine.CursorResult:
+async def list_rulebook_rulesets(
+    db: AsyncSession, rulebook_id: int
+) -> sa.engine.CursorResult:
     query = build_ruleset_base_query()
     query = query.filter(a_ruleset.c.rulebook_id == rulebook_id)
-    return (await bsql.execute_get_results(db, query))
+    return await bsql.execute_get_results(db, query)
 
 
 # Adds a common base class to mark any exception coming from this module code
 def raise_exception(exc: Exception):
-    err = type(exc.__class__.__name__, (exc.__class__, RulebookQueryEception), {})
+    err = type(
+        exc.__class__.__name__, (exc.__class__, RulebookQueryEception), {}
+    )
     raise err(str(exc))

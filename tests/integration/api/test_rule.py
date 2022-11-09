@@ -243,7 +243,17 @@ async def test_read_rule(client: AsyncClient, db: AsyncSession):
     }
     for exp_key in expected:
         assert expected[exp_key] == data[exp_key]
+    import sys
+    print(data["fired_stats"])
     assert len(data["fired_stats"]) > 0
+    for fs in data["fired_stats"]:
+        assert fs["total_type"] == "date_status_object"
+        assert fs["object_status"] == "success"
+        assert fs["date_status_total"] == 1
+        assert fs["object_status_total"] == 1
+        assert fs["pct_date_status_total"] == 100
+        assert fs["window_total"] == 1
+        assert fs["pct_window_total"] == 100
 
 
 async def test_list_rulesets(client: AsyncClient, db: AsyncSession):
@@ -346,6 +356,7 @@ async def test_read_ruleset(client: AsyncClient, db: AsyncSession):
         assert fs["fired_date"] in (str(aud_rul[0].fired_date.date()), str(aud_rul[1].fired_date.date()))
         assert fs["object_status"] in (aud_rul[0].status, aud_rul[1].status)
         assert fs["object_status_total"] == 1
+        assert fs["date_status_total"] == 1
         assert fs["pct_date_status_total"] == 100
         assert fs["window_total"] == 2
         assert fs["pct_window_total"] == 50
@@ -354,3 +365,16 @@ async def test_read_ruleset(client: AsyncClient, db: AsyncSession):
 async def test_read_ruleset_not_found(client: AsyncClient, db: AsyncSession):
     response = await client.get("/api/rulesets/-1")
     assert response.status_code == status_codes.HTTP_404_NOT_FOUND
+
+
+async def test_resd_ruleset_rules(client: AsyncClient, db: AsyncSession):
+    test_data = await _create_rules(db)
+    ruleset = test_data.ruleset
+    rules = test_data.rules
+
+    response = await client.get(f"/api/rulesets/{ruleset.id}/rules")
+    assert response.status_code == status_codes.HTTP_200_OK
+    data = response.json()
+    assert len(data) == len(rules)
+    assert data[0]["id"] == rules[0].id
+    assert data[0]["ruleset"]["id"] == ruleset.id

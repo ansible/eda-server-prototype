@@ -57,6 +57,7 @@ class FireCountsDetailRef(BaseModel):
     fired_date: date
     object_status: str
     object_status_total: int
+    date_status_total: int
     pct_date_status_total: Decimal
     window_total: int
     pct_window_total: Decimal

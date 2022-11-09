@@ -6,12 +6,10 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from eda_server import schema
-from eda_server.db import models
 from eda_server.db.dependency import get_db_session
 
 # Rule, Ruleset, Rulebook query builder, enums, etc
-# Common (simplified) object getters
-from eda_server.db.sql import base as bsql, rulebook as rsql
+from eda_server.db.sql import rulebook as rsql
 from eda_server.project import insert_rulebook_related_data
 
 router = APIRouter(tags=["rulebooks"])
@@ -84,7 +82,7 @@ async def build_detail_object_totals(
     ]
     object_totals = []
 
-    last_date = date_status_total = None
+    last_date = date_status_total_int = date_status_total_dec = None
     for key in (
         key for key in date_status_object_record_index if key[2] == object_id
     ):
@@ -93,20 +91,20 @@ async def build_detail_object_totals(
         fire_date = key[0]
         if fire_date != last_date:
             last_date = fire_date
-            date_status_total = Decimal(
-                record_index[rsql.DATE_STATUS_TOTAL][date_status_key][
-                    "fired_count"
-                ]
-            )
+            date_status_total_int = record_index[rsql.DATE_STATUS_TOTAL][
+                date_status_key
+            ]["fired_count"]
+            date_status_total_dec = Decimal(date_status_total_int)
         object_totals.append(
             {
                 "total_type": "date_status_object",
                 "fired_date": rec["fired_date"],
                 "object_status": rec["status"],
                 "object_status_total": rec["fired_count"],
+                "date_status_total": date_status_total_int,
                 "pct_date_status_total": (
                     Decimal(rec["fired_count"])
-                    / date_status_total
+                    / date_status_total_dec
                     * one_hundred_dec
                 ),
                 "window_total": grand_total_int,
@@ -124,6 +122,7 @@ async def build_detail_object_totals(
 # ------------------------------------
 #   rules endpoints
 # ------------------------------------
+
 
 @router.get(
     "/api/rules",
@@ -175,6 +174,7 @@ async def read_rule(rule_id: int, db: AsyncSession = Depends(get_db_session)):
 # ------------------------------------
 #   rulesets endpoints
 # ------------------------------------
+
 
 @router.get(
     "/api/rulesets",
@@ -245,24 +245,6 @@ async def list_ruleset_rules(
     return response
 
 
-@router.get(
-    "/api/rulesets/sources",
-    response_model=List[schema.RulesetSource],
-    operation_id="read_ruleset",
-)
-async def list_ruleset_sources(
-    ruleset_id: int, db: AsyncSession = Depends(get_db_session)
-):
-    ruleset_sources = await rsql.list_ruleset_sources(db, ruleset_id)
-    if ruleset_sources.rowcount == 0:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Ruleset not found"
-        )
-
-    results = [rec._asdict() for rec in cur]
-    return results
-
-
 # There used to be a separate query for rulesets/<id>/sources, but that data
 # is being returned as part of the `get_ruleset` endpoint, so the separate
 # endpoint is no longer needed.
@@ -271,6 +253,7 @@ async def list_ruleset_sources(
 # ------------------------------------
 #   rulebooks endpoints
 # ------------------------------------
+
 
 @router.post(
     "/api/rulebooks",
@@ -286,7 +269,7 @@ async def create_rulebook(
                 "name": rulebook.name,
                 "rulesets": rulebook.rulesets,
                 "description": rulebook.description,
-            }
+            },
         )
     except rsql.IntegrityError:
         raise HTTPException(
@@ -340,7 +323,7 @@ async def read_rulebook(
 async def read_rulebook_json(
     rulebook_id: int, db: AsyncSession = Depends(get_db_session)
 ):
-    ruleset = await rsql.get_ruleset(db, ruleset_id)
+    ruleset = await rsql.get_ruleset(db, rulebook_id)
     response = ruleset._asdict()
     response["rulesets"] = yaml.safe_load(response["rulesets"])
     return response
