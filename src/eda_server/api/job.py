@@ -23,8 +23,8 @@ router = APIRouter(tags=["jobs"])
 
 
 @router.get(
-    "/api/job_instances/",
-    response_model=List[schema.JobInstanceBaseRead],
+    "/api/job_instances",
+    response_model=List[schema.JobInstanceRead],
     operation_id="list_job_instances",
 )
 async def list_job_instances(db: AsyncSession = Depends(get_db_session)):
@@ -34,8 +34,8 @@ async def list_job_instances(db: AsyncSession = Depends(get_db_session)):
 
 
 @router.post(
-    "/api/job_instance/",
-    response_model=schema.JobInstanceRead,
+    "/api/job_instance",
+    response_model=schema.JobInstanceBaseRead,
     operation_id="create_job_instance",
 )
 async def create_job_instance(
@@ -93,7 +93,7 @@ async def create_job_instance(
 
 @router.get(
     "/api/job_instance/{job_instance_id}",
-    response_model=schema.JobInstanceBaseRead,
+    response_model=schema.JobInstanceRead,
     operation_id="read_job_instance",
 )
 async def read_job_instance(

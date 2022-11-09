@@ -416,15 +416,40 @@ async def stream_activation_instance_logs(
 
 @router.get(
     "/api/activation_instance_job_instances/{activation_instance_id}",
-    response_model=List[schema.ActivationInstanceJobInstance],
+    response_model=List[schema.JobInstanceRead],
     operation_id="list_activation_instance_job_instances",
 )
 async def list_activation_instance_job_instances(
     activation_instance_id: int, db: AsyncSession = Depends(get_db_session)
 ):
-    query = sa.select(models.activation_instance_job_instances).where(
-        models.activation_instance_job_instances.c.activation_instance_id
-        == activation_instance_id
+    query = (
+        sa.select(
+            models.job_instances.c.id,
+            models.job_instances.c.uuid,
+            models.job_instances.c.action,
+            models.job_instances.c.name,
+            models.job_instances.c.ruleset,
+            models.job_instances.c.rule,
+            models.job_instances.c.hosts,
+            models.audit_rules.c.fired_date,
+            models.audit_rules.c.status,
+        )
+        .select_from(models.job_instances)
+        .join(
+            models.activation_instance_job_instances,
+            models.activation_instance_job_instances.c.job_instance_id
+            == models.job_instances.c.id,
+        )
+        .outerjoin(
+            models.audit_rules,
+            models.audit_rules.c.activation_instance_id == models.job_instances.c.id,
+        )
+        .where(
+            models.activation_instance_job_instances.c.activation_instance_id
+            == activation_instance_id
+        )
     )
+
     result = await db.execute(query)
+    print(result.all())
     return result.all()
