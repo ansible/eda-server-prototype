@@ -7,7 +7,6 @@ vars:
   MINIKUBE_CMD: "scripts/eda_kube.sh"
   DOCKER_COMPOSE: "docker-compose"
   DOCKER_COMPOSE_ARGS: "--project-name eda --file tools/docker/docker-compose.yml"
-  VERSION_CHK_CMD: "scripts/version_check.sh"
 
 tasks:
   default:
@@ -67,7 +66,6 @@ tasks:
       Example:
         $ task dev -- services-start
     cmds:
-      - task: version:check:bash
       - '{{.DEV_CMD}} {{.CLI_ARGS}}'
 
   dev:services:start:
@@ -208,7 +206,6 @@ tasks:
       Example:
         $ task minikube -- build
     cmds:
-      - task: version:check:bash
       - '{{.MINIKUBE_CMD}} {{.CLI_ARGS}}'
 
   minikube:build:
@@ -252,20 +249,3 @@ tasks:
       - task: minikube:clean
       - task: minikube:build
       - task: minikube:deploy
-
-  version:
-    desc: "Run version_check.sh with specific CLI args"
-    summary: |
-      Run version_check.sh with specific CLI args.
-
-      Example:
-        $ task version -- bash
-    cmds:
-      - '{{.VERSION_CHK_CMD}} {{.CLI_ARGS}}'
-
-  version:check:bash:
-    desc: "Check for valid bash version"
-    cmds:
-      - task: version
-        vars:
-          CLI_ARGS: bash
