@@ -10,15 +10,15 @@ export interface TableToolbarViewProps {
   columns: ICell[];
   toolbarButtons?: () => ReactNode;
   fetchData: (pagination: PaginationConfiguration) => Promise<any | void>;
-  setLimit: any;
-  setOffset: any;
+  setLimit?: any;
+  setOffset?: any;
   pagination?: PaginationConfiguration;
   plural?: string;
   singular?: string;
   routes?: () => ReactNode;
   actionResolver?: IActionsResolver;
   filterValue?: string;
-  onFilterChange: (value?: string) => void;
+  onFilterChange?: (value?: string) => void;
   isLoading?: boolean;
   renderEmptyState?: () => ReactNode;
   sortBy?: ISortBy;
@@ -44,7 +44,7 @@ export const TableToolbarView: React.ComponentType<TableToolbarViewProps> = ({
   setLimit,
   setOffset,
   plural,
-  pagination = defaultSettings,
+  pagination,
   filterValue,
   onFilterChange,
   isLoading = false,
@@ -57,24 +57,26 @@ export const TableToolbarView: React.ComponentType<TableToolbarViewProps> = ({
 }) => {
   const intl = useIntl();
 
-  const paginationConfig = {
-    itemCount: pagination.count,
-    page: pagination.offset || 1,
-    perPage: pagination.limit,
-    onSetPage: (_e, page) => {
-      setOffset(page || 1);
-      return fetchData({ ...pagination, offset: page });
-    },
-    onPerPageSelect: (_e, size) => {
-      setLimit(size);
-      return fetchData({ ...pagination, limit: size });
-    },
-    isDisabled: isLoading,
-  };
+  const paginationConfig = pagination
+    ? {
+        itemCount: pagination.count,
+        page: pagination.offset || 1,
+        perPage: pagination.limit,
+        onSetPage: (_e, page) => {
+          setOffset(page || 1);
+          return fetchData({ ...pagination, offset: page });
+        },
+        onPerPageSelect: (_e, size) => {
+          setLimit(size);
+          return fetchData({ ...pagination, limit: size });
+        },
+        isDisabled: isLoading,
+      }
+    : undefined;
 
   const renderToolbar = () => (
     <PrimaryToolbar
-      pagination={paginationConfig}
+      {...(pagination && { pagination: paginationConfig })}
       bulkSelect={bulkSelect}
       {...(toolbarButtons && {
         actionsConfig: {
@@ -84,23 +86,27 @@ export const TableToolbarView: React.ComponentType<TableToolbarViewProps> = ({
           actions: [toolbarButtons()],
         },
       })}
-      filterConfig={{
-        items: [
-          {
-            label: intl.formatMessage({
-              id: 'search',
-              defaultMessage: 'Search',
-            }),
-            filterValues: {
-              id: 'search',
-              placeholder: intl.formatMessage(sharedMessages.search),
-              'aria-label': intl.formatMessage(sharedMessages.search),
-              onChange: (_event: React.SyntheticEvent<Element, Event>, value?: string) => onFilterChange(value),
-              value: filterValue,
-            },
-          },
-        ],
-      }}
+      filterConfig={
+        onFilterChange
+          ? {
+              items: [
+                {
+                  label: intl.formatMessage({
+                    id: 'search',
+                    defaultMessage: 'Search',
+                  }),
+                  filterValues: {
+                    id: 'search',
+                    placeholder: intl.formatMessage(sharedMessages.search),
+                    'aria-label': intl.formatMessage(sharedMessages.search),
+                    onChange: (_event: React.SyntheticEvent<Element, Event>, value?: string) => onFilterChange(value),
+                    value: filterValue,
+                  },
+                },
+              ],
+            }
+          : undefined
+      }
     />
   );
   return (
@@ -126,7 +132,7 @@ export const TableToolbarView: React.ComponentType<TableToolbarViewProps> = ({
               <TableBody />
             </Table>
           )}
-          {pagination.count! > 0 && (
+          {pagination && pagination.count! > 0 && (
             <PrimaryToolbar
               bulkSelect={bulkSelect}
               pagination={{

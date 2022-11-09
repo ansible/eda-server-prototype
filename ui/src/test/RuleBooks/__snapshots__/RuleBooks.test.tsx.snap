@@ -119,6 +119,14 @@ exports[`RuleBooks should render the RuleBooks component 1`] = `
                   isLoading={false}
                   onFilterChange={[Function]}
                   ouiaId="RuleBooks-table"
+                  pagination={
+                    {
+                      "count": 0,
+                      "filter": "",
+                      "limit": 50,
+                      "offset": 0,
+                    }
+                  }
                   plural="Rulebooks"
                   renderEmptyState={[Function]}
                   rows={

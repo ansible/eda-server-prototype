@@ -90,6 +90,10 @@ const sharedMessages = defineMessages({
     id: 'shared.restart',
     defaultMessage: 'Restart',
   },
+  selected: {
+    id: 'shared.selected',
+    defaultMessage: 'Selected',
+  },
   addJob: {
     id: 'activation.addJob',
     defaultMessage: 'Add job',

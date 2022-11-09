@@ -133,6 +133,7 @@ const RulebookRulesets: React.FunctionComponent<{ rulebook: RuleBookType }> = ({
         actionResolver={actionResolver}
         setLimit={setLimit}
         setOffset={setOffset}
+        pagination={defaultSettings}
         plural={intl.formatMessage(sharedMessages.rulesets)}
         singular={intl.formatMessage(sharedMessages.ruleset)}
         isLoading={isFetching || isFiltering}

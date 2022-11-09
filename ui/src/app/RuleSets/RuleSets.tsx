@@ -198,6 +198,7 @@ const RuleSets: React.FunctionComponent = () => {
           routes={routes}
           setLimit={setLimit}
           setOffset={setOffset}
+          pagination={defaultSettings}
           actionResolver={actionResolver}
           plural={intl.formatMessage(sharedMessages.rulesets)}
           singular={intl.formatMessage(sharedMessages.ruleset)}

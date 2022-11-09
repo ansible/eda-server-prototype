@@ -118,6 +118,7 @@ const ActivationJobs: React.FunctionComponent<{ activation: ActivationType; jobs
         setOffset={setOffset}
         columns={columns(intl)}
         fetchData={updateJobs}
+        pagination={defaultSettings}
         plural={intl.formatMessage(sharedMessages.jobs)}
         singular={intl.formatMessage(sharedMessages.job)}
         isLoading={isFetching || isFiltering}

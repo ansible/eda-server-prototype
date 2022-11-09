@@ -123,6 +123,7 @@ const RulesetRules: React.FunctionComponent<{ ruleset: RuleSetType }> = ({ rules
         setOffset={setOffset}
         columns={columns(intl)}
         fetchData={updateRules}
+        pagination={defaultSettings}
         plural={intl.formatMessage(sharedMessages.rules)}
         singular={intl.formatMessage(sharedMessages.rules)}
         isLoading={isFetching || isFiltering}

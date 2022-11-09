@@ -27,9 +27,10 @@ import { addNotification } from '@redhat-cloud-services/frontend-components-noti
 import { useDispatch } from 'react-redux';
 import { addRulebookActivation } from '@app/API/Activation';
 import { listRulebooks } from '@app/API/Rulebook';
-import { listInventories } from '@app/API/Inventory';
 import { listExtraVars } from '@app/API/Extravar';
 import { listProjects } from '@app/API/Project';
+import { InventoriesSelect, InventorySelectType } from '@app/InventoriesSelect/InventoriesSelect';
+import { usePrevious } from '@app/utils/utils';
 
 const CardBody = styled(PFCardBody)`
   white-space: pre-wrap;
@@ -51,12 +52,6 @@ const NewActivation: React.FunctionComponent = () => {
     {
       id: '',
       name: intl.formatMessage(sharedMessages.ruleSetPlaceholder),
-    },
-  ]);
-  const [inventories, setInventories] = useState<InventoryType[]>([
-    {
-      id: '',
-      name: intl.formatMessage(sharedMessages.inventoryPlaceholder),
     },
   ]);
   const [extravars, setExtraVars] = useState<ExtraVarType[]>([
@@ -90,10 +85,11 @@ const NewActivation: React.FunctionComponent = () => {
   const [executionEnvironment, setExecutionEnvironment] = useState('');
   const [restartPolicy, setRestartPolicy] = useState('');
   const [ruleset, setRuleSet] = useState('');
-  const [inventory, setInventory] = useState('');
+  const [inventory, setInventory] = useState<InventorySelectType | undefined>(undefined);
   const [extravar, setExtraVar] = useState('');
   const [project, setProject] = useState('');
   const [workingDirectory, setWorkingDirectory] = useState('');
+  const [isInventoryModalOpen, setIsInventoryModalOpen] = useState(false);
 
   const [validatedName, setValidatedName] = useState<ValidatedOptions>(ValidatedOptions.default);
   const [validatedRuleSet, setValidatedRuleSet] = useState<ValidatedOptions>(ValidatedOptions.default);
@@ -112,10 +108,6 @@ const NewActivation: React.FunctionComponent = () => {
 
   useEffect(() => {
     listRulebooks().then((data) => setRuleSets([...rulesets, ...data.data]));
-  }, []);
-
-  useEffect(() => {
-    listInventories().then((data) => setInventories([...inventories, ...data.data]));
   }, []);
 
   useEffect(() => {
@@ -178,11 +170,13 @@ const NewActivation: React.FunctionComponent = () => {
       return true;
     }
   };
+  const prevInventory = usePrevious(inventory);
 
-  const onInventoryChange = (value) => {
-    setInventory(value);
-    validateInventory(value);
-  };
+  useEffect(() => {
+    if (!isInventoryModalOpen && inventory !== prevInventory) {
+      validateInventory(inventory);
+    }
+  }, [isInventoryModalOpen]);
 
   const validateExtraVar = (value): boolean => {
     if (!value || value.length < 1) {
@@ -244,7 +238,8 @@ const NewActivation: React.FunctionComponent = () => {
     addRulebookActivation({
       name: name,
       rulebook_id: ruleset,
-      inventory_id: inventory,
+      // @ts-ignore
+      inventory_id: inventory.id,
       extra_var_id: extravar,
       project_id: project,
       working_directory: workingDirectory,
@@ -275,9 +270,14 @@ const NewActivation: React.FunctionComponent = () => {
         );*/
       });
   };
-
   return (
     <React.Fragment>
+      <InventoriesSelect
+        isModalOpen={isInventoryModalOpen}
+        setIsModalOpen={setIsInventoryModalOpen}
+        inventory={inventory}
+        setInventory={setInventory}
+      />
       <TopToolbar
         breadcrumbs={[
           {
@@ -342,23 +342,16 @@ const NewActivation: React.FunctionComponent = () => {
                     helperTextInvalidIcon={<ExclamationCircleIcon />}
                     validated={validatedInventory}
                   >
-                    <FormSelect
-                      value={inventory}
+                    <TextInput
+                      value={inventory?.name || ''}
+                      iconVariant={inventory?.name || validatedInventory === 'error' ? undefined : 'search'}
+                      type="text"
+                      onClick={() => setIsInventoryModalOpen(true)}
                       placeholder={intl.formatMessage(sharedMessages.inventoryPlaceholder)}
-                      onChange={onInventoryChange}
                       onBlur={() => validateInventory(inventory)}
                       validated={validatedInventory}
                       aria-label="FormSelect Input Inventory"
-                    >
-                      {inventories.map((option, index) => (
-                        <FormSelectOption
-                          key={index}
-                          value={option?.id}
-                          label={`${option?.id} ${option?.name}`}
-                          isPlaceholder={option?.id === ''}
-                        />
-                      ))}
-                    </FormSelect>
+                    />
                   </FormGroup>
                 </GridItem>
                 <GridItem span={4}>
