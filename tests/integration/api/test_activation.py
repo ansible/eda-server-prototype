@@ -371,7 +371,6 @@ async def test_list_activation_instance_job_instances(
         "inventory_id": foreign_keys["inventory_id"],
         "extra_var_id": foreign_keys["extra_var_id"],
         "working_directory": "/tmp",
-        "execution_environment": "quay.io/aizquier/ansible-rulebook",
     }
 
     response = await client.post(
