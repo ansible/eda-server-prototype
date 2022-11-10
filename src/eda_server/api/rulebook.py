@@ -263,7 +263,7 @@ async def read_rulebook(
         sa.select(
             rulebook.c.id,
             rulebook.c.name,
-            rulebook.c.description,
+            sa.func.coalesce(rulebook.c.description, "").label("description"),
             rulebook.c.created_at,
             rulebook.c.modified_at,
             sa.func.coalesce(rulebook_ruleset_count.c.ruleset_count, 0).label(
