@@ -16,7 +16,6 @@ jobs:
         image: 'postgres:13'
         env:
           POSTGRES_PASSWORD: secret
-          EDA_DEPLOYMENT_TYPE: local
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
