@@ -142,7 +142,7 @@ async def rerun_job_instance(
             status_code=status.HTTP_404_NOT_FOUND, detail=error
         )
 
-    logger.info("job_instance: %s", job_instance)
+    logger.debug("rerun the job: %s", job_instance)
 
     query = (
         sa.select(models.activation_instances)
@@ -166,22 +166,37 @@ async def rerun_job_instance(
             status_code=status.HTTP_400_BAD_REQUEST, detail=error
         )
 
-    logger.info("activation_instance: %s", activation_instance)
+    logger.debug("activation_instance: %s", activation_instance)
 
+    # first try to find playbook by file lookup, ex. playbooks/hello.yml
+    playbook_name = job_instance.name.split("/")[-1]
     query = sa.select(models.playbooks).where(
-        models.playbooks.c.name == job_instance.name,
+        models.playbooks.c.name == playbook_name,
         models.playbooks.c.project_id == activation_instance.project_id,
     )
     playbook_row = (await db.execute(query)).first()
 
     if not playbook_row:
-        error = f"Playbook {job_instance.name} not found"
-        logger.error(error)
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail=error
+        logger.warning(
+            "Playbook %s not found, try with collection pattern", playbook_name
         )
 
-    logger.info("playbook_row: %s", playbook_row)
+        # then try to find by colletion name FQCN, ex. ansible.eda.hello
+        _, _, base_name = job_instance.name.rpartition(".")
+        playbook_name = f"{base_name}.yml"
+        query = sa.select(models.playbooks).where(
+            models.playbooks.c.name == playbook_name,
+            models.playbooks.c.project_id == activation_instance.project_id,
+        )
+        playbook_row = (await db.execute(query)).first()
+
+        if not playbook_row:
+            error = f"Playbook {job_instance.name} not found"
+            logger.error(error)
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail=error
+            )
+    logger.debug("playbook_row: %s", playbook_row)
 
     query = sa.select(models.extra_vars).where(
         models.extra_vars.c.id == activation_instance.extra_var_id,
@@ -194,7 +209,7 @@ async def rerun_job_instance(
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail=error
         )
-    logger.info("extra_var_row: %s", extra_var_row)
+    logger.debug("extra_var_row: %s", extra_var_row)
 
     query = sa.select(models.inventories).where(
         models.inventories.c.id == activation_instance.inventory_id,
@@ -206,13 +221,7 @@ async def rerun_job_instance(
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail=error
         )
-    logger.info("inventory_row: %s", inventory_row)
-
-    logger.debug(
-        "Job rerun using playbook: %s, extra_vars: %s",
-        playbook_row.playbook,
-        extra_var_row.extra_var,
-    )
+    logger.debug("inventory_row: %s", inventory_row)
 
     job_uuid = str(uuid.uuid4())
 
