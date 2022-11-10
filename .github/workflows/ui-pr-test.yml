@@ -13,7 +13,7 @@ jobs:
       run:
         working-directory: ./ui
     concurrency:
-      group: ${{ github.head_ref }}
+      group: ${{ github.head_ref || github.run_id }}
       cancel-in-progress: true
     steps:
       - uses: actions/checkout@v3
