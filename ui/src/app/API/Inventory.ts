@@ -18,6 +18,6 @@ export const fetchInventory = (id: string | number | undefined): Promise<AxiosRe
   getAxiosInstance().get(`${inventoryEndpoint}/${id}`);
 
 export const addInventory = (data: NewInventoryType): Promise<AxiosResponse> =>
-  getAxiosInstance().post(inventoriesEndpoint, data);
+  getAxiosInstance().post(inventoryEndpoint, data);
 export const removeInventory = (inventoryId: string | number): Promise<AxiosResponse> =>
   getAxiosInstance().delete(`${inventoryEndpoint}/${inventoryId}`);

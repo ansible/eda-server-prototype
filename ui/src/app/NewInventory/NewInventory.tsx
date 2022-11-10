@@ -3,6 +3,8 @@ import {
   Button,
   Card,
   CardBody as PFCardBody,
+  Flex,
+  FlexItem,
   Form,
   FormGroup,
   Grid,
@@ -21,12 +23,11 @@ import { TopToolbar } from '@app/shared/top-toolbar';
 import { ExclamationCircleIcon } from '@patternfly/react-icons';
 import { useIntl } from 'react-intl';
 import sharedMessages from '../messages/shared.messages';
-import AceEditor from 'react-ace';
-import { FocusWrapper } from '@app/Activation/activation-details';
-import 'ace-builds/src-noconflict/theme-kuroir';
 import { addNotification } from '@redhat-cloud-services/frontend-components-notifications';
 import { useDispatch } from 'react-redux';
 import { addInventory } from '@app/API/Inventory';
+import { EdaCodeEditor } from '@app/utils/EdaCodeEditor';
+import { Language } from '@patternfly/react-code-editor';
 
 const CardBody = styled(PFCardBody)`
   white-space: pre-wrap;
@@ -74,9 +75,10 @@ const NewInventory: React.FunctionComponent = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     validateFields();
-    addInventory({ name: name, description: description, inventory: inventory })
+    console.log('Debug: inventory, code: ', inventory, code);
+    addInventory({ name: name, description: description, inventory: code })
       .then((data) => {
-        data?.data?.id ? history.push(`/inventory/${data?.data?.id}`) : history.push(`/inventories`);
+        data?.data?.id ? history.push(`/inventories/inventory/${data?.data?.id}`) : history.push(`/inventories`);
         dispatch(
           addNotification({
             variant: 'success',
@@ -87,7 +89,7 @@ const NewInventory: React.FunctionComponent = () => {
         );
       })
       .catch((error) => {
-        history.push(`/jobs`);
+        history.push(`/inventories`);
         dispatch(
           addNotification({
             variant: 'danger',
@@ -97,6 +99,18 @@ const NewInventory: React.FunctionComponent = () => {
           })
         );
       });
+  };
+
+  const onEditorDidMount = (editor, monaco) => {
+    // eslint-disable-next-line no-console
+    console.log('Debug - editor: ', editor, monaco);
+    editor.focus();
+  };
+
+  const [code, setCode] = React.useState('');
+
+  const onChange = (code) => {
+    console.log('Debug - onChange code: ', code);
   };
 
   return (
@@ -118,7 +132,7 @@ const NewInventory: React.FunctionComponent = () => {
         <Card>
           <CardBody>
             <Form>
-              <Stack hasGutter>
+              <Stack hasGutter style={{ paddingRight: '30px' }}>
                 <StackItem>
                   <Grid hasGutter>
                     <GridItem span={4}>
@@ -162,35 +176,24 @@ const NewInventory: React.FunctionComponent = () => {
                   </Grid>
                 </StackItem>
                 <StackItem>
-                  <FormGroup label={intl.formatMessage(sharedMessages.inventory)} fieldId={`inventory-inventory`}>
-                    <Card>
-                      <FocusWrapper>
-                        <AceEditor
-                          theme={'kuroir'}
-                          name="inventory_inventory"
-                          fontSize={16}
-                          value={inventory}
-                          height={'200px'}
-                          width={'100pct'}
-                          setOptions={{
-                            enableBasicAutocompletion: false,
-                            enableLiveAutocompletion: false,
-                            enableSnippets: false,
-                            showLineNumbers: true,
-                            tabSize: 2,
-                            focus: false,
-                            highlightActiveLine: false,
-                            cursorStart: 0,
-                            cursorStyle: undefined,
-                          }}
-                        />
-                      </FocusWrapper>
-                    </Card>
+                  <FormGroup
+                    label={intl.formatMessage(sharedMessages.inventory)}
+                    fieldId={`inventory-inventory`}
+                    width={'80pct'}
+                  >
+                    <EdaCodeEditor
+                      code={code}
+                      editMode={true}
+                      setEditedCode={setCode}
+                      language={Language.yaml}
+                      width={'100%'}
+                      height={'400'}
+                    />
                   </FormGroup>
                 </StackItem>
                 <StackItem>
                   <ActionGroup>
-                    <Button variant="primary" isDisabled={true} onClick={handleSubmit} isLoading={isSubmitting}>
+                    <Button variant="primary" onClick={handleSubmit} isLoading={isSubmitting}>
                       {isSubmitting ? 'Adding ' : 'Add'}
                     </Button>
                     <Button variant="link" onClick={() => history.push('/inventories')}>

@@ -1,0 +1,7 @@
+.monaco-editor span {
+  font-family: unset;
+}
+
+.pf-c-code-editor__code {
+  padding: 0;
+}
