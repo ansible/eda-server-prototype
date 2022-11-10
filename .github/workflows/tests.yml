@@ -43,3 +43,4 @@ jobs:
         run: pytest
         env:
           EDA_DATABASE_URL: 'postgresql+asyncpg://postgres:secret@localhost:5432/postgres'
+          EDA_DEPLOYMENT_TYPE: docker
