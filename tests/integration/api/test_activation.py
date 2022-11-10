@@ -359,3 +359,32 @@ async def test_delete_activation(client: AsyncClient, db: AsyncSession):
 async def test_delete_activation_not_found(client: AsyncClient):
     response = await client.delete("/api/activations/1")
     assert response.status_code == status_codes.HTTP_404_NOT_FOUND
+
+
+async def test_list_activation_instance_job_instances(
+    client: AsyncClient, db: AsyncSession
+):
+    foreign_keys = await _create_activation_dependent_objects(client, db)
+    test_activation_instance = {
+        "name": "test",
+        "rulebook_id": foreign_keys["rulebook_id"],
+        "inventory_id": foreign_keys["inventory_id"],
+        "extra_var_id": foreign_keys["extra_var_id"],
+        "working_directory": "/tmp",
+    }
+
+    response = await client.post(
+        "/api/activation_instance",
+        json=test_activation_instance,
+    )
+    assert response.status_code == status_codes.HTTP_200_OK
+    activation_instance = response.json()
+    assert "id" in activation_instance
+
+    response = await client.get(
+        f"/api/activation_instance_job_instances/{activation_instance['id']}",
+    )
+    assert response.status_code == status_codes.HTTP_200_OK
+    activation_instance_job_instances = response.json()
+
+    assert type(activation_instance_job_instances) is list
