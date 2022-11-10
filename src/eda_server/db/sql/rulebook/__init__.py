@@ -206,9 +206,7 @@ def build_rule_count_subquery(
         )
 
     if filters is not None:
-        rules_fired_count_sub = rules_fired_count_sub.filter(
-            filters
-        )
+        rules_fired_count_sub = rules_fired_count_sub.filter(filters)
 
     rules_fired_count_sub = rules_fired_count_sub.group_by(
         sa.func.grouping_sets(*query_parts["grouping_set_tuples"])
@@ -343,20 +341,18 @@ def build_rulebook_rulesets_fire_counts_query(
     window_end: Optional[datetime.datetime] = None,
 ) -> sa.sql.Select:
     query_parts = get_count_cols_and_grouping(AuditGrouping.RULESET)
-    rb_rs_count_subquery = (
-        build_rule_count_subquery(
-            AuditGrouping.RULESET,
-            query_parts,
-            object_id=None,
-            window_start=window_start,
-            window_end=window_end,
-            select_from=(
-                a_audit_rule.outerjoin(
-                    a_ruleset, a_ruleset.c.id == a_audit_rule.c.ruleset_id
-                )
-            ),
-            filters=(a_ruleset.c.rulebook_id == rulebook_id),
-        )
+    rb_rs_count_subquery = build_rule_count_subquery(
+        AuditGrouping.RULESET,
+        query_parts,
+        object_id=None,
+        window_start=window_start,
+        window_end=window_end,
+        select_from=(
+            a_audit_rule.outerjoin(
+                a_ruleset, a_ruleset.c.id == a_audit_rule.c.ruleset_id
+            )
+        ),
+        filters=(a_ruleset.c.rulebook_id == rulebook_id),
     )
 
     rb_rs_fired_counts_query = build_labeled_count_query(
@@ -364,7 +360,6 @@ def build_rulebook_rulesets_fire_counts_query(
     )
 
     return rb_rs_fired_counts_query
-
 
 
 # ------------------------------------
