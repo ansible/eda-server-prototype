@@ -370,8 +370,7 @@ async def test_list_activation_instance_job_instances(
         "rulebook_id": foreign_keys["rulebook_id"],
         "inventory_id": foreign_keys["inventory_id"],
         "extra_var_id": foreign_keys["extra_var_id"],
-        "working_directory": "/tmp",
-        "execution_environment": "quay.io/bthomass/eda-project",
+        "working_directory": "./",
     }
 
     response = await client.post(
