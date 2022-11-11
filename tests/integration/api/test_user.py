@@ -12,7 +12,7 @@ from eda_server.auth import add_role_permissions, add_user_role, create_role
 from eda_server.db import models
 from eda_server.types import Action, ResourceType
 from eda_server.users import UserDatabase, current_active_user
-from tests.integration.utils.app import override_dependencies
+from tests.utils.app import override_dependencies
 
 
 @pytest.fixture

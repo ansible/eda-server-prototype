@@ -60,6 +60,11 @@ rulesets = sa.Table(
     ),
     sa.Column("name", sa.String),
     sa.Column(
+        "sources",
+        postgresql.JSONB(none_as_null=True),
+        comment="Expanded source information from ruleset data.",
+    ),
+    sa.Column(
         "created_at",
         sa.DateTime(timezone=True),
         nullable=False,
