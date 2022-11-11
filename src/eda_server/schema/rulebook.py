@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Optional
+from typing import List, Optional
 
 from pydantic import BaseModel, StrictStr
 
@@ -70,3 +70,15 @@ class Rule(BaseModel):
     name: Optional[str]
     action: dict
     ruleset: RuleRulesetRef
+
+
+class MetaSchema(BaseModel):
+    name: str
+    tables: List[str]
+
+class MetaEngine(BaseModel):
+    name: str
+    schemata: List[MetaSchema]
+
+class MetaMeta(BaseModel):
+    engines: List[MetaEngine]

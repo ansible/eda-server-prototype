@@ -1,5 +1,5 @@
 from importlib import resources
-from typing import Optional
+from typing import List, Optional
 
 import yaml
 from fastapi.requests import Request
@@ -16,9 +16,12 @@ class Settings(BaseSettings):
     host: str = "127.0.0.1"
     port: int = 9000
 
-    database_url: str = (
-        "postgresql+asyncpg://postgres:secret@localhost:5432/eda_server"
-    )
+    db_driver: str = "postgresql+asyncpg"
+    db_user: str = "postgres"
+    db_password: str = "secret"
+    db_host: str = "localhost"
+    db_port: int = 5432
+    db_name: str = "eda_server"
 
     deployment_type: str = "docker"
     server_name: str = "localhost"
@@ -28,6 +31,30 @@ class Settings(BaseSettings):
     class Config:
         env_prefix = "EDA_"
         env_nested_delimiter = "__"
+
+    @property
+    def database_url(self) -> str:
+        return self.build_database_url(
+            self.db_driver,
+            self.db_user,
+            self.db_password,
+            self.db_host,
+            self.db_port,
+            self.db_name,
+        )
+
+    def build_database_url(
+        self,
+        driver: str,
+        user: str,
+        password: str,
+        host: str,
+        port: int,
+        dbname: str,
+    ) -> str:
+        return (
+            f"{driver}://{user}:{password}@{host}:{port}/{dbname}"
+        )
 
 
 def load_settings() -> Settings:

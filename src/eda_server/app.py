@@ -4,8 +4,9 @@ from fastapi import APIRouter, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from eda_server.api import router as api_router
-from eda_server.config import load_settings
+from eda_server.config import Settings, load_settings
 from eda_server.db.dependency import get_db_session_factory
+from eda_server.db.metameta.asyncmeta import AMetaMeta
 from eda_server.db.provider import DatabaseProvider
 
 ALLOWED_ORIGINS = [
@@ -18,6 +19,28 @@ ALLOWED_ORIGINS = [
 ]
 
 root_router = APIRouter()
+
+
+_settings = load_settings()
+_provider = DatabaseProvider(_settings.database_url)
+_eda_meta = AMetaMeta()
+_eda_meta.register_engine(
+    _provider.engine,
+    _provider.session_factory,
+    engine_name=_settings.db_name,
+)
+
+
+def get_settings() -> Settings:
+    return _settings
+
+
+def get_provider() -> DatabaseProvider:
+    return _provider
+
+
+def get_metameta() -> AMetaMeta:
+    return _eda_meta
 
 
 @root_router.get("/ping")
@@ -40,9 +63,9 @@ def setup_routes(app: FastAPI) -> None:
     app.include_router(api_router)
 
 
-def setup_database(app: FastAPI) -> None:
+def setup_database_handlers(app: FastAPI) -> None:
     settings = app.state.settings
-    provider = DatabaseProvider(settings.database_url)
+    provider = get_provider()
     app.add_event_handler("shutdown", provider.close)
     app.dependency_overrides[
         get_db_session_factory
@@ -60,7 +83,6 @@ def configure_logging(app):
 # TODO(cutwater): Implement customizable ApplicationBuilder for testing.
 def create_app() -> FastAPI:
     """Initialize FastAPI application."""
-    settings = load_settings()
     app = FastAPI(
         title="Ansible Events API",
         description="API for Event Driven Automation",
@@ -68,12 +90,12 @@ def create_app() -> FastAPI:
         redoc_url="/api/redoc",
         openapi_url="/api/openapi.json",
     )
-    app.state.settings = settings
+    app.state.settings = get_settings()
 
     configure_logging(app)
     setup_cors(app)
     setup_routes(app)
 
-    setup_database(app)
+    setup_database_handlers(app)
 
     return app

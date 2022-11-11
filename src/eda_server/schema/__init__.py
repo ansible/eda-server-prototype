@@ -42,6 +42,7 @@ from .role import (
     RoleRead,
 )
 from .rulebook import (
+    MetaMeta,
     Rule,
     RulebookCreate,
     RulebookList,
@@ -81,6 +82,7 @@ __all__ = [
     "JobInstanceBaseRead",
     "JobInstanceRead",
     "JobInstanceEventsRead",
+    "MetaMeta",
     "ProducerMessage",
     "ProducerResponse",
     "PlaybookRef",
