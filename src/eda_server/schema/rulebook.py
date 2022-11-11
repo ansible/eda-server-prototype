@@ -13,7 +13,7 @@ class RulebookCreate(BaseModel):
 class RulebookRead(BaseModel):
     id: int
     name: StrictStr
-    description: Optional[StrictStr] = ""
+    description: StrictStr
     ruleset_count: int
     fire_count: int
     created_at: datetime
