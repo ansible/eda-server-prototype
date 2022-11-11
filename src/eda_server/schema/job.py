@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Optional
 
 from pydantic import BaseModel, StrictStr
@@ -10,15 +11,20 @@ class JobInstanceCreate(BaseModel):
     extra_var_id: int
 
 
-class JobInstanceBaseRead(BaseModel):
-    id: int
+class JobInstanceBaseRead(JobInstanceCreate):
     uuid: StrictStr
 
 
-class JobInstanceRead(JobInstanceBaseRead):
-    playbook_id: int
-    inventory_id: int
-    extra_var_id: int
+class JobInstanceRead(BaseModel):
+    id: int
+    uuid: StrictStr
+    action: Optional[StrictStr]
+    name: StrictStr
+    ruleset: Optional[StrictStr]
+    rule: Optional[StrictStr]
+    hosts: Optional[StrictStr]
+    status: Optional[StrictStr]
+    fired_date: Optional[datetime]
 
 
 class JobInstanceEventsRead(BaseModel):

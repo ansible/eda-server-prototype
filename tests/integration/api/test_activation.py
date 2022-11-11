@@ -359,3 +359,15 @@ async def test_delete_activation(client: AsyncClient, db: AsyncSession):
 async def test_delete_activation_not_found(client: AsyncClient):
     response = await client.delete("/api/activations/1")
     assert response.status_code == status_codes.HTTP_404_NOT_FOUND
+
+
+async def test_list_activation_instance_job_instances(
+    client: AsyncClient, db: AsyncSession
+):
+    response = await client.get(
+        "/api/activation_instance_job_instances/1",
+    )
+    assert response.status_code == status_codes.HTTP_200_OK
+    activation_instance_job_instances = response.json()
+
+    assert type(activation_instance_job_instances) is list
