@@ -65,10 +65,10 @@ async def create_activation(
     try:
         result = await db.execute(query)
     except sa.exc.IntegrityError as e:
-        errorInfo = e.orig.args[0].split("\n")
+        error_info = e.orig.args[0].split("\n")
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail=str(errorInfo[1]),
+            detail=str(error_info[1]),
         )
     await db.commit()
     (id_,) = result.inserted_primary_key
@@ -283,10 +283,10 @@ async def create_activation_instance(
     try:
         result = await db.execute(query)
     except sa.exc.IntegrityError as e:
-        errorInfo = e.orig.args[0].split("\n")
+        error_info = e.orig.args[0].split("\n")
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail=str(errorInfo[1]),
+            detail=str(error_info[1]),
         )
     await db.commit()
     id_, large_data_id = result.first()
