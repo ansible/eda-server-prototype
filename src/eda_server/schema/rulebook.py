@@ -14,7 +14,7 @@ class RulebookCreate(BaseModel):
 class RulebookRead(BaseModel):
     id: int
     name: StrictStr
-    description: StrictStr
+    description: Optional[StrictStr]
     ruleset_count: int
     created_at: datetime
     modified_at: datetime
