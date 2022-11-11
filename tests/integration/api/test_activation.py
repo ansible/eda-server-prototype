@@ -1,6 +1,3 @@
-import logging
-import time
-
 import sqlalchemy as sa
 from fastapi import status as status_codes
 from httpx import AsyncClient
@@ -10,8 +7,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from eda_server.db import models
 from eda_server.db.models.activation import RestartPolicy
 from eda_server.db.utils.lostream import PGLargeObject
-
-logger = logging.getLogger("eda_server")
 
 TEST_ACTIVATION = {
     "name": "test-activation",
@@ -370,7 +365,7 @@ async def test_list_activation_instance_job_instances(
     client: AsyncClient, db: AsyncSession
 ):
     response = await client.get(
-        f"/api/activation_instance_job_instances/1",
+        "/api/activation_instance_job_instances/1",
     )
     assert response.status_code == status_codes.HTTP_200_OK
     activation_instance_job_instances = response.json()
