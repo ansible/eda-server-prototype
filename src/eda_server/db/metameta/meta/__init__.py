@@ -51,7 +51,7 @@ class MetaEngine(MetaMetaBase):
         return self._engine
 
     def _build_discover_engine_query(self):
-        if (exclusions_params := getattr(self, "ns_excl_pref_regexs", [])):
+        if (exclusions_params := tuple(getattr(self, "ns_excl_pref_regexs", ()))):
             exclusions = "and schema_name !~ %s " * len(exclusions_params)
         else:
             exclusions = ""
