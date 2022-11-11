@@ -1,3 +1,6 @@
+import logging
+import time
+
 import sqlalchemy as sa
 from fastapi import status as status_codes
 from httpx import AsyncClient
@@ -7,6 +10,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from eda_server.db import models
 from eda_server.db.models.activation import RestartPolicy
 from eda_server.db.utils.lostream import PGLargeObject
+
+logger = logging.getLogger("eda_server")
 
 TEST_ACTIVATION = {
     "name": "test-activation",
@@ -364,25 +369,8 @@ async def test_delete_activation_not_found(client: AsyncClient):
 async def test_list_activation_instance_job_instances(
     client: AsyncClient, db: AsyncSession
 ):
-    foreign_keys = await _create_activation_dependent_objects(client, db)
-    test_activation_instance = {
-        "name": "test",
-        "rulebook_id": foreign_keys["rulebook_id"],
-        "inventory_id": foreign_keys["inventory_id"],
-        "extra_var_id": foreign_keys["extra_var_id"],
-        "working_directory": "./",
-    }
-
-    response = await client.post(
-        "/api/activation_instance",
-        json=test_activation_instance,
-    )
-    assert response.status_code == status_codes.HTTP_200_OK
-    activation_instance = response.json()
-    assert "id" in activation_instance
-
     response = await client.get(
-        f"/api/activation_instance_job_instances/{activation_instance['id']}",
+        f"/api/activation_instance_job_instances/1",
     )
     assert response.status_code == status_codes.HTTP_200_OK
     activation_instance_job_instances = response.json()
