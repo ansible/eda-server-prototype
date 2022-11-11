@@ -322,10 +322,15 @@ async def read_rulebook(
 async def read_rulebook_json(
     rulebook_id: int, db: AsyncSession = Depends(get_db_session)
 ):
-    ruleset = await rsql.get_ruleset(db, rulebook_id)
-    response = ruleset._asdict()
-    response["rulesets"] = yaml.safe_load(response["rulesets"])
-    return response
+    result = await rsql.get_rulebook(db, rulebook_id)
+    if not result:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Rulebook Not Found.",
+        )
+    result = result._asdict()
+    result["rulesets"] = yaml.safe_load(result["rulesets"])
+    return result
 
 
 @router.get(
