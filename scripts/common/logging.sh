@@ -9,9 +9,6 @@ TS=$(tput setaf 2)
 TAG=$(tput setaf 10)
 RESET=$(tput sgr0)
 
-# emoji
-ERR_X='\U274C'
-
 # timestamp
 TIMESTAMP=$(date "+%Y-%m-%d %H:%M:%S")
 
@@ -32,7 +29,7 @@ log-warn() {
 }
 
 log-err() {
-    log "ERROR" "${ERR} ${ERR_X} $@"
+    log "ERROR" "${ERR} $@"
 }
 
 log-debug() {
