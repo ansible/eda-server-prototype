@@ -1,7 +1,8 @@
 # Event Driven Ansible Server
 
 ## Installation
-For instructions on how to quickly spin up a preview instance of *eda-server*, please see [INSTALL.md](./INSTALL.md).
+
+For instructions on how to quickly spin up a preview instance of _eda-server_, please see [INSTALL.md](./INSTALL.md).
 
 ## Setting up a development environment
 
@@ -12,6 +13,7 @@ The below instructions detail how to setup a development environment for _eda-se
 - [Docker](https://docs.docker.com/engine/install/) or [podman](https://podman.io/getting-started/installation)
 - Docker-compose: `pip install docker-compose`
 - [Taskfile](https://taskfile.dev/installation/)
+  - Note: For Macs with the M1 or M2 chip make sure you download Task from the arm64 architecture (https://github.com/go-task/task/releases)
 - Git
 - Python >= 3.9
 - python3-pip
@@ -25,7 +27,7 @@ The below instructions detail how to setup a development environment for _eda-se
 
       sudo ln -s $(which podman) $(dirname $(which podman))/docker
 
-- `DOCKER_HOST` environment variable must be defined pointing to the podman socket to be able to use `docker-compose`.  Example:
+- `DOCKER_HOST` environment variable must be defined pointing to the podman socket to be able to use `docker-compose`. Example:
 
       export DOCKER_HOST=unix:///run/user/$UID/podman/podman.sock
 
@@ -58,8 +60,10 @@ Install Ansible and `ansible.eda` collection:
 pip install ansible
 ansible-galaxy collection install ansible.eda
 ```
+
 ### 3. Set up env variables
-  Set up the following env variable(s) when testing/running local dev env
+
+Set up the following env variable(s) when testing/running local dev env
 
 ```shell
 export EDA_DEPLOYMENT_TYPE=local
@@ -68,8 +72,8 @@ export EDA_DEPLOYMENT_TYPE=local
 ### 4. Services
 
 **Note:**
-  Instead of running the below `task` steps individually, you can execute all tasks with `task dev:all:start` and then follow the steps in the
-  [Accessing the UI](#6-accessing-the-ui) section.
+Instead of running the below `task` steps individually, you can execute all tasks with `task dev:all:start` and then follow the steps in the
+[Accessing the UI](#6-accessing-the-ui) section.
 
 Start up a PostgreSQL database sever:
 
@@ -100,7 +104,7 @@ task dev:ui:start
 ### 7. Accessing the UI
 
 1. Create a dev superuser account
-  Defaults: user: dev_user@redhat.com, password: none2tuff
+   Defaults: user: dev_user@redhat.com, password: none2tuff
 
 ```shell
 task dev:user:add
@@ -112,7 +116,6 @@ API docs can be accessed at:
 
 - <http://localhost:8080/api/docs>
 - <http://localhost:8080/api/openapi.json>
-
 
 **You have finished setting up the development environment.**
 
@@ -133,7 +136,7 @@ task test
 Or call `pytest` directly:
 
 ```shell
-python -m pytest 
+python -m pytest
 ```
 
 ## Logging
