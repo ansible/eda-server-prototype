@@ -231,7 +231,7 @@ async def get_ruleset(
 @router.get(
     "/api/rulesets/{ruleset_id}/rules",
     response_model=List[schema.RuleList],
-    operation_id="read_ruleset",
+    operation_id="list_ruleset_rules",
 )
 async def list_ruleset_rules(
     ruleset_id: int, db: AsyncSession = Depends(get_db_session)
