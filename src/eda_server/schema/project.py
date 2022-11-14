@@ -5,7 +5,6 @@ from pydantic import BaseModel, StrictStr, constr
 
 from .extra_vars import ExtraVarsRef
 from .inventory import InventoryRef
-from .meta import MetaData
 from .playbook import PlaybookRef
 from .rulebook import RuleRulesetRef
 
@@ -38,11 +37,6 @@ class ProjectList(BaseModel):
     id: int
     url: StrictStr
     name: StrictStr
-
-
-class ProjectListWithMeta(BaseModel):
-    meta: MetaData
-    data: List[ProjectList]
 
 
 class ProjectUpdate(BaseModel):

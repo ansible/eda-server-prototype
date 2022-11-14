@@ -390,7 +390,7 @@ async def test_get_projects(client: AsyncClient, db: AsyncSession):
     assert response.status_code == status_codes.HTTP_200_OK
 
     data = response.json()
-    assert data["meta"]["params"]["limit"] == 10
+    assert data["params"]["limit"] == 10
     assert len(data["data"]) == 2
     assert data["data"][0]["name"] == TEST_PROJECT["name"]
     assert data["data"][1]["url"] == test_project_two["url"]

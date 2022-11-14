@@ -27,16 +27,15 @@ from .job import (
     JobInstanceRead,
 )
 from .message import ProducerMessage, ProducerResponse
-from .meta import BaseParams, MetaData
 from .playbook import PlaybookRead, PlaybookRef
 from .project import (
     ProjectCreate,
     ProjectDetail,
     ProjectList,
-    ProjectListWithMeta,
     ProjectRead,
     ProjectUpdate,
 )
+from .query_param import QueryParam, QueryParamPaginate
 from .role import (
     RoleCreate,
     RolePermissionCreate,
@@ -101,7 +100,8 @@ __all__ = [
     "ProjectList",
     "ProjectRead",
     "ProjectUpdate",
-    "ProjectListWithMeta",
+    "QueryParam",
+    "QueryParamPaginate",
     "RestartPolicy",
     "RoleCreate",
     "RolePermissionCreate",
@@ -125,6 +125,4 @@ __all__ = [
     "UserCreate",
     "UserRead",
     "UserUpdate",
-    "BaseParams",
-    "MetaData",
 ]

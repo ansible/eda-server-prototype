@@ -44,11 +44,9 @@ async def list_projects(
         .offset(offset)
     )
     result = await db.execute(query)
-    return schema.ProjectListWithMeta(
-        meta=schema.MetaData(
-            params=schema.BaseParams(limit=limit, offset=offset)
-        ),
-        data=result.all(),
+    params = {"limit": limit, "offset": offset}
+    return schema.QueryParamPaginate[schema.ProjectList](
+        params=params, data=result.all()
     )
 
 
