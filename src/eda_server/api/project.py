@@ -46,7 +46,7 @@ async def list_projects(
     )
     result = await db.execute(query)
     params = {"limit": limit, "offset": offset}
-    return {"params": params, "data" : result.all()}
+    return {"params": params, "data": result.all()}
 
 
 @router.post(
