@@ -31,6 +31,7 @@ async def project_by_name_exists_or_404(db: AsyncSession, project_name: str):
 @router.get(
     "/api/projects",
     operation_id="list_projects",
+    response_model=schema.QueryParamPaginate[schema.ProjectList],
     tags=["projects"],
 )
 async def list_projects(
@@ -45,9 +46,7 @@ async def list_projects(
     )
     result = await db.execute(query)
     params = {"limit": limit, "offset": offset}
-    return schema.QueryParamPaginate[schema.ProjectList](
-        params=params, data=result.all()
-    )
+    return {"params": params, "data" : result.all()}
 
 
 @router.post(
