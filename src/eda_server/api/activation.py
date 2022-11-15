@@ -43,8 +43,12 @@ router = APIRouter(tags=["activations"])
 
 
 def activation_unprocessable_entity_exception(e):
-    error_detail = e.orig.args[0].split("\n")[1]
-    object_id = re.findall(r"\d+", error_detail)[0]
+    try:
+        error_detail = e.orig.args[0].split("\n")[1]
+        object_id = re.findall(r"\d+", error_detail)[0]
+    except IndexError as ie:
+        logger.error(f"activation_unprocessable_entity_exception: {str(ie)}")
+        raise ie
     dependent_objects = ["rulebook", "inventory", "extra_var", "project"]
     for object in dependent_objects:
         if object in error_detail:
@@ -53,7 +57,7 @@ def activation_unprocessable_entity_exception(e):
                 content={
                     "message": "Error occurred while creating an activation.",
                     "detail": (
-                        f"{object.capitalize()} with ID={object_id} does not"
+                        f"{object.capitalize()} with ID={object_id} does not "
                         "exist."
                     ),
                 },
