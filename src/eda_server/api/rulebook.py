@@ -210,7 +210,7 @@ async def list_rulesets(db: AsyncSession = Depends(get_db_session)):
     response_model=schema.RulesetDetail,
     operation_id="read_ruleset",
 )
-async def get_ruleset(
+async def read_ruleset(
     ruleset_id: int, db: AsyncSession = Depends(get_db_session)
 ):
     ruleset = await rsql.get_ruleset(db, ruleset_id)
