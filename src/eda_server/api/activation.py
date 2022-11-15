@@ -16,7 +16,6 @@
 
 import json
 import logging
-import re
 from typing import List
 
 import aiodocker.exceptions
@@ -42,16 +41,14 @@ __all__ = ("router",)
 router = APIRouter(tags=["activations"])
 
 
-async def dependent_object_exists_or_exception(
-    db: AsyncSession, activation
-):
-    ACTIVATION_DEPENDENT_OBJECTS = [
+async def dependent_object_exists_or_exception(db: AsyncSession, activation):
+    activation_dependent_objects = [
         (models.rulebooks, "rulebook"),
         (models.inventories, "inventory"),
         (models.extra_vars, "extra_var"),
         (models.projects, "project"),
     ]
-    
+
     dep_object_ids = [
         activation.rulebook_id,
         activation.inventory_id,
@@ -59,7 +56,9 @@ async def dependent_object_exists_or_exception(
         activation.project_id,
     ]
 
-    for dep_object, object_id in zip(ACTIVATION_DEPENDENT_OBJECTS, dep_object_ids):
+    for dep_object, object_id in zip(
+        activation_dependent_objects, dep_object_ids
+    ):
         dependent_object = (
             await db.execute(
                 sa.select(dep_object[0]).where(dep_object[0].c.id == object_id)
@@ -68,7 +67,10 @@ async def dependent_object_exists_or_exception(
         if dependent_object is None:
             raise HTTPException(
                 status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                detail=f"{dep_object[1].capitalize()} with ID={object_id} does not exist.",
+                detail=(
+                    f"{dep_object[1].capitalize()} with ID={object_id} does"
+                    " not exist."
+                ),
             )
 
 
