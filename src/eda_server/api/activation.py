@@ -16,6 +16,7 @@
 
 import json
 import logging
+import re
 from typing import List
 
 import aiodocker.exceptions
@@ -41,9 +42,30 @@ __all__ = ("router",)
 router = APIRouter(tags=["activations"])
 
 
+def activation_unprocessable_entity_exception(e):
+    error_detail = e.orig.args[0].split("\n")[1]
+    object_id = re.findall(r"\d+", error_detail)[0]
+    dependent_objects = ["rulebook", "inventory", "extra_var", "project"]
+    for object in dependent_objects:
+        if object in error_detail:
+            return JSONResponse(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                content={
+                    "message": "Error occurred while creating an activation.",
+                    "detail": (
+                        f"{object.capitalize()} with ID={object_id} does not"
+                        "exist."
+                    ),
+                },
+            )
+
+
 @router.post(
     "/api/activations",
     response_model=schema.ActivationBaseRead,
+    responses={
+        status.HTTP_422_UNPROCESSABLE_ENTITY: {"model": ActivationErrorMessage}
+    },
     operation_id="create_activation",
 )
 async def create_activation(
@@ -65,11 +87,7 @@ async def create_activation(
     try:
         result = await db.execute(query)
     except sa.exc.IntegrityError as e:
-        error_info = e.orig.args[0].split("\n")
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail=str(error_info[1]),
-        )
+        return activation_unprocessable_entity_exception(e)
     await db.commit()
     (id_,) = result.inserted_primary_key
 
@@ -79,7 +97,7 @@ async def create_activation(
 @router.get(
     "/api/activations/{activation_id}",
     response_model=schema.ActivationRead,
-    operation_id="show_activation",
+    operation_id="read_activation",
 )
 async def read_activation(
     activation_id: int, db: AsyncSession = Depends(get_db_session)
@@ -253,7 +271,10 @@ async def read_output(proc, activation_instance_id, db_session_factory):
     responses={
         status.HTTP_500_INTERNAL_SERVER_ERROR: {
             "model": ActivationErrorMessage
-        }
+        },
+        status.HTTP_422_UNPROCESSABLE_ENTITY: {
+            "model": ActivationErrorMessage
+        },
     },
     operation_id="create_activation_instance",
 )
@@ -283,11 +304,7 @@ async def create_activation_instance(
     try:
         result = await db.execute(query)
     except sa.exc.IntegrityError as e:
-        error_info = e.orig.args[0].split("\n")
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail=str(error_info[1]),
-        )
+        return activation_unprocessable_entity_exception(e)
     await db.commit()
     id_, large_data_id = result.first()
 
