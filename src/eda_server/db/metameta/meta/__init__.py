@@ -28,7 +28,7 @@ class MetaEngine(MetaMetaBase):
         self.schemata = self._items
         self.list_schemata = self.list_item_keys
         self.resolve_engine_name(engine_name)
-        self.ns_excl_pref_regexs = ["^pg_", "^information_schema"]
+        self.ns_excl_pref_regexs = ("^pg_", "^information_schema")
         self._meta = meta
         self._engine = engine
         self.session_factory = session_factory
@@ -43,7 +43,7 @@ class MetaEngine(MetaMetaBase):
         else:
             self.name = engine_name
 
-    def register_schema(self, schema_name):
+    def register_schema(self, schema_name: str):
         schema = self.child_class(schema_name, self)
         self.schemata[schema_name] = schema
 
@@ -51,8 +51,8 @@ class MetaEngine(MetaMetaBase):
         return self._engine
 
     def _build_discover_engine_query(self):
-        if (exclusions_params := tuple(getattr(self, "ns_excl_pref_regexs", ()))):
-            exclusions = "and schema_name !~ %s " * len(exclusions_params)
+        if (exclusions_params := getattr(self, "ns_excl_pref_regexs", ())):
+            exclusions = ["schema_name !~ %s"] * len(exclusions_params)
         else:
             exclusions = ""
 
@@ -70,7 +70,7 @@ select schema_name
         schemata = None
         db = self.session_factory()
         try:
-            cur = db.execute(query, params)
+            cur = db.execute(sa.text(query), params)
             schemata = [rec["schema_name"] for rec in cur]
         finally:
             db.rollback()

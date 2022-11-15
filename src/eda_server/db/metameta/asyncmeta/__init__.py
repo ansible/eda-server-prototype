@@ -1,14 +1,11 @@
 import sqlalchemy as sa
 from sqlalchemy.ext.asyncio import AsyncEngine
-from .. import dicta, MetaMetaBase
+from .. import dicta
+from ..meta import MetaMeta, MetaEngine, MetaSchema
 from typing import Any, Callable, Hashable, List, Optional
 
 
-class AMetaMetaBase(MetaMetaBase):
-    pass
-
-
-class AMetaMeta(AMetaMetaBase):
+class AMetaMeta(MetaMeta):
     def __init__(self):
         super().__init__()
         self.engines = self._items
@@ -18,11 +15,10 @@ class AMetaMeta(AMetaMetaBase):
     def register_engine(
         self,
         engine: AsyncEngine,
-        session_factory: Callable,
         *,
         engine_name: Optional[str] = None
     ):
-        _engine = self.child_class(engine, session_factory, meta=self, engine_name=engine_name)
+        _engine = self.child_class(engine, meta=self, engine_name=engine_name)
         self.engines[_engine.name] = _engine
 
 
@@ -30,7 +26,6 @@ class AMetaEngine(AMetaMetaBase):
     def __init__(
         self,
         engine: AsyncEngine,
-        session_factory: Callable,
         *,
         meta: MetaMetaBase,
         engine_name: Optional[str] = None
@@ -39,18 +34,27 @@ class AMetaEngine(AMetaMetaBase):
         self.schemata = self._items
         self.list_schemata = self.list_item_keys
         self.resolve_engine_name(engine_name)
-        self.ns_excl_pref_regexs = ["^pg_", "^information_schema"]
+        self.ns_excl_pref_regexs = {"expr_1": "^pg_", "expr_2": "^information_schema"}
         self._meta = meta
         self._engine = engine
-        self.session_fatory = session_factory
         self.child_class = AMetaSchema
+
+    @property
+    def metameta(self):
+        return self._meta
+
+    @propert
+    def engine(self):
+        return self._engine
 
     def resolve_engine_name(self, engine_name: str):
         if not engine_name:
             try:
                 self.name = engine.raw_connection().connection.get_dsn_parameters()["dbname"]
             except (KeyError, AttributeError) as e:
-                raise e.__class__("Cannot detect engine name from connection. Specify engine name in arguments.")
+                raise e.__class__(
+                    "Cannot detect engine name from connection. Specify engine name in arguments."
+                )
         else:
             self.name = engine_name
 
@@ -58,20 +62,18 @@ class AMetaEngine(AMetaMetaBase):
         schema = self.child_class(schema_name, self)
         self.schemata[schema_name] = schema
 
-    def get_engine(self):
-        return self._engine
-
     def _build_discover_engine_query(self):
-        if (exclusions_params := getattr(self, "ns_excl_pref_regexs", [])):
-            exclusions = "and schema_name !~ %s " * len(exclusions_params)
+        if (exclusions_params := getattr(self, "ns_excl_pref_regexs", {})):
+            exclusions = (
+                " and ".join((f"schema_name !~ :{k}" for k in exclusions_params))
+            )
         else:
             exclusions = ""
 
         sql = f"""
 select schema_name
   from information_schema.schemata
- where 1 = 1
-    {exclusions}
+ where {exclusions}
 ;
 """
         return (sql, exclusions_params)
@@ -79,12 +81,9 @@ select schema_name
     async def _get_engine_schemata(self):
         query, params = self._build_discover_engine_query()
         schemata = None
-        db = self.session_fatory()
-        try:
-            cur = await db.execute(query, params)
+        async with self.engine.connect() as conn:
+            cur = await conn.execute(query, params)
             schemata = [rec["schema_name"] for rec in cur]
-        finally:
-            db.rollback()
 
         return schemata
 
@@ -112,13 +111,22 @@ class AMetaSchema(AMetaMetaBase):
         self.name = schema_name
         self.sa_metadata = sa.MetaData(schema=self.name)
 
-    async def _reflect_objects(self):
-        await self.sa_metadata.reflect(bind=self.get_engine())
+    @property
+    def metaengine(self):
+        return self._engine
 
-    def get_engine(self):
-        return self._engine._engine
+    @property
+    def engine(self):
+        return self.metaengine.engine
 
-    def _reindex_tables(self):
+    def _get_reflection(self, conn):
+        self.sa_metadata.reflect(bind=conn)
+
+    async def _reflect_objects(self) -> None:
+        async with self.engine.connect() as conn:
+            await conn.run_sync(self._get_reflection)
+
+    def _reindex_tables(self) -> None:
         _metadata = self.sa_metadata
         _tables = self.tables
         prefix = f"{self.name}."
@@ -130,17 +138,17 @@ class AMetaSchema(AMetaMetaBase):
                 mstab = tab
             _tables[mstab] = _metadata.tables[tab]
 
-    async def discover_tables(self):
+    async def discover_tables(self) -> None:
         await self._reflect_objects()
         self._reindex_tables()
 
     def get_table(self, table_name: str) -> sa.Table:
         return self.tables[table_name]
 
-    def add_table(self, table_name: str, table: sa.Table):
+    def add_table(self, table_name: str, table: sa.Table) -> None:
         self.tables[table_name] = table
 
-    def rm_table(self, table_name: str):
+    def rm_table(self, table_name: str) -> None:
         del self.tables[table_name]
 
 

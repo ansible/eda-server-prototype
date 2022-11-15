@@ -34,26 +34,25 @@ class Settings(BaseSettings):
 
     @property
     def database_url(self) -> str:
-        return self.build_database_url(
-            self.db_driver,
-            self.db_user,
-            self.db_password,
-            self.db_host,
-            self.db_port,
-            self.db_name,
-        )
+        return self.build_database_url()
 
     def build_database_url(
         self,
-        driver: str,
-        user: str,
-        password: str,
-        host: str,
-        port: int,
-        dbname: str,
+        driver: Optional[str] = None,
+        user: Optional[str] = None,
+        password: Optional[str] = None,
+        host: Optional[str] = None,
+        port: Optional[str] = None,
+        dbname: Optional[str] = None,
     ) -> str:
+        _driver = driver or self.db_driver
+        _user = user or self.db_user
+        _password = password or self.db_password
+        _host = host or self.db_host
+        _port = port or self.db_port
+        _dbname = dbname or self.db_name
         return (
-            f"{driver}://{user}:{password}@{host}:{port}/{dbname}"
+            f"{_driver}://{_user}:{_password}@{_host}:{_port}/{_dbname}"
         )
 
 

@@ -373,7 +373,6 @@ async def list_rulebook_rulesets(
 @router.get(
     "/api/scandb",
     operation_id="register_db",
-    response_model=List[schema.MetaMeta],
 )
 async def register_db(
     db: AsyncSession = Depends(get_db_session)
@@ -384,12 +383,7 @@ async def register_db(
     settings = get_settings()
     db_name = "dup_eda_server"
     new_db_url = settings.build_database_url(
-        settings.db_driver,
-        settings.db_user,
-        settings.db_password,
-        settings.db_host,
-        settings.db_port,
-        db_name,
+        dbname=db_name,
     )
     my_provider = DatabaseProvider(new_db_url)
     eda_meta = get_metameta()
@@ -400,14 +394,8 @@ async def register_db(
     )
     await eda_meta.engines[db_name].discover_engine()
 
-    response = {"engines": []}
-    for e in eda_meta.engines:
-        engine = eda_meta.engines[e]
-        _engine = {"name": engine.name, "schemata": []}
-        response["engines"].append(_engine)
-        for s in engine.schemata:
-            schema = engine.schemata[s]
-            _schema = {"name": schema.name, "tables": list(schema.tables)}
-            _engine["schemata"].append(_schema)
+    response = {
+        "tables": list(eda_meta.dup_eda_server.public.tables)
+    }
 
     return response
