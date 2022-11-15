@@ -42,22 +42,33 @@ __all__ = ("router",)
 router = APIRouter(tags=["activations"])
 
 
-def activation_unprocessable_entity_exception(e):
-    try:
-        error_detail = e.orig.args[0].split("\n")[1]
-        object_id = re.findall(r"\d+", error_detail)[0]
-    except IndexError as ie:
-        logger.error(f"activation_unprocessable_entity_exception: {str(ie)}")
-        raise ie
-    dependent_objects = ["rulebook", "inventory", "extra_var", "project"]
-    for object in dependent_objects:
-        if object in error_detail:
+async def dependent_object_exists_or_exception(
+    db: AsyncSession, activation
+):
+    ACTIVATION_DEPENDENT_OBJECTS = [
+        (models.rulebooks, "rulebook"),
+        (models.inventories, "inventory"),
+        (models.extra_vars, "extra_var"),
+        (models.projects, "project"),
+    ]
+    
+    dep_object_ids = [
+        activation.rulebook_id,
+        activation.inventory_id,
+        activation.extra_var_id,
+        activation.project_id,
+    ]
+
+    for dep_object, object_id in zip(ACTIVATION_DEPENDENT_OBJECTS, dep_object_ids):
+        dependent_object = (
+            await db.execute(
+                sa.select(dep_object[0]).where(dep_object[0].c.id == object_id)
+            )
+        ).one_or_none()
+        if dependent_object is None:
             raise HTTPException(
                 status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                detail=(
-                    f"{object.capitalize()} with ID={object_id} does not"
-                    " exist."
-                ),
+                detail=f"{dep_object[1].capitalize()} with ID={object_id} does not exist.",
             )
 
 
@@ -70,6 +81,8 @@ async def create_activation(
     activation: schema.ActivationCreate,
     db: AsyncSession = Depends(get_db_session),
 ):
+    await dependent_object_exists_or_exception(db, activation)
+
     query = sa.insert(models.activations).values(
         name=activation.name,
         description=activation.description,
@@ -82,10 +95,8 @@ async def create_activation(
         is_enabled=activation.is_enabled,
         extra_var_id=activation.extra_var_id,
     )
-    try:
-        result = await db.execute(query)
-    except sa.exc.IntegrityError as e:
-        activation_unprocessable_entity_exception(e)
+    result = await db.execute(query)
+
     await db.commit()
     (id_,) = result.inserted_primary_key
 
@@ -279,6 +290,7 @@ async def create_activation_instance(
     db_factory=Depends(get_db_session_factory),
     settings: Settings = Depends(get_settings),
 ):
+    await dependent_object_exists_or_exception(db, a)
 
     query = (
         sa.insert(models.activation_instances)
@@ -296,10 +308,8 @@ async def create_activation_instance(
             models.activation_instances.c.large_data_id,
         )
     )
-    try:
-        result = await db.execute(query)
-    except sa.exc.IntegrityError as e:
-        activation_unprocessable_entity_exception(e)
+    result = await db.execute(query)
+
     await db.commit()
     id_, large_data_id = result.first()
 
