@@ -1,5 +1,6 @@
-from typing import Any, Hashable, List, Optional
-
+import sqlalchemy as sa
+from typing import Any, Hashable, List, Union
+from .exceptions import MetaMetaNotFound
 
 class dicta(dict):
     """
@@ -11,19 +12,19 @@ class dicta(dict):
         print(x['b'])  # 2
     """
 
-    def __getattr__(self, key: Hashable):
+    def __getattr__(self, key: Hashable) -> Any:
         """Get attribute."""
         return super().__getitem__(key)
 
-    def __setattr__(self, key: Hashable, val: Any):
+    def __setattr__(self, key: Hashable, val: Any) -> None:
         """Set attribute."""
         super().__setitem__(key, val)
 
-    def __delattr__(self, key: Hashable):
+    def __delattr__(self, key: Hashable) -> None:
         """Delete attribute."""
         super().__delitem__(key)
 
-    def copy(self):
+    def copy(self) -> "dicta":
         """Get a copy."""
         return self.__class__(self)
 
@@ -32,15 +33,26 @@ class MetaMetaBase:
     def __init__(self):
         self._items = dicta()
         self.name = "MetaMetaBase"
+        self._notfound_exc = MetaMetaNotFound
 
-    def _get_child_class(self):
-        return self.__class__
+    def __iter__(self):
+        return iter(self._items)
+
+    def __getitem__(
+        self, key: str
+    ) -> Union["MetaEngine", "MetaSchema", sa.Table]:
+        if key not in self._items:
+            raise self._notfound_exc(key)
+        return self._items[key]
 
     def __getattr__(self, key: str) -> Any:
         if key in self._items:
             return self._items[key]
         else:
-            super().__getattr__(key)
+            try:
+                super().__getattr__(key)
+            except AttributeError:
+                raise MetaMetaNotFound(key)
 
     def __contains__(self, item_name: str) -> bool:
         return item_name in self._items
@@ -48,11 +60,27 @@ class MetaMetaBase:
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}({self.name})"
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.__repr__()}.({(s for s in self.list_item_keys())})"
 
-    def list_item_keys(self) -> List[Any]:
+    @property
+    def child_class(self) -> "MetaMetaBase":
+        NotImplementedError("The child class property must be defined")
+
+    def keys(self):
+        for key in self._items:
+            yield key
+
+    def items(self):
+        for elem in self._items.items():
+            yield elem
+
+    def values(self):
+        for val in self._items.values():
+            yield val
+
+    def list_item_keys(self) -> List[str]:
         return sorted(self._items)
 
 
-__all__ = ("dicta",)
+__all__ = ("dicta", "MetaMetaBase")

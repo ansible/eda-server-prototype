@@ -26,7 +26,6 @@ _provider = DatabaseProvider(_settings.database_url)
 _eda_meta = AMetaMeta()
 _eda_meta.register_engine(
     _provider.engine,
-    _provider.session_factory,
     engine_name=_settings.db_name,
 )
 

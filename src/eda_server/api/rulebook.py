@@ -381,21 +381,58 @@ async def register_db(
     from eda_server.db.provider import DatabaseProvider
     from eda_server.db.metameta.asyncmeta import AMetaMeta
     settings = get_settings()
+
+    # Setup new data provider
     db_name = "dup_eda_server"
     new_db_url = settings.build_database_url(
         dbname=db_name,
     )
     my_provider = DatabaseProvider(new_db_url)
+
     eda_meta = get_metameta()
+    # Scan the app db while we're at it.
+    await eda_meta.eda_server.discover()
+
+    # Register the new engine
     eda_meta.register_engine(
         my_provider.engine,
-        my_provider.session_factory,
         engine_name=db_name
     )
-    await eda_meta.engines[db_name].discover_engine()
+    await eda_meta[db_name].discover()
 
     response = {
-        "tables": list(eda_meta.dup_eda_server.public.tables)
+        "tables": list(eda_meta.dup_eda_server.public)
+    }
+
+    return response
+
+
+@router.get(
+    "/api/dup_projects",
+    operation_id="get_dup_projects",
+)
+async def list_dup_projects(
+    db: AsyncSession = Depends(get_db_session)
+):
+    from eda_server.app import get_settings, get_metameta
+    from eda_server.db.provider import DatabaseProvider
+    from eda_server.db.metameta.asyncmeta import AMetaMeta
+    eda_meta = get_metameta()
+    dup_project = eda_meta.dup_eda_server.public.dup_project
+    project = eda_meta.eda_server.public.project
+
+    dup_query = sa.select(dup_project)
+    query = sa.select(project)
+
+    async with eda_meta.dup_eda_server.engine.connect() as conn:
+        cur = await conn.execute(dup_query)
+        dup_project_data = cur.all()
+
+    project_data = (await db.execute(query)).all()
+
+    response = {
+        "eda_server.public.project": project_data,
+        "dup_eda_server.public.dup_project": dup_project_data,
     }
 
     return response
