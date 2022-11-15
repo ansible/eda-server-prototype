@@ -269,7 +269,7 @@ async def read_output(proc, activation_instance_id, db_session_factory):
     responses={
         status.HTTP_500_INTERNAL_SERVER_ERROR: {
             "model": ActivationErrorMessage
-        },
+        }
     },
     operation_id="create_activation_instance",
 )
