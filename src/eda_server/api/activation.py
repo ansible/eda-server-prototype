@@ -52,24 +52,18 @@ def activation_unprocessable_entity_exception(e):
     dependent_objects = ["rulebook", "inventory", "extra_var", "project"]
     for object in dependent_objects:
         if object in error_detail:
-            return JSONResponse(
+            raise HTTPException(
                 status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                content={
-                    "message": "Error occurred while creating an activation.",
-                    "detail": (
-                        f"{object.capitalize()} with ID={object_id} does not "
-                        "exist."
-                    ),
-                },
+                detail=(
+                    f"{object.capitalize()} with ID={object_id} does not"
+                    " exist."
+                ),
             )
 
 
 @router.post(
     "/api/activations",
     response_model=schema.ActivationBaseRead,
-    responses={
-        status.HTTP_422_UNPROCESSABLE_ENTITY: {"model": ActivationErrorMessage}
-    },
     operation_id="create_activation",
 )
 async def create_activation(
@@ -91,7 +85,7 @@ async def create_activation(
     try:
         result = await db.execute(query)
     except sa.exc.IntegrityError as e:
-        return activation_unprocessable_entity_exception(e)
+        activation_unprocessable_entity_exception(e)
     await db.commit()
     (id_,) = result.inserted_primary_key
 
@@ -276,9 +270,6 @@ async def read_output(proc, activation_instance_id, db_session_factory):
         status.HTTP_500_INTERNAL_SERVER_ERROR: {
             "model": ActivationErrorMessage
         },
-        status.HTTP_422_UNPROCESSABLE_ENTITY: {
-            "model": ActivationErrorMessage
-        },
     },
     operation_id="create_activation_instance",
 )
@@ -308,7 +299,7 @@ async def create_activation_instance(
     try:
         result = await db.execute(query)
     except sa.exc.IntegrityError as e:
-        return activation_unprocessable_entity_exception(e)
+        activation_unprocessable_entity_exception(e)
     await db.commit()
     id_, large_data_id = result.first()
 
