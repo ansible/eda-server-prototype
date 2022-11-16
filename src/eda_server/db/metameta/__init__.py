@@ -2,36 +2,9 @@ import sqlalchemy as sa
 from typing import Any, Hashable, List, Union
 from .exceptions import MetaMetaNotFound
 
-class dicta(dict):
-    """
-    Dict subclass that can access values via key or attribute.
-
-    Ex:
-        x = dicta(a=1, b=2)
-        print(x.a)     # 1
-        print(x['b'])  # 2
-    """
-
-    def __getattr__(self, key: Hashable) -> Any:
-        """Get attribute."""
-        return super().__getitem__(key)
-
-    def __setattr__(self, key: Hashable, val: Any) -> None:
-        """Set attribute."""
-        super().__setitem__(key, val)
-
-    def __delattr__(self, key: Hashable) -> None:
-        """Delete attribute."""
-        super().__delitem__(key)
-
-    def copy(self) -> "dicta":
-        """Get a copy."""
-        return self.__class__(self)
-
-
 class MetaMetaBase:
     def __init__(self):
-        self._items = dicta()
+        self._items = {}
         self.name = "MetaMetaBase"
         self._notfound_exc = MetaMetaNotFound
 
@@ -83,4 +56,4 @@ class MetaMetaBase:
         return sorted(self._items)
 
 
-__all__ = ("dicta", "MetaMetaBase")
+__all__ = ("MetaMetaBase")

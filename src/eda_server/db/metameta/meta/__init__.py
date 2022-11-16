@@ -1,7 +1,7 @@
 from __future__ import annotations
 import sqlalchemy as sa
 from typing import List, Optional, Tuple
-from .. import dicta, MetaMetaBase
+from .. import MetaMetaBase
 from ..exceptions import (
     MetaMetaEngineNotFound,
     MetaMetaSchemaNotFound,
