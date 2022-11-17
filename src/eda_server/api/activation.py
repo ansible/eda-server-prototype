@@ -41,6 +41,28 @@ __all__ = ("router",)
 router = APIRouter(tags=["activations"])
 
 
+async def dependent_object_exists_or_exception(db: AsyncSession, activation):
+    activation_dependent_objects = [
+        (models.rulebooks, "rulebook", activation.rulebook_id),
+        (models.inventories, "inventory", activation.inventory_id),
+        (models.extra_vars, "extra_var", activation.extra_var_id),
+        (models.projects, "project", activation.project_id),
+    ]
+
+    for object_model, object_name, object_id in activation_dependent_objects:
+        object_exists = await db.scalar(
+            sa.select(sa.exists().where(object_model.c.id == object_id))
+        )
+        if not object_exists:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail=(
+                    f"{object_name.capitalize()} with ID={object_id} does"
+                    " not exist."
+                ),
+            )
+
+
 @router.post(
     "/api/activations",
     response_model=schema.ActivationBaseRead,
@@ -65,10 +87,9 @@ async def create_activation(
     try:
         result = await db.execute(query)
     except sa.exc.IntegrityError:
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail="Unprocessable Entity.",
-        )
+        await db.rollback()
+        await dependent_object_exists_or_exception(db, activation)
+
     await db.commit()
     (id_,) = result.inserted_primary_key
 
@@ -78,7 +99,7 @@ async def create_activation(
 @router.get(
     "/api/activations/{activation_id}",
     response_model=schema.ActivationRead,
-    operation_id="show_activation",
+    operation_id="read_activation",
 )
 async def read_activation(
     activation_id: int, db: AsyncSession = Depends(get_db_session)
@@ -262,7 +283,6 @@ async def create_activation_instance(
     db_factory=Depends(get_db_session_factory),
     settings: Settings = Depends(get_settings),
 ):
-
     query = (
         sa.insert(models.activation_instances)
         .values(
@@ -279,7 +299,11 @@ async def create_activation_instance(
             models.activation_instances.c.large_data_id,
         )
     )
-    result = await db.execute(query)
+    try:
+        result = await db.execute(query)
+    except sa.exc.IntegrityError:
+        await db.rollback()
+        await dependent_object_exists_or_exception(db, a)
     await db.commit()
     id_, large_data_id = result.first()
 

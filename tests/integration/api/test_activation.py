@@ -89,10 +89,23 @@ async def _create_activation_dependent_objects(db: AsyncSession):
         )
     ).inserted_primary_key
 
+    (project_id,) = (
+        await bsql.insert_object(
+            db,
+            models.projects,
+            values={
+                "url": "https://github.com/ansible/event-driven-ansible",
+                "name": "test",
+                "description": "test",
+            },
+        )
+    ).inserted_primary_key
+
     foreign_keys = {
         "extra_var_id": extra_var_id,
         "inventory_id": inventory_id,
         "rulebook_id": rulebook_id,
+        "project_id": project_id,
     }
 
     return foreign_keys
@@ -130,6 +143,7 @@ async def test_create_activation(client: AsyncClient, db: AsyncSession):
     my_test_activation["rulebook_id"] = fks["rulebook_id"]
     my_test_activation["extra_var_id"] = fks["extra_var_id"]
     my_test_activation["inventory_id"] = fks["inventory_id"]
+    my_test_activation["project_id"] = fks["project_id"]
 
     response = await client.post(
         "/api/activations",
