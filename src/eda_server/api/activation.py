@@ -59,7 +59,6 @@ async def dependent_object_exists_or_exception(db: AsyncSession, activation):
     for dep_object, object_id in zip(
         activation_dependent_objects, dep_object_ids
     ):
-        await db.rollback()
         object_exists = await db.scalar(
             sa.select(sa.exists().where(dep_object[0].c.id == object_id))
         )
@@ -97,6 +96,7 @@ async def create_activation(
     try:
         result = await db.execute(query)
     except sa.exc.IntegrityError:
+        await db.rollback()
         await dependent_object_exists_or_exception(db, activation)
 
     await db.commit()
@@ -311,6 +311,7 @@ async def create_activation_instance(
     try:
         result = await db.execute(query)
     except sa.exc.IntegrityError:
+        await db.rollback()
         await dependent_object_exists_or_exception(db, a)
     await db.commit()
     id_, large_data_id = result.first()
