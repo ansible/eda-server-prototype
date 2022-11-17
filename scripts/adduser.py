@@ -54,7 +54,7 @@ async def create_user(
     password: str,
     is_superuser: bool = False,
 ):
-    user_db = get_user_db(config, db)
+    user_db = get_user_db(db)
     user_manager = get_user_manager(config, user_db)
 
     try:

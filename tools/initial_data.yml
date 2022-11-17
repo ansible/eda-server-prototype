@@ -45,6 +45,7 @@ roles:
 
   - name: 'default'
     description: 'Default role, that is applied to all users'
+    is_default: true
     permissions:
       - resources:
           - 'project'

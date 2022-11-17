@@ -61,17 +61,13 @@ async def list_roles(db: AsyncSession = Depends(get_db_session)):
 async def create_role(
     data: schema.RoleCreate, db: AsyncSession = Depends(get_db_session)
 ):
-    query = sa.insert(models.roles).values(
-        name=data.name, description=data.description
-    )
+    query = sa.insert(models.roles).values(data.dict())
     try:
         (role_id,) = (await db.execute(query)).inserted_primary_key
     except sa.exc.IntegrityError:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT)
     await db.commit()
-    return schema.RoleRead(
-        id=role_id, name=data.name, description=data.description
-    )
+    return schema.RoleRead(id=role_id, **data.dict())
 
 
 @router.get(
