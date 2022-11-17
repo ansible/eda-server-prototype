@@ -43,30 +43,21 @@ router = APIRouter(tags=["activations"])
 
 async def dependent_object_exists_or_exception(db: AsyncSession, activation):
     activation_dependent_objects = [
-        (models.rulebooks, "rulebook"),
-        (models.inventories, "inventory"),
-        (models.extra_vars, "extra_var"),
-        (models.projects, "project"),
+        (models.rulebooks, "rulebook", activation.rulebook_id),
+        (models.inventories, "inventory", activation.inventory_id),
+        (models.extra_vars, "extra_var", activation.extra_var_id),
+        (models.projects, "project", activation.project_id),
     ]
 
-    dep_object_ids = [
-        activation.rulebook_id,
-        activation.inventory_id,
-        activation.extra_var_id,
-        activation.project_id,
-    ]
-
-    for dep_object, object_id in zip(
-        activation_dependent_objects, dep_object_ids
-    ):
+    for object_model, object_name, object_id in activation_dependent_objects:
         object_exists = await db.scalar(
-            sa.select(sa.exists().where(dep_object[0].c.id == object_id))
+            sa.select(sa.exists().where(object_model.c.id == object_id))
         )
         if not object_exists:
             raise HTTPException(
                 status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
                 detail=(
-                    f"{dep_object[1].capitalize()} with ID={object_id} does"
+                    f"{object_name.capitalize()} with ID={object_id} does"
                     " not exist."
                 ),
             )
