@@ -11,6 +11,7 @@ dist/
 .env
 /venv
 /.venv
+.tox
 
 # IDE's
 .idea

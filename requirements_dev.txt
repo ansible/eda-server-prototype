@@ -1,5 +1,7 @@
+-r requirements.txt
 -r requirements_test.txt
 -r requirements_lint.txt
 
 sqlalchemy[mypy] ~= 1.4
 python-dateutil
+pre-commit

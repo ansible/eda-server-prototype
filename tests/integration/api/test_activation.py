@@ -12,6 +12,8 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
+from unittest import mock
+
 import sqlalchemy as sa
 from fastapi import status as status_codes
 from httpx import AsyncClient
@@ -22,6 +24,7 @@ from eda_server.db import models
 from eda_server.db.models.activation import RestartPolicy
 from eda_server.db.sql import base as bsql
 from eda_server.db.utils.lostream import PGLargeObject
+from eda_server.types import Action, ResourceType
 
 TEST_ACTIVATION = {
     "name": "test-activation",
@@ -136,8 +139,11 @@ async def _create_activation(db: AsyncSession, foreign_keys: dict):
     return activation_id
 
 
-async def test_create_activation(client: AsyncClient, db: AsyncSession):
+async def test_create_activation(
+    client: AsyncClient, db: AsyncSession, check_permission_spy: mock.Mock
+):
     fks = await _create_activation_dependent_objects(db)
+    await db.commit()
 
     my_test_activation = TEST_ACTIVATION.copy()
     my_test_activation["rulebook_id"] = fks["rulebook_id"]
@@ -159,9 +165,13 @@ async def test_create_activation(client: AsyncClient, db: AsyncSession):
     assert activation["name"] == TEST_ACTIVATION["name"]
     assert activation["is_enabled"] == TEST_ACTIVATION["is_enabled"]
 
+    check_permission_spy.assert_called_once_with(
+        mock.ANY, mock.ANY, ResourceType.ACTIVATION, Action.CREATE
+    )
+
 
 async def test_delete_activation_instance(
-    client: AsyncClient, db: AsyncSession
+    client: AsyncClient, db: AsyncSession, check_permission_spy: mock.Mock
 ):
     foreign_keys = await _create_activation_dependent_objects(db)
 
@@ -176,10 +186,13 @@ async def test_delete_activation_instance(
         )
     ).inserted_primary_key
 
+    # REVIEW(cutwater): This assert statement tests the test case itself
     num_activation_instances = await db.scalar(
         sa.select(func.count()).select_from(models.activation_instances)
     )
     assert num_activation_instances == 1
+
+    await db.commit()
 
     response = await client.delete(f"/api/activation_instance/{inserted_id}")
     assert response.status_code == status_codes.HTTP_204_NO_CONTENT
@@ -189,10 +202,12 @@ async def test_delete_activation_instance(
     )
     assert num_activation_instances == 0
 
+    check_permission_spy.assert_called_once_with(
+        mock.ANY, mock.ANY, ResourceType.ACTIVATION_INSTANCE, Action.DELETE
+    )
 
-async def test_ins_del_activation_instance_manages_log_lob(
-    client: AsyncClient, db: AsyncSession
-):
+
+async def test_ins_del_activation_instance_manages_log_lob(db: AsyncSession):
     foreign_keys = await _create_activation_dependent_objects(db)
     activation_id = await _create_activation(db, foreign_keys)
 
@@ -231,14 +246,13 @@ async def test_ins_del_activation_instance_manages_log_lob(
     exists, _ = await PGLargeObject.verify_large_object(db, large_data_id)
     assert not exists
 
+    # REVIEW(cutwater): This query does nothing
     query = sa.delete(models.activations).where(
         models.activations.c.id == activation_id
     )
 
 
-async def test_create_activation_bad_entity(
-    client: AsyncClient, db: AsyncSession
-):
+async def test_create_activation_bad_entity(client: AsyncClient):
     response = await client.post(
         "/api/activations",
         json=TEST_ACTIVATION,
@@ -251,9 +265,12 @@ async def test_delete_activation_instance_not_found(client: AsyncClient):
     assert response.status_code == status_codes.HTTP_404_NOT_FOUND
 
 
-async def test_read_activation(client: AsyncClient, db: AsyncSession):
+async def test_read_activation(
+    client: AsyncClient, db: AsyncSession, check_permission_spy: mock.Mock
+):
     foreign_keys = await _create_activation_dependent_objects(db)
     activation_id = await _create_activation(db, foreign_keys)
+    await db.commit()
 
     response = await client.get(
         f"/api/activations/{activation_id}",
@@ -286,15 +303,22 @@ async def test_read_activation(client: AsyncClient, db: AsyncSession):
         "name": "vars.yml",
     }
 
+    check_permission_spy.assert_called_once_with(
+        mock.ANY, mock.ANY, ResourceType.ACTIVATION, Action.READ
+    )
+
 
 async def test_read_activation_not_found(client: AsyncClient):
     response = await client.get("/api/activations/1")
     assert response.status_code == status_codes.HTTP_404_NOT_FOUND
 
 
-async def test_read_activations(client: AsyncClient, db: AsyncSession):
+async def test_list_activations(
+    client: AsyncClient, db: AsyncSession, check_permission_spy: mock.Mock
+):
     foreign_keys = await _create_activation_dependent_objects(db)
     activation_id = await _create_activation(db, foreign_keys)
+    await db.commit()
 
     response = await client.get(
         "/api/activations",
@@ -309,10 +333,12 @@ async def test_read_activations(client: AsyncClient, db: AsyncSession):
     assert activation["name"] == TEST_ACTIVATION["name"]
     assert activation["description"] == TEST_ACTIVATION["description"]
 
+    check_permission_spy.assert_called_once_with(
+        mock.ANY, mock.ANY, ResourceType.ACTIVATION, Action.READ
+    )
 
-async def test_read_activations_empty_response(
-    client: AsyncClient, db: AsyncSession
-):
+
+async def test_list_activations_empty_response(client: AsyncClient):
     response = await client.get(
         "/api/activations",
     )
@@ -321,9 +347,12 @@ async def test_read_activations_empty_response(
     assert activations == []
 
 
-async def test_update_activation(client: AsyncClient, db: AsyncSession):
+async def test_update_activation(
+    client: AsyncClient, db: AsyncSession, check_permission_spy: mock.Mock
+):
     foreign_keys = await _create_activation_dependent_objects(db)
     activation_id = await _create_activation(db, foreign_keys)
+    await db.commit()
 
     new_activation = {
         "name": "new demo",
@@ -342,10 +371,12 @@ async def test_update_activation(client: AsyncClient, db: AsyncSession):
     assert activation["description"] == new_activation["description"]
     assert activation["is_enabled"] == new_activation["is_enabled"]
 
+    check_permission_spy.assert_called_once_with(
+        mock.ANY, mock.ANY, ResourceType.ACTIVATION, Action.UPDATE
+    )
 
-async def test_update_activation_bad_entity(
-    client: AsyncClient, db: AsyncSession
-):
+
+async def test_update_activation_bad_entity(client: AsyncClient):
     new_activation = {
         "name": 1,
         "description": "demo activation",
@@ -372,14 +403,18 @@ async def test_update_activation_not_found(client: AsyncClient):
     assert response.status_code == status_codes.HTTP_404_NOT_FOUND
 
 
-async def test_delete_activation(client: AsyncClient, db: AsyncSession):
+async def test_delete_activation(
+    client: AsyncClient, db: AsyncSession, check_permission_spy: mock.Mock
+):
     foreign_keys = await _create_activation_dependent_objects(db)
     activation_id = await _create_activation(db, foreign_keys)
 
+    # REVIEW(cutwater): This assert statement tests the test case itself
     num_activations = await db.scalar(
         sa.select(func.count()).select_from(models.activations)
     )
     assert num_activations == 1
+    await db.commit()
 
     response = await client.delete(f"/api/activations/{activation_id}")
     assert response.status_code == status_codes.HTTP_204_NO_CONTENT
@@ -388,6 +423,10 @@ async def test_delete_activation(client: AsyncClient, db: AsyncSession):
         sa.select(func.count()).select_from(models.activation_instances)
     )
     assert num_activations == 0
+
+    check_permission_spy.assert_called_once_with(
+        mock.ANY, mock.ANY, ResourceType.ACTIVATION, Action.DELETE
+    )
 
 
 async def test_delete_activation_not_found(client: AsyncClient):
