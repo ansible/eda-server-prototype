@@ -1,3 +1,4 @@
+# NOTE(cutwater): Keep list of flake8 plugins in sync with .pre-commit-config.yaml
 flake8
 flake8-broken-line
 flake8-bugbear
