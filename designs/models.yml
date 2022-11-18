@@ -1,0 +1,377 @@
+models:
+- fields:
+  - name: version_num
+    pk: true
+    type: VARCHAR(32)
+  name: alembic_version
+- fields:
+  - name: id
+    pk: true
+    type: INTEGER
+  - name: activation_instance_id
+    pk: false
+    type: INTEGER
+  - name: job_instance_id
+    pk: false
+    type: INTEGER
+  name: activation_instance_job_instance
+- fields:
+  - name: id
+    pk: true
+    type: INTEGER
+  - name: name
+    pk: false
+    type: VARCHAR
+  - name: rulebook_id
+    pk: false
+    type: INTEGER
+  - name: inventory_id
+    pk: false
+    type: INTEGER
+  - name: extra_var_id
+    pk: false
+    type: INTEGER
+  - name: execution_environment
+    pk: false
+    type: VARCHAR
+  - name: working_directory
+    pk: false
+    type: VARCHAR
+  - name: large_data_id
+    pk: false
+    type: OID
+  - name: project_id
+    pk: false
+    type: INTEGER
+  name: activation_instance
+- fields:
+  - name: id
+    pk: true
+    type: INTEGER
+  - name: name
+    pk: false
+    type: VARCHAR
+  - name: extra_var
+    pk: false
+    type: VARCHAR
+  - name: project_id
+    pk: false
+    type: INTEGER
+  name: extra_var
+- fields:
+  - name: id
+    pk: true
+    type: INTEGER
+  - name: git_hash
+    pk: false
+    type: VARCHAR
+  - name: url
+    pk: false
+    type: VARCHAR
+  - name: name
+    pk: false
+    type: VARCHAR
+  - name: description
+    pk: false
+    type: VARCHAR
+  - name: created_at
+    pk: false
+    type: TIMESTAMP
+  - name: modified_at
+    pk: false
+    type: TIMESTAMP
+  - name: large_data_id
+    pk: false
+    type: OID
+  name: project
+- fields:
+  - name: id
+    pk: true
+    type: INTEGER
+  - name: name
+    pk: false
+    type: VARCHAR
+  - name: inventory
+    pk: false
+    type: VARCHAR
+  - name: project_id
+    pk: false
+    type: INTEGER
+  name: inventory
+- fields:
+  - name: id
+    pk: true
+    type: INTEGER
+  - name: name
+    pk: false
+    type: VARCHAR
+  - name: rulesets
+    pk: false
+    type: VARCHAR
+  - name: project_id
+    pk: false
+    type: INTEGER
+  - name: description
+    pk: false
+    type: VARCHAR
+  - name: created_at
+    pk: false
+    type: TIMESTAMP
+  - name: modified_at
+    pk: false
+    type: TIMESTAMP
+  name: rulebook
+- fields:
+  - name: id
+    pk: true
+    type: INTEGER
+  - name: uuid
+    pk: false
+    type: UUID
+  name: job_instance
+- fields:
+  - name: id
+    pk: true
+    type: INTEGER
+  - name: activation_instance_id
+    pk: false
+    type: INTEGER
+  - name: line_number
+    pk: false
+    type: INTEGER
+  - name: log
+    pk: false
+    type: VARCHAR
+  name: activation_instance_log
+- fields:
+  - name: id
+    pk: true
+    type: INTEGER
+  - name: ruleset_id
+    pk: false
+    type: INTEGER
+  - name: name
+    pk: false
+    type: VARCHAR
+  - name: action
+    pk: false
+    type: JSONB
+  name: rule
+- fields:
+  - name: id
+    pk: true
+    type: INTEGER
+  - name: rulebook_id
+    pk: false
+    type: INTEGER
+  - name: name
+    pk: false
+    type: VARCHAR
+  - name: created_at
+    pk: false
+    type: TIMESTAMP
+  - name: modified_at
+    pk: false
+    type: TIMESTAMP
+  name: ruleset
+- fields:
+  - name: id
+    pk: true
+    type: INTEGER
+  - name: uuid
+    pk: false
+    type: UUID
+  name: job
+- fields:
+  - name: id
+    pk: true
+    type: INTEGER
+  - name: name
+    pk: false
+    type: VARCHAR
+  - name: playbook
+    pk: false
+    type: VARCHAR
+  - name: project_id
+    pk: false
+    type: INTEGER
+  name: playbook
+- fields:
+  - name: id
+    pk: true
+    type: INTEGER
+  - name: name
+    pk: false
+    type: VARCHAR
+  - name: description
+    pk: false
+    type: VARCHAR
+  - name: status
+    pk: false
+    type: VARCHAR
+  - name: fired_date
+    pk: false
+    type: TIMESTAMP
+  - name: created_at
+    pk: false
+    type: TIMESTAMP
+  - name: definition
+    pk: false
+    type: JSONB
+  - name: rule_id
+    pk: false
+    type: INTEGER
+  - name: ruleset_id
+    pk: false
+    type: INTEGER
+  - name: activation_instance_id
+    pk: false
+    type: INTEGER
+  - name: job_instance_id
+    pk: false
+    type: INTEGER
+  name: audit_rule
+- fields:
+  - name: id
+    pk: true
+    type: INTEGER
+  - name: job_uuid
+    pk: false
+    type: UUID
+  - name: counter
+    pk: false
+    type: INTEGER
+  - name: stdout
+    pk: false
+    type: VARCHAR
+  - name: type
+    pk: false
+    type: VARCHAR
+  - name: created_at
+    pk: false
+    type: TIMESTAMP
+  name: job_instance_event
+- fields:
+  - name: id
+    pk: true
+    type: INTEGER
+  - name: host
+    pk: false
+    type: VARCHAR
+  - name: job_uuid
+    pk: false
+    type: UUID
+  - name: playbook
+    pk: false
+    type: VARCHAR
+  - name: play
+    pk: false
+    type: VARCHAR
+  - name: task
+    pk: false
+    type: VARCHAR
+  - name: status
+    pk: false
+    type: VARCHAR
+  name: job_instance_host
+- fields:
+  - name: id
+    pk: true
+    type: INTEGER
+  - name: name
+    pk: false
+    type: VARCHAR
+  - name: rulebook_id
+    pk: false
+    type: INTEGER
+  - name: inventory_id
+    pk: false
+    type: INTEGER
+  - name: extra_var_id
+    pk: false
+    type: INTEGER
+  - name: description
+    pk: false
+    type: VARCHAR
+  - name: status
+    pk: false
+    type: VARCHAR
+  - name: is_enabled
+    pk: false
+    type: BOOLEAN
+  - name: restarted_at
+    pk: false
+    type: TIMESTAMP
+  - name: restart_count
+    pk: false
+    type: INTEGER
+  - name: created_at
+    pk: false
+    type: TIMESTAMP
+  - name: modified_at
+    pk: false
+    type: TIMESTAMP
+  - name: working_directory
+    pk: false
+    type: VARCHAR
+  - name: execution_environment
+    pk: false
+    type: VARCHAR(6)
+  - name: restart_policy
+    pk: false
+    type: VARCHAR(10)
+  name: activation
+- fields:
+  - name: id
+    pk: true
+    type: UUID
+  - name: name
+    pk: false
+    type: VARCHAR
+  - name: description
+    pk: false
+    type: VARCHAR
+  name: role
+- fields:
+  - name: id
+    pk: true
+    type: UUID
+  - name: role_id
+    pk: false
+    type: UUID
+  - name: resource_type
+    pk: false
+    type: VARCHAR(13)
+  - name: action
+    pk: false
+    type: VARCHAR(6)
+  name: role_permission
+- fields:
+  - name: user_id
+    pk: true
+    type: UUID
+  - name: role_id
+    pk: true
+    type: UUID
+  name: user_role
+- fields:
+  - name: email
+    pk: false
+    type: VARCHAR(320)
+  - name: hashed_password
+    pk: false
+    type: VARCHAR(1024)
+  - name: is_active
+    pk: false
+    type: BOOLEAN
+  - name: is_superuser
+    pk: false
+    type: BOOLEAN
+  - name: is_verified
+    pk: false
+    type: BOOLEAN
+  - name: id
+    pk: true
+    type: UUID
+  name: user
+
