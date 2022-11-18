@@ -11,6 +11,12 @@ roles:
           - 'rulebook'
           - 'execution_env'
           - 'role'
+          - 'activation'
+          - 'activation_instance'
+          - 'audit_rule'
+          - 'job'
+          - 'task'
+          - 'user'
         actions:
           - 'create'
           - 'read'
@@ -27,6 +33,12 @@ roles:
           - 'playbook'
           - 'rulebook'
           - 'execution_env'
+          - 'activation'
+          - 'activation_instance'
+          - 'audit_rule'
+          - 'job'
+          - 'task'
+          - 'user'
         actions:
           - 'read'
           - 'update'
@@ -41,6 +53,10 @@ roles:
           - 'playbook'
           - 'rulebook'
           - 'execution_env'
+          - 'activation'
+          - 'activation_instance'
+          - 'job'
+          - 'task'
         actions:
           - 'read'
 users:

@@ -12,12 +12,15 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
+from unittest import mock
+
 import sqlalchemy as sa
 from fastapi import status as status_codes
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from eda_server.db import models
+from eda_server.types import Action, ResourceType
 
 TEST_RULESETS_SIMPLE = """
 ---
@@ -53,7 +56,9 @@ async def test_read_rulebook_not_found(client: AsyncClient):
     assert response.status_code == status_codes.HTTP_404_NOT_FOUND
 
 
-async def test_create_rulebook(client: AsyncClient, db: AsyncSession):
+async def test_create_rulebook(
+    client: AsyncClient, db: AsyncSession, check_permission_spy: mock.Mock
+):
     response = await client.post(
         "/api/rulebooks",
         json={
@@ -81,8 +86,12 @@ async def test_create_rulebook(client: AsyncClient, db: AsyncSession):
     assert rule["ruleset_id"] == ruleset["id"]
     assert rule["action"] == {"debug": None}
 
+    check_permission_spy.assert_called_once_with(
+        mock.ANY, mock.ANY, ResourceType.RULEBOOK, Action.CREATE
+    )
 
-async def test_list_rulebooks(client: AsyncClient, db: AsyncSession):
+
+async def test_list_rulebooks(client: AsyncClient):
     response = await client.post(
         "/api/rulebooks",
         json={

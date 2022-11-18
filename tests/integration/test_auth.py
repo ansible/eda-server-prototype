@@ -31,13 +31,15 @@ from eda_server.users import UserDatabase
 
 @pytest_asyncio.fixture
 async def admin_user(db: AsyncSession):
-    return await UserDatabase(db).create(
+    user = await UserDatabase(db).create(
         {
             "email": "admin@example.com",
             "hashed_password": "",
             "is_superuser": True,
         }
     )
+    await db.commit()
+    return user
 
 
 @pytest_asyncio.fixture
@@ -58,6 +60,7 @@ async def regular_user(db: AsyncSession):
         }
     )
     await add_user_role(db, user.id, role_id)
+    await db.commit()
     return user
 
 
@@ -113,7 +116,6 @@ async def test_requires_permission_dependency_forbidden(
     db: AsyncSession, regular_user: models.User
 ):
     dependency = requires_permission(ResourceType.ROLE, Action.CREATE)
-
     with pytest.raises(HTTPException) as excinfo:
         await dependency(regular_user, db)
     assert excinfo.value.status_code == status.HTTP_403_FORBIDDEN

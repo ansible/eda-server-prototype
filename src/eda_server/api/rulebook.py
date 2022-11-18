@@ -20,11 +20,13 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from eda_server import schema
+from eda_server.auth import requires_permission
 from eda_server.db.dependency import get_db_session
 
 # Rule, Ruleset, Rulebook query builder, enums, etc
 from eda_server.db.sql import rulebook as rsql
 from eda_server.project import insert_rulebook_related_data
+from eda_server.types import Action, ResourceType
 
 router = APIRouter(tags=["rulebooks"])
 
@@ -142,6 +144,9 @@ async def build_detail_object_totals(
     "/api/rules",
     response_model=List[schema.RuleList],
     operation_id="list_rules",
+    dependencies=[
+        Depends(requires_permission(ResourceType.RULEBOOK, Action.READ)),
+    ],
 )
 async def list_rules(db: AsyncSession = Depends(get_db_session)):
     rules = await rsql.list_rules(db)
@@ -168,6 +173,9 @@ async def list_rules(db: AsyncSession = Depends(get_db_session)):
     "/api/rules/{rule_id}",
     response_model=schema.RuleDetail,
     operation_id="read_rule",
+    dependencies=[
+        Depends(requires_permission(ResourceType.RULEBOOK, Action.READ)),
+    ],
 )
 async def read_rule(rule_id: int, db: AsyncSession = Depends(get_db_session)):
     rule = await rsql.get_rule(db, rule_id)
@@ -194,6 +202,9 @@ async def read_rule(rule_id: int, db: AsyncSession = Depends(get_db_session)):
     "/api/rulesets",
     response_model=List[schema.RulesetList],
     operation_id="list_rulesets",
+    dependencies=[
+        Depends(requires_permission(ResourceType.RULEBOOK, Action.READ)),
+    ],
 )
 async def list_rulesets(db: AsyncSession = Depends(get_db_session)):
     rulesets = await rsql.list_rulesets(db)
@@ -223,6 +234,9 @@ async def list_rulesets(db: AsyncSession = Depends(get_db_session)):
     "/api/rulesets/{ruleset_id}",
     response_model=schema.RulesetDetail,
     operation_id="read_ruleset",
+    dependencies=[
+        Depends(requires_permission(ResourceType.RULEBOOK, Action.READ)),
+    ],
 )
 async def read_ruleset(
     ruleset_id: int, db: AsyncSession = Depends(get_db_session)
@@ -271,6 +285,9 @@ async def list_ruleset_rules(
 @router.post(
     "/api/rulebooks",
     operation_id="create_rulebook",
+    dependencies=[
+        Depends(requires_permission(ResourceType.RULEBOOK, Action.CREATE)),
+    ],
 )
 async def create_rulebook(
     rulebook: schema.RulebookCreate, db: AsyncSession = Depends(get_db_session)
@@ -307,6 +324,9 @@ async def create_rulebook(
     "/api/rulebooks",
     operation_id="list_rulebooks",
     response_model=List[schema.RulebookList],
+    dependencies=[
+        Depends(requires_permission(ResourceType.RULEBOOK, Action.READ)),
+    ],
 )
 async def list_rulebooks(db: AsyncSession = Depends(get_db_session)):
     rulebooks = await rsql.list_rulebooks(db)
@@ -317,6 +337,9 @@ async def list_rulebooks(db: AsyncSession = Depends(get_db_session)):
     "/api/rulebooks/{rulebook_id}",
     operation_id="read_rulebook",
     response_model=schema.RulebookRead,
+    dependencies=[
+        Depends(requires_permission(ResourceType.RULEBOOK, Action.READ)),
+    ],
 )
 async def read_rulebook(
     rulebook_id: int, db: AsyncSession = Depends(get_db_session)
@@ -331,7 +354,11 @@ async def read_rulebook(
 
 
 @router.get(
-    "/api/rulebook_json/{rulebook_id}", operation_id="read_rulebook_json"
+    "/api/rulebook_json/{rulebook_id}",
+    operation_id="read_rulebook_json",
+    dependencies=[
+        Depends(requires_permission(ResourceType.RULEBOOK, Action.READ)),
+    ],
 )
 async def read_rulebook_json(
     rulebook_id: int, db: AsyncSession = Depends(get_db_session)
@@ -351,6 +378,9 @@ async def read_rulebook_json(
     "/api/rulebooks/{rulebook_id}/rulesets",
     operation_id="list_rulebook_rulesets",
     response_model=List[schema.RulesetList],
+    dependencies=[
+        Depends(requires_permission(ResourceType.RULEBOOK, Action.READ)),
+    ],
 )
 async def list_rulebook_rulesets(
     rulebook_id: int, db: AsyncSession = Depends(get_db_session)
@@ -377,5 +407,3 @@ async def list_rulebook_rulesets(
         response.append(resp_obj)
 
     return response
-
-    return rulebook_rulesets.all()

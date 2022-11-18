@@ -31,6 +31,18 @@ async def check_permission(
     resource_type: ResourceType,
     action: Action,
 ) -> bool:
+    """
+    Check user access permission.
+
+    Check that specified user has a permission to perform a specified action
+    against the specified resource type.
+
+    :param db: SQLAlchemy session.
+    :param user: User instance.
+    :param resource_type: Resource type.
+    :param action: Resource action.
+    :return: ``True`` if user permission is granted, ``False`` otherwise.
+    """
     if user.is_superuser:
         return True
 
@@ -56,12 +68,10 @@ def requires_permission(resource_type: ResourceType, action: Action):
         user: models.User = Depends(current_active_user),
         db: AsyncSession = Depends(get_db_session),
     ):
-        if not await check_permission(
-            db,
-            user,
-            resource_type,
-            action,
-        ):
+        has_permission = await check_permission(
+            db, user, resource_type, action
+        )
+        if not has_permission:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
 
     return requires_permission_dependency
