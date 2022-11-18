@@ -45,6 +45,7 @@
     "react-hooks/rules-of-hooks": "error",
     "react-hooks/exhaustive-deps": "warn",
     "@typescript-eslint/interface-name-prefix": "off",
+    "@typescript-eslint/no-empty-function": "warn",
     "prettier/prettier": "warn",
     "import/no-unresolved": "off",
     "import/extensions": "off",

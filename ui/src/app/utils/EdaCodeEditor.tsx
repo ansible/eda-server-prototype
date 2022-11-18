@@ -29,8 +29,6 @@ export const EdaCodeEditor = (props: {
   useResizeObserver(pageRef, (entry) => {
     const { width } = entry.contentRect;
     const { height } = entry.contentRect;
-    console.log('Debug - width, height, pageRef: ', width, height, pageRef);
-    console.log('Debug -  editorRef?.current?: ', editorRef?.current);
     editorRef?.current?.layout({ width, height });
   });
   useEffect(() => {
@@ -40,7 +38,6 @@ export const EdaCodeEditor = (props: {
   }, [code, editorRef, defaultScrollToLine]);
 
   function onEditorDidMount(editor: any, monaco: any) {
-    console.log('Debug - editorDidMount: editor, monaco: ', editor, monaco);
     editorRef.current = editor;
     monacoRef.current = monaco;
   }

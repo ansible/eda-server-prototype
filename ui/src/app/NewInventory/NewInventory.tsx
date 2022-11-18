@@ -3,8 +3,6 @@ import {
   Button,
   Card,
   CardBody as PFCardBody,
-  Flex,
-  FlexItem,
   Form,
   FormGroup,
   Grid,
@@ -75,7 +73,6 @@ const NewInventory: React.FunctionComponent = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     validateFields();
-    console.log('Debug: inventory, code: ', inventory, code);
     addInventory({ name: name, description: description, inventory: code })
       .then((data) => {
         data?.data?.id ? history.push(`/inventories/inventory/${data?.data?.id}`) : history.push(`/inventories`);
@@ -103,15 +100,10 @@ const NewInventory: React.FunctionComponent = () => {
 
   const onEditorDidMount = (editor, monaco) => {
     // eslint-disable-next-line no-console
-    console.log('Debug - editor: ', editor, monaco);
     editor.focus();
   };
 
   const [code, setCode] = React.useState('');
-
-  const onChange = (code) => {
-    console.log('Debug - onChange code: ', code);
-  };
 
   return (
     <React.Fragment>
