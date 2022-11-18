@@ -139,6 +139,39 @@ Or call `pytest` directly:
 python -m pytest
 ```
 
+## Git pre-commit hooks (optional)
+
+To automatically run linters and code formatter you may use
+[git pre-commit hooks](https://git-scm.com/book/en/v2/Customizing-Git-Git-Hooks).
+This project provides a configuration for [pre-commit](https://pre-commit.com/)
+framework to automatically setup hooks for you.
+
+1. First install the `pre-commit` tool:
+   1. Into your virtual environment:
+      ```shell
+      pip install pre-commit
+      ```
+   
+   2. Into your user directory:
+      ```shell
+      pip install --user pre-commit
+      ```
+   3. Via [pipx](https://pypa.github.io/pipx/) tool: 
+      ```shell
+      pipx install pre-commit
+      ```
+
+2. Then generate git pre-commit hooks:
+   ```shell
+   pre-commit install
+   ```
+
+You may run pre-commit manually on all tracked files by calling:
+```shell
+pre-commit run --all-files
+```
+
+
 ## Logging
 
 When you start server using the binary `eda-server`, it will use default project

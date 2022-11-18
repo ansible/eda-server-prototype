@@ -3,3 +3,4 @@
 
 sqlalchemy[mypy] ~= 1.4
 python-dateutil
+pre-commit
