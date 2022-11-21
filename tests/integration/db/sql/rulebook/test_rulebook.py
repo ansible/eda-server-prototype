@@ -25,6 +25,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from eda_server import project as bl_prj
 from eda_server.db import models
 from eda_server.db.sql import base as bsql, rulebook as rsql
+from eda_server.types import InventorySource
 
 TEST_RULESET_SIMPLE = """
 ---
@@ -390,7 +391,11 @@ async def insert_rule(
 async def insert_inventory(
     db: AsyncSession, project: sa.engine.Row
 ) -> sa.engine.Row:
-    vals = {"name": "inventory-1", "project_id": project.id}
+    vals = {
+        "name": "inventory-1",
+        "project_id": project.id,
+        "inventory_source": InventorySource.PROJECT,
+    }
     inventory = (
         await bsql.insert_object(
             db, models.inventories, values=vals, returning=[models.inventories]

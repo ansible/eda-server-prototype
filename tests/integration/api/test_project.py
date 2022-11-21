@@ -22,7 +22,7 @@ from sqlalchemy import func
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from eda_server.db import models
-from eda_server.types import Action, ResourceType
+from eda_server.types import Action, InventorySource, ResourceType
 
 TEST_PROJECT = {
     "url": "https://git.example.com/sample/test-project",
@@ -80,6 +80,7 @@ async def test_delete_project(
     query = sa.insert(models.inventories).values(
         name="inventory.yml",
         inventory=TEST_INVENTORY,
+        inventory_source=InventorySource.PROJECT,
         project_id=project_id,
     )
     await db.execute(query)

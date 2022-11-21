@@ -42,3 +42,10 @@ class Action(Enum):
 
     def __str__(self):
         return self.value
+
+
+class InventorySource(Enum):
+    PROJECT = "Project"
+    COLLECTION = "Collection"
+    USER_DEFINED = "User-Defined"
+    EXECUTION_ENV = "Execution Environment"

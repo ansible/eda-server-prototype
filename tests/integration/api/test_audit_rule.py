@@ -21,7 +21,7 @@ from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from eda_server.db import models
-from eda_server.types import Action, ResourceType
+from eda_server.types import Action, InventorySource, ResourceType
 
 TEST_AUDIT_RULE = {
     "name": "test-audit-rule",
@@ -94,7 +94,9 @@ async def _create_activation_dependent_objects(db: AsyncSession):
     (inventory_id,) = (
         await db.execute(
             sa.insert(models.inventories).values(
-                name="inventory.yml", inventory=TEST_INVENTORY
+                name="inventory.yml",
+                inventory=TEST_INVENTORY,
+                inventory_source=InventorySource.USER_DEFINED,
             )
         )
     ).inserted_primary_key

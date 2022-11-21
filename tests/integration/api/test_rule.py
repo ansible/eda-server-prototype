@@ -23,7 +23,7 @@ from starlette import status as status_codes
 
 from eda_server.db import models
 from eda_server.db.sql import base as bsql
-from eda_server.types import Action, ResourceType
+from eda_server.types import Action, InventorySource, ResourceType
 
 TEST_RULESET_SIMPLE = """
 ---
@@ -134,7 +134,11 @@ async def _create_rules(db: AsyncSession, intervals: Tuple[int, int] = (5, 6)):
         await bsql.insert_object(
             db,
             models.inventories,
-            values={"name": "tst-inv-1", "project_id": project.id},
+            values={
+                "name": "tst-inv-1",
+                "project_id": project.id,
+                "inventory_source": InventorySource.PROJECT,
+            },
             returning=[models.inventories],
         )
     ).one()

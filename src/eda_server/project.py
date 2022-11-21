@@ -22,6 +22,8 @@ import sqlalchemy as sa
 import yaml
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from eda_server.types import InventorySource
+
 from .db import models
 from .db.models import extra_vars, inventories, playbooks, rulebooks
 from .db.utils.lostream import CHUNK_SIZE, PGLargeObject
@@ -273,7 +275,10 @@ async def find_inventory(db: AsyncSession, project_id: int, project_dir: str):
                 inventory = f.read()
 
             query = sa.insert(inventories).values(
-                name=filename, inventory=inventory, project_id=project_id
+                name=filename,
+                inventory=inventory,
+                project_id=project_id,
+                inventory_source=InventorySource.PROJECT,
             )
             (record_id,) = (await db.execute(query)).inserted_primary_key
             # TODO(cutwater): Remove debugging print
