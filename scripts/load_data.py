@@ -65,6 +65,7 @@ class PermissionSchema(pydantic.BaseModel):
 class RoleSchema(pydantic.BaseModel):
     name: str
     description: str = ""
+    is_default: bool = False
     permissions: List[PermissionSchema]
 
 
@@ -74,7 +75,10 @@ class DocumentSchema(pydantic.BaseModel):
 
 
 async def create_roles(db: AsyncSession, roles: List[RoleSchema]):
-    values = [role.dict(include={"name", "description"}) for role in roles]
+    values = [
+        role.dict(include={"name", "description", "is_default"})
+        for role in roles
+    ]
     result = await db.execute(sa.insert(models.roles), values)
     logging.info("Roles created: {0!r}".format([r.name for r in roles]))
 
@@ -149,7 +153,7 @@ async def main(args: argparse.Namespace):
     session_factory = create_session_factory(engine)
     async with dispose_context(engine), session_factory() as db:
         await create_roles(db, document.roles)
-        user_db = get_user_db(config, db)
+        user_db = get_user_db(db)
         user_manager = get_user_manager(config, user_db)
         for user in document.users:
             user_id = await create_user(user_manager, user)

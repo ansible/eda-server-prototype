@@ -41,27 +41,16 @@ class RoleNotExists(Exception):
 
 
 class UserDatabase(SQLAlchemyUserDatabase[models.User, uuid.UUID]):
-    def __init__(
-        self,
-        session: AsyncSession,
-        default_role: Optional[str] = None,
-    ):
+    def __init__(self, session: AsyncSession):
         super().__init__(session, models.User, None)
-        self.default_role = default_role
 
-    async def _add_default_role(self, user: models.User) -> None:
-        if self.default_role is None:
-            return
-        role_id = await self.session.scalar(
-            sa.select(models.roles.c.id).where(
-                models.roles.c.name == self.default_role
-            )
-        )
-        if role_id is None:
-            raise RoleNotExists(f"Role {self.default_role} doesn't exist.")
+    async def _add_default_roles(self, user_id: uuid.UUID) -> None:
         await self.session.execute(
-            sa.insert(models.user_roles).values(
-                user_id=user.id, role_id=role_id
+            sa.insert(models.user_roles).from_select(
+                ["user_id", "role_id"],
+                sa.select(sa.literal(user_id), models.roles.c.id).where(
+                    models.roles.c.is_default.is_(True)
+                ),
             )
         )
 
@@ -69,7 +58,7 @@ class UserDatabase(SQLAlchemyUserDatabase[models.User, uuid.UUID]):
         user = self.user_table(**create_dict)
         self.session.add(user)
         await self.session.flush()
-        await self._add_default_role(user)
+        await self._add_default_roles(user.id)
         await self.session.commit()
         await self.session.refresh(user)
         return user
@@ -111,11 +100,8 @@ class UserManager(UUIDIDMixin, BaseUserManager[models.User, uuid.UUID]):
         )
 
 
-def get_user_db(
-    settings: Settings = Depends(get_settings),
-    session: AsyncSession = Depends(get_db_session),
-):
-    return UserDatabase(session, default_role=settings.default_user_role)
+def get_user_db(session: AsyncSession = Depends(get_db_session)):
+    return UserDatabase(session)
 
 
 def get_user_manager(

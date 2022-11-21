@@ -13,12 +13,14 @@
 #  limitations under the License.
 
 import operator
+import uuid
+from typing import Any, Dict
 from unittest import mock
 
 import pytest
 import sqlalchemy as sa
 from fastapi import status
-from httpx import AsyncClient
+from httpx import AsyncClient, Response
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from eda_server.auth import add_role_permissions, create_role
@@ -26,29 +28,61 @@ from eda_server.db import models
 from eda_server.types import Action, ResourceType
 
 
+async def _check_create_role(
+    db: AsyncSession, response: Response, expected_data: Dict[str, Any]
+):
+    assert response.status_code == status.HTTP_201_CREATED
+    data = response.json()
+
+    role_id = data["id"]
+    assert data == {**expected_data, "id": role_id}
+
+    query = sa.select(models.roles).where(models.roles.c.id == role_id)
+    db_role = (await db.execute(query)).first()
+    assert db_role._asdict() == {**expected_data, "id": uuid.UUID(role_id)}
+
+
 async def test_create_role(
     client: AsyncClient, db: AsyncSession, check_permission_spy: mock.Mock
 ):
     response = await client.post(
         "/api/roles",
-        json={"name": "test-role-01", "description": "A test role 01."},
+        json={
+            "name": "test-role-01",
+            "description": "A test role 01.",
+        },
     )
-    assert response.status_code == status.HTTP_201_CREATED
-    data = response.json()
-
-    assert data["name"] == "test-role-01"
-    assert data["description"] == "A test role 01."
-
-    role = (
-        await db.execute(
-            sa.select(models.roles).where(models.roles.c.id == data["id"])
-        )
-    ).first()
-
-    assert role["name"] == "test-role-01"
-    assert role["description"] == "A test role 01."
+    await _check_create_role(
+        db,
+        response,
+        {
+            "name": "test-role-01",
+            "description": "A test role 01.",
+            "is_default": False,
+        },
+    )
     check_permission_spy.assert_called_once_with(
         mock.ANY, mock.ANY, ResourceType.ROLE, Action.CREATE
+    )
+
+
+async def test_create_default_role(client: AsyncClient, db: AsyncSession):
+    response = await client.post(
+        "/api/roles",
+        json={
+            "name": "test-role-011",
+            "description": "A test role 011.",
+            "is_default": True,
+        },
+    )
+    await _check_create_role(
+        db,
+        response,
+        {
+            "name": "test-role-011",
+            "description": "A test role 011.",
+            "is_default": True,
+        },
     )
 
 
@@ -64,6 +98,7 @@ async def test_show_role(
         "id": str(role_id),
         "name": "test-role-02",
         "description": "",
+        "is_default": False,
     }
     check_permission_spy.assert_called_once_with(
         mock.ANY, mock.ANY, ResourceType.ROLE, Action.READ

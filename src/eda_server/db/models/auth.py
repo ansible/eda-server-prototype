@@ -58,6 +58,13 @@ roles = sa.Table(
         server_default="",
         nullable=False,
     ),
+    sa.Column(
+        "is_default",
+        sa.Boolean,
+        default=False,
+        server_default=sa.false(),
+        nullable=True,
+    ),
 )
 
 user_roles = sa.Table(

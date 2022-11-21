@@ -93,11 +93,13 @@ def _check_test_user_roles_response(
             "id": str(role_ids[0]),
             "name": "test-role__0",
             "description": "",
+            "is_default": False,
         },
         {
             "id": str(role_ids[1]),
             "name": "test-role__1",
             "description": "",
+            "is_default": False,
         },
     ]
 
