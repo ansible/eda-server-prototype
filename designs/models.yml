@@ -1,4 +1,4 @@
-app: db
+app: eda_server
 external_models: []
 models:
 - fields:
