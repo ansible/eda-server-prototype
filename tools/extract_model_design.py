@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""extract_model_design.py - Extracts model design from the database schema into a YAML file."""
+"""Extracts model design from the database schema into a YAML file."""
 
 
 import sqlalchemy as sa
@@ -28,7 +28,8 @@ engine = sa.create_engine(
 mm = meta.MetaMeta()
 # This will use the database name from the URL as the attribute name
 mm.register_engine(engine)
-# This will probe all schemata in eda_server and for each schema, the tables will be reflected.
+# This will probe all schemata in eda_server and for each schema,
+# the tables will be reflected.
 mm.eda_server.discover()
 
 
@@ -49,4 +50,4 @@ for _, table in mm.eda_server.public.items():
     model = {"name": str(table.name), "fields": fields}
     models.append(model)
 
-print(yaml.dump(data))
+print(yaml.dump(data))  # noqa: T201
