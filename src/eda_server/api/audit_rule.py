@@ -226,9 +226,12 @@ async def list_audit_rule_events(
 async def list_audit_rules_fired(db: AsyncSession = Depends(get_db_session)):
     query = (
         sa.select(
+            models.audit_rules.c.rule_id.label("rule_id"),
             models.audit_rules.c.name.label("rule_name"),
+            models.audit_rules.c.job_instance_id.label("job_id"),
             models.job_instance_hosts.c.task.label("job_name"),
             models.audit_rules.c.status.label("status"),
+            models.rulesets.c.id.label("ruleset_id"),
             models.rulesets.c.name.label("ruleset_name"),
             models.audit_rules.c.fired_date.label("fired_date"),
         )
@@ -257,9 +260,12 @@ async def list_audit_rules_fired(db: AsyncSession = Depends(get_db_session)):
     for row in rows:
         response.append(
             {
+                "id": row["rule_id"],
                 "name": row["rule_name"],
+                "job_id": row["job_id"],
                 "job": row["job_name"],
                 "status": row["status"],
+                "ruleset_id": row["ruleset_id"],
                 "ruleset": row["ruleset_name"],
                 "fired_date": row["fired_date"],
             }
@@ -277,7 +283,9 @@ async def list_audit_hosts_changed(db: AsyncSession = Depends(get_db_session)):
     query = (
         sa.select(
             models.job_instance_hosts.c.host.label("host"),
+            models.audit_rules.c.rule_id.label("rule_id"),
             models.audit_rules.c.name.label("rule_name"),
+            models.rulesets.c.id.label("ruleset_id"),
             models.rulesets.c.name.label("ruleset_name"),
             models.audit_rules.c.fired_date.label("fired_date"),
         )
@@ -307,7 +315,9 @@ async def list_audit_hosts_changed(db: AsyncSession = Depends(get_db_session)):
         response.append(
             {
                 "host": row["host"],
+                "rule_id": row["rule_id"],
                 "rule": row["rule_name"],
+                "ruleset_id": row["ruleset_id"],
                 "ruleset": row["ruleset_name"],
                 "fired_date": row["fired_date"],
             }

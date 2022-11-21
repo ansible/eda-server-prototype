@@ -57,15 +57,20 @@ class AuditRuleHost(BaseModel):
 
 
 class AuditFiredRule(BaseModel):
+    id: int
     name: StrictStr
+    job_id: int
     job: StrictStr
     status: Optional[StrictStr]
+    ruleset_id: int
     ruleset: StrictStr
     fired_date: datetime
 
 
 class AuditChangedHost(BaseModel):
     host: StrictStr
+    rule_id: int
     rule: StrictStr
+    ruleset_id: int
     ruleset: StrictStr
     fired_date: datetime
