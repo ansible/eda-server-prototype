@@ -13,7 +13,6 @@
 #  limitations under the License.
 
 from importlib import resources
-from typing import Optional
 
 import yaml
 from fastapi.requests import Request
@@ -36,8 +35,6 @@ class Settings(BaseSettings):
 
     deployment_type: str = "docker"
     server_name: str = "localhost"
-
-    default_user_role: Optional[str] = None
 
     class Config:
         env_prefix = "EDA_"

@@ -14,7 +14,7 @@
 
 import uuid
 
-from pydantic import BaseModel
+from pydantic import BaseModel, StrictBool
 
 from eda_server.types import Action, ResourceType
 
@@ -23,11 +23,13 @@ class RoleRead(BaseModel):
     id: uuid.UUID
     name: str
     description: str
+    is_default: StrictBool
 
 
 class RoleCreate(BaseModel):
     name: str
     description: str = ""
+    is_default: StrictBool = False
 
 
 class RolePermissionRead(BaseModel):
