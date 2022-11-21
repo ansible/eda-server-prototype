@@ -28,7 +28,7 @@ router = APIRouter(tags=["inventories"])
 
 
 @router.post(
-    "/api/inventories",
+    "/api/inventory",
     response_model=schema.InventoryRead,
     operation_id="create_inventory",
     dependencies=[
@@ -62,7 +62,7 @@ async def create_inventory(
 
 
 @router.patch(
-    "/api/inventories/{inventory_id}",
+    "/api/inventory/{inventory_id}",
     response_model=schema.InventoryRead,
     operation_id="update_inventory",
     dependencies=[
@@ -110,7 +110,7 @@ async def update_inventory(
 
 
 @router.get(
-    "/api/inventories/{inventory_id}",
+    "/api/inventory/{inventory_id}",
     response_model=schema.InventoryRead,
     operation_id="read_inventory",
     dependencies=[
@@ -154,7 +154,7 @@ async def list_inventories(
 
 
 @router.delete(
-    "/api/inventories/{inventory_id}",
+    "/api/inventory/{inventory_id}",
     status_code=status.HTTP_204_NO_CONTENT,
     operation_id="delete_inventory",
     dependencies=[

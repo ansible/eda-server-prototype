@@ -36,7 +36,7 @@ async def test_create_inventory(
     client: AsyncClient, check_permission_spy: mock.Mock
 ):
     response = await client.post(
-        "/api/inventories",
+        "/api/inventory",
         json=TEST_INVENTORY,
     )
     assert response.status_code == status_codes.HTTP_200_OK
@@ -80,7 +80,7 @@ async def test_list_inventories(
 async def test_read_inventory_not_found(
     client: AsyncClient, check_permission_spy: mock.Mock
 ):
-    response = await client.get("/api/inventories/42")
+    response = await client.get("/api/inventory/42")
 
     assert response.status_code == status_codes.HTTP_404_NOT_FOUND
 
@@ -98,7 +98,7 @@ async def test_delete_inventory(
     await db.commit()
     inventory_id = result.inserted_primary_key[0]
 
-    response = await client.delete(f"/api/inventories/{inventory_id}")
+    response = await client.delete(f"/api/inventory/{inventory_id}")
     assert response.status_code == status_codes.HTTP_204_NO_CONTENT
 
     num_inventories = await db.scalar(
