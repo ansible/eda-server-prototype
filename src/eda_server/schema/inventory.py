@@ -12,19 +12,32 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
+from datetime import datetime
 from typing import Optional
 
 from pydantic import BaseModel, StrictStr
 
+from eda_server.types import InventorySource
+
 
 class InventoryCreate(BaseModel):
     name: StrictStr
-    inventory: StrictStr
+    description: StrictStr = ""
+    inventory: Optional[StrictStr] = ""
+    inventory_source: InventorySource = InventorySource.USER_DEFINED
 
 
 class InventoryRead(InventoryCreate):
     id: int
     project_id: Optional[int]
+    created_at: datetime
+    modified_at: datetime
+
+
+class InventoryUpdate(BaseModel):
+    name: StrictStr
+    description: StrictStr = ""
+    inventory: Optional[StrictStr] = ""
 
 
 class InventoryRef(BaseModel):

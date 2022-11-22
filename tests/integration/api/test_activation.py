@@ -24,7 +24,7 @@ from eda_server.db import models
 from eda_server.db.models.activation import RestartPolicy
 from eda_server.db.sql import base as bsql
 from eda_server.db.utils.lostream import PGLargeObject
-from eda_server.types import Action, ResourceType
+from eda_server.types import Action, InventorySource, ResourceType
 
 TEST_ACTIVATION = {
     "name": "test-activation",
@@ -80,7 +80,11 @@ async def _create_activation_dependent_objects(db: AsyncSession):
         await bsql.insert_object(
             db,
             models.inventories,
-            values={"name": "inventory.yml", "inventory": TEST_INVENTORY},
+            values={
+                "name": "inventory.yml",
+                "inventory": TEST_INVENTORY,
+                "inventory_source": InventorySource.USER_DEFINED.value,
+            },
         )
     ).inserted_primary_key
 

@@ -19,7 +19,6 @@ from .base import metadata
 
 __all__ = (
     "projects",
-    "inventories",
     "extra_vars",
     "playbooks",
 )
@@ -63,24 +62,6 @@ projects = sa.Table(
         sa.dialects.postgresql.OID,
         nullable=True,
         comment="OID of large object containing project files.",
-    ),
-)
-
-inventories = sa.Table(
-    "inventory",
-    metadata,
-    sa.Column(
-        "id",
-        sa.Integer,
-        sa.Identity(always=True),
-        primary_key=True,
-    ),
-    sa.Column("name", sa.String),
-    sa.Column("inventory", sa.String),
-    sa.Column(
-        "project_id",
-        sa.ForeignKey("project.id", ondelete="CASCADE"),
-        nullable=True,
     ),
 )
 

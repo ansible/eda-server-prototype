@@ -19,6 +19,7 @@ from .activation import (
 )
 from .auth import User, role_permissions, roles, user_roles
 from .base import Base, metadata
+from .inventory import inventories
 from .job import (
     activation_instance_job_instances,
     job_instance_events,
@@ -26,7 +27,7 @@ from .job import (
     job_instances,
     jobs,
 )
-from .project import extra_vars, inventories, playbooks, projects
+from .project import extra_vars, playbooks, projects
 from .rulebook import audit_rules, rulebooks, rules, rulesets
 
 __all__ = (
@@ -42,6 +43,8 @@ __all__ = (
     "activations",
     "activation_instances",
     "activation_instance_logs",
+    # inventory
+    "inventories",
     # job
     "activation_instance_job_instances",
     "job_instance_events",
@@ -50,7 +53,6 @@ __all__ = (
     "jobs",
     # project
     "extra_vars",
-    "inventories",
     "playbooks",
     "projects",
     # rulebook
