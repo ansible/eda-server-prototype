@@ -68,7 +68,6 @@ export function getServer() {
 
 export const getTabFromPath = (tabs: TabItemType[], path: string): string | undefined => {
   const currentTab = tabs.find((tabItem) => tabItem.name.split('/').pop() === (path.slice(0,1)).split('/').pop());
-  console.log('Debug currentTab.title, path', currentTab?.title, path);
   return currentTab?.title;
 };
 

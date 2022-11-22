@@ -1,17 +1,18 @@
 import React, { Fragment } from 'react';
 import { Link } from 'react-router-dom';
+import { Text, TextVariants } from '@patternfly/react-core';
 
 export const createRows = (data) =>
-  data.map(({ name, rule, rule_name, ruleset, ruleset_name, last_fired_at }) => ({
+  data.map(({ name, rule, rule_id, ruleset, ruleset_id, last_fired_at }) => ({
     cells: [
       name,
-      <Fragment key={`[audit-rule-${rule}`}>
+      <Fragment key={`[audit-rule-${rule_id}`}>
         <Link
           to={{
-            pathname: `/rules/${rule}`,
+            pathname: `/rule/${rule_id}`,
           }}
         >
-          {rule_name || rule}
+          {rule || rule_id}
         </Link>
       </Fragment>,
       <Fragment key={`[audit-ruleset-${ruleset}`}>
@@ -20,9 +21,15 @@ export const createRows = (data) =>
             pathname: `/ruleset/${ruleset}`,
           }}
         >
-          {ruleset_name || ruleset}
+          {ruleset || ruleset_id}
         </Link>
       </Fragment>,
-      last_fired_at,
+      <Fragment key={`[audit-last_fired-${name}`}>
+        <Text component={TextVariants.small}>
+          {new Intl.DateTimeFormat('en-US', { dateStyle: 'short', timeStyle: 'long' }).format(
+            new Date(last_fired_at || 0)
+          )}
+        </Text>
+      </Fragment>,
     ],
   }));
