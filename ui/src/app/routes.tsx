@@ -34,6 +34,8 @@ import { Rule } from '@app/Rule/Rule';
 import { Fragment } from 'react';
 import { NewInventory } from '@app/NewInventory/NewInventory';
 import { AuditView } from '@app/AuditView/AuditView';
+import {AuditRules} from "@app/AuditView/audit-rules";
+import {AuditHosts} from "@app/AuditView/audit-hosts";
 
 export interface IAppRoute {
   label?: string; // Excluding the label will exclude the route from the nav sidebar in AppLayout
@@ -234,10 +236,21 @@ const routes: AppRouteConfig[] = [
   },
   {
     component: AuditView,
-    exact: true,
     label: 'Audit View',
     path: '/audit',
     title: 'Audit View',
+  },
+  {
+    component: AuditRules,
+    exact: true,
+    path: '/audit/rules',
+    title: 'Audit Rules',
+  },
+  {
+    component: AuditHosts,
+    exact: true,
+    path: '/audit/hosts',
+    title: 'Audit Hosts',
   },
 ];
 

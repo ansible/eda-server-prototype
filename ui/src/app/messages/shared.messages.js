@@ -162,6 +162,14 @@ const sharedMessages = defineMessages({
     id: 'shared.error',
     defaultMessage: 'Error',
   },
+  host: {
+    id: 'shared.host',
+    defaultMessage: 'Hosts',
+  },
+  hosts: {
+    id: 'shared.hosts',
+    defaultMessage: 'Hosts',
+  },
   project: {
     id: 'project.project',
     defaultMessage: 'Project',
@@ -625,6 +633,26 @@ const sharedMessages = defineMessages({
   delete_inventory_failure: {
     id: 'inventory.deleteInventoryFailure',
     defaultMessage: 'Remove inventory failed',
+  },
+  audit_view_title: {
+    id: 'audit.auditViewTitle',
+    defaultMessage: 'Audit View',
+  },
+  audit_rules_title: {
+    id: 'audit.auditRulesTitle',
+    defaultMessage: 'Rules recently fired',
+  },
+  audit_hosts_title: {
+    id: 'audit.auditHostsTitle',
+    defaultMessage: 'Hosts recently changed',
+  },
+  norulesrecentlyfired: {
+    id: 'audit.norulesrecentlyfired',
+    defaultMessage: 'No rules recently fired',
+  },
+  nohostsrecentlychanged: {
+    id: 'host.nohostsrecentlychnaged',
+    defaultMessage: 'No hosts recently changed',
   },
 });
 
