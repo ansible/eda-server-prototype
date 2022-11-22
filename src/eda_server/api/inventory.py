@@ -44,7 +44,7 @@ async def create_inventory(
             name=inventory_.name,
             description=inventory_.description,
             inventory=inventory_.inventory,
-            inventory_source=InventorySource.USER_DEFINED.value,
+            inventory_source=InventorySource.USER_DEFINED,
         )
     )
     await db.commit()

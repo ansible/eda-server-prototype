@@ -45,7 +45,7 @@ class Action(Enum):
 
 
 class InventorySource(Enum):
-    PROJECT = "Project"
-    COLLECTION = "Collection"
-    USER_DEFINED = "User-Defined"
-    EXECUTION_ENV = "Execution Environment"
+    PROJECT = "project"
+    COLLECTION = "collection"
+    USER_DEFINED = "user_defined"
+    EXECUTION_ENV = "execution_env"

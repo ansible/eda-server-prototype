@@ -22,6 +22,8 @@ Create Date: 2022-11-21 18:03:21.894162+00:00
 import sqlalchemy as sa
 from alembic import op
 
+import eda_server.db.utils.migrations  # noqa: F401
+
 # revision identifiers, used by Alembic.
 revision = "4f5d3c60fbb8"
 down_revision = "202cf90fc4b0"
@@ -37,10 +39,10 @@ def upgrade() -> None:
         ),
     )
     inventory_source = sa.Enum(
-        "Project",
-        "Collection",
-        "User-Defined",
-        "Execution Environment",
+        "project",
+        "collection",
+        "user_defined",
+        "execution_env",
         name="inventory_source_enum",
     )
     inventory_source.create(op.get_bind(), checkfirst=True)
@@ -83,4 +85,4 @@ def downgrade() -> None:
     op.drop_column("inventory", "created_at")
     op.drop_column("inventory", "inventory_source")
     op.drop_column("inventory", "description")
-    op.execute(sa.text('DROP TYPE "inventory_source_enum"'))
+    op.drop_type("inventory_source_enum")
