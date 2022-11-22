@@ -22,12 +22,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from eda_server import schema
 from eda_server.auth import requires_permission
 from eda_server.db.dependency import get_db_session
-from eda_server.db.models.project import (
-    extra_vars,
-    inventories,
-    playbooks,
-    projects,
-)
+from eda_server.db.models.inventory import inventories
+from eda_server.db.models.project import extra_vars, playbooks, projects
 from eda_server.db.models.rulebook import rulebooks
 from eda_server.project import GitCommandFailed, import_project
 from eda_server.types import Action, ResourceType
@@ -261,62 +257,6 @@ async def read_playbook(
             detail="Playbook Not Found.",
         )
     return result
-
-
-@router.get(
-    "/api/inventories/",
-    response_model=List[schema.InventoryRead],
-    operation_id="list_inventories",
-    tags=["inventories"],
-    dependencies=[
-        Depends(requires_permission(ResourceType.INVENTORY, Action.READ))
-    ],
-)
-async def list_inventories(db: AsyncSession = Depends(get_db_session)):
-    query = sa.select(inventories)
-    result = await db.execute(query)
-    return result.all()
-
-
-@router.get(
-    "/api/inventory/{inventory_id}",
-    response_model=schema.InventoryRead,
-    operation_id="read_inventory",
-    tags=["inventories"],
-    dependencies=[
-        Depends(requires_permission(ResourceType.INVENTORY, Action.READ))
-    ],
-)
-async def read_inventory(
-    inventory_id: int, db: AsyncSession = Depends(get_db_session)
-):
-    query = sa.select(inventories).where(inventories.c.id == inventory_id)
-    result = (await db.execute(query)).first()
-    if not result:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Inventory Not Found.",
-        )
-    return result
-
-
-@router.post(
-    "/api/inventory/",
-    response_model=schema.InventoryRead,
-    operation_id="create_inventory",
-    tags=["inventories"],
-    dependencies=[
-        Depends(requires_permission(ResourceType.INVENTORY, Action.CREATE))
-    ],
-)
-async def create_inventory(
-    i: schema.InventoryCreate, db: AsyncSession = Depends(get_db_session)
-):
-    query = sa.insert(inventories).values(name=i.name, inventory=i.inventory)
-    result = await db.execute(query)
-    await db.commit()
-    (id_,) = result.inserted_primary_key
-    return {**i.dict(), "id": id_}
 
 
 @router.get(

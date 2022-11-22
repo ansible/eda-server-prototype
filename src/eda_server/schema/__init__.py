@@ -33,7 +33,12 @@ from .audit_rule import (
     AuditRuleJobInstanceEvent,
 )
 from .extra_vars import ExtraVarsCreate, ExtraVarsRead, ExtraVarsRef
-from .inventory import InventoryCreate, InventoryRead, InventoryRef
+from .inventory import (
+    InventoryCreate,
+    InventoryRead,
+    InventoryRef,
+    InventoryUpdate,
+)
 from .job import (
     JobInstanceBaseRead,
     JobInstanceCreate,
@@ -99,6 +104,7 @@ __all__ = [
     "Inventory",
     "InventoryCreate",
     "InventoryRead",
+    "InventoryUpdate",
     "InventoryRef",
     "JobInstanceCreate",
     "JobInstanceBaseRead",
