@@ -20,13 +20,13 @@ import tempfile
 
 import sqlalchemy as sa
 import yaml
+from asyncpg_lostream.lostream import CHUNK_SIZE, PGLargeObject
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from eda_server.types import InventorySource
 
 from .db import models
 from .db.models import extra_vars, inventories, playbooks, rulebooks
-from .db.utils.lostream import CHUNK_SIZE, PGLargeObject
 from .schema import ProjectCreate
 from .utils import subprocess as subprocess_utils
 
