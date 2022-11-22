@@ -654,6 +654,42 @@ const sharedMessages = defineMessages({
     id: 'host.nohostsrecentlychnaged',
     defaultMessage: 'No hosts recently changed',
   },
+  backToAuditView: {
+    id: 'audit.backToAuditView',
+    defaultMessage: 'Back to Audit View',
+  },
+  noauditrulejobs: {
+    id: 'common.noauditrulejobs',
+    defaultMessage: 'There are currently no jobs for this rule.',
+  },
+  noauditrulehosts: {
+    id: 'common.noauditrulehosts',
+    defaultMessage: 'There are currently no hosts for this rule.',
+  },
+  noauditruleevents: {
+    id: 'common.noauditruleevents',
+    defaultMessage: 'There are currently no events for this rule.',
+  },
+  increment_counter: {
+    id: 'common.increment_counter',
+    defaultMessage: 'Increment counter',
+  },
+  source_type: {
+    id: 'common.source_type',
+    defaultMessage: 'Source type',
+  },
+  timestamp: {
+    id: 'common.timestamp',
+    defaultMessage: 'Timestamp',
+  },
+  event: {
+    id: 'common.event',
+    defaultMessage: 'Event',
+  },
+  events: {
+    id: 'common.events',
+    defaultMessage: 'Events',
+  },
 });
 
 export default sharedMessages;
