@@ -497,7 +497,6 @@ async def stream_activation_instance_logs(
     large_data_id = cur.first().large_data_id
 
     async with PGLargeObject(db, oid=large_data_id, mode="r") as lobject:
-        leftover = b""
         async for buff in lobject:
             await updatemanager.broadcast(
                 f"/activation_instance/{activation_instance_id}",
