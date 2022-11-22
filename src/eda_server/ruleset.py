@@ -212,7 +212,6 @@ async def read_output(
                         break
                     buff = buff.decode()
                     logger.debug("read_output %s", buff)
-                    leftover = b""
                     await lobject.write(buff)
                     await db.commit()
                     await updatemanager.broadcast(
