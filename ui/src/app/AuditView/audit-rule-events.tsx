@@ -5,27 +5,31 @@ import sharedMessages from '../messages/shared.messages';
 import TableEmptyState from '@app/shared/table-empty-state';
 import { useIntl } from 'react-intl';
 import { defaultSettings } from '@app/shared/pagination';
-import { createRows } from './audit-rules-table-helpers';
+import { createRows } from './audit-rule-events-table-helpers';
 import { CubesIcon } from '@patternfly/react-icons';
-import { renderAuditTabs } from '@app/AuditView/AuditView';
-import { AuditRuleType } from '@app/AuditView/AuditView';
-import { listAuditRules } from '@app/API/Audit';
+import {listAuditRuleEvents} from '@app/API/Audit';
+import {RuleType} from "@app/Rules/Rules";
+import {renderAuditRuleTabs} from "@app/AuditView/AuditRule";
+
+export interface EventType {
+  name: string;
+  increment_counter?: string;
+  source_type?: string;
+  time_stamp?: string;
+}
 
 const columns = (intl) => [
   {
     title: intl.formatMessage(sharedMessages.name),
   },
   {
-    title: intl.formatMessage(sharedMessages.job),
+    title: intl.formatMessage(sharedMessages.increment_counter),
   },
   {
-    title: intl.formatMessage(sharedMessages.status),
+    title: intl.formatMessage(sharedMessages.source_type),
   },
   {
-    title: intl.formatMessage(sharedMessages.ruleset),
-  },
-  {
-    title: intl.formatMessage(sharedMessages.lastFiredDate),
+    title: intl.formatMessage(sharedMessages.timestamp),
   },
 ];
 
@@ -48,7 +52,7 @@ const initialState = (filterValue = '') => ({
 });
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-export const auditRulesListState = (state, action) => {
+export const eventsListState = (state, action) => {
   switch (action.type) {
     case 'setRows':
       return {
@@ -74,41 +78,33 @@ export const auditRulesListState = (state, action) => {
   }
 };
 
-const AuditRules: React.FunctionComponent = () => {
+const AuditRuleEvents: React.FunctionComponent<{ rule: RuleType }> = ({ rule }) => {
   const [limit, setLimit] = useState(defaultSettings.limit);
   const [offset, setOffset] = useState(1);
-  const [auditRules, setAuditRules] = useState<AuditRuleType[]>([]);
+  const [events, setEvents] = useState<EventType[]>([]);
 
-  const meta = { count: auditRules?.length || 0, limit, offset };
-
-  const [{ filterValue, isFetching, isFiltering, rows }, stateDispatch] = useReducer(
-    auditRulesListState,
-    initialState()
-  );
+  const meta = { count: events?.length || 0, limit, offset };
+  const [{ filterValue, isFetching, isFiltering, rows }, stateDispatch] = useReducer(eventsListState, initialState());
 
   const intl = useIntl();
-  const updateAuditRules = (pagination) => {
+  const updateEvents = (pagination) => {
     stateDispatch({ type: 'setFetching', payload: true });
-    return listAuditRules(pagination)
-      .then((data) => {
-        console.log('Debug - data', data);
-        setAuditRules(data?.data);
-        return stateDispatch({ type: 'setFetching', payload: false });
-      })
+    return listAuditRuleEvents(rule?.id, pagination)
+      .then(() => stateDispatch({ type: 'setFetching', payload: false }))
       .catch(() => stateDispatch({ type: 'setFetching', payload: false }));
   };
 
   useEffect(() => {
-    updateAuditRules(defaultSettings);
+    updateEvents(defaultSettings);
   }, []);
 
   useEffect(() => {
-    stateDispatch({ type: 'setRows', payload: createRows(auditRules) });
-  }, [auditRules]);
+    stateDispatch({ type: 'setRows', payload: createRows(events) });
+  }, [events]);
 
   const clearFilters = () => {
     stateDispatch({ type: 'clearFilters' });
-    return updateAuditRules(meta);
+    return updateEvents(meta);
   };
 
   const handleFilterChange = (value) => {
@@ -116,23 +112,23 @@ const AuditRules: React.FunctionComponent = () => {
   };
 
   return (
-    <PageSection page-type={'activation-details'} id={'activation-details'}>
-      {renderAuditTabs(intl)}
+    <PageSection page-type={'audit-rule-events'} id={'audit-rule-events'}>
+      {renderAuditRuleTabs(rule?.id, intl)}
       <TableToolbarView
-        ouiaId={'audit-rules-table'}
+        ouiaId={'audit-rule-events-table'}
         rows={rows}
         setLimit={setLimit}
         setOffset={setOffset}
         columns={columns(intl)}
-        fetchData={updateAuditRules}
+        fetchData={updateEvents}
         pagination={defaultSettings}
-        plural={intl.formatMessage(sharedMessages.rules)}
-        singular={intl.formatMessage(sharedMessages.rule)}
+        plural={intl.formatMessage(sharedMessages.events)}
+        singular={intl.formatMessage(sharedMessages.event)}
         isLoading={isFetching || isFiltering}
         onFilterChange={handleFilterChange}
         renderEmptyState={() => (
           <TableEmptyState
-            title={intl.formatMessage(sharedMessages.norulesrecentlyfired)}
+            title={intl.formatMessage(sharedMessages.noauditruleevents)}
             Icon={CubesIcon}
             PrimaryAction={() =>
               filterValue !== '' ? (
@@ -143,7 +139,7 @@ const AuditRules: React.FunctionComponent = () => {
             }
             description={
               filterValue === ''
-                ? intl.formatMessage(sharedMessages.norulesrecentlyfired)
+                ? intl.formatMessage(sharedMessages.noauditruleevents)
                 : intl.formatMessage(sharedMessages.clearAllFiltersDescription)
             }
           />
@@ -153,4 +149,4 @@ const AuditRules: React.FunctionComponent = () => {
   );
 };
 
-export { AuditRules };
+export { AuditRuleEvents };
