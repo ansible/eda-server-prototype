@@ -40,6 +40,16 @@ TEST_ACTIVATION = {
     "project_id": 1,
 }
 
+TEST_ACTIVATION_INSTANCE = {
+    "name": "test-activation_instance",
+    "rulebook_id": 1,
+    "inventory_id": 1,
+    "extra_var_id": 1,
+    "working_directory": "/tmp",
+    "execution_environment": "quay.io/aizquier/ansible-rulebook",
+    "project_id": 1,
+}
+
 TEST_EXTRA_VAR = """
 ---
 collections:
@@ -438,8 +448,154 @@ async def test_delete_activation_not_found(client: AsyncClient):
     assert response.status_code == status_codes.HTTP_404_NOT_FOUND
 
 
+async def _create_activation_instance(db: AsyncSession, foreign_keys: dict):
+    (activation_instance_id,) = (
+        await bsql.insert_object(
+            db,
+            models.activation_instances,
+            values={
+                "name": TEST_ACTIVATION_INSTANCE["name"],
+                "rulebook_id": foreign_keys["rulebook_id"],
+                "inventory_id": foreign_keys["inventory_id"],
+                "extra_var_id": foreign_keys["extra_var_id"],
+                "working_directory": TEST_ACTIVATION_INSTANCE[
+                    "working_directory"
+                ],
+                "execution_environment": TEST_ACTIVATION_INSTANCE[
+                    "execution_environment"
+                ],
+                "project_id": foreign_keys["project_id"],
+            },
+        )
+    ).inserted_primary_key
+
+    return activation_instance_id
+
+
+@mock.patch("eda_server.ruleset.activate_rulesets")
+async def test_create_activation_instance(
+    activate_rulesets: mock.Mock,
+    client: AsyncClient,
+    db: AsyncSession,
+    check_permission_spy: mock.Mock,
+):
+    fks = await _create_activation_dependent_objects(db)
+    await db.commit()
+
+    my_test_activation_instance = TEST_ACTIVATION_INSTANCE.copy()
+    my_test_activation_instance["rulebook_id"] = fks["rulebook_id"]
+    my_test_activation_instance["extra_var_id"] = fks["extra_var_id"]
+    my_test_activation_instance["inventory_id"] = fks["inventory_id"]
+    my_test_activation_instance["project_id"] = fks["project_id"]
+
+    response = await client.post(
+        "/api/activation_instance",
+        json=my_test_activation_instance,
+    )
+    assert response.status_code == status_codes.HTTP_200_OK
+    data = response.json()
+    assert data["name"] == TEST_ACTIVATION_INSTANCE["name"]
+
+    activation_instances = (
+        await db.execute(sa.select(models.activation_instances))
+    ).all()
+    assert len(activation_instances) == 1
+    activation_instance = activation_instances[0]
+    assert activation_instance["name"] == TEST_ACTIVATION_INSTANCE["name"]
+
+    check_permission_spy.assert_called_once_with(
+        mock.ANY, mock.ANY, ResourceType.ACTIVATION_INSTANCE, Action.CREATE
+    )
+
+
+async def test_list_activation_instances(
+    client: AsyncClient, db: AsyncSession, check_permission_spy: mock.Mock
+):
+    foreign_keys = await _create_activation_dependent_objects(db)
+    activation_instance_id = await _create_activation_instance(
+        db, foreign_keys
+    )
+    await db.commit()
+
+    response = await client.get(
+        "/api/activation_instances",
+    )
+    assert response.status_code == status_codes.HTTP_200_OK
+    activation_instances = response.json()
+    assert type(activation_instances) is list
+    assert len(activation_instances) > 0
+
+    activation_instance = activation_instances[0]
+    assert activation_instance["id"] == activation_instance_id
+    assert activation_instance["name"] == TEST_ACTIVATION_INSTANCE["name"]
+    assert (
+        activation_instance["working_directory"]
+        == TEST_ACTIVATION_INSTANCE["working_directory"]
+    )
+
+    check_permission_spy.assert_called_once_with(
+        mock.ANY, mock.ANY, ResourceType.ACTIVATION_INSTANCE, Action.READ
+    )
+
+
+async def test_list_activation_instances_empty_response(
+    client: AsyncClient, check_permission_spy: mock.Mock
+):
+    response = await client.get(
+        "/api/activation_instances",
+    )
+    assert response.status_code == status_codes.HTTP_200_OK
+    activation_instances = response.json()
+    assert activation_instances == []
+
+    check_permission_spy.assert_called_once_with(
+        mock.ANY, mock.ANY, ResourceType.ACTIVATION_INSTANCE, Action.READ
+    )
+
+
+async def test_read_activation_instance(
+    client: AsyncClient, db: AsyncSession, check_permission_spy: mock.Mock
+):
+    foreign_keys = await _create_activation_dependent_objects(db)
+    activation_instance_id = await _create_activation_instance(
+        db, foreign_keys
+    )
+    await db.commit()
+
+    response = await client.get(
+        f"/api/activation_instance/{activation_instance_id}",
+    )
+    assert response.status_code == status_codes.HTTP_200_OK
+    activation_instance = response.json()
+    assert "id" in activation_instance
+
+    assert activation_instance["name"] == TEST_ACTIVATION_INSTANCE["name"]
+    assert activation_instance["id"] == activation_instance_id
+    assert activation_instance["ruleset_id"] == foreign_keys["rulebook_id"]
+    assert activation_instance["inventory_id"] == foreign_keys["inventory_id"]
+    assert activation_instance["extra_var_id"] == foreign_keys["extra_var_id"]
+    assert activation_instance["ruleset_name"] == "ruleset.yml"
+    assert activation_instance["inventory_name"] == "inventory.yml"
+    assert activation_instance["extra_var_name"] == "vars.yml"
+
+    check_permission_spy.assert_called_once_with(
+        mock.ANY, mock.ANY, ResourceType.ACTIVATION_INSTANCE, Action.READ
+    )
+
+
+async def test_read_activation_instance_not_found(
+    client: AsyncClient, check_permission_spy: mock.Mock
+):
+    response = await client.get("/api/activation_instance/1")
+    assert response.status_code == status_codes.HTTP_404_NOT_FOUND
+
+    check_permission_spy.assert_called_once_with(
+        mock.ANY, mock.ANY, ResourceType.ACTIVATION_INSTANCE, Action.READ
+    )
+
+
 async def test_list_activation_instance_job_instances(
-    client: AsyncClient, db: AsyncSession
+    client: AsyncClient, check_permission_spy: mock.Mock
 ):
     response = await client.get(
         "/api/activation_instance_job_instances/1",
@@ -448,3 +604,40 @@ async def test_list_activation_instance_job_instances(
     activation_instance_job_instances = response.json()
 
     assert type(activation_instance_job_instances) is list
+
+    check_permission_spy.assert_called_once_with(
+        mock.ANY, mock.ANY, ResourceType.ACTIVATION_INSTANCE, Action.READ
+    )
+
+
+async def test_list_activation_instance_logs(
+    client: AsyncClient, db: AsyncSession, check_permission_spy: mock.Mock
+):
+    foreign_keys = await _create_activation_dependent_objects(db)
+    instance_id = await _create_activation_instance(db, foreign_keys)
+    await db.commit()
+
+    response = await client.get(
+        f"/api/activation_instance_logs?activation_instance_id={instance_id}",
+    )
+    assert response.status_code == status_codes.HTTP_200_OK
+    activation_instance_logs = response.json()
+
+    assert type(activation_instance_logs) is list
+
+    check_permission_spy.assert_called_once_with(
+        mock.ANY, mock.ANY, ResourceType.ACTIVATION_INSTANCE, Action.READ
+    )
+
+
+async def test_list_activation_instance_logs_not_found(
+    client: AsyncClient, db: AsyncSession, check_permission_spy: mock.Mock
+):
+    response = await client.get(
+        "/api/activation_instance_logs?activation_instance_id=1",
+    )
+    assert response.status_code == status_codes.HTTP_404_NOT_FOUND
+
+    check_permission_spy.assert_called_once_with(
+        mock.ANY, mock.ANY, ResourceType.ACTIVATION_INSTANCE, Action.READ
+    )

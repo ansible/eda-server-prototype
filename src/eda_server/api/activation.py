@@ -448,8 +448,14 @@ async def read_activation_instance(
         )
         .where(models.activation_instances.c.id == activation_instance_id)
     )
-    result = await db.execute(query)
-    return result.first()
+    activation_instance = (await db.execute(query)).first()
+
+    if activation_instance is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Activation instance Not Found.",
+        )
+    return activation_instance
 
 
 @router.delete(
@@ -494,8 +500,11 @@ async def stream_activation_instance_logs(
     query = sa.select(models.activation_instances.c.large_data_id).where(
         models.activation_instances.c.id == activation_instance_id
     )
-    cur = await db.execute(query)
-    large_data_id = cur.first().large_data_id
+    activation_instance = (await db.execute(query)).first()
+    if activation_instance is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+
+    large_data_id = activation_instance.large_data_id
 
     async with PGLargeObject(db, oid=large_data_id, mode="r") as lobject:
         async for buff in lobject:

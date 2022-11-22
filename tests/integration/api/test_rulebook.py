@@ -15,11 +15,13 @@
 from unittest import mock
 
 import sqlalchemy as sa
+import yaml
 from fastapi import status as status_codes
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from eda_server.db import models
+from eda_server.db.sql import base as bsql
 from eda_server.types import Action, ResourceType
 
 TEST_RULESETS_SIMPLE = """
@@ -50,10 +52,65 @@ TEST_RULESETS_SIMPLE = """
 """
 
 
+async def _create_rulebook(db: AsyncSession):
+    (rulebook_id,) = (
+        await bsql.insert_object(
+            db,
+            models.rulebooks,
+            values={
+                "name": "test-ruleset-0110.yml",
+                "rulesets": TEST_RULESETS_SIMPLE,
+            },
+        )
+    ).inserted_primary_key
+
+    return rulebook_id
+
+
+async def test_read_rulebooks(
+    client: AsyncClient, db: AsyncSession, check_permission_spy: mock.Mock
+):
+    rulebook_id = await _create_rulebook(db)
+    await db.commit()
+
+    response = await client.get(
+        f"/api/rulebooks/{rulebook_id}",
+    )
+    assert response.status_code == status_codes.HTTP_200_OK
+    rulebook = response.json()
+
+    assert rulebook["id"] == rulebook_id
+    assert rulebook["name"] == "test-ruleset-0110.yml"
+
+    check_permission_spy.assert_called_once_with(
+        mock.ANY, mock.ANY, ResourceType.RULEBOOK, Action.READ
+    )
+
+
 async def test_read_rulebook_not_found(client: AsyncClient):
     response = await client.get("/api/rulebooks/42")
 
     assert response.status_code == status_codes.HTTP_404_NOT_FOUND
+
+
+async def test_read_rulebook_json(
+    client: AsyncClient, db: AsyncSession, check_permission_spy: mock.Mock
+):
+    rulebook_id = await _create_rulebook(db)
+    await db.commit()
+
+    response = await client.get(
+        f"/api/rulebook_json/{rulebook_id}",
+    )
+    assert response.status_code == status_codes.HTTP_200_OK
+    rulebook_json = response.json()
+    assert rulebook_json["id"] == rulebook_id
+    assert rulebook_json["name"] == "test-ruleset-0110.yml"
+    assert rulebook_json["rulesets"] == yaml.safe_load(TEST_RULESETS_SIMPLE)
+
+    check_permission_spy.assert_called_once_with(
+        mock.ANY, mock.ANY, ResourceType.RULEBOOK, Action.READ
+    )
 
 
 async def test_create_rulebook(
@@ -91,28 +148,42 @@ async def test_create_rulebook(
     )
 
 
-async def test_list_rulebooks(client: AsyncClient):
-    response = await client.post(
-        "/api/rulebooks",
-        json={
-            "name": "test-ruleset-0110.yml",
-            "rulesets": TEST_RULESETS_SIMPLE,
-        },
-    )
+async def test_list_rulebooks(
+    client: AsyncClient, db: AsyncSession, check_permission_spy: mock.Mock
+):
+    rulebook_id = await _create_rulebook(db)
+    await db.commit()
 
-    assert response.status_code == status_codes.HTTP_200_OK
-
-    rulebook = response.json()
     response = await client.get("/api/rulebooks")
     assert response.status_code == status_codes.HTTP_200_OK
     data = response.json()
     assert isinstance(data, list)
     assert len(data) > 0
-    assert data[0]["id"] == rulebook["id"]
-    assert data[0]["ruleset_count"] > 0
+    assert data[0]["id"] == rulebook_id
+
+    check_permission_spy.assert_called_once_with(
+        mock.ANY, mock.ANY, ResourceType.RULEBOOK, Action.READ
+    )
 
 
-async def test_list_rulebook_rulesets(client: AsyncClient, db: AsyncSession):
+async def test_list_rulebooks_empty_response(
+    client: AsyncClient, db: AsyncSession, check_permission_spy: mock.Mock
+):
+    response = await client.get(
+        "/api/rulebooks",
+    )
+    assert response.status_code == status_codes.HTTP_200_OK
+    rulebooks = response.json()
+    assert rulebooks == []
+
+    check_permission_spy.assert_called_once_with(
+        mock.ANY, mock.ANY, ResourceType.RULEBOOK, Action.READ
+    )
+
+
+async def test_list_rulebook_rulesets(
+    client: AsyncClient, db: AsyncSession, check_permission_spy: mock.Mock
+):
     response = await client.post(
         "/api/rulebooks",
         json={
@@ -151,3 +222,7 @@ async def test_list_rulebook_rulesets(client: AsyncClient, db: AsyncSession):
         assert rulebook_rulesets[ix]["id"] == rulesets[ix].id
         assert rulebook_rulesets[ix]["name"] == rulesets[ix].name
         assert rulebook_rulesets[ix]["rule_count"] == rulesets[ix].rule_count
+
+    check_permission_spy.assert_called_with(
+        mock.ANY, mock.ANY, ResourceType.RULEBOOK, Action.READ
+    )

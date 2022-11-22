@@ -128,6 +128,42 @@ async def test_show_role_not_exist(client: AsyncClient):
     assert response.status_code == status.HTTP_404_NOT_FOUND
 
 
+async def test_list_role(
+    client: AsyncClient, db: AsyncSession, check_permission_spy: mock.Mock
+):
+    role_id = await create_role(db, "test-role-08")
+    await db.commit()
+
+    response = await client.get("/api/roles")
+    assert response.status_code == status.HTTP_200_OK
+    roles = response.json()
+    assert type(roles) is list
+    assert len(roles) > 0
+
+    role = roles[0]
+    assert role["id"] == f"{role_id}"
+    assert role["name"] == "test-role-08"
+
+    check_permission_spy.assert_called_once_with(
+        mock.ANY, mock.ANY, ResourceType.ROLE, Action.READ
+    )
+
+
+async def test_list_roles_empty_response(
+    client: AsyncClient, check_permission_spy: mock.Mock
+):
+    response = await client.get(
+        "/api/roles",
+    )
+    assert response.status_code == status.HTTP_200_OK
+    roles = response.json()
+    assert roles == []
+
+    check_permission_spy.assert_called_once_with(
+        mock.ANY, mock.ANY, ResourceType.ROLE, Action.READ
+    )
+
+
 async def test_delete_role(
     client: AsyncClient, db: AsyncSession, check_permission_spy: mock.Mock
 ):
