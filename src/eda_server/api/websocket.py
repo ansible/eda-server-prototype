@@ -18,6 +18,7 @@ import logging
 from datetime import datetime
 from enum import Enum
 
+from asyncpg_lostream.lostream import PGLargeObject
 from fastapi import APIRouter, Depends
 from sqlalchemy import cast, insert, select
 from sqlalchemy.dialects import postgresql
@@ -27,7 +28,6 @@ from starlette.websockets import WebSocket, WebSocketDisconnect
 
 from eda_server.db import models
 from eda_server.db.dependency import get_db_session_factory
-from eda_server.db.utils.lostream import PGLargeObject
 from eda_server.managers import secretsmanager, updatemanager
 
 logger = logging.getLogger("eda_server")
