@@ -45,13 +45,9 @@ from functools import partial
 import aiodocker
 import aiodocker.images
 import ansible_runner
+from asyncpg_lostream.lostream import CHUNK_SIZE, PGLargeObject
 from sqlalchemy import insert
 
-from eda_server.db.utils.lostream import (
-    CHUNK_SIZE,
-    PGLargeObject,
-    decode_bytes_buff,
-)
 from eda_server.managers import taskmanager
 
 from .db.models import job_instance_events
@@ -214,15 +210,14 @@ async def read_output(
                     buff = await proc.stdout.read(CHUNK_SIZE)
                     if not buff:
                         break
+                    buff = buff.decode()
                     logger.debug("read_output %s", buff)
-                    leftover = b""
                     await lobject.write(buff)
                     await db.commit()
-            buff, leftover = decode_bytes_buff(leftover + buff)
-            await updatemanager.broadcast(
-                f"/activation_instance/{activation_instance_id}",
-                json.dumps(["Stdout", {"stdout": buff}]),
-            )
+                    await updatemanager.broadcast(
+                        f"/activation_instance/{activation_instance_id}",
+                        json.dumps(["Stdout", {"stdout": buff.decode()}]),
+                    )
 
     except Exception as e:
         logger.error("read_output %s", e)

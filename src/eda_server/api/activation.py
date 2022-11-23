@@ -20,6 +20,7 @@ from typing import List
 
 import aiodocker.exceptions
 import sqlalchemy as sa
+from asyncpg_lostream.lostream import PGLargeObject
 from fastapi import APIRouter, Depends, Response, status
 from fastapi.exceptions import HTTPException
 from fastapi.responses import JSONResponse
@@ -30,7 +31,6 @@ from eda_server.auth import requires_permission
 from eda_server.config import Settings, get_settings
 from eda_server.db import models
 from eda_server.db.dependency import get_db_session, get_db_session_factory
-from eda_server.db.utils.lostream import PGLargeObject, decode_bytes_buff
 from eda_server.managers import updatemanager
 from eda_server.messages import ActivationErrorMessage
 from eda_server.ruleset import activate_rulesets, inactivate_rulesets
@@ -497,12 +497,10 @@ async def stream_activation_instance_logs(
     large_data_id = cur.first().large_data_id
 
     async with PGLargeObject(db, oid=large_data_id, mode="r") as lobject:
-        leftover = b""
         async for buff in lobject:
-            buff, leftover = decode_bytes_buff(leftover + buff)
             await updatemanager.broadcast(
                 f"/activation_instance/{activation_instance_id}",
-                json.dumps(["Stdout", {"stdout": buff}]),
+                json.dumps(["Stdout", {"stdout": buff.decode()}]),
             )
 
     # Empty list return to satisfy the UI get() call

@@ -1,5 +1,6 @@
 alembic
 asyncpg
+asyncpg-lostream
 fastapi
 fastapi-users[sqlalchemy]
 pyyaml
