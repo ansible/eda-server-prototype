@@ -472,7 +472,7 @@ async def _create_activation_instance(db: AsyncSession, foreign_keys: dict):
     return activation_instance_id
 
 
-@mock.patch("eda_server.ruleset.activate_rulesets")
+@mock.patch("eda_server.ruleset.activate_rulesets", return_value=mock.ANY)
 async def test_create_activation_instance(
     activate_rulesets: mock.Mock,
     client: AsyncClient,

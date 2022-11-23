@@ -73,14 +73,14 @@ async def test_create_extar_var(
     await db.commit()
 
     response = await client.post(
-        "/api/extra_vars/",
+        "/api/extra_vars",
         json={
             "name": "test_create_extar_var",
             "extra_var": TEST_EXTRA_VAR,
             "project_id": project_id,
         },
     )
-    assert response.status_code == status_codes.HTTP_200_OK
+    assert response.status_code == status_codes.HTTP_201_CREATED
     data = response.json()
     assert data["name"] == "test_create_extar_var"
     assert data["extra_var"] == TEST_EXTRA_VAR
@@ -99,7 +99,7 @@ async def test_create_extar_var_bad_entity(
     client: AsyncClient, check_permission_spy: mock.Mock
 ):
     response = await client.post(
-        "/api/extra_vars/",
+        "/api/extra_vars",
         json=TEST_EXTRA_VAR,
     )
     assert response.status_code == status_codes.HTTP_422_UNPROCESSABLE_ENTITY
@@ -116,7 +116,7 @@ async def test_list_extra_vars(
     await db.commit()
 
     response = await client.get(
-        "/api/extra_vars/",
+        "/api/extra_vars",
     )
     assert response.status_code == status_codes.HTTP_200_OK
     extra_vars = response.json()
@@ -137,7 +137,7 @@ async def test_list_extra_vars_empty_response(
     client: AsyncClient, check_permission_spy: mock.Mock
 ):
     response = await client.get(
-        "/api/extra_vars/",
+        "/api/extra_vars",
     )
     assert response.status_code == status_codes.HTTP_200_OK
     extra_vars = response.json()

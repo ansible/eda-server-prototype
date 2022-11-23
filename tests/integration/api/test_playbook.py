@@ -77,7 +77,7 @@ async def test_list_playbooks(
     await db.commit()
 
     response = await client.get(
-        "/api/playbooks/",
+        "/api/playbooks",
     )
     assert response.status_code == status_codes.HTTP_200_OK
     playbooks = response.json()
@@ -98,7 +98,7 @@ async def test_list_playbooks_empty_response(
     client: AsyncClient, check_permission_spy: mock.Mock
 ):
     response = await client.get(
-        "/api/playbooks/",
+        "/api/playbooks",
     )
     assert response.status_code == status_codes.HTTP_200_OK
     activations = response.json()

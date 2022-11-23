@@ -21,7 +21,9 @@ from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from eda_server.db import models
-from eda_server.types import Action, ResourceType
+from eda_server.db.sql import base as bsql
+from eda_server.managers import taskmanager
+from eda_server.types import Action, InventorySource, ResourceType
 
 TEST_EXTRA_VAR = """
 ---
@@ -50,25 +52,256 @@ TEST_RULEBOOK = """
 """
 
 TEST_PLAYBOOK = TEST_RULEBOOK
+JOB_UUID = "f4c87c90-254e-11ed-861d-0242ac120002"
 
 
-async def test_create_delete_job(
+async def _create_dependent_objects(db: AsyncSession):
+    (extra_var_id,) = (
+        await bsql.insert_object(
+            db,
+            models.extra_vars,
+            values={"name": "vars.yml", "extra_var": TEST_EXTRA_VAR},
+        )
+    ).inserted_primary_key
+
+    (inventory_id,) = (
+        await bsql.insert_object(
+            db,
+            models.inventories,
+            values={
+                "name": "inventory.yml",
+                "inventory": TEST_INVENTORY,
+                "inventory_source": InventorySource.USER_DEFINED.value,
+            },
+        )
+    ).inserted_primary_key
+
+    (rulebook_id,) = (
+        await bsql.insert_object(
+            db,
+            models.rulebooks,
+            values={"name": "ruleset.yml", "rulesets": TEST_RULEBOOK},
+        )
+    ).inserted_primary_key
+
+    (project_id,) = (
+        await bsql.insert_object(
+            db,
+            models.projects,
+            values={
+                "url": "https://github.com/ansible/event-driven-ansible",
+                "name": "test",
+                "description": "test",
+            },
+        )
+    ).inserted_primary_key
+
+    (playbook_id,) = (
+        await bsql.insert_object(
+            db,
+            models.playbooks,
+            values={
+                "name": "hello.yml",
+                "playbook": TEST_PLAYBOOK,
+                "project_id": project_id,
+            },
+        )
+    ).inserted_primary_key
+
+    foreign_keys = {
+        "extra_var_id": extra_var_id,
+        "inventory_id": inventory_id,
+        "rulebook_id": rulebook_id,
+        "project_id": project_id,
+        "playbook_id": playbook_id,
+    }
+
+    return foreign_keys
+
+
+async def _create_job_instance(db: AsyncSession, foreign_keys: dict):
+    (job_instance_id,) = (
+        await bsql.insert_object(
+            db,
+            models.job_instances,
+            values={
+                "name": "test_job_instance",
+                "uuid": JOB_UUID,
+            },
+        )
+    ).inserted_primary_key
+
+    return job_instance_id
+
+
+@mock.patch("asyncio.create_task")
+async def test_create_job_instance(
+    create_task: mock.Mock,
+    client: AsyncClient,
+    db: AsyncSession,
+    check_permission_spy: mock.Mock,
+):
+    fks = await _create_dependent_objects(db)
+    await db.commit()
+
+    response = await client.post(
+        "/api/job_instance",
+        json={
+            "playbook_id": fks["playbook_id"],
+            "inventory_id": fks["inventory_id"],
+            "extra_var_id": fks["extra_var_id"],
+        },
+    )
+
+    assert response.status_code == status_codes.HTTP_200_OK
+    data = response.json()
+
+    assert data["playbook_id"] == fks["playbook_id"]
+    assert data["inventory_id"] == fks["inventory_id"]
+    assert data["extra_var_id"] == fks["extra_var_id"]
+
+    check_permission_spy.assert_called_once_with(
+        mock.ANY, mock.ANY, ResourceType.JOB, Action.CREATE
+    )
+
+    # clear tasks for the test of listing tasks
+    taskmanager.tasks.clear()
+
+
+# Suppress warnings from asyncio.create_task when calling coroutines
+@pytest.mark.filterwarnings("ignore::RuntimeWarning")
+async def test_read_job(
+    client: AsyncClient,
+    db: AsyncSession,
+    check_permission_spy: mock.Mock,
+):
+    fks = await _create_dependent_objects(db)
+    job_instance_id = await _create_job_instance(db, fks)
+
+    response = await client.get(
+        f"/api/job_instance/{job_instance_id}",
+    )
+
+    assert response.status_code == status_codes.HTTP_200_OK
+
+    job_instance = response.json()
+    assert job_instance["uuid"] == JOB_UUID
+    assert job_instance["name"] == "test_job_instance"
+
+    check_permission_spy.assert_called_once_with(
+        mock.ANY, mock.ANY, ResourceType.JOB, Action.READ
+    )
+
+
+@pytest.mark.filterwarnings("ignore::RuntimeWarning")
+async def test_read_job_not_found(
+    client: AsyncClient,
+    check_permission_spy: mock.Mock,
+):
+    response = await client.get("/api/job_instance/42")
+
+    assert response.status_code == status_codes.HTTP_404_NOT_FOUND
+
+    check_permission_spy.assert_called_once_with(
+        mock.ANY, mock.ANY, ResourceType.JOB, Action.READ
+    )
+
+
+async def test_list_job(
+    client: AsyncClient,
+    db: AsyncSession,
+    check_permission_spy: mock.Mock,
+):
+    fks = await _create_dependent_objects(db)
+    job_instance_id = await _create_job_instance(db, fks)
+
+    response = await client.get("/api/job_instances")
+
+    assert response.status_code == status_codes.HTTP_200_OK
+
+    job_instances = response.json()
+    assert type(job_instances) is list
+    assert len(job_instances) > 0
+
+    job_instance = job_instances[0]
+
+    assert job_instance["id"] == job_instance_id
+    assert job_instance["uuid"] == JOB_UUID
+    assert job_instance["name"] == "test_job_instance"
+
+    check_permission_spy.assert_called_once_with(
+        mock.ANY, mock.ANY, ResourceType.JOB, Action.READ
+    )
+
+
+async def test_list_job_empty_response(
+    client: AsyncClient,
+    db: AsyncSession,
+    check_permission_spy: mock.Mock,
+):
+    response = await client.get("/api/job_instances")
+
+    assert response.status_code == status_codes.HTTP_200_OK
+
+    job_instances = response.json()
+    assert job_instances == []
+
+    check_permission_spy.assert_called_once_with(
+        mock.ANY, mock.ANY, ResourceType.JOB, Action.READ
+    )
+
+
+async def test_read_job_instance_events(
+    client: AsyncClient,
+    db: AsyncSession,
+    check_permission_spy: mock.Mock,
+):
+    fks = await _create_dependent_objects(db)
+    job_instance_id = await _create_job_instance(db, fks)
+
+    response = await client.get(
+        f"/api/job_instance_events/{job_instance_id}",
+    )
+
+    assert response.status_code == status_codes.HTTP_200_OK
+
+    job_instance_events = response.json()
+
+    assert type(job_instance_events) is list
+    assert job_instance_events == []
+
+    check_permission_spy.assert_called_once_with(
+        mock.ANY, mock.ANY, ResourceType.JOB, Action.READ
+    )
+
+
+async def test_read_job_instance_events_not_found(
+    client: AsyncClient,
+    db: AsyncSession,
+    check_permission_spy: mock.Mock,
+):
+    response = await client.get(
+        "/api/job_instance_events/42",
+    )
+
+    assert response.status_code == status_codes.HTTP_404_NOT_FOUND
+
+    check_permission_spy.assert_called_once_with(
+        mock.ANY, mock.ANY, ResourceType.JOB, Action.READ
+    )
+
+
+async def test_delete_job(
     client: AsyncClient, db: AsyncSession, check_permission_spy: mock.Mock
 ):
-    query = sa.insert(models.job_instances).values(
-        uuid="f4c87c90-254e-11ed-861d-0242ac120002",
-    )
-    await db.execute(query)
+    fks = await _create_dependent_objects(db)
+    job_instance_id = await _create_job_instance(db, fks)
+    await db.commit()
 
     jobs = (await db.execute(sa.select(models.job_instances))).all()
     jobs_len = len(jobs)
 
-    job_to_delete = (await db.execute(sa.select(models.job_instances))).first()
-    job_id = job_to_delete.id
-
-    await db.commit()
-
-    response = await client.delete(f"/api/job_instance/{job_id}")
+    response = await client.delete(f"/api/job_instance/{job_instance_id}")
     assert response.status_code == status_codes.HTTP_204_NO_CONTENT
 
     jobs = (await db.execute(sa.select(models.job_instances))).all()
@@ -79,9 +312,15 @@ async def test_create_delete_job(
     )
 
 
-async def test_delete_job_not_found(client: AsyncClient):
+async def test_delete_job_not_found(
+    client: AsyncClient, check_permission_spy: mock.Mock
+):
     response = await client.delete("/api/job_instance/1")
     assert response.status_code == status_codes.HTTP_404_NOT_FOUND
+
+    check_permission_spy.assert_called_once_with(
+        mock.ANY, mock.ANY, ResourceType.JOB, Action.DELETE
+    )
 
 
 @mock.patch("eda_server.ruleset.activate_rulesets")

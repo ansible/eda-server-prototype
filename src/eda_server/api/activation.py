@@ -502,7 +502,10 @@ async def stream_activation_instance_logs(
     )
     activation_instance = (await db.execute(query)).first()
     if activation_instance is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Activation instance Not Found.",
+        )
 
     large_data_id = activation_instance.large_data_id
 
