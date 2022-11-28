@@ -39,7 +39,7 @@ async def test_create_inventory(
         "/api/inventory",
         json=TEST_INVENTORY,
     )
-    assert response.status_code == status_codes.HTTP_200_OK
+    assert response.status_code == status_codes.HTTP_201_CREATED
     data = response.json()
     assert "id" in data
     assert data["name"] == TEST_INVENTORY["name"]

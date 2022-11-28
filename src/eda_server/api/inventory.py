@@ -34,6 +34,7 @@ router = APIRouter(tags=["inventories"])
     dependencies=[
         Depends(requires_permission(ResourceType.INVENTORY, Action.CREATE))
     ],
+    status_code=status.HTTP_201_CREATED,
 )
 async def create_inventory(
     inventory_: schema.InventoryCreate,
