@@ -222,6 +222,9 @@ async def list_audit_rule_events(
     "/api/audit/rules_fired",
     response_model=List[schema.AuditFiredRule],
     operation_id="list_audit_rules_fired",
+    dependencies=[
+        Depends(requires_permission(ResourceType.AUDIT_RULE, Action.READ)),
+    ],
 )
 async def list_audit_rules_fired(db: AsyncSession = Depends(get_db_session)):
     query = (
@@ -260,14 +263,20 @@ async def list_audit_rules_fired(db: AsyncSession = Depends(get_db_session)):
     for row in rows:
         response.append(
             {
-                "id": row["rule_id"],
-                "name": row["rule_name"],
-                "job_id": row["job_id"],
-                "job": row["job_name"],
+                "job": {
+                    "id": row["job_id"],
+                    "name": row["job_name"],
+                },
                 "status": row["status"],
-                "ruleset_id": row["ruleset_id"],
-                "ruleset": row["ruleset_name"],
                 "fired_date": row["fired_date"],
+                "rule": {
+                    "id": row["rule_id"],
+                    "name": row["rule_name"],
+                },
+                "ruleset": {
+                    "id": row["ruleset_id"],
+                    "name": row["ruleset_name"],
+                },
             }
         )
 
@@ -278,6 +287,9 @@ async def list_audit_rules_fired(db: AsyncSession = Depends(get_db_session)):
     "/api/audit/hosts_changed",
     response_model=List[schema.AuditChangedHost],
     operation_id="list_audit_hosts_changed",
+    dependencies=[
+        Depends(requires_permission(ResourceType.AUDIT_RULE, Action.READ)),
+    ],
 )
 async def list_audit_hosts_changed(db: AsyncSession = Depends(get_db_session)):
     query = (
@@ -315,11 +327,15 @@ async def list_audit_hosts_changed(db: AsyncSession = Depends(get_db_session)):
         response.append(
             {
                 "host": row["host"],
-                "rule_id": row["rule_id"],
-                "rule": row["rule_name"],
-                "ruleset_id": row["ruleset_id"],
-                "ruleset": row["ruleset_name"],
                 "fired_date": row["fired_date"],
+                "rule": {
+                    "id": row["rule_id"],
+                    "name": row["rule_name"],
+                },
+                "ruleset": {
+                    "id": row["ruleset_id"],
+                    "name": row["ruleset_name"],
+                },
             }
         )
 

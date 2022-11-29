@@ -17,7 +17,8 @@ from typing import Optional
 
 from pydantic import BaseModel, StrictStr
 
-from .rulebook import RuleRulesetRef
+from .job import JobRef
+from .rulebook import RuleRef, RuleRulesetRef
 
 
 class AuditRuleActivationRef(BaseModel):
@@ -57,20 +58,15 @@ class AuditRuleHost(BaseModel):
 
 
 class AuditFiredRule(BaseModel):
-    id: int
-    name: StrictStr
-    job_id: int
-    job: StrictStr
+    job: JobRef
+    rule: RuleRef
+    ruleset: RuleRulesetRef
     status: Optional[StrictStr]
-    ruleset_id: int
-    ruleset: StrictStr
-    fired_date: datetime
+    fired_date: Optional[datetime]
 
 
 class AuditChangedHost(BaseModel):
     host: StrictStr
-    rule_id: int
-    rule: StrictStr
-    ruleset_id: int
-    ruleset: StrictStr
-    fired_date: datetime
+    rule: RuleRef
+    ruleset: RuleRulesetRef
+    fired_date: Optional[datetime]
