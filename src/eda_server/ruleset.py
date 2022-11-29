@@ -40,7 +40,9 @@ import logging
 import os
 import shutil
 import tempfile
+from collections import defaultdict
 from functools import partial
+from typing import Callable, Dict, Tuple, Union
 
 import aiodocker
 import aiodocker.images
@@ -48,6 +50,7 @@ import ansible_runner
 from asyncpg_lostream.lostream import CHUNK_SIZE, PGLargeObject
 from sqlalchemy import insert
 
+from eda_server.config.enums import DeploymentType
 from eda_server.managers import taskmanager
 
 from .db.models import job_instance_events
@@ -56,13 +59,15 @@ from .messages import JobEnd
 
 logger = logging.getLogger("eda_server")
 
-activated_rulesets = {}
+activated_rulesets = defaultdict(list)
 ansible_rulebook = shutil.which("ansible-rulebook")
 if ansible_rulebook is None:
     raise Exception("ansible-rulebook not found")
 ssh_agent = shutil.which("ssh-agent")
 if ssh_agent is None:
     raise Exception("ssh-agent not found")
+
+DEFAULT_HOST = "eda-server"
 
 
 def ensure_directory(directory):
@@ -73,13 +78,198 @@ def ensure_directory(directory):
         return directory
 
 
-# TODO(cutwater): Move database query outside of this function
+def add_activated_ruleset_executor(
+    activation_id: int,
+    executor: Union[
+        aiodocker.docker.DockerContainer, asyncio.subprocess.Process
+    ],
+) -> None:
+    activated_rulesets[activation_id].append(executor)
+
+
+def create_async_task(
+    task_action: partial,
+    task_name: str,
+) -> None:
+    task = asyncio.create_task(task_action(), name=task_name)
+    taskmanager.tasks.append(task)
+
+
+async def create_fallback_docker_activation(
+    activation_id: int,
+    execution_environment: str,
+    port: Union[str, int],
+    host: str = DEFAULT_HOST,
+) -> Tuple[aiodocker.docker.Docker, aiodocker.docker.DockerContainer]:
+    docker = aiodocker.Docker()
+    try:
+        await aiodocker.images.DockerImages(docker).pull(execution_environment)
+
+        logger.debug("Creating fallback/default container")
+        logger.debug("Host: %s", host)
+        logger.debug("Port: %s", port)
+        container = await docker.containers.create(
+            {
+                "Cmd": [
+                    "ssh-agent",
+                    "ansible-rulebook",
+                    "--worker",
+                    "--websocket-address",
+                    f"ws://{host}:{port}/api/ws2",
+                    "--id",
+                    str(activation_id),
+                    "--debug",
+                ],
+                "Image": execution_environment,
+                "Env": ["ANSIBLE_FORCE_COLOR=True"],
+                "ExtraHosts": ["host.docker.internal:host-gateway"],
+                "ExposedPorts": {"8000/tcp": {}},
+                "HostConfig": {
+                    "PortBindings": {"8000/tcp": [{"HostPort": "8000"}]},
+                    "NetworkMode": "eda-network",
+                },
+            }
+        )
+        logger.debug("Starting fallback/default container")
+        await container.start()
+    except aiodocker.exceptions.DockerError as e:
+        logger.error("Failed to start fallback/default container: %s", e)
+        await container.delete()
+        await docker.close()
+        raise
+
+    return (docker, container)
+
+
+async def create_websocket_docker_activation(
+    activation_id: int,
+    source: Dict,
+    execution_environment: str,
+    default_port: Union[str, int],
+    default_host: str = DEFAULT_HOST,
+) -> Tuple[aiodocker.docker.Docker, aiodocker.docker.DockerContainer]:
+    config = source.get("config", {})
+    host = config.get("host", default_host)
+    port = config.get("port", default_port)
+    exposed_ports = config.get("exposed_ports", {"8000/tcp": {}})
+    extra_hosts = config.get(
+        "extra_hosts", ["host.docker.internal:host-gateway"]
+    )
+    host_config = config.get(
+        "host_config",
+        {
+            "PortBindings": {"8000/tcp": [{"HostPort": "8000"}]},
+            "NetworkMode": "eda-network",
+        },
+    )
+    environment = config.get("environment", ["ANSIBLE_FORCE_COLOR=True"])
+
+    docker = aiodocker.Docker()
+    try:
+        await aiodocker.images.DockerImages(docker).pull(execution_environment)
+
+        logger.debug("Creating container")
+        logger.debug("Host: %s", host)
+        logger.debug("Port: %s", port)
+        container = await docker.containers.create(
+            {
+                "Cmd": [
+                    "ssh-agent",
+                    "ansible-rulebook",
+                    "--worker",
+                    "--websocket-address",
+                    f"ws://{host}:{port}/api/ws2",
+                    "--id",
+                    str(activation_id),
+                    "--debug",
+                ],
+                "Image": execution_environment,
+                "Env": environment,
+                "ExtraHosts": extra_hosts,
+                "ExposedPorts": exposed_ports,
+                "HostConfig": host_config,
+            }
+        )
+        logger.debug("Starting container")
+        await container.start()
+    except aiodocker.exceptions.DockerError as e:
+        logger.error("Failed to start container: %s", e)
+        await container.delete()
+        await docker.close()
+        raise
+
+    return (docker, container)
+
+
+SOURCE_TYPE_ACTIVATION = {
+    "websocket": "create_websocket_docker_activation",
+}
+
+
+def resolve_activation_function(source: Dict) -> Callable:
+    # TODO: React to source type
+    activation_type = "websocket"
+    activation_func = globals()[SOURCE_TYPE_ACTIVATION[activation_type]]
+
+    return activation_func
+
+
+async def create_docker_activation(
+    activation_id: int,
+    source: Dict,
+    execution_environment,
+    default_port: Union[str, int],
+    default_host: str = DEFAULT_HOST,
+) -> Tuple[aiodocker.docker.Docker, aiodocker.docker.DockerContainer]:
+    # TODO: React to source type
+    activation_func = resolve_activation_function(source)
+    docker_container = await activation_func(
+        activation_id,
+        source,
+        execution_environment,
+        default_port,
+        default_host,
+    )
+
+    return docker_container
+
+
+async def create_local_activation(
+    activation_id: int, working_directory: str
+) -> asyncio.subprocess.Process:
+    local_working_directory = working_directory
+    ensure_directory(local_working_directory)
+
+    # for local development this is better
+    cmd_args = [
+        ansible_rulebook,
+        "--worker",
+        "--websocket-address",
+        "ws://localhost:8080/api/ws2",
+        "--id",
+        str(activation_id),
+    ]
+    logger.debug(ansible_rulebook)
+    logger.debug(cmd_args)
+
+    proc = await asyncio.create_subprocess_exec(
+        ssh_agent,
+        *cmd_args,
+        cwd=local_working_directory,
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.STDOUT,
+    )
+
+    return proc
+
+
 async def activate_rulesets(
     deployment_type,
     activation_id,
     large_data_id,
     execution_environment,
     rulesets,
+    ruleset_sources,
     inventory,
     extravars,
     working_directory,
@@ -92,101 +282,75 @@ async def activate_rulesets(
 
     logger.debug("activate_rulesets %s %s", activation_id, deployment_type)
 
-    # TODO(ben): Change to enum
-    if deployment_type == "local":
-
-        # for local development this is better
-        cmd_args = [
-            ansible_rulebook,
-            "--worker",
-            "--websocket-address",
-            "ws://localhost:8080/api/ws2",
-            "--id",
-            str(activation_id),
-        ]
-        logger.debug(ansible_rulebook)
-        logger.debug(cmd_args)
-
-        proc = await asyncio.create_subprocess_exec(
-            ssh_agent,
-            *cmd_args,
-            cwd=local_working_directory,
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.STDOUT,
-        )
-
-        activated_rulesets[activation_id] = proc
-
-        task = asyncio.create_task(
-            read_output(proc, activation_id, large_data_id, db_factory),
-            name=f"read_output {proc.pid}",
-        )
-        taskmanager.tasks.append(task)
-
-    elif deployment_type == "docker" or deployment_type == "podman":
-
-        docker = aiodocker.Docker()
-
-        host = "eda-server"
-
-        try:
-            await aiodocker.images.DockerImages(docker).pull(
-                execution_environment
-            )
-
-            logger.debug("Creating container")
-            logger.debug("Host: %s", host)
-            logger.debug("Port: %s", port)
-            container = await docker.containers.create(
-                {
-                    "Cmd": [
-                        "ssh-agent",
-                        "ansible-rulebook",
-                        "--worker",
-                        "--websocket-address",
-                        f"ws://{host}:{port}/api/ws2",
-                        "--id",
-                        str(activation_id),
-                        "--debug",
-                    ],
-                    "Image": execution_environment,
-                    "Env": ["ANSIBLE_FORCE_COLOR=True"],
-                    "ExtraHosts": ["host.docker.internal:host-gateway"],
-                    "ExposedPorts": {"8000/tcp": {}},
-                    "HostConfig": {
-                        "PortBindings": {"8000/tcp": [{"HostPort": "8000"}]},
-                        "NetworkMode": "eda-network",
-                    },
-                }
-            )
-            logger.debug("Starting container")
-            await container.start()
-        except aiodocker.exceptions.DockerError as e:
-            logger.error("Failed to start container: %s", e)
-            await container.delete()
-            await docker.close()
-            raise
-
-        activated_rulesets[activation_id] = container
-
-        task = asyncio.create_task(
-            read_log(
-                docker, container, activation_id, large_data_id, db_factory
+    if deployment_type == DeploymentType.LOCAL:
+        proc = await create_local_activation(activation_id, working_directory)
+        add_activated_ruleset_executor(activation_id, proc)
+        create_async_task(
+            partial(
+                read_output, proc, activation_id, large_data_id, db_factory
             ),
-            name=f"read_log {container}",
+            f"read_output {proc.pid}",
         )
-        taskmanager.tasks.append(task)
 
-    elif deployment_type == "k8s":
+    elif deployment_type in (
+        DeploymentType.DOCKER,
+        DeploymentType.PODMAN,
+    ):
+        if ruleset_sources:
+            for source in ruleset_sources:
+                docker, container = await create_docker_activation(
+                    activation_id,
+                    source,
+                    execution_environment,
+                    port,
+                    host,
+                )
+                add_activated_ruleset_executor(activation_id, container)
+                create_async_task(
+                    partial(
+                        read_log,
+                        docker,
+                        container,
+                        activation_id,
+                        large_data_id,
+                        db_factory,
+                    ),
+                    f"read_log {container}",
+                )
+        else:
+            docker, container = await create_fallback_docker_activation(
+                activation_id,
+                execution_environment,
+                port,
+                host,
+            )
+            add_activated_ruleset_executor(activation_id, container)
+            create_async_task(
+                partial(
+                    read_log,
+                    docker,
+                    container,
+                    activation_id,
+                    large_data_id,
+                    db_factory,
+                ),
+                f"read_log {container}",
+            )
+
+    elif deployment_type in (
+        DeploymentType.K8S,
+        DeploymentType.KUBERNETES,
+    ):
         # Calls to the k8s apis.
         logger.error("k8s deployment not implemented yet")
     else:
         raise Exception("Unsupported deployment_type")
 
 
-async def inactivate_rulesets(activation_id):
+async def inactivate_rulesets(activation_id: int):
     try:
-        activated_rulesets[activation_id].kill()
+        for activated_ruleset in activated_rulesets[activation_id]:
+            activated_ruleset.kill()
     except ProcessLookupError:
         pass
 

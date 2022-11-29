@@ -18,6 +18,8 @@ import yaml
 from fastapi.requests import Request
 from pydantic import BaseSettings
 
+from .enums import DeploymentType
+
 
 class Settings(BaseSettings):
     """Application settings."""
@@ -33,7 +35,7 @@ class Settings(BaseSettings):
         "postgresql+asyncpg://postgres:secret@localhost:5432/eda_server"
     )
 
-    deployment_type: str = "docker"
+    deployment_type: DeploymentType = DeploymentType.DOCKER
     server_name: str = "localhost"
 
     class Config:

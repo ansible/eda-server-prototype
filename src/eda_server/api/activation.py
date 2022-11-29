@@ -31,6 +31,7 @@ from eda_server.auth import requires_permission
 from eda_server.config import Settings, get_settings
 from eda_server.db import models
 from eda_server.db.dependency import get_db_session, get_db_session_factory
+from eda_server.db.sql.app import activation as asql
 from eda_server.managers import updatemanager
 from eda_server.messages import ActivationErrorMessage
 from eda_server.ruleset import activate_rulesets, inactivate_rulesets
@@ -308,53 +309,16 @@ async def create_activation_instance(
     db_factory=Depends(get_db_session_factory),
     settings: Settings = Depends(get_settings),
 ):
-    query = (
-        sa.insert(models.activation_instances)
-        .values(
-            name=a.name,
-            rulebook_id=a.rulebook_id,
-            inventory_id=a.inventory_id,
-            extra_var_id=a.extra_var_id,
-            working_directory=a.working_directory,
-            execution_environment=a.execution_environment,
-            project_id=a.project_id,
-        )
-        .returning(
-            models.activation_instances.c.id,
-            models.activation_instances.c.large_data_id,
-        )
-    )
     try:
-        result = await db.execute(query)
+        activation_data = await asql.create_activation_instance(db, a.dict())
     except sa.exc.IntegrityError:
         await db.rollback()
         await dependent_object_exists_or_exception(db, a)
-    await db.commit()
-    id_, large_data_id = result.first()
 
-    query = (
-        sa.select(
-            models.inventories.c.inventory,
-            models.rulebooks.c.rulesets,
-            models.extra_vars.c.extra_var,
-        )
-        .join(
-            models.inventories,
-            models.activation_instances.c.inventory_id
-            == models.inventories.c.id,
-        )
-        .join(
-            models.rulebooks,
-            models.activation_instances.c.rulebook_id == models.rulebooks.c.id,
-        )
-        .join(
-            models.extra_vars,
-            models.activation_instances.c.extra_var_id
-            == models.extra_vars.c.id,
-        )
-        .where(models.activation_instances.c.id == id_)
-    )
-    activation_data = (await db.execute(query)).first()
+    await db.commit()
+
+    id_ = activation_data.activation_instance_id
+    large_data_id = activation_data.activation_instance_large_data_id
 
     try:
         await activate_rulesets(
@@ -363,6 +327,7 @@ async def create_activation_instance(
             large_data_id,
             a.execution_environment,
             activation_data.rulesets,
+            activation_data.ruleset_sources,
             activation_data.inventory,
             activation_data.extra_var,
             a.working_directory,
@@ -379,7 +344,7 @@ async def create_activation_instance(
             },
         )
 
-    return {**a.dict(), "id": id_}
+    return {**a.dict(), "id": id_, "large_data_id": large_data_id}
 
 
 # FIXME(cutwater): The URL is not related to activation instances.

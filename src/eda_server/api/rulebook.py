@@ -24,7 +24,8 @@ from eda_server.auth import requires_permission
 from eda_server.db.dependency import get_db_session
 
 # Rule, Ruleset, Rulebook query builder, enums, etc
-from eda_server.db.sql import rulebook as rsql
+from eda_server.db.sql.endpoints import rulebook as rsql
+from eda_server.project import insert_rulebook_related_data
 from eda_server.types import Action, ResourceType
 
 router = APIRouter(tags=["rulebooks"])

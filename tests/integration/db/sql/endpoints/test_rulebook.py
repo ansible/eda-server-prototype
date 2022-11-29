@@ -23,7 +23,8 @@ from dateutil.parser import parse as dtparse
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from eda_server.db import models
-from eda_server.db.sql import base as bsql, rulebook as rsql
+from eda_server.db.sql import base as bsql
+from eda_server.db.sql.endpoints import rulebook as rsql
 from eda_server.types import InventorySource
 
 TEST_RULESET_SIMPLE = """
