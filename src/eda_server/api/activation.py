@@ -72,6 +72,7 @@ async def dependent_object_exists_or_exception(db: AsyncSession, activation):
     dependencies=[
         Depends(requires_permission(ResourceType.ACTIVATION, Action.CREATE)),
     ],
+    status_code=status.HTTP_201_CREATED,
 )
 async def create_activation(
     activation: schema.ActivationCreate,

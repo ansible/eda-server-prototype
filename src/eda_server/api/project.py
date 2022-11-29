@@ -304,6 +304,7 @@ async def read_extra_var(
     dependencies=[
         Depends(requires_permission(ResourceType.EXTRA_VAR, Action.CREATE))
     ],
+    status_code=status.HTTP_201_CREATED,
 )
 async def create_extra_vars(
     e: schema.ExtraVarsCreate, db: AsyncSession = Depends(get_db_session)

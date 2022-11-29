@@ -159,7 +159,7 @@ async def test_create_activation(
         "/api/activations",
         json=my_test_activation,
     )
-    assert response.status_code == status_codes.HTTP_200_OK
+    assert response.status_code == status_codes.HTTP_201_CREATED
     data = response.json()
     assert data["name"] == TEST_ACTIVATION["name"]
 
