@@ -22,14 +22,16 @@ from typing import List
 import sqlalchemy as sa
 from fastapi import APIRouter, Depends, Response, status
 from fastapi.exceptions import HTTPException
+from fastapi.responses import JSONResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from eda_server import schema
 from eda_server.auth import requires_permission
+from eda_server.config import Settings, get_settings
 from eda_server.db import models
 from eda_server.db.dependency import get_db_session, get_db_session_factory
 from eda_server.managers import taskmanager
-from eda_server.ruleset import run_job, write_job_events
+from eda_server.ruleset import activate_rulesets, run_job, write_job_events
 from eda_server.types import Action, ResourceType
 
 logger = logging.getLogger("eda_server")
@@ -125,11 +127,17 @@ async def create_job_instance(
 
 @router.post(
     "/api/job_instance/{job_instance_id}",
-    response_model=schema.JobInstanceRead,
+    response_model=schema.JobInstanceCreate,
     operation_id="rerun_job_instance",
+    dependencies=[
+        Depends(requires_permission(ResourceType.JOB, Action.CREATE))
+    ],
 )
 async def rerun_job_instance(
-    job_instance_id: int, db: AsyncSession = Depends(get_db_session)
+    job_instance_id: int,
+    db: AsyncSession = Depends(get_db_session),
+    db_factory=Depends(get_db_session_factory),
+    settings: Settings = Depends(get_settings),
 ):
     query = sa.select(models.job_instances).where(
         models.job_instances.c.id == job_instance_id
@@ -168,108 +176,62 @@ async def rerun_job_instance(
 
     logger.debug("activation_instance: %s", activation_instance)
 
-    # first try to find playbook by file lookup, ex. playbooks/hello.yml
-    playbook_name = job_instance.name.split("/")[-1]
-    query = sa.select(models.playbooks).where(
-        models.playbooks.c.name == playbook_name,
-        models.playbooks.c.project_id == activation_instance.project_id,
-    )
-    playbook_row = (await db.execute(query)).first()
-
-    if not playbook_row:
-        logger.warning(
-            "Playbook %s not found, try with collection pattern", playbook_name
+    query = (
+        sa.select(
+            models.inventories.c.inventory,
+            models.rulebooks.c.rulesets,
+            models.extra_vars.c.extra_var,
         )
-
-        # then try to find by colletion name FQCN, ex. ansible.eda.hello
-        _, _, base_name = job_instance.name.rpartition(".")
-        playbook_name = f"{base_name}.yml"
-        query = sa.select(models.playbooks).where(
-            models.playbooks.c.name == playbook_name,
-            models.playbooks.c.project_id == activation_instance.project_id,
+        .join(
+            models.inventories,
+            models.activation_instances.c.inventory_id
+            == models.inventories.c.id,
         )
-        playbook_row = (await db.execute(query)).first()
-
-        if not playbook_row:
-            error = f"Playbook {job_instance.name} not found"
-            logger.error(error)
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST, detail=error
-            )
-    logger.debug("playbook_row: %s", playbook_row)
-
-    query = sa.select(models.extra_vars).where(
-        models.extra_vars.c.id == activation_instance.extra_var_id,
-    )
-    extra_var_row = (await db.execute(query)).first()
-
-    if not extra_var_row:
-        error = f"extra_var {activation_instance.extra_var_id} not found"
-        logger.error(error)
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail=error
+        .join(
+            models.rulebooks,
+            models.activation_instances.c.rulebook_id == models.rulebooks.c.id,
         )
-    logger.debug("extra_var_row: %s", extra_var_row)
-
-    query = sa.select(models.inventories).where(
-        models.inventories.c.id == activation_instance.inventory_id,
-    )
-    inventory_row = (await db.execute(query)).first()
-    if not inventory_row:
-        error = f"inventory {activation_instance.inventory_id} not found"
-        logger.error(error)
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail=error
+        .join(
+            models.extra_vars,
+            models.activation_instances.c.extra_var_id
+            == models.extra_vars.c.id,
         )
-    logger.debug("inventory_row: %s", inventory_row)
-
-    job_uuid = str(uuid.uuid4())
-
-    query = sa.insert(models.job_instances).values(
-        uuid=job_uuid,
-        name=job_instance.name,
-        ruleset=job_instance.ruleset,
-        rule=job_instance.rule,
-        hosts=job_instance.hosts,
-        action=job_instance.action,
+        .where(models.activation_instances.c.id == activation_instance.id)
     )
-    result = await db.execute(query)
-    await db.commit()
-    (new_job_instance_id,) = result.inserted_primary_key
 
-    event_log = asyncio.Queue()
+    rerun_data = (await db.execute(query)).first()
 
-    task = asyncio.create_task(
-        run_job(
-            job_uuid,
-            event_log,
-            playbook_row.playbook,
-            inventory_row.inventory,
-            extra_var_row.extra_var,
-            db,
-        ),
-        name=f"rerun_job {job_instance_id}",
-    )
-    taskmanager.tasks.append(task)
-    task = asyncio.create_task(
-        write_job_events(event_log, new_job_instance_id, db),
-        name=f"write_job_events {new_job_instance_id}",
-    )
-    taskmanager.tasks.append(task)
-
-    query = sa.insert(models.activation_instance_job_instances).values(
-        job_instance_id=new_job_instance_id,
-        activation_instance_id=activation_instance.activation_instance_id,
-    )
-    await db.execute(query)
-    await db.commit()
+    try:
+        await activate_rulesets(
+            settings.deployment_type,
+            activation_instance.id,
+            activation_instance.large_data_id,
+            activation_instance.execution_environment,
+            rerun_data.rulesets,
+            rerun_data.inventory,
+            rerun_data.extra_var,
+            activation_instance.working_directory,
+            settings.server_name,
+            settings.port,
+            db_factory,
+        )
+    except Exception as e:
+        return JSONResponse(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            content={
+                "message": "Error occurred while reactivating instance.",
+                "detail": str(e),
+            },
+        )
 
     return {
-        "playbook_id": playbook_row.id,
-        "inventory_id": inventory_row.id,
-        "extra_var_id": extra_var_row.id,
-        "id": new_job_instance_id,
-        "uuid": job_uuid,
+        "action": job_instance.action,
+        "name": job_instance.name,
+        "ruleset": job_instance.ruleset,
+        "rule": job_instance.rule,
+        "hosts": job_instance.hosts,
+        "inventory_id": activation_instance.inventory_id,
+        "extra_var_id": activation_instance.extra_var_id,
     }
 
 
