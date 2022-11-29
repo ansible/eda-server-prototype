@@ -66,9 +66,7 @@ const Inventory: React.FunctionComponent = () => {
       aria-label="Edit"
       key="edit-inventory"
       id="edit-inventory"
-      component={
-        <Link to={`/inventories/inventory/edit-inventory/${id}`}>{intl.formatMessage(sharedMessages.edit)}</Link>
-      }
+      component={<Link to={`/inventories/${id}/edit`}>{intl.formatMessage(sharedMessages.edit)}</Link>}
       role="link"
     />,
     <DropdownItem

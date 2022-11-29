@@ -9,7 +9,7 @@ export interface NewInventoryType {
 }
 
 const inventoriesEndpoint = '/api/inventories';
-const inventoryEndpoint = '/api/inventory';
+const inventoryEndpoint = '/api/inventory/';
 
 export const listInventories = (pagination = defaultSettings): Promise<AxiosResponse> =>
   getAxiosInstance().get(inventoriesEndpoint);

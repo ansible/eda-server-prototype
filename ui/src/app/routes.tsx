@@ -32,7 +32,8 @@ import { RulesetRules } from '@app/RuleSet/ruleset-rules';
 import { Rules } from '@app/Rules/Rules';
 import { Rule } from '@app/Rule/Rule';
 import { Fragment } from 'react';
-import { NewInventory } from '@app/NewInventory/NewInventory';
+import { NewInventory } from '@app/Inventory/NewInventory';
+import { EditInventory } from '@app/Inventory/EditInventory';
 import { AuditView } from '@app/AuditView/AuditView';
 import {AuditRules} from "@app/AuditView/audit-rules";
 import {AuditHosts} from "@app/AuditView/audit-hosts";
@@ -191,6 +192,16 @@ const routes: AppRouteConfig[] = [
         title: 'Rule',
       },
       {
+        component: NewInventory,
+        path: '/inventories/add',
+        title: 'New Inventory',
+      },
+      {
+        component: EditInventory,
+        path: '/inventories/:id/edit',
+        title: 'Inventory',
+      },
+      {
         component: Inventory,
         path: '/inventories/inventory/:id',
         title: 'Inventory',
@@ -200,11 +211,6 @@ const routes: AppRouteConfig[] = [
         label: 'Inventories',
         path: '/inventories',
         title: 'Inventories',
-      },
-      {
-        component: NewInventory,
-        path: '/new-inventory/',
-        title: 'New Inventory',
       },
       {
         component: Vars,

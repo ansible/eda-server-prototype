@@ -11,10 +11,11 @@ import { TableToolbarView } from '@app/shared/table-toolbar-view';
 import TableEmptyState from '@app/shared/table-empty-state';
 import { useIntl } from 'react-intl';
 import { defaultSettings } from '@app/shared/pagination';
-import { NewInventory } from '@app/NewInventory/NewInventory';
+import { NewInventory } from '@app/Inventory/NewInventory';
 import { createRows } from '@app/Inventories/inventories-table-helpers';
 import { RemoveInventory } from '@app/RemoveInventory/RemoveInventory';
 import { listInventories } from '@app/API/Inventory';
+import { EditInventory } from '@app/Inventory/EditInventory';
 
 export interface InventoryType {
   id: string;
@@ -174,9 +175,7 @@ const Inventories: React.FunctionComponent = () => {
 
   const routes = () => (
     <Fragment>
-      <Route exact path={'/new-inventory'}>
-        <NewInventory />
-      </Route>
+      <Route exact path="/inventories/add" render={(props) => <NewInventory />} />
       <Route
         exact
         path="/inventories/remove"
@@ -189,6 +188,7 @@ const Inventories: React.FunctionComponent = () => {
           />
         )}
       />
+      <Route exact path="/inventories/:id/edit" render={(props) => <EditInventory />} />
       <Route
         exact
         path="/inventories/remove/:id"
@@ -203,7 +203,7 @@ const Inventories: React.FunctionComponent = () => {
       component: 'button',
       onClick: (_event, _rowId, inventory) =>
         history.push({
-          pathname: `/inventories/edit-inventory/${inventory.id}`,
+          pathname: `/inventories/${inventory.id}/edit`,
         }),
     },
     {
@@ -242,7 +242,7 @@ const Inventories: React.FunctionComponent = () => {
   const toolbarButtons = () => (
     <ToolbarGroup className={`pf-u-pl-lg top-toolbar`}>
       <ToolbarItem>
-        <Link id="add-inventory-link" to={{ pathname: '/new-inventory' }}>
+        <Link id="add-inventory-link" to={{ pathname: '/inventories/add' }}>
           <Button
             ouiaId={'add-inventory-link'}
             variant="primary"
@@ -308,7 +308,7 @@ const Inventories: React.FunctionComponent = () => {
                       {intl.formatMessage(sharedMessages.clearAllFilters)}
                     </Button>
                   ) : (
-                    <Link id="create-inventory-link" to={{ pathname: '/new-inventory' }}>
+                    <Link id="create-inventory-link" to={{ pathname: '/inventories/add' }}>
                       <Button
                         ouiaId={'create-inventory-link'}
                         variant="primary"
