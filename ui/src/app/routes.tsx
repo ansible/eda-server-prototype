@@ -203,7 +203,7 @@ const routes: AppRouteConfig[] = [
       },
       {
         component: Inventory,
-        path: '/inventories/inventory/:id',
+        path: '/inventories/:id/details',
         title: 'Inventory',
       },
       {

@@ -1,4 +1,4 @@
-import { Card, CardBody as PFCardBody, Form, PageSection, Title, ValidatedOptions } from '@patternfly/react-core';
+import { Card, CardBody as PFCardBody, Form, PageSection, Title } from '@patternfly/react-core';
 import { useHistory, useParams } from 'react-router-dom';
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
@@ -8,7 +8,7 @@ import sharedMessages from '../messages/shared.messages';
 import 'ace-builds/src-noconflict/theme-kuroir';
 import { addNotification } from '@redhat-cloud-services/frontend-components-notifications';
 import { useDispatch } from 'react-redux';
-import { addInventory, fetchInventory } from '@app/API/Inventory';
+import { updateInventory, fetchInventory } from '@app/API/Inventory';
 import InventoryForm from './shared/InventoryForm';
 import { InventoryType } from './inventory';
 interface ParamsType {
@@ -26,21 +26,20 @@ const EditInventory: React.FunctionComponent = () => {
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-  const fetchInventoryDetails = async () => {
-    try {
-      const { data } = await fetchInventory(params.id);
-      console.log(data);
-      setInventory(data);
-    } catch (err: any) {
-      setError(err);
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   useEffect(() => {
+    const fetchInventoryDetails = async () => {
+      try {
+        const { data } = await fetchInventory(params.id);
+        setInventory(data);
+      } catch (err: any) {
+        setError(err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
     fetchInventoryDetails();
-  }, [history.location]);
+  }, [history.location, params.id]);
 
   const validateName = (value: string) => {
     if (!value || value.length < 1) {
@@ -67,8 +66,8 @@ const EditInventory: React.FunctionComponent = () => {
     try {
       setIsSubmitting(true);
       validateFields(name, inventory);
-      addInventory({ name, description, inventory }).then((data) => {
-        data?.data?.id ? history.push(`/inventory/${data?.data?.id}`) : history.push(`/inventories`);
+      updateInventory(params.id, { name, description, inventory }).then((data) => {
+        data?.data?.id ? history.push(`/inventories/${data?.data?.id}/details`) : history.push(`/inventories`);
         dispatch(
           addNotification({
             variant: 'success',
@@ -102,8 +101,8 @@ const EditInventory: React.FunctionComponent = () => {
             key: 'inventories',
           },
           {
-            title: 'Add',
-            key: 'inventory-add',
+            title: 'Edit',
+            key: 'inventory-edit',
           },
         ]}
       >

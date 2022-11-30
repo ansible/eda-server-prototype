@@ -90,7 +90,7 @@ const Inventory: React.FunctionComponent = () => {
           {
             title: inventory?.name,
             key: 'details',
-            to: `/inventories/inventory/${inventory?.id}/details`,
+            to: `/inventories/${inventory?.id}/details`,
           },
           {
             title: currentTab || intl.formatMessage(sharedMessages.details),
@@ -116,7 +116,7 @@ const Inventory: React.FunctionComponent = () => {
       </TopToolbar>
       {inventory && (
         <Switch>
-          <Route path="/inventories/inventory/:id">
+          <Route path="/inventories/:id/details">
             <InventoryDetails inventory={inventory} />
           </Route>
         </Switch>

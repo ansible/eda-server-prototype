@@ -25,7 +25,7 @@ function InventoryForm(props: {
   inventory?: InventoryType;
   handleSubmit: (name: string, inventory: string, description?: string | undefined) => void;
   isSubmitting: boolean;
-}) {
+}): JSX.Element {
   const { inventory, isSubmitting, handleSubmit } = props;
   const history = useHistory();
   const intl = useIntl();
@@ -37,7 +37,6 @@ function InventoryForm(props: {
   const [name, setName] = useState(inventory?.name || '');
   const [inventoryVars, setInventoryVars] = useState(inventory?.inventory || '');
   const [description, setDescription] = useState(inventory?.description || '');
-  console.log(inventoryVars);
   return (
     <>
       <Stack hasGutter>
@@ -85,7 +84,7 @@ function InventoryForm(props: {
           </Grid>
         </StackItem>
         <StackItem>
-          <FormGroup label={intl.formatMessage(sharedMessages.inventory)} fieldId={`inventory-inventory`}>
+          <FormGroup isRequired label={intl.formatMessage(sharedMessages.inventory)} fieldId={`inventory-inventory`}>
             <Card>
               <FocusWrapper>
                 <AceEditor
@@ -119,7 +118,7 @@ function InventoryForm(props: {
               onClick={() => handleSubmit(name, inventoryVars, description)}
               isLoading={isSubmitting}
             >
-              {isSubmitting ? 'Adding ' : 'Add'}
+              {isSubmitting ? 'Submitting ' : 'Submit'}
             </Button>
             <Button variant="link" onClick={() => history.push('/inventories')}>
               Cancel

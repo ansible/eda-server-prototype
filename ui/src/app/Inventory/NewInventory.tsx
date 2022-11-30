@@ -38,7 +38,7 @@ const NewInventory: React.FunctionComponent = () => {
       validateName(name);
       validateInventory(inventory);
     } catch (err: any) {
-      setError(err);
+      throw new Error(err);
     }
   };
 
@@ -47,7 +47,7 @@ const NewInventory: React.FunctionComponent = () => {
       setIsSubmitting(true);
       validateFields(name, inventory);
       addInventory({ name, description, inventory }).then((data) => {
-        data?.data?.id ? history.push(`/inventory/${data?.data?.id}`) : history.push(`/inventories`);
+        data?.data?.id ? history.push(`/inventories/${data?.data?.id}/details`) : history.push(`/inventories`);
         dispatch(
           addNotification({
             variant: 'success',

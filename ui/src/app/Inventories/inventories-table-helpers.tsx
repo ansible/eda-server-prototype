@@ -2,9 +2,16 @@ import React, { Fragment, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import InventoriesTableContext from '@app/Inventories/inventories-table-context';
 import { Checkbox } from '@patternfly/react-core';
-import PropTypes from 'prop-types';
 
-export const SelectBox = ({ id }) => {
+interface InventoryType {
+  name: string;
+  description?: string;
+  inventory: string;
+  id: string;
+  source: string;
+}
+export const SelectBox = (props: { id: string }): JSX.Element => {
+  const { id } = props;
   const { selectedInventories, setSelectedInventories } = useContext(InventoriesTableContext);
 
   return (
@@ -16,12 +23,8 @@ export const SelectBox = ({ id }) => {
   );
 };
 
-SelectBox.propTypes = {
-  id: PropTypes.string.isRequired,
-};
-
-export const createRows = (data) =>
-  data.map(({ id, name, source }) => ({
+export const createRows = (data: InventoryType[]): { id: string; cells: React.ReactNode }[] =>
+  data.map(({ id, source, name }: InventoryType) => ({
     id,
     cells: [
       <React.Fragment key={`${id}-checkbox`}>
@@ -30,7 +33,7 @@ export const createRows = (data) =>
       <Fragment key={`[inventory-${id}`}>
         <Link
           to={{
-            pathname: `/inventories/inventory/${id}`,
+            pathname: `/inventories/${id}/details`,
           }}
         >
           {name}
