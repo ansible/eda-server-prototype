@@ -103,8 +103,7 @@ task dev:ui:start
 
 ### 7. Accessing the UI
 
-1. Load a set of RBAC users and roles
-   Loading From config file: tools/initial_data.yml 
+1. Load a set of RBAC users and roles (config file: tools/initial_data.yml) 
 
 Defaults from config file
 ```yaml
