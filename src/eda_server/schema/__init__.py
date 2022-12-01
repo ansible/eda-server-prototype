@@ -44,6 +44,7 @@ from .job import (
     JobInstanceCreate,
     JobInstanceEventsRead,
     JobInstanceRead,
+    JobRef,
 )
 from .message import ProducerMessage, ProducerResponse
 from .playbook import PlaybookRead, PlaybookRef
@@ -110,6 +111,7 @@ __all__ = [
     "JobInstanceBaseRead",
     "JobInstanceRead",
     "JobInstanceEventsRead",
+    "JobRef",
     "ProducerMessage",
     "ProducerResponse",
     "PlaybookRef",
