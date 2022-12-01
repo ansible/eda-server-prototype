@@ -29,6 +29,11 @@ class JobInstanceBaseRead(JobInstanceCreate):
     uuid: StrictStr
 
 
+class JobRef(BaseModel):
+    id: int
+    name: Optional[str]
+
+
 class JobInstanceRead(BaseModel):
     id: int
     uuid: StrictStr

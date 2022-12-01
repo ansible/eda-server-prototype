@@ -32,6 +32,7 @@ usage() {
     log-info "stop-all            stop both the services and EDA UI"
     log-info "restart-all         restart both the services and EDA UI"
     log-info "add-dev-user        add dev user(defaults): user dev_user@redhat.com, password: none2tuff"
+    log-info "load-rbac-data      load in test RBAC users and roles"
     log-info "help                gives this usage output"
 }
 
@@ -81,8 +82,15 @@ check_uvicorn_status() {
 
 add-dev-user() {
   log-info "Adding dev user: ${DEV_USER}, pass: ${DEV_PASS}"
-  log-debug "scripts/adduser.py --password ${DEV_PASS} ${DEV_USER}"
-  "${DEV_SCRIPTS_PATH}"/adduser.py --password "${DEV_PASS}" "${DEV_USER}"
+  log-debug "${DEV_SCRIPTS_PATH}/adduser.py -S --password ${DEV_PASS} ${DEV_USER}"
+  "${DEV_SCRIPTS_PATH}"/adduser.py -S --password "${DEV_PASS}" "${DEV_USER}"
+}
+
+load-rbac-data() {
+  local data_file=tools/initial_data.yml
+  log-info "Loading RBAC data..."
+  log-debug "${DEV_SCRIPTS_PATH}/load_data.py ${data_file}"
+  "${DEV_SCRIPTS_PATH}"/load_data.py "${data_file}"
 }
 
 start-events-services() {
@@ -282,6 +290,8 @@ case ${ARG} in
     start-events-all ;;
   "ADD-DEV-USER")
     add-dev-user ;;
+  "LOAD-RBAC-DATA")
+    load-rbac-data ;;
  "HELP") usage ;;
  *) usage ;;
 esac
