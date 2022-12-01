@@ -12,7 +12,8 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-from fastapi import APIRouter
+import yaml
+from fastapi import APIRouter, Request, Response
 
 from . import (
     activation,
@@ -44,3 +45,15 @@ router.include_router(task.router)
 router.include_router(user.router)
 router.include_router(ssh.router)
 router.include_router(websocket.router)
+
+
+OPENAPI_YAML_CACHE = None
+
+
+@router.get("/api/openapi.yml", include_in_schema=False)
+async def openapi_yaml(request: Request) -> Response:
+    global OPENAPI_YAML_CACHE
+    if OPENAPI_YAML_CACHE is None:
+        OPENAPI_YAML_CACHE = yaml.dump(request.app.openapi())
+
+    return Response(OPENAPI_YAML_CACHE, media_type="text/yaml")
