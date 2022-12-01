@@ -95,7 +95,7 @@ task dev:api:start
 
 ### 6. User interface
 
-Build UI files:
+Start webpack server:
 
 ```shell
 task dev:ui:start
@@ -103,11 +103,29 @@ task dev:ui:start
 
 ### 7. Accessing the UI
 
-1. Create a dev superuser account
-   Defaults: user: dev_user@redhat.com, password: none2tuff
+1. Load a set of RBAC users and roles (config file: tools/initial_data.yml) 
+
+Defaults from config file
+```yaml
+users:
+  - email: 'root@example.com'
+    password: 'secret'
+    is_superuser: true
+
+  - email: 'admin@example.com'
+    password: 'secret'
+    roles: ['admin']
+
+  - email: 'manager@example.com'
+    password: 'secret'
+    roles: ['manager']
+
+  - email: 'bob@example.com'
+    password: 'secret'
+```
 
 ```shell
-task dev:user:add
+task dev:rbac:loaddata
 ```
 
 2. You can now login to the UI at <http://localhost:8080/eda/>.
