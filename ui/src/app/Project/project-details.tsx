@@ -12,9 +12,7 @@ const ProjectDetails: React.FunctionComponent<{ project: ProjectType | undefined
   project: ProjectType | undefined;
 }) => {
   const intl = useIntl();
-  const renderFlexProjectDetails: React.FunctionComponent<ProjectType | undefined> = (
-    project: ProjectType | undefined
-  ) => (
+  const renderFlexProjectDetails = (project: ProjectType | undefined): JSX.Element => (
     <Flex>
       <Flex direction={{ default: 'column' }} flex={{ default: 'flex_1' }}>
         <FlexItem>
