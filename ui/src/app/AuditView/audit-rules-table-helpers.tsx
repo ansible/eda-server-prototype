@@ -3,41 +3,41 @@ import { Link } from 'react-router-dom';
 import { Text, TextVariants } from '@patternfly/react-core';
 
 export const createRows = (data) =>
-  data.map(({ id, name, job, job_id, status, ruleset, ruleset_id, last_fired_at }) => ({
-    id,
+  data.map(({ rule, job, status, ruleset, fired_date }) => ({
+    rule,
     cells: [
-      <Fragment key={`[audit-rule-${id}`}>
+      <Fragment key={`[audit-rule-${rule?.id}`}>
         <Link
           to={{
-            pathname: `/rule/${id}`,
+            pathname: `/rule/${rule?.id}`,
           }}
         >
-          {name || id}
+          {rule?.name || rule?.id}
         </Link>
       </Fragment>,
-      <Fragment key={`[audit-job-${job_id}`}>
+      <Fragment key={`[audit-job-${job?.id}`}>
         <Link
           to={{
-            pathname: `/job/${job_id}`,
+            pathname: `/job/${job?.id}`,
           }}
         >
-          {job || job_id}
+          {job?.name || job?.id}
         </Link>
       </Fragment>,
       status,
-      <Fragment key={`[audit-ruleset-${ruleset_id}`}>
+      <Fragment key={`[audit-ruleset-${ruleset?.id}`}>
         <Link
           to={{
-            pathname: `/ruleset/${ruleset_id}`,
+            pathname: `/ruleset/${ruleset?.id}`,
           }}
         >
-          {ruleset || ruleset_id}
+          {ruleset?.name || ruleset?.id}
         </Link>
       </Fragment>,
-      <Fragment key={`[audit-last_fired-${id}`}>
+      <Fragment key={`[audit-last_fired-${rule?.id}`}>
         <Text component={TextVariants.small}>
           {new Intl.DateTimeFormat('en-US', { dateStyle: 'short', timeStyle: 'long' }).format(
-            new Date(last_fired_at || 0)
+            new Date(fired_date || 0)
           )}
         </Text>
       </Fragment>,

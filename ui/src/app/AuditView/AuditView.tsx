@@ -6,8 +6,8 @@ import AppTabs from '@app/shared/app-tabs';
 import { TopToolbar } from '@app/shared/top-toolbar';
 import { AnyObject, TabItemType } from '@app/shared/types/common-types';
 import sharedMessages from '../messages/shared.messages';
-import {AuditRules} from "@app/AuditView/audit-rules";
-import {AuditHosts} from "@app/AuditView/audit-hosts";
+import { AuditRules } from '@app/AuditView/audit-rules';
+import { AuditHosts } from '@app/AuditView/audit-hosts';
 
 export interface AuditRuleType {
   id: string;
@@ -21,13 +21,11 @@ export interface AuditRuleType {
 }
 
 export interface AuditHostType {
-  name: string;
-  rule: string;
-  rule_name: string;
+  rule: { id: string; name: string };
+  job?: { id: string; name: string };
+  ruleset?: { id: string; name: string };
   status: string;
-  ruleset: string;
-  ruleset_name: string;
-  fired_at?: string;
+  fired_date?: string;
 }
 
 const buildAuditTabs = (intl: AnyObject): TabItemType[] => [
@@ -58,10 +56,10 @@ const AuditView: React.FunctionComponent = () => {
       </TopToolbar>
       <Switch>
         <Route exact path="/audit/hosts">
-          <AuditHosts/>
+          <AuditHosts />
         </Route>
         <Route path="/audit">
-          <AuditRules/>
+          <AuditRules />
         </Route>
       </Switch>
     </React.Fragment>
