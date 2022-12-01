@@ -38,6 +38,7 @@ usage() {
     log-info "\t clean                         remove deployment directory and all EDA resource from minikube"
     log-info "\t port-forward-ui <port>        forward local port to Events UI (default: 8080)"
     log-info "\t add-dev-user                  add user: dev_user@redhat.com, password: none2tuff"
+    log-info "\t load-rbac-data                load up RBAC users and roles"
     log-info "\t help                          show usage"
 }
 
@@ -168,12 +169,20 @@ port-forward-ui() {
 
 add-dev-user() {
   local user="dev_user@redhat.com"
-  local password="none2tuff"
   local eda_server_pod_name=$(kubectl get pod -l app=eda-server -o jsonpath="{.items[0].metadata.name}")
 
   log-info "Adding development admin user: dev_user@redhat.com"
   log-debug "kubectl exec "${eda_server_pod_name}" -- scripts/adduser.py -S --password "${password}" "${user}""
   kubectl exec "${eda_server_pod_name}" -- scripts/adduser.py -S --password "${password}" "${user}"
+}
+
+load-rbac-data() {
+  local data_file=tools/initial_data.yml
+  local eda_server_pod_name=$(kubectl get pod -l app=eda-server -o jsonpath="{.items[0].metadata.name}")
+
+  log-info "Adding development admin user: dev_user@redhat.com"
+  log-debug "kubectl exec "${eda_server_pod_name}" -- scripts/load_data.py ${data_file}"
+  kubectl exec "${eda_server_pod_name}" -- scripts/load_data.py "${data_file}"
 }
 
 #
@@ -185,6 +194,7 @@ case ${CMD} in
   "deploy") deploy "${VERSION}" ;;
   "port-forward-ui") port-forward-ui "${UI_LOCAL_PORT}" ;;
   "add-dev-user") add-dev-user ;;
+  "load-rbac-data") load-rbac-data ;;
   "help") usage ;;
    *) usage ;;
 esac
