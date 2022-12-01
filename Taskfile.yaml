@@ -96,13 +96,6 @@ tasks:
         vars:
           CLI_ARGS: db-migrations
 
-  dev:user:add:
-    desc: "Add development user"
-    cmds:
-      - task: dev
-        vars:
-          CLI_ARGS: add-dev-user
-
   dev:rbac:loaddata:
     desc: "Load RBAC user and roles from tools/initial_data.yml file"
     cmds:

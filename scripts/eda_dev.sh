@@ -82,8 +82,8 @@ check_uvicorn_status() {
 
 add-dev-user() {
   log-info "Adding dev user: ${DEV_USER}, pass: ${DEV_PASS}"
-  log-debug "${DEV_SCRIPTS_PATH}/adduser.py --password ${DEV_PASS} ${DEV_USER}"
-  "${DEV_SCRIPTS_PATH}"/adduser.py --password "${DEV_PASS}" "${DEV_USER}"
+  log-debug "${DEV_SCRIPTS_PATH}/adduser.py -S --password ${DEV_PASS} ${DEV_USER}"
+  "${DEV_SCRIPTS_PATH}"/adduser.py -S --password "${DEV_PASS}" "${DEV_USER}"
 }
 
 load-rbac-data() {
