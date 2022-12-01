@@ -1,7 +1,7 @@
 import { getAxiosInstance } from '@app/API/baseApi';
 import { AxiosResponse } from 'axios';
 
-const extravarsEndpoint = '/api/extra_vars';
+const extravarsEndpoint = '/api/extra_vars/';
 const extravarEndpoint = '/api/extra_var';
 
 export const listExtraVars = (): Promise<AxiosResponse> => getAxiosInstance().get(extravarsEndpoint);
