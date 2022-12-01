@@ -205,13 +205,6 @@ tasks:
         vars:
           CLI_ARGS: add-dev-user
 
-  docker:rbac:loaddata:
-    desc: "Load RBAC user and roles from tools/initial_data.yml file"
-    cmds:
-      - task: dev
-        vars:
-          CLI_ARGS: load-rbac-data
-
   minikube:
     desc: "Run eda_kube.sh with specified CLI arguments."
     summary: |
