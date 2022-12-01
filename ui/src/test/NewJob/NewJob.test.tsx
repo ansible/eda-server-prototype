@@ -26,7 +26,7 @@ describe('NewJob', () => {
   });
 
   it('should render the New Job form', async () => {
-    mockApi.onGet(`/api/extra_vars`).replyOnce(200, [
+    mockApi.onGet(`/api/extra_vars/`).replyOnce(200, [
       { id: '1', name: 'Var 1' },
       { id: '2', name: 'Var 2' },
     ]);
@@ -34,7 +34,7 @@ describe('NewJob', () => {
       { id: '1', name: 'Inventory 1' },
       { id: '2', name: 'Inventory 2' },
     ]);
-    mockApi.onGet(`/api/playbooks`).replyOnce(200, [
+    mockApi.onGet(`/api/playbooks/`).replyOnce(200, [
       { id: '1', name: 'Playbook 1' },
       { id: '2', name: 'Playbook 2' },
       { id: '3', name: 'Playbook 3' },

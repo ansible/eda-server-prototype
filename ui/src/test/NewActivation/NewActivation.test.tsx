@@ -31,7 +31,7 @@ describe('NewActivation', () => {
       { id: '2', name: 'RuleBook 2' },
       { id: '3', name: 'RuleBook 3' },
     ]);
-    mockApi.onGet(`/api/extra_vars`).replyOnce(200, [
+    mockApi.onGet(`/api/extra_vars/`).replyOnce(200, [
       { id: '1', name: 'Var 1' },
       { id: '2', name: 'Var 2' },
     ]);
