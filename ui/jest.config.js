@@ -19,9 +19,14 @@ module.exports = {
     '\\.(css|less)$': '<rootDir>/__mocks__/styleMock.js',
     '\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$':
       '<rootDir>/__mocks__/fileMock.js',
+    'monaco-editor': '<rootDir>/node_modules/react-monaco-editor',
     '@app/(.*)': '<rootDir>/src/app/$1',
   },
-
+  transform: {
+    '^.+\\.jsx?$': 'babel-jest',
+    '^.+\\.tsx?$': 'ts-jest',
+  },
+  transformIgnorePatterns: ['node_modules/(?!react-monaco-editor|@react-hook/*|@patternfly/react-tokens)'],
   // A preset that is used as a base for Jest's configuration
   preset: 'ts-jest/presets/js-with-ts',
 
@@ -31,7 +36,7 @@ module.exports = {
   // The test environment that will be used for testing.
   testEnvironment: 'jsdom',
 
-  testURL: "http://localhost:8080",
+  testEnvironmentOptions: { url: 'http://localhost:8080' },
 
   // A list of paths to snapshot serializer modules Jest should use for snapshot testing
   snapshotSerializers: ['enzyme-to-json/serializer'],

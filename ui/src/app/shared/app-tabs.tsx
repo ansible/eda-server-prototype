@@ -9,8 +9,9 @@ export interface AppTabsProps {
     eventKey: number;
     title: React.ReactNode;
   }[];
+  defaultActive?: number;
 }
-const AppTabs: React.ComponentType<AppTabsProps> = ({ tabItems }) => {
+const AppTabs: React.ComponentType<AppTabsProps> = ({ tabItems, defaultActive = 1 }) => {
   const { push } = useHistory();
   const { pathname, search } = useLocation();
   const activeTab = tabItems.find(({ name }) => name.split('/').pop() === pathname.split('/').pop());
@@ -19,7 +20,7 @@ const AppTabs: React.ComponentType<AppTabsProps> = ({ tabItems }) => {
 
   return (
     <Tabs
-      activeKey={activeTab ? activeTab.eventKey : 1}
+      activeKey={activeTab ? activeTab.eventKey : defaultActive}
       onSelect={handleTabClick}
       style={{
         backgroundColor: 'var(--pf-global--palette--white)',

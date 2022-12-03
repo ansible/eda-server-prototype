@@ -1,0 +1,70 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`AuditHosts should render the AuditView component 1`] = `
+<ComponentWrapper
+  initialEntries={
+    [
+      "/audit",
+    ]
+  }
+>
+  <IntlProvider
+    defaultFormats={{}}
+    defaultLocale="en"
+    fallbackOnEmptyString={true}
+    formats={{}}
+    locale="en"
+    messages={{}}
+    onError={[Function]}
+    onWarn={[Function]}
+    textComponent={Symbol(react.fragment)}
+  >
+    <MemoryRouter
+      initialEntries={
+        [
+          "/audit",
+        ]
+      }
+      key="test"
+      keyLength={0}
+    >
+      <Router
+        history={
+          {
+            "action": "POP",
+            "block": [Function],
+            "canGo": [Function],
+            "createHref": [Function],
+            "entries": [
+              {
+                "hash": "",
+                "pathname": "/audit",
+                "search": "",
+                "state": undefined,
+              },
+            ],
+            "go": [Function],
+            "goBack": [Function],
+            "goForward": [Function],
+            "index": 0,
+            "length": 1,
+            "listen": [Function],
+            "location": {
+              "hash": "",
+              "pathname": "/audit",
+              "search": "",
+              "state": undefined,
+            },
+            "push": [Function],
+            "replace": [Function],
+          }
+        }
+      >
+        <Route
+          path="/audit/rules"
+        />
+      </Router>
+    </MemoryRouter>
+  </IntlProvider>
+</ComponentWrapper>
+`;

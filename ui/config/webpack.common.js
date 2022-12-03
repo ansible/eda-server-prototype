@@ -3,6 +3,8 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyPlugin = require('copy-webpack-plugin');
 const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 const Dotenv = require('dotenv-webpack');
+const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
+
 const BG_IMAGES_DIRNAME = 'bgimages';
 const ASSET_PATH = process.env.ASSET_PATH || '/eda/';
 module.exports = (env) => {
@@ -11,6 +13,7 @@ module.exports = (env) => {
       rules: [
         {
           test: /\.(tsx|ts|jsx|js)?$/,
+          exclude: /node_modules/,
           use: [
             {
               loader: 'ts-loader',
@@ -36,6 +39,9 @@ module.exports = (env) => {
       publicPath: ASSET_PATH,
     },
     plugins: [
+      new MonacoWebpackPlugin({
+        languages: ['yaml'],
+      }),
       new HtmlWebpackPlugin({
         template: path.resolve(__dirname, '../src', 'index.html'),
         applicationName: 'Event driven automation',
