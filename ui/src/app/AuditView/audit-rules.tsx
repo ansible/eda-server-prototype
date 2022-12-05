@@ -29,17 +29,6 @@ const columns = (intl) => [
   },
 ];
 
-const prepareChips = (filterValue, intl) =>
-  filterValue
-    ? [
-        {
-          category: intl.formatMessage(sharedMessages.name),
-          key: 'name',
-          chips: [{ name: filterValue, value: filterValue }],
-        },
-      ]
-    : [];
-
 const initialState = (filterValue = '') => ({
   filterValue,
   isFetching: false,
@@ -91,7 +80,6 @@ const AuditRules: React.FunctionComponent = () => {
     stateDispatch({ type: 'setFetching', payload: true });
     return listAuditRules(pagination)
       .then((data) => {
-        console.log('Debug - data', data);
         setAuditRules(data?.data);
         return stateDispatch({ type: 'setFetching', payload: false });
       })
@@ -103,7 +91,7 @@ const AuditRules: React.FunctionComponent = () => {
   }, []);
 
   useEffect(() => {
-    stateDispatch({ type: 'setRows', payload: createRows(auditRules) });
+    stateDispatch({ type: 'setRows', payload: createRows(auditRules, intl) });
   }, [auditRules]);
 
   const clearFilters = () => {

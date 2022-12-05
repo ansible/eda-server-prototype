@@ -7,7 +7,7 @@ import { useIntl } from 'react-intl';
 import { defaultSettings } from '@app/shared/pagination';
 import { createRows } from './audit-rule-events-table-helpers';
 import { CubesIcon } from '@patternfly/react-icons';
-import {listAuditRuleEvents} from '@app/API/Audit';
+import {listAuditRuleEvents, listAuditRuleHosts} from '@app/API/Audit';
 import {RuleType} from "@app/Rules/Rules";
 import {renderAuditRuleTabs} from "@app/AuditView/AuditRule";
 
@@ -32,17 +32,6 @@ const columns = (intl) => [
     title: intl.formatMessage(sharedMessages.timestamp),
   },
 ];
-
-const prepareChips = (filterValue, intl) =>
-  filterValue
-    ? [
-        {
-          category: intl.formatMessage(sharedMessages.name),
-          key: 'name',
-          chips: [{ name: filterValue, value: filterValue }],
-        },
-      ]
-    : [];
 
 const initialState = (filterValue = '') => ({
   filterValue,
@@ -89,8 +78,11 @@ const AuditRuleEvents: React.FunctionComponent<{ rule: RuleType }> = ({ rule }) 
   const intl = useIntl();
   const updateEvents = (pagination) => {
     stateDispatch({ type: 'setFetching', payload: true });
-    return listAuditRuleEvents(rule?.id, pagination)
-      .then(() => stateDispatch({ type: 'setFetching', payload: false }))
+    return listAuditRuleEvents(rule.id, pagination)
+      .then((data) => {
+        setEvents(data?.data);
+        return stateDispatch({ type: 'setFetching', payload: false });
+      })
       .catch(() => stateDispatch({ type: 'setFetching', payload: false }));
   };
 

@@ -1,15 +1,16 @@
 import React, { Fragment } from 'react';
 import { Link } from 'react-router-dom';
 import { Text, TextVariants } from '@patternfly/react-core';
+import {statusLabel} from "@app/utils/utils";
 
-export const createRows = (data) =>
+export const createRows = (data, intl) =>
   data.map(({ rule, job, status, ruleset, fired_date }) => ({
     rule,
     cells: [
       <Fragment key={`[audit-rule-${rule?.id}`}>
         <Link
           to={{
-            pathname: `/rule/${rule?.id}`,
+            pathname: `/audit-rule/${rule?.id}`,
           }}
         >
           {rule?.name || rule?.id}
@@ -24,7 +25,7 @@ export const createRows = (data) =>
           {job?.name || job?.id}
         </Link>
       </Fragment>,
-      status,
+      <Fragment key={`[audit-rule-hosts-${name}`}>{statusLabel({ text: status, intl: intl })}</Fragment>,
       <Fragment key={`[audit-ruleset-${ruleset?.id}`}>
         <Link
           to={{

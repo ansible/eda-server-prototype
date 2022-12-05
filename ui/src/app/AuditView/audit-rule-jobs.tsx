@@ -2,43 +2,27 @@ import { Button, PageSection } from '@patternfly/react-core';
 import React, { useEffect, useReducer, useState } from 'react';
 import { TableToolbarView } from '@app/shared/table-toolbar-view';
 import sharedMessages from '../messages/shared.messages';
-import { cellWidth } from '@patternfly/react-table';
 import TableEmptyState from '@app/shared/table-empty-state';
 import { useIntl } from 'react-intl';
 import { defaultSettings } from '@app/shared/pagination';
 import { createRows } from './audit-rule-jobs-table-helpers';
 import { CubesIcon } from '@patternfly/react-icons';
 import { JobType } from '@app/Job/Job';
-import { listAuditRuleJobs } from '@app/API/Audit';
-import {RuleType} from "@app/Rules/Rules";
-import {renderAuditRuleTabs} from "@app/AuditView/AuditRule";
+import {listAuditRuleJobs} from '@app/API/Audit';
+import { RuleType } from '@app/Rules/Rules';
+import { renderAuditRuleTabs } from '@app/AuditView/AuditRule';
 
 const columns = (intl) => [
   {
-    title: intl.formatMessage(sharedMessages.jobs),
-    transforms: [cellWidth(40)],
+    title: intl.formatMessage(sharedMessages.name),
   },
   {
     title: intl.formatMessage(sharedMessages.status),
   },
   {
-    title: intl.formatMessage(sharedMessages.rule),
-  },
-  {
     title: intl.formatMessage(sharedMessages.lastFiredDate),
   },
 ];
-
-const prepareChips = (filterValue, intl) =>
-  filterValue
-    ? [
-        {
-          category: intl.formatMessage(sharedMessages.name),
-          key: 'name',
-          chips: [{ name: filterValue, value: filterValue }],
-        },
-      ]
-    : [];
 
 const initialState = (filterValue = '') => ({
   filterValue,
@@ -85,8 +69,11 @@ const AuditRuleJobs: React.FunctionComponent<{ rule: RuleType }> = ({ rule }) =>
   const intl = useIntl();
   const updateJobs = (pagination) => {
     stateDispatch({ type: 'setFetching', payload: true });
-    return listAuditRuleJobs(rule?.id, pagination)
-      .then(() => stateDispatch({ type: 'setFetching', payload: false }))
+    return listAuditRuleJobs(rule.id, pagination)
+      .then((data) => {
+        setJobs(data?.data);
+        return stateDispatch({ type: 'setFetching', payload: false });
+      })
       .catch(() => stateDispatch({ type: 'setFetching', payload: false }));
   };
 
@@ -95,7 +82,7 @@ const AuditRuleJobs: React.FunctionComponent<{ rule: RuleType }> = ({ rule }) =>
   }, []);
 
   useEffect(() => {
-    stateDispatch({ type: 'setRows', payload: createRows(jobs) });
+    stateDispatch({ type: 'setRows', payload: createRows(jobs, intl) });
   }, [jobs]);
 
   const clearFilters = () => {
