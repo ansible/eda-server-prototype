@@ -1,4 +1,4 @@
-import { Title } from '@patternfly/react-core';
+import { Skeleton, Title } from '@patternfly/react-core';
 import { Route, Switch, useLocation, useParams } from 'react-router-dom';
 import React, { useState, useEffect, ReactNode } from 'react';
 import { useIntl } from 'react-intl';
@@ -10,10 +10,10 @@ import { AuditRuleDetails } from '@app/AuditView/audit-rule-details';
 import sharedMessages from '../messages/shared.messages';
 import { AnyObject } from '@app/shared/types/common-types';
 import { fetchAuditRuleDetails } from '@app/API/Audit';
-import {AuditRuleJobs} from "@app/AuditView/audit-rule-jobs";
-import {AuditRuleHosts} from "@app/AuditView/audit-rule-hosts";
-import {RuleType} from "@app/Rules/Rules";
-import {AuditRuleEvents} from "@app/AuditView/audit-rule-events";
+import { AuditRuleJobs } from '@app/AuditView/audit-rule-jobs';
+import { AuditRuleHosts } from '@app/AuditView/audit-rule-hosts';
+import { RuleType } from '@app/Rules/Rules';
+import { AuditRuleEvents } from '@app/AuditView/audit-rule-events';
 
 interface TabItemType {
   eventKey: number;
@@ -50,15 +50,16 @@ const AuditRule: React.FunctionComponent = () => {
   const intl = useIntl();
 
   useEffect(() => {
-    fetchAuditRuleDetails(id).then((data) => setRule(data?.data));
-  }, []);
-
+    fetchAuditRuleDetails(id).then((data) => {
+      return setRule(data?.data);
+    });
+  }, [id]);
   const location = useLocation();
-  const currentTab = rule?.id
-    ? getTabFromPath(buildAuditRuleTabs(rule.id, intl), location.pathname)
+  const currentTab = id
+    ? getTabFromPath(buildAuditRuleTabs(id, intl), location.pathname)
     : intl.formatMessage(sharedMessages.details);
-  console.log('Debug - rule, location.pathname, currentTab', rule, location.pathname, currentTab);
-  return (
+
+  return rule ? (
     <React.Fragment>
       <TopToolbar
         breadcrumbs={[
@@ -70,7 +71,7 @@ const AuditRule: React.FunctionComponent = () => {
           {
             title: rule?.name || '',
             key: 'details',
-            to: `/audit-rule/${rule?.id}`,
+            to: `/audit-rule/${id}`,
           },
           {
             title: currentTab || intl.formatMessage(sharedMessages.details),
@@ -80,23 +81,23 @@ const AuditRule: React.FunctionComponent = () => {
       >
         <Title headingLevel={'h2'}>{`${rule?.name}`}</Title>
       </TopToolbar>
-      {rule && (
-        <Switch>
-          <Route exact path="/audit-rule/:id/jobs">
-            <AuditRuleJobs rule={rule} />
-          </Route>
-          <Route exact path="/audit-rule/:id/hosts">
-            <AuditRuleHosts rule={rule} />
-          </Route>
-          <Route exact path="/audit-rule/:id/events">
-            <AuditRuleEvents rule={rule} />
-          </Route>
-          <Route path="/audit-rule/:id">
-            <AuditRuleDetails rule={rule} />
-          </Route>
-        </Switch>
-      )}
+      <Switch>
+        <Route exact path="/audit-rule/:id/jobs">
+          <AuditRuleJobs rule={rule} />
+        </Route>
+        <Route exact path="/audit-rule/:id/hosts">
+          <AuditRuleHosts rule={rule} />
+        </Route>
+        <Route exact path="/audit-rule/:id/events">
+          <AuditRuleEvents rule={rule} />
+        </Route>
+        <Route path="/audit-rule/:id">
+          <AuditRuleDetails rule={rule} />
+        </Route>
+      </Switch>
     </React.Fragment>
+  ) : (
+    <Skeleton />
   );
 };
 

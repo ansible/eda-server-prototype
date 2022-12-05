@@ -35,6 +35,7 @@ export interface RuleType {
   id: string;
   name?: string;
   action?: AnyObject;
+  activation?: { id: string; name: string };
   description?: string;
   ruleset?: RuleSetType;
   type?: string;
@@ -44,7 +45,10 @@ export interface RuleType {
   created_at?: string;
   modified_at?: string;
   last_fired_date?: string;
+  fired_date?: string;
   extra_var_id?: string;
+  definition?: string;
+  status?: string;
 }
 
 export interface RuleSetType {

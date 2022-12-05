@@ -1,8 +1,9 @@
 import React, { Fragment } from 'react';
 import { Link } from 'react-router-dom';
+import { statusLabel } from '@app/utils/utils';
 
-export const createRows = (data) =>
-  data.map(({ id, name, status, last_fired_at }) => ({
+export const createRows = (data, intl) =>
+  data.map(({ id, name, status, last_fired_date }) => ({
     id,
     cells: [
       <Fragment key={`[job-${id}`}>
@@ -14,7 +15,7 @@ export const createRows = (data) =>
           {name || id}
         </Link>
       </Fragment>,
-      status,
-      last_fired_at,
+      <Fragment key={`[audit-rule-jobs-${name}`}>{statusLabel({ text: status, intl: intl })}</Fragment>,
+      last_fired_date,
     ],
   }));

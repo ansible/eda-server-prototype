@@ -1,6 +1,6 @@
 import {
   Card,
-  CardBody,
+  CardBody, CodeBlock, CodeBlockCode,
   Flex,
   FlexItem,
   Grid,
@@ -8,22 +8,23 @@ import {
   PageSection,
   Stack,
   StackItem,
+  Text,
+  TextVariants,
   Title,
   ToggleGroup,
   ToggleGroupItem,
 } from '@patternfly/react-core';
-import { Link } from 'react-router-dom';
-import React, { useState, useEffect } from 'react';
+import { Link, useParams } from 'react-router-dom';
+import React, { useState, useEffect, Fragment } from 'react';
 import ReactJsonView from 'react-json-view';
 import AceEditor from 'react-ace';
 import 'ace-builds/src-noconflict/mode-yaml';
 import 'ace-builds/src-noconflict/theme-xcode';
 import styled from 'styled-components';
 import { RuleType } from '@app/RuleSets/RuleSets';
-import { ExtraVarType } from '@app/Vars/Vars';
 import { useIntl } from 'react-intl';
-import { fetchRuleVars } from '@app/API/Extravar';
-import {renderAuditRuleTabs} from "@app/AuditView/AuditRule";
+import { renderAuditRuleTabs } from '@app/AuditView/AuditRule';
+import { statusLabel } from '@app/utils/utils';
 
 const FocusWrapper = styled.div`
   && + .keyboard-help-text {
@@ -39,16 +40,9 @@ const FocusWrapper = styled.div`
 `;
 
 const AuditRuleDetails: React.FunctionComponent<{ rule: RuleType }> = ({ rule }) => {
-  const [ruleVars, setRuleVars] = useState<ExtraVarType | undefined>(undefined);
   const [varFormat, setVarFormat] = useState('yaml');
-  const id = rule?.id;
   const intl = useIntl();
-
-  useEffect(() => {
-    rule?.extra_var_id
-      ? fetchRuleVars(rule.extra_var_id).then((data) => setRuleVars(data?.data))
-      : setRuleVars(undefined);
-  }, [rule]);
+  const { id } = useParams<{ id: string }>();
 
   const handleToggleVarFormat = (_, event) => {
     const id = event.currentTarget.id;
@@ -71,11 +65,13 @@ const AuditRuleDetails: React.FunctionComponent<{ rule: RuleType }> = ({ rule })
             <FlexItem>
               <Stack>
                 <StackItem>
-                  <Title headingLevel="h3">Action</Title>
+                  <Title headingLevel="h3">Activation</Title>
                 </StackItem>
-                {rule && rule.action && (
+                {rule && rule.activation && (
                   <StackItem>
-                    <Link to={'/jobs'}>{rule?.action ? Object.keys(rule?.action) : 'Link to action'}</Link>
+                    <Link to={`activation/${rule.activation.id}`}>
+                      {rule?.activation ? rule?.activation.name : 'Link to activation'}
+                    </Link>
                   </StackItem>
                 )}
               </Stack>
@@ -83,17 +79,15 @@ const AuditRuleDetails: React.FunctionComponent<{ rule: RuleType }> = ({ rule })
             <FlexItem>
               <Stack>
                 <StackItem>
-                  <Title headingLevel="h3">Last fired date</Title>
+                  <Title headingLevel="h3">Fired date</Title>
                 </StackItem>
-                <StackItem>{rule?.last_fired_date}</StackItem>
-              </Stack>
-            </FlexItem>
-            <FlexItem>
-              <Stack>
                 <StackItem>
-                  <Title headingLevel="h3">Last modified</Title>
+                  <Text component={TextVariants.small}>
+                    {new Intl.DateTimeFormat('en-US', { dateStyle: 'short', timeStyle: 'long' }).format(
+                      new Date(rule?.fired_date || 0)
+                    )}
+                  </Text>
                 </StackItem>
-                <StackItem>{rule?.modified_at}</StackItem>
               </Stack>
             </FlexItem>
           </Flex>
@@ -109,30 +103,6 @@ const AuditRuleDetails: React.FunctionComponent<{ rule: RuleType }> = ({ rule })
             <FlexItem>
               <Stack>
                 <StackItem>
-                  <Title headingLevel="h3">Project</Title>
-                </StackItem>
-                {rule && rule.project_id && (
-                  <StackItem>
-                    <Link to={'/project/' + rule?.project_id}>
-                      {rule?.project_name || `Project ${rule?.project_id}`}
-                    </Link>
-                  </StackItem>
-                )}
-              </Stack>
-            </FlexItem>
-            <FlexItem>
-              <Stack>
-                <StackItem>
-                  <Title headingLevel="h3">Fire count</Title>
-                </StackItem>
-                <StackItem>{rule?.fired_count || 0}</StackItem>
-              </Stack>
-            </FlexItem>
-          </Flex>
-          <Flex direction={{ default: 'column' }} flex={{ default: 'flex_1' }}>
-            <FlexItem>
-              <Stack>
-                <StackItem>
                   <Title headingLevel="h3">Rule set</Title>
                 </StackItem>
                 {rule && rule.ruleset && (
@@ -142,12 +112,18 @@ const AuditRuleDetails: React.FunctionComponent<{ rule: RuleType }> = ({ rule })
                 )}
               </Stack>
             </FlexItem>
+          </Flex>
+          <Flex direction={{ default: 'column' }} flex={{ default: 'flex_1' }}>
             <FlexItem>
               <Stack>
                 <StackItem>
-                  <Title headingLevel="h3">Rule type</Title>
+                  <StackItem>
+                    <Title headingLevel="h3">Status</Title>
+                  </StackItem>
                 </StackItem>
-                <StackItem>{rule?.type}</StackItem>
+                <StackItem>
+                  <Fragment key={`[audit-rule-details-${rule?.name}`}>{statusLabel({ text: rule?.status, intl: intl })}</Fragment>
+                </StackItem>
               </Stack>
             </FlexItem>
             <FlexItem>
@@ -162,11 +138,11 @@ const AuditRuleDetails: React.FunctionComponent<{ rule: RuleType }> = ({ rule })
         </Flex>
       </StackItem>
       <StackItem>
-        <Stack hasGutter={true}>
+        <Stack hasGutter>
           <StackItem>
-            <Grid>
-              <GridItem span={1}>
-                <Title headingLevel="h3">Variables</Title>
+            <Grid hasGutter>
+              <GridItem span={2}>
+                <Title headingLevel="h3">Rule definition</Title>
               </GridItem>
               <GridItem span={2}>
                 <ToggleGroup isCompact aria-label="JsonYaml">
@@ -187,9 +163,10 @@ const AuditRuleDetails: React.FunctionComponent<{ rule: RuleType }> = ({ rule })
             </Grid>
           </StackItem>
           <StackItem>
-            {ruleVars ? (
+            {rule.definition ? (
               varFormat === 'json' ? (
-                <ReactJsonView displayObjectSize={false} displayDataTypes={false} quotesOnKeys={false} src={ruleVars} />
+                // @ts-ignore
+                <ReactJsonView displayObjectSize={false} displayDataTypes={false} quotesOnKeys={false} src={rule?.definition} />
               ) : (
                 <Card>
                   <FocusWrapper>
@@ -198,7 +175,7 @@ const AuditRuleDetails: React.FunctionComponent<{ rule: RuleType }> = ({ rule })
                       theme="xcode"
                       name="rule_extravars"
                       fontSize={14}
-                      value={ruleVars?.extra_var}
+                      value={JSON.stringify(rule?.definition)}
                       height={'100px'}
                       setOptions={{
                         enableBasicAutocompletion: false,

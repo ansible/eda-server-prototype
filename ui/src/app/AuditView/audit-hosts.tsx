@@ -28,17 +28,6 @@ const columns = (intl) => [
   },
 ];
 
-const prepareChips = (filterValue, intl) =>
-  filterValue
-    ? [
-        {
-          category: intl.formatMessage(sharedMessages.name),
-          key: 'name',
-          chips: [{ name: filterValue, value: filterValue }],
-        },
-      ]
-    : [];
-
 const initialState = (filterValue = '') => ({
   filterValue,
   isFetching: false,

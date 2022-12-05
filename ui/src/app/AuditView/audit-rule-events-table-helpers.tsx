@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import {Text, TextVariants} from "@patternfly/react-core";
 
 export const createRows = (data) =>
-  data.map(({ id, name, increment_counter, source_type, timestamp }) => ({
+  data.map(({ id, name, increment_counter, type, timestamp }) => ({
     id,
     cells: [
       <Fragment key={`[event-${id}`}>
@@ -16,7 +16,7 @@ export const createRows = (data) =>
         </Link>
       </Fragment>,
       increment_counter,
-      source_type,
+      type,
       <Fragment key={`[audit-rule-${id}-event`}>
         <Text component={TextVariants.small}>
           {new Intl.DateTimeFormat('en-US', { dateStyle: 'short', timeStyle: 'long' }).format(
