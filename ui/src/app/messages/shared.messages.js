@@ -114,6 +114,62 @@ const sharedMessages = defineMessages({
     id: 'shared.rule',
     defaultMessage: 'Rule',
   },
+  disabled: {
+    id: 'shared.disabled',
+    defaultMessage: 'Disabled',
+  },
+  failed: {
+    id: 'shared.failed',
+    defaultMessage: 'Failed',
+  },
+  skipped: {
+    id: 'shared.skipped',
+    defaultMessage: 'Skipped',
+  },
+  unreachable: {
+    id: 'shared.unreachable',
+    defaultMessage: 'Unreachable',
+  },
+  no_remaining: {
+    id: 'shared.no_remaining',
+    defaultMessage: 'No remaining',
+  },
+  polling: {
+    id: 'shared.polling',
+    defaultMessage: 'Polling',
+  },
+  async_ok: {
+    id: 'shared.async_ok',
+    defaultMessage: 'Async OK',
+  },
+  async_failure: {
+    id: 'shared.async_failure',
+    defaultMessage: 'Async failure',
+  },
+  retry: {
+    id: 'shared.retry',
+    defaultMessage: 'Retry',
+  },
+  no_hosts: {
+    id: 'shared.no_hosts',
+    defaultMessage: 'No hosts',
+  },
+  ok: {
+    id: 'shared.ok',
+    defaultMessage: 'OK',
+  },
+  success: {
+    id: 'shared.success',
+    defaultMessage: 'Success',
+  },
+  successful: {
+    id: 'shared.successful',
+    defaultMessage: 'Successful',
+  },
+  no_matched: {
+    id: 'shared.no_matched',
+    defaultMessage: 'No matched',
+  },
   clearAllFilters: {
     id: 'shared.clearAllFilters',
     defaultMessage: 'Clear all filters',

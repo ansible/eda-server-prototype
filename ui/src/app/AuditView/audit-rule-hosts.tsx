@@ -8,41 +8,23 @@ import { useIntl } from 'react-intl';
 import { defaultSettings } from '@app/shared/pagination';
 import { createRows } from './audit-rule-hosts-table-helpers';
 import { CubesIcon } from '@patternfly/react-icons';
-import {listAuditRuleHosts} from '@app/API/Audit';
-import {RuleType} from "@app/Rules/Rules";
-import {renderAuditRuleTabs} from "@app/AuditView/AuditRule";
+import {listAuditRuleHosts, listAuditRules} from '@app/API/Audit';
+import { RuleType } from '@app/Rules/Rules';
+import { renderAuditRuleTabs } from '@app/AuditView/AuditRule';
 
-export interface HostType{
+export interface HostType {
   name: string;
   status?: string;
 }
 
 const columns = (intl) => [
   {
-    title: intl.formatMessage(sharedMessages.jobs),
-    transforms: [cellWidth(40)],
+    title: intl.formatMessage(sharedMessages.name),
   },
   {
     title: intl.formatMessage(sharedMessages.status),
   },
-  {
-    title: intl.formatMessage(sharedMessages.rule),
-  },
-  {
-    title: intl.formatMessage(sharedMessages.lastFiredDate),
-  },
 ];
-
-const prepareChips = (filterValue, intl) =>
-  filterValue
-    ? [
-        {
-          category: intl.formatMessage(sharedMessages.name),
-          key: 'name',
-          chips: [{ name: filterValue, value: filterValue }],
-        },
-      ]
-    : [];
 
 const initialState = (filterValue = '') => ({
   filterValue,
@@ -89,8 +71,11 @@ const AuditRuleHosts: React.FunctionComponent<{ rule: RuleType }> = ({ rule }) =
   const intl = useIntl();
   const updateHosts = (pagination) => {
     stateDispatch({ type: 'setFetching', payload: true });
-    return listAuditRuleHosts(rule?.id, pagination)
-      .then(() => stateDispatch({ type: 'setFetching', payload: false }))
+    return listAuditRuleHosts(rule.id, pagination)
+      .then((data) => {
+        setHosts(data?.data);
+        return stateDispatch({ type: 'setFetching', payload: false });
+      })
       .catch(() => stateDispatch({ type: 'setFetching', payload: false }));
   };
 
@@ -99,7 +84,7 @@ const AuditRuleHosts: React.FunctionComponent<{ rule: RuleType }> = ({ rule }) =
   }, []);
 
   useEffect(() => {
-    stateDispatch({ type: 'setRows', payload: createRows(hosts) });
+    stateDispatch({ type: 'setRows', payload: createRows(hosts, intl) });
   }, [hosts]);
 
   const clearFilters = () => {
@@ -110,7 +95,6 @@ const AuditRuleHosts: React.FunctionComponent<{ rule: RuleType }> = ({ rule }) =
   const handleFilterChange = (value) => {
     !value || value === '' ? clearFilters() : stateDispatch({ type: 'setFilterValue', payload: value });
   };
-
   return (
     <PageSection page-type={'audit-rule-hosts'} id={'audit-rule-hosts'}>
       {renderAuditRuleTabs(rule?.id, intl)}
