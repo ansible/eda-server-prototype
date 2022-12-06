@@ -1,8 +1,6 @@
-import { FocusWrapper } from '@app/Activation/activation-details';
 import {
   ActionGroup,
   Button,
-  Card,
   FormGroup,
   Grid,
   GridItem,
@@ -16,10 +14,9 @@ import React, { useState } from 'react';
 import { ExclamationCircleIcon } from '@patternfly/react-icons';
 import { useIntl } from 'react-intl';
 import sharedMessages from '../../messages/shared.messages';
-import AceEditor from 'react-ace';
-
-// import 'ace-builds/src-noconflict/theme-kuroir';
 import { InventoryType } from '../inventory';
+import { EdaCodeEditor } from '@app/utils/EdaCodeEditor';
+import { Language } from '@patternfly/react-code-editor';
 
 function InventoryForm(props: {
   inventory?: InventoryType;
@@ -85,30 +82,14 @@ function InventoryForm(props: {
         </StackItem>
         <StackItem>
           <FormGroup isRequired label={intl.formatMessage(sharedMessages.inventory)} fieldId={`inventory-inventory`}>
-            <Card>
-              <FocusWrapper>
-                <AceEditor
-                  theme={'kuroir'}
-                  name="inventory_inventory"
-                  fontSize={16}
-                  value={inventoryVars}
-                  onChange={(e) => setInventoryVars(e)}
-                  height={'200px'}
-                  width={'100pct'}
-                  setOptions={{
-                    enableBasicAutocompletion: false,
-                    enableLiveAutocompletion: false,
-                    enableSnippets: false,
-                    showLineNumbers: true,
-                    tabSize: 2,
-                    focus: false,
-                    highlightActiveLine: false,
-                    cursorStart: 0,
-                    cursorStyle: undefined,
-                  }}
-                />
-              </FocusWrapper>
-            </Card>
+            <EdaCodeEditor
+              code={inventoryVars}
+              editMode={true}
+              setEditedCode={setInventoryVars}
+              language={Language.yaml}
+              width={'100%'}
+              height={'400'}
+            />
           </FormGroup>
         </StackItem>
         <StackItem>
@@ -118,7 +99,7 @@ function InventoryForm(props: {
               onClick={() => handleSubmit(name, inventoryVars, description)}
               isLoading={isSubmitting}
             >
-              {isSubmitting ? 'Submitting ' : 'Submit'}
+              {isSubmitting ? 'Saving ' : 'Save'}
             </Button>
             <Button variant="link" onClick={() => history.push('/inventories')}>
               Cancel

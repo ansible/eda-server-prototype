@@ -99,7 +99,6 @@
     "@redhat-cloud-services/frontend-components-notifications": "^3.2.9",
     "@redhat-cloud-services/frontend-components-utilities": "^3.3.1",
     "@storybook/builder-webpack5": "^6.2.9",
-    "ace-builds": "^1.13.1",
     "axios": "^0.27.2",
     "css-loader": "^6.7.1",
     "react": "^17.0.2",
