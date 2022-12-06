@@ -221,7 +221,7 @@ start-events-api() {
   log-info "Starting API (eda-server)"
   cd "${EDA_PROJECT_HOME}"
   log-debug "eda-server &"
-  eda-server &
+  eda-server --reload &
 }
 
 # shellcheck disable=SC2046

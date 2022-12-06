@@ -12,15 +12,31 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
+import argparse
+
 import uvicorn
 
 from .config import default_log_config, load_settings
 
 
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "-r",
+        "--reload",
+        action="store_true",
+        help="Enable Auto-reload",
+        default=False,
+    )
+    return parser.parse_args()
+
+
 def main():
     settings = load_settings()
+    args = parse_args()
     uvicorn.run(
         "eda_server.app:create_app",
+        reload=args.reload,
         factory=True,
         host=settings.host,
         port=settings.port,
