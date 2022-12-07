@@ -25,7 +25,11 @@ from eda_server.db.dependency import get_db_session
 from eda_server.db.models.inventory import inventories
 from eda_server.db.models.project import extra_vars, playbooks, projects
 from eda_server.db.models.rulebook import rulebooks
-from eda_server.project import GitCommandFailed, import_project
+from eda_server.project import (
+    GitCommandFailed,
+    import_project,
+    sync_existing_project,
+)
 from eda_server.types import Action, ResourceType
 
 router = APIRouter()
@@ -82,6 +86,32 @@ async def create_project(
         )
     await db.commit()
     return project
+
+
+@router.post(
+    "/api/projects/{project_id}",
+    operation_id="sync_project",
+    status_code=status.HTTP_200_OK,
+    tags=["projects"],
+    dependencies=[
+        Depends(requires_permission(ResourceType.PROJECT, Action.UPDATE))
+    ],
+)
+async def sync_project(
+    project_id: int, db: AsyncSession = Depends(get_db_session)
+):
+    project = (
+        await db.execute(
+            sa.select(projects).where(projects.c.id == project_id)
+        )
+    ).first()
+    if not project:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Project Not Found."
+        )
+
+    await sync_existing_project(db, project)
+    await db.commit()
 
 
 @router.get(
