@@ -5,12 +5,16 @@ import sharedMessages from '../messages/shared.messages';
 import TableEmptyState from '@app/shared/table-empty-state';
 import { useIntl } from 'react-intl';
 import { defaultSettings } from '@app/shared/pagination';
-import { createRows } from './audit-rule-jobs-table-helpers';
+import { createRows } from './actions-rule-hosts-table-helpers';
 import { CubesIcon } from '@patternfly/react-icons';
-import { JobType } from '@app/Job/Job';
-import {listAuditRuleJobs} from '@app/API/Audit';
+import {listActionsRuleHosts} from '@app/API/Actions';
 import { RuleType } from '@app/Rules/Rules';
-import { renderAuditRuleTabs } from '@app/AuditView/AuditRule';
+import { renderActionsRuleTabs } from '@app/Actions/ActionsRule';
+
+export interface HostType {
+  name: string;
+  status?: string;
+}
 
 const columns = (intl) => [
   {
@@ -18,9 +22,6 @@ const columns = (intl) => [
   },
   {
     title: intl.formatMessage(sharedMessages.status),
-  },
-  {
-    title: intl.formatMessage(sharedMessages.lastFiredDate),
   },
 ];
 
@@ -32,7 +33,7 @@ const initialState = (filterValue = '') => ({
 });
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-export const jobsListState = (state, action) => {
+export const hostsListState = (state, action) => {
   switch (action.type) {
     case 'setRows':
       return {
@@ -58,60 +59,59 @@ export const jobsListState = (state, action) => {
   }
 };
 
-const AuditRuleJobs: React.FunctionComponent<{ rule: RuleType }> = ({ rule }) => {
+const ActionsRuleHosts: React.FunctionComponent<{ rule: RuleType }> = ({ rule }) => {
   const [limit, setLimit] = useState(defaultSettings.limit);
   const [offset, setOffset] = useState(1);
-  const [jobs, setJobs] = useState<JobType[]>([]);
+  const [hosts, setHosts] = useState<HostType[]>([]);
 
-  const meta = { count: jobs?.length || 0, limit, offset };
-  const [{ filterValue, isFetching, isFiltering, rows }, stateDispatch] = useReducer(jobsListState, initialState());
+  const meta = { count: hosts?.length || 0, limit, offset };
+  const [{ filterValue, isFetching, isFiltering, rows }, stateDispatch] = useReducer(hostsListState, initialState());
 
   const intl = useIntl();
-  const updateJobs = (pagination) => {
+  const updateHosts = (pagination) => {
     stateDispatch({ type: 'setFetching', payload: true });
-    return listAuditRuleJobs(rule.id, pagination)
+    return listActionsRuleHosts(rule.id, pagination)
       .then((data) => {
-        setJobs(data?.data);
+        setHosts(data?.data);
         return stateDispatch({ type: 'setFetching', payload: false });
       })
       .catch(() => stateDispatch({ type: 'setFetching', payload: false }));
   };
 
   useEffect(() => {
-    updateJobs(defaultSettings);
+    updateHosts(defaultSettings);
   }, []);
 
   useEffect(() => {
-    stateDispatch({ type: 'setRows', payload: createRows(jobs, intl) });
-  }, [jobs]);
+    stateDispatch({ type: 'setRows', payload: createRows(hosts, intl) });
+  }, [hosts]);
 
   const clearFilters = () => {
     stateDispatch({ type: 'clearFilters' });
-    return updateJobs(meta);
+    return updateHosts(meta);
   };
 
   const handleFilterChange = (value) => {
     !value || value === '' ? clearFilters() : stateDispatch({ type: 'setFilterValue', payload: value });
   };
-
   return (
-    <PageSection page-type={'audit-rule-jobs'} id={'audit-rule-jobs'}>
-      {renderAuditRuleTabs(rule?.id, intl)}
+    <PageSection page-type={'actions-rule-hosts'} id={'actions-rule-hosts'}>
+      {renderActionsRuleTabs(rule?.id, intl)}
       <TableToolbarView
-        ouiaId={'audit-rule-jobs-table'}
+        ouiaId={'actions-rule-hosts-table'}
         rows={rows}
         setLimit={setLimit}
         setOffset={setOffset}
         columns={columns(intl)}
-        fetchData={updateJobs}
+        fetchData={updateHosts}
         pagination={defaultSettings}
-        plural={intl.formatMessage(sharedMessages.jobs)}
-        singular={intl.formatMessage(sharedMessages.job)}
+        plural={intl.formatMessage(sharedMessages.hosts)}
+        singular={intl.formatMessage(sharedMessages.host)}
         isLoading={isFetching || isFiltering}
         onFilterChange={handleFilterChange}
         renderEmptyState={() => (
           <TableEmptyState
-            title={intl.formatMessage(sharedMessages.noauditrulejobs)}
+            title={intl.formatMessage(sharedMessages.noactionsrulehosts)}
             Icon={CubesIcon}
             PrimaryAction={() =>
               filterValue !== '' ? (
@@ -122,7 +122,7 @@ const AuditRuleJobs: React.FunctionComponent<{ rule: RuleType }> = ({ rule }) =>
             }
             description={
               filterValue === ''
-                ? intl.formatMessage(sharedMessages.noauditrulejobs)
+                ? intl.formatMessage(sharedMessages.noactionsrulehosts)
                 : intl.formatMessage(sharedMessages.clearAllFiltersDescription)
             }
           />
@@ -132,4 +132,4 @@ const AuditRuleJobs: React.FunctionComponent<{ rule: RuleType }> = ({ rule }) =>
   );
 };
 
-export { AuditRuleJobs };
+export { ActionsRuleHosts };

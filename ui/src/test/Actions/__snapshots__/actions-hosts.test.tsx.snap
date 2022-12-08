@@ -1,10 +1,10 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`AuditHosts should render the AuditView component 1`] = `
+exports[`ActionsHosts should render the ActionsView component 1`] = `
 <ComponentWrapper
   initialEntries={
     [
-      "/audit",
+      "/actions",
     ]
   }
 >
@@ -22,7 +22,7 @@ exports[`AuditHosts should render the AuditView component 1`] = `
     <MemoryRouter
       initialEntries={
         [
-          "/audit",
+          "/actions",
         ]
       }
       key="test"
@@ -38,7 +38,7 @@ exports[`AuditHosts should render the AuditView component 1`] = `
             "entries": [
               {
                 "hash": "",
-                "pathname": "/audit",
+                "pathname": "/actions",
                 "search": "",
                 "state": undefined,
               },
@@ -51,7 +51,7 @@ exports[`AuditHosts should render the AuditView component 1`] = `
             "listen": [Function],
             "location": {
               "hash": "",
-              "pathname": "/audit",
+              "pathname": "/actions",
               "search": "",
               "state": undefined,
             },
@@ -61,7 +61,7 @@ exports[`AuditHosts should render the AuditView component 1`] = `
         }
       >
         <Route
-          path="/audit/rules"
+          path="/actions/rules"
         />
       </Router>
     </MemoryRouter>

@@ -17,7 +17,7 @@ export const createRows = (data) =>
       </Fragment>,
       increment_counter,
       type,
-      <Fragment key={`[audit-rule-${id}-event`}>
+      <Fragment key={`[actions-rule-${id}-event`}>
         <Text component={TextVariants.small}>
           {new Intl.DateTimeFormat('en-US', { dateStyle: 'short', timeStyle: 'long' }).format(
             new Date(timestamp || 0)

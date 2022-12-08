@@ -2,19 +2,20 @@ import { Button, PageSection } from '@patternfly/react-core';
 import React, { useEffect, useReducer, useState } from 'react';
 import { TableToolbarView } from '@app/shared/table-toolbar-view';
 import sharedMessages from '../messages/shared.messages';
-import { cellWidth } from '@patternfly/react-table';
 import TableEmptyState from '@app/shared/table-empty-state';
 import { useIntl } from 'react-intl';
 import { defaultSettings } from '@app/shared/pagination';
-import { createRows } from './audit-rule-hosts-table-helpers';
+import { createRows } from './actions-rule-events-table-helpers';
 import { CubesIcon } from '@patternfly/react-icons';
-import {listAuditRuleHosts, listAuditRules} from '@app/API/Audit';
-import { RuleType } from '@app/Rules/Rules';
-import { renderAuditRuleTabs } from '@app/AuditView/AuditRule';
+import {listActionsRuleEvents} from '@app/API/Actions';
+import {RuleType} from "@app/Rules/Rules";
+import {renderActionsRuleTabs} from "@app/Actions/ActionsRule";
 
-export interface HostType {
+export interface EventType {
   name: string;
-  status?: string;
+  increment_counter?: string;
+  source_type?: string;
+  time_stamp?: string;
 }
 
 const columns = (intl) => [
@@ -22,7 +23,13 @@ const columns = (intl) => [
     title: intl.formatMessage(sharedMessages.name),
   },
   {
-    title: intl.formatMessage(sharedMessages.status),
+    title: intl.formatMessage(sharedMessages.increment_counter),
+  },
+  {
+    title: intl.formatMessage(sharedMessages.source_type),
+  },
+  {
+    title: intl.formatMessage(sharedMessages.timestamp),
   },
 ];
 
@@ -34,7 +41,7 @@ const initialState = (filterValue = '') => ({
 });
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-export const hostsListState = (state, action) => {
+export const eventsListState = (state, action) => {
   switch (action.type) {
     case 'setRows':
       return {
@@ -60,59 +67,60 @@ export const hostsListState = (state, action) => {
   }
 };
 
-const AuditRuleHosts: React.FunctionComponent<{ rule: RuleType }> = ({ rule }) => {
+const ActionsRuleEvents: React.FunctionComponent<{ rule: RuleType }> = ({ rule }) => {
   const [limit, setLimit] = useState(defaultSettings.limit);
   const [offset, setOffset] = useState(1);
-  const [hosts, setHosts] = useState<HostType[]>([]);
+  const [events, setEvents] = useState<EventType[]>([]);
 
-  const meta = { count: hosts?.length || 0, limit, offset };
-  const [{ filterValue, isFetching, isFiltering, rows }, stateDispatch] = useReducer(hostsListState, initialState());
+  const meta = { count: events?.length || 0, limit, offset };
+  const [{ filterValue, isFetching, isFiltering, rows }, stateDispatch] = useReducer(eventsListState, initialState());
 
   const intl = useIntl();
-  const updateHosts = (pagination) => {
+  const updateEvents = (pagination) => {
     stateDispatch({ type: 'setFetching', payload: true });
-    return listAuditRuleHosts(rule.id, pagination)
+    return listActionsRuleEvents(rule.id, pagination)
       .then((data) => {
-        setHosts(data?.data);
+        setEvents(data?.data);
         return stateDispatch({ type: 'setFetching', payload: false });
       })
       .catch(() => stateDispatch({ type: 'setFetching', payload: false }));
   };
 
   useEffect(() => {
-    updateHosts(defaultSettings);
+    updateEvents(defaultSettings);
   }, []);
 
   useEffect(() => {
-    stateDispatch({ type: 'setRows', payload: createRows(hosts, intl) });
-  }, [hosts]);
+    stateDispatch({ type: 'setRows', payload: createRows(events) });
+  }, [events]);
 
   const clearFilters = () => {
     stateDispatch({ type: 'clearFilters' });
-    return updateHosts(meta);
+    return updateEvents(meta);
   };
 
   const handleFilterChange = (value) => {
     !value || value === '' ? clearFilters() : stateDispatch({ type: 'setFilterValue', payload: value });
   };
+
   return (
-    <PageSection page-type={'audit-rule-hosts'} id={'audit-rule-hosts'}>
-      {renderAuditRuleTabs(rule?.id, intl)}
+    <PageSection page-type={'actions-rule-events'} id={'actions-rule-events'}>
+      {renderActionsRuleTabs(rule?.id, intl)}
       <TableToolbarView
-        ouiaId={'audit-rule-hosts-table'}
+        ouiaId={'actions-rule-events-table'}
         rows={rows}
         setLimit={setLimit}
         setOffset={setOffset}
         columns={columns(intl)}
-        fetchData={updateHosts}
+        fetchData={updateEvents}
         pagination={defaultSettings}
-        plural={intl.formatMessage(sharedMessages.hosts)}
-        singular={intl.formatMessage(sharedMessages.host)}
+        plural={intl.formatMessage(sharedMessages.events)}
+        singular={intl.formatMessage(sharedMessages.event)}
         isLoading={isFetching || isFiltering}
         onFilterChange={handleFilterChange}
         renderEmptyState={() => (
           <TableEmptyState
-            title={intl.formatMessage(sharedMessages.noauditrulehosts)}
+            title={intl.formatMessage(sharedMessages.noactionsruleevents)}
             Icon={CubesIcon}
             PrimaryAction={() =>
               filterValue !== '' ? (
@@ -123,7 +131,7 @@ const AuditRuleHosts: React.FunctionComponent<{ rule: RuleType }> = ({ rule }) =
             }
             description={
               filterValue === ''
-                ? intl.formatMessage(sharedMessages.noauditrulehosts)
+                ? intl.formatMessage(sharedMessages.noactionsruleevents)
                 : intl.formatMessage(sharedMessages.clearAllFiltersDescription)
             }
           />
@@ -133,4 +141,4 @@ const AuditRuleHosts: React.FunctionComponent<{ rule: RuleType }> = ({ rule }) =
   );
 };
 
-export { AuditRuleHosts };
+export { ActionsRuleEvents };
