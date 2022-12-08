@@ -23,9 +23,11 @@ import yaml
 from asyncpg_lostream.lostream import CHUNK_SIZE, PGLargeObject
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from eda_server.types import InventorySource
-
 from .db import models
+from .db.sql.extra_var import import_extra_var_file, update_extra_var
+from .db.sql.inventory import import_inventory_file, update_inventory
+from .db.sql.playbook import import_playbook_file, update_playbook
+from .db.sql.rulebook import import_rulebook_file, update_rulebook
 from .schema import ProjectCreate
 from .utils import subprocess as subprocess_utils
 
@@ -143,7 +145,7 @@ async def clone_project(url: str, dest: str):
     return await git_get_current_commit(dest)
 
 
-def find_project_files(project_dir: str):
+def find_project_files(project_dir: str) -> dict:
     project_files = {
         "rulebook": [],
         "inventory": [],
@@ -165,10 +167,18 @@ def find_project_files(project_dir: str):
     return project_files
 
 
-async def import_project_files(db: AsyncSession, project_files, project_id):
+async def import_project_files(
+    db: AsyncSession, project_files: dict, project_id: int
+):
     for file_type, files in project_files.items():
         for file in files:
-            await import_project_file(db, file, file_type, project_id)
+            directory, filename = file
+            full_path = os.path.join(directory, filename)
+            with open(full_path) as f:
+                file_content = f.read()
+            await import_project_file(
+                db, filename, file_content, file_type, project_id
+            )
 
 
 def is_rules_file(filename: str):
@@ -195,54 +205,6 @@ def yield_files(project_dir: str):
             continue
         for f in files:
             yield root, f
-
-
-def expand_ruleset_sources(rulebook_data: dict) -> dict:
-    expanded_ruleset_sources = {}
-    if rulebook_data is not None:
-        for ruleset_data in rulebook_data:
-            xp_sources = []
-            expanded_ruleset_sources[ruleset_data["name"]] = xp_sources
-            for source in ruleset_data.get("sources", []):
-                xp_src = {"name": "<unnamed>"}
-                for src_key, src_val in source.items():
-                    if src_key == "name":
-                        xp_src["name"] = src_val
-                    else:
-                        xp_src["type"] = src_key.split(".")[-1]
-                        xp_src["source"] = src_key
-                        xp_src["config"] = src_val
-                xp_sources.append(xp_src)
-
-    return expanded_ruleset_sources
-
-
-async def insert_rulebook_related_data(
-    db: AsyncSession, rulebook_id: int, rulebook_data: dict
-):
-    expanded_sources = expand_ruleset_sources(rulebook_data)
-    ruleset_values = [
-        {
-            "name": ruleset_data["name"],
-            "rulebook_id": rulebook_id,
-            "sources": expanded_sources.get(ruleset_data["name"]),
-        }
-        for ruleset_data in (rulebook_data or [])
-    ]
-    query = (
-        sa.insert(models.rulesets)
-        .returning(models.rulesets.c.id)
-        .values(ruleset_values)
-    )
-    ruleset_ids = (await db.scalars(query)).all()
-
-    rule_values = [
-        {"name": rule["name"], "action": rule["action"], "ruleset_id": rsid}
-        for rsid, rsdata in zip(ruleset_ids, rulebook_data)
-        for rule in rsdata["rules"]
-    ]
-    query = sa.insert(models.rules).values(rule_values)
-    await db.execute(query)
 
 
 def is_inventory_file(filename: str):
@@ -318,149 +280,39 @@ async def tar_project(db: AsyncSession, large_data_id: int, project_dir: str):
                     await lobject.write(data)
 
 
-async def import_project_file(db: AsyncSession, file, file_type, project_id):
-    directory, filename = file
-    full_path = os.path.join(directory, filename)
-    with open(full_path) as f:
-        file_content = f.read()
+async def import_project_file(
+    db: AsyncSession,
+    filename: str,
+    file_content: str,
+    file_type: str,
+    project_id: int,
+):
+    import_project_file = {
+        "rulebook": import_rulebook_file,
+        "inventory": import_inventory_file,
+        "extra_var": import_extra_var_file,
+        "playbook": import_playbook_file,
+    }
 
-    if file_type == "rulebook":
-        await import_rulebook(db, filename, file_content, project_id)
-
-    elif file_type == "inventory":
-        await import_inventory(db, filename, file_content, project_id)
-
-    elif file_type == "extra_var":
-        await import_extra_var(db, filename, file_content, project_id)
-
-    elif file_type == "playbook":
-        await import_playbook(db, filename, file_content, project_id)
+    await import_project_file[file_type](
+        db, filename, file_content, project_id
+    )
 
 
 async def update_project_file(
-    db: AsyncSession, file, file_type, existing_files
+    db: AsyncSession, file_content: str, file_type: str, existing_file_id: int
 ):
-    directory, filename = file
-    full_path = os.path.join(directory, filename)
-    existing_file_id = next(
-        file["id"] for file in existing_files if file["name"] == filename
-    )
-    existing_file_content = next(
-        file[2] for file in existing_files if file["id"] == existing_file_id
-    )
+    update_project_file = {
+        "rulebook": update_rulebook,
+        "inventory": update_inventory,
+        "extra_var": update_extra_var,
+        "playbook": update_playbook,
+    }
 
-    with open(full_path) as f:
-        file_content = f.read()
-
-    if file_content != existing_file_content:
-        if file_type == "rulebook":
-            await update_rulebook(db, file_content, existing_file_id)
-
-        elif file_type == "inventory":
-            await update_inventory(db, file_content, existing_file_id)
-
-        elif file_type == "extra_var":
-            await update_extra_var(db, file_content, existing_file_id)
-
-        elif file_type == "playbook":
-            await update_playbook(db, file_content, existing_file_id)
+    await update_project_file[file_type](db, file_content, existing_file_id)
 
 
-async def import_rulebook(
-    db: AsyncSession, filename, file_content, project_id
-):
-    (rulebook_id,) = (
-        await db.execute(
-            sa.insert(models.rulebooks).values(
-                name=filename,
-                rulesets=file_content,
-                project_id=project_id,
-            )
-        )
-    ).inserted_primary_key
-
-    rulebook_data = yaml.safe_load(file_content)
-    await insert_rulebook_related_data(db, rulebook_id, rulebook_data)
-
-
-async def update_rulebook(db: AsyncSession, file_content, rulebook_id):
-    await db.execute(
-        sa.update(models.rulebooks)
-        .where(models.rulebooks.c.id == rulebook_id)
-        .values(rulesets=file_content)
-    )
-
-    # TODO: (doston) need to implement updating rulebook related data
-
-
-async def import_inventory(
-    db: AsyncSession, filename, file_content, project_id
-):
-    await db.execute(
-        sa.insert(models.inventories).values(
-            name=filename,
-            inventory=file_content,
-            project_id=project_id,
-            inventory_source=InventorySource.PROJECT,
-        )
-    )
-
-
-async def update_inventory(db: AsyncSession, file_content, inventory_id):
-    await db.execute(
-        sa.update(models.inventories)
-        .where(models.inventories.c.id == inventory_id)
-        .values(
-            inventory=file_content,
-        )
-    )
-
-
-async def import_extra_var(
-    db: AsyncSession, filename, file_content, project_id
-):
-    await db.execute(
-        sa.insert(models.extra_vars).values(
-            name=filename,
-            extra_var=file_content,
-            project_id=project_id,
-        )
-    )
-
-
-async def update_extra_var(db: AsyncSession, file_content, extra_var_id):
-    await db.execute(
-        sa.update(models.extra_vars)
-        .where(models.extra_vars.c.id == extra_var_id)
-        .values(
-            extra_var=file_content,
-        )
-    )
-
-
-async def import_playbook(
-    db: AsyncSession, filename, file_content, project_id
-):
-    await db.execute(
-        sa.insert(models.playbooks).values(
-            name=filename,
-            playbook=file_content,
-            project_id=project_id,
-        )
-    )
-
-
-async def update_playbook(db: AsyncSession, file_content, playbook_id):
-    await db.execute(
-        sa.update(models.playbooks)
-        .where(models.playbooks.c.id == playbook_id)
-        .values(
-            playbook=file_content,
-        )
-    )
-
-
-async def sync_existing_project(db: AsyncSession, project):
+async def sync_existing_project(db: AsyncSession, project: sa.engine.row.Row):
     with tempfile.TemporaryDirectory(prefix="eda-sync-project") as repo_dir:
         commit_id = await clone_project(project.url, repo_dir)
         if commit_id != project.git_hash:
@@ -472,7 +324,9 @@ async def sync_existing_project(db: AsyncSession, project):
             )
 
 
-async def sync_new_project_files(db: AsyncSession, project_id, repo_dir):
+async def sync_new_project_files(
+    db: AsyncSession, project_id: int, repo_dir: str
+):
     new_project_files = find_project_files(repo_dir)
     existing_project_files = await retrieve_existing_project_files(
         db, project_id
@@ -480,22 +334,35 @@ async def sync_new_project_files(db: AsyncSession, project_id, repo_dir):
 
     for file_type, new_files in new_project_files.items():
         for new_file in new_files:
-            _, filename = new_file
+            directory, filename = new_file
+            full_path = os.path.join(directory, filename)
+            with open(full_path) as f:
+                file_content = f.read()
+
             existing_files = existing_project_files[file_type]
             existing_files_names = [file["name"] for file in existing_files]
 
-            # if a file content has changed
+            # if the file exists
             if filename in existing_files_names:
-                await update_project_file(
-                    db, new_file, file_type, existing_files
+                existing_file_id, existing_file_content = next(
+                    (file[0], file[2])
+                    for file in existing_files
+                    if file["name"] == filename
                 )
-            # if a file is new
+                if existing_file_content != file_content:
+                    await update_project_file(
+                        db, file_content, file_type, existing_file_id
+                    )
+            # if the file is new
             else:
-                logger.info("import project file\n")
-                await import_project_file(db, new_file, file_type, project_id)
+                await import_project_file(
+                    db, filename, file_content, file_type, project_id
+                )
 
 
-async def retrieve_existing_project_files(db: AsyncSession, project_id):
+async def retrieve_existing_project_files(
+    db: AsyncSession, project_id: int
+) -> dict:
     project_files = {}
 
     project_files["rulebook"] = (

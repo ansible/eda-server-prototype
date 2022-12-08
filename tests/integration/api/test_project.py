@@ -178,11 +178,15 @@ async def test_create_project(
 @mock.patch("tempfile.TemporaryDirectory")
 @mock.patch("eda_server.project.clone_project")
 @mock.patch("eda_server.project.find_project_files")
+@mock.patch(
+    "builtins.open", new_callable=mock.mock_open, read_data="test data"
+)
 @mock.patch("eda_server.project.retrieve_existing_project_files")
 @mock.patch("eda_server.project.import_project_file")
 async def test_sync_project(
     import_project_file: mock.Mock,
     retrieve_existing_project_files: mock.Mock,
+    project_file: mock.mock_open,
     find_project_files: mock.Mock,
     clone_project: mock.Mock,
     tempfile: mock.Mock(),
@@ -201,7 +205,8 @@ async def test_sync_project(
     await db.commit()
 
     file_type = "rulebook"
-    new_files = [("rulebook", "test-rules.yml")]
+    filename = "test-rules.yml"
+    new_files = [("rulebook", filename)]
     project_files = {file_type: new_files}
     repo_dir = "/tmp/test-sync-project"
 
@@ -224,8 +229,10 @@ async def test_sync_project(
 
     find_project_files.assert_called_once_with(repo_dir)
     retrieve_existing_project_files.assert_called_once_with(db, project_id)
+    assert open(repo_dir).read() == "test data"
+    project_file.assert_called_with(repo_dir)
     import_project_file.assert_called_once_with(
-        db, new_files[0], file_type, project_id
+        db, filename, "test data", file_type, project_id
     )
     check_permission_spy.assert_called_once_with(
         mock.ANY, mock.ANY, ResourceType.PROJECT, Action.UPDATE

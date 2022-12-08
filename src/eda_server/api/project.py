@@ -110,8 +110,19 @@ async def sync_project(
             status_code=status.HTTP_404_NOT_FOUND, detail="Project Not Found."
         )
 
-    await sync_existing_project(db, project)
+    try:
+        await sync_existing_project(db, project)
+    except GitCommandFailed:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Cannot clone repository.",
+        )
     await db.commit()
+
+    return Response(
+        status_code=status.HTTP_200_OK,
+        content="Project has been syned successfully!",
+    )
 
 
 @router.get(
