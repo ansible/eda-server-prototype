@@ -16,7 +16,7 @@ const columns = (intl) => [
     title: intl.formatMessage(sharedMessages.name),
   },
   {
-    title: intl.formatMessage(sharedMessages.job),
+    title: intl.formatMessage(sharedMessages.action_type),
   },
   {
     title: intl.formatMessage(sharedMessages.status),
