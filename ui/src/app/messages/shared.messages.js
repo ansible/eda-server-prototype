@@ -226,6 +226,10 @@ const sharedMessages = defineMessages({
     id: 'shared.hosts',
     defaultMessage: 'Hosts',
   },
+  action_type: {
+    id: 'shared.action_type',
+    defaultMessage: 'Action type',
+  },
   project: {
     id: 'project.project',
     defaultMessage: 'Project',

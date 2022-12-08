@@ -65,6 +65,38 @@ const ActionsRuleDetails: React.FunctionComponent<{ rule: RuleType }> = ({ rule 
             <FlexItem>
               <Stack>
                 <StackItem>
+                  <Title headingLevel="h3">Action type</Title>
+                </StackItem>
+                <StackItem>{rule?.type}</StackItem>
+              </Stack>
+            </FlexItem>
+            <FlexItem>
+              <Stack>
+                <StackItem>
+                  <Title headingLevel="h3">Created</Title>
+                </StackItem>
+                <StackItem>
+                  <Text component={TextVariants.small}>
+                    {new Intl.DateTimeFormat('en-US', { dateStyle: 'short', timeStyle: 'long' }).format(
+                      new Date(rule?.created_at || 0)
+                    )}
+                  </Text>
+                </StackItem>
+              </Stack>
+            </FlexItem>
+          </Flex>
+          <Flex direction={{ default: 'column' }} flex={{ default: 'flex_1' }}>
+            <FlexItem>
+              <Stack>
+                <StackItem>
+                  <Title headingLevel="h3">Description</Title>
+                </StackItem>
+                <StackItem>{rule?.description}</StackItem>
+              </Stack>
+            </FlexItem>
+            <FlexItem>
+              <Stack>
+                <StackItem>
                   <Title headingLevel="h3">Activation</Title>
                 </StackItem>
                 {rule && rule.activation && (
@@ -95,9 +127,15 @@ const ActionsRuleDetails: React.FunctionComponent<{ rule: RuleType }> = ({ rule 
             <FlexItem>
               <Stack>
                 <StackItem>
-                  <Title headingLevel="h3">Description</Title>
+                  <StackItem>
+                    <Title headingLevel="h3">Status</Title>
+                  </StackItem>
                 </StackItem>
-                <StackItem>{rule?.description}</StackItem>
+                <StackItem>
+                  <Fragment key={`[actions-rule-details-${rule?.name}`}>
+                    {statusLabel({ text: rule?.status, intl: intl })}
+                  </Fragment>
+                </StackItem>
               </Stack>
             </FlexItem>
             <FlexItem>
@@ -110,28 +148,6 @@ const ActionsRuleDetails: React.FunctionComponent<{ rule: RuleType }> = ({ rule 
                     {<Link to={'/ruleset/' + rule.ruleset.id}>{rule.ruleset.name || rule.ruleset.name}</Link>}
                   </StackItem>
                 )}
-              </Stack>
-            </FlexItem>
-          </Flex>
-          <Flex direction={{ default: 'column' }} flex={{ default: 'flex_1' }}>
-            <FlexItem>
-              <Stack>
-                <StackItem>
-                  <StackItem>
-                    <Title headingLevel="h3">Status</Title>
-                  </StackItem>
-                </StackItem>
-                <StackItem>
-                  <Fragment key={`[actions-rule-details-${rule?.name}`}>{statusLabel({ text: rule?.status, intl: intl })}</Fragment>
-                </StackItem>
-              </Stack>
-            </FlexItem>
-            <FlexItem>
-              <Stack>
-                <StackItem>
-                  <Title headingLevel="h3">Created</Title>
-                </StackItem>
-                <StackItem>{rule?.created_at}</StackItem>
               </Stack>
             </FlexItem>
           </Flex>
@@ -166,7 +182,8 @@ const ActionsRuleDetails: React.FunctionComponent<{ rule: RuleType }> = ({ rule 
             {rule.definition ? (
               varFormat === 'json' ? (
                 // @ts-ignore
-                <ReactJsonView displayObjectSize={false} displayDataTypes={false} quotesOnKeys={false} src={rule?.definition} />
+                <ReactJsonView displayObjectSize={false} displayDataTypes={false} quotesOnKeys={false} src={rule?.definition}
+                />
               ) : (
                 <Card>
                   <FocusWrapper>
