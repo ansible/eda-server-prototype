@@ -6,10 +6,10 @@ import AppTabs from '@app/shared/app-tabs';
 import { TopToolbar } from '@app/shared/top-toolbar';
 import { AnyObject, TabItemType } from '@app/shared/types/common-types';
 import sharedMessages from '../messages/shared.messages';
-import { AuditRules } from '@app/AuditView/audit-rules';
-import { AuditHosts } from '@app/AuditView/audit-hosts';
+import { ActionsRules } from '@app/Actions/actions-rules';
+import { ActionsHosts } from '@app/Actions/actions-hosts';
 
-export interface AuditRuleType {
+export interface ActionsRuleType {
   id: string;
   name: string;
   job: string;
@@ -20,7 +20,7 @@ export interface AuditRuleType {
   fired_at?: string;
 }
 
-export interface AuditHostType {
+export interface ActionsHostType {
   rule: { id: string; name: string };
   job?: { id: string; name: string };
   ruleset?: { id: string; name: string };
@@ -28,21 +28,21 @@ export interface AuditHostType {
   fired_date?: string;
 }
 
-const buildAuditTabs = (intl: AnyObject): TabItemType[] => [
-  { eventKey: 0, title: intl.formatMessage(sharedMessages.audit_rules_title), name: `/audit/rules` },
+const buildActionsTabs = (intl: AnyObject): TabItemType[] => [
+  { eventKey: 0, title: intl.formatMessage(sharedMessages.actions_title), name: `/actions/rules` },
   {
     eventKey: 1,
-    title: intl.formatMessage(sharedMessages.audit_hosts_title),
-    name: `/audit/hosts`,
+    title: intl.formatMessage(sharedMessages.actions_hosts_title),
+    name: `/actions/hosts`,
   },
 ];
 
-export const renderAuditTabs = (intl) => {
-  const audit_tabs = buildAuditTabs(intl);
-  return <AppTabs tabItems={audit_tabs} defaultActive={0} />;
+export const renderActionsTabs = (intl) => {
+  const actions_tabs = buildActionsTabs(intl);
+  return <AppTabs tabItems={actions_tabs} defaultActive={0} />;
 };
 
-const AuditView: React.FunctionComponent = () => {
+const Actions: React.FunctionComponent = () => {
   const intl = useIntl();
 
   return (
@@ -50,20 +50,20 @@ const AuditView: React.FunctionComponent = () => {
       <TopToolbar>
         <Level>
           <LevelItem>
-            <Title headingLevel={'h2'}>{intl.formatMessage(sharedMessages.audit_view_title)}</Title>
+            <Title headingLevel={'h2'}>{intl.formatMessage(sharedMessages.actions_view_title)}</Title>
           </LevelItem>
         </Level>
       </TopToolbar>
       <Switch>
-        <Route exact path="/audit/hosts">
-          <AuditHosts />
+        <Route exact path="/actions/hosts">
+          <ActionsHosts />
         </Route>
-        <Route path="/audit">
-          <AuditRules />
+        <Route path="/actions">
+          <ActionsRules />
         </Route>
       </Switch>
     </React.Fragment>
   );
 };
 
-export { AuditView };
+export { Actions };

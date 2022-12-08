@@ -690,40 +690,40 @@ const sharedMessages = defineMessages({
     id: 'inventory.deleteInventoryFailure',
     defaultMessage: 'Remove inventory failed',
   },
-  audit_view_title: {
-    id: 'audit.auditViewTitle',
-    defaultMessage: 'Audit View',
+  actions_view_title: {
+    id: 'actions.actionsTitle',
+    defaultMessage: 'Actions',
   },
-  audit_rules_title: {
-    id: 'audit.auditRulesTitle',
-    defaultMessage: 'Rules recently fired',
+  actions_title: {
+    id: 'actions.actionsTitle',
+    defaultMessage: 'Recent actions',
   },
-  audit_hosts_title: {
-    id: 'audit.auditHostsTitle',
+  actions_hosts_title: {
+    id: 'actions.actionsHostsTitle',
     defaultMessage: 'Hosts recently changed',
   },
   norulesrecentlyfired: {
-    id: 'audit.norulesrecentlyfired',
+    id: 'actions.norulesrecentlyfired',
     defaultMessage: 'No rules recently fired',
   },
   nohostsrecentlychanged: {
     id: 'host.nohostsrecentlychnaged',
     defaultMessage: 'No hosts recently changed',
   },
-  backToAuditView: {
-    id: 'audit.backToAuditView',
-    defaultMessage: 'Back to Audit View',
+  backToActions: {
+    id: 'actions.backToActions',
+    defaultMessage: 'Back to Actions',
   },
-  noauditrulejobs: {
-    id: 'common.noauditrulejobs',
+  noactionsrulejobs: {
+    id: 'common.noactionsrulejobs',
     defaultMessage: 'There are currently no jobs for this rule.',
   },
-  noauditrulehosts: {
-    id: 'common.noauditrulehosts',
+  noactionsrulehosts: {
+    id: 'common.noactionsrulehosts',
     defaultMessage: 'There are currently no hosts for this rule.',
   },
-  noauditruleevents: {
-    id: 'common.noauditruleevents',
+  noactionsruleevents: {
+    id: 'common.noactionsruleevents',
     defaultMessage: 'There are currently no events for this rule.',
   },
   increment_counter: {

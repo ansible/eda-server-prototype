@@ -1,6 +1,6 @@
 import {
   Card,
-  CardBody, CodeBlock, CodeBlockCode,
+  CardBody,
   Flex,
   FlexItem,
   Grid,
@@ -15,7 +15,7 @@ import {
   ToggleGroupItem,
 } from '@patternfly/react-core';
 import { Link, useParams } from 'react-router-dom';
-import React, { useState, useEffect, Fragment } from 'react';
+import React, { useState, Fragment } from 'react';
 import ReactJsonView from 'react-json-view';
 import AceEditor from 'react-ace';
 import 'ace-builds/src-noconflict/mode-yaml';
@@ -23,7 +23,7 @@ import 'ace-builds/src-noconflict/theme-xcode';
 import styled from 'styled-components';
 import { RuleType } from '@app/RuleSets/RuleSets';
 import { useIntl } from 'react-intl';
-import { renderAuditRuleTabs } from '@app/AuditView/AuditRule';
+import { renderActionsRuleTabs } from '@app/Actions/ActionsRule';
 import { statusLabel } from '@app/utils/utils';
 
 const FocusWrapper = styled.div`
@@ -39,7 +39,7 @@ const FocusWrapper = styled.div`
   }
 `;
 
-const AuditRuleDetails: React.FunctionComponent<{ rule: RuleType }> = ({ rule }) => {
+const ActionsRuleDetails: React.FunctionComponent<{ rule: RuleType }> = ({ rule }) => {
   const [varFormat, setVarFormat] = useState('yaml');
   const intl = useIntl();
   const { id } = useParams<{ id: string }>();
@@ -122,7 +122,7 @@ const AuditRuleDetails: React.FunctionComponent<{ rule: RuleType }> = ({ rule })
                   </StackItem>
                 </StackItem>
                 <StackItem>
-                  <Fragment key={`[audit-rule-details-${rule?.name}`}>{statusLabel({ text: rule?.status, intl: intl })}</Fragment>
+                  <Fragment key={`[actions-rule-details-${rule?.name}`}>{statusLabel({ text: rule?.status, intl: intl })}</Fragment>
                 </StackItem>
               </Stack>
             </FlexItem>
@@ -202,7 +202,7 @@ const AuditRuleDetails: React.FunctionComponent<{ rule: RuleType }> = ({ rule })
 
   return (
     <PageSection page-type={'rule-details'} id={'rule-details'}>
-      {renderAuditRuleTabs(id, intl)}
+      {renderActionsRuleTabs(id, intl)}
       <Stack>
         <StackItem>
           <Card>
@@ -214,4 +214,4 @@ const AuditRuleDetails: React.FunctionComponent<{ rule: RuleType }> = ({ rule })
   );
 };
 
-export { AuditRuleDetails };
+export { ActionsRuleDetails };

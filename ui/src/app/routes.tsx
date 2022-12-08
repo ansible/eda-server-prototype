@@ -33,10 +33,10 @@ import { Rules } from '@app/Rules/Rules';
 import { Rule } from '@app/Rule/Rule';
 import { Fragment } from 'react';
 import { NewInventory } from '@app/NewInventory/NewInventory';
-import { AuditView } from '@app/AuditView/AuditView';
-import {AuditRules} from "@app/AuditView/audit-rules";
-import {AuditHosts} from "@app/AuditView/audit-hosts";
-import {AuditRule} from "@app/AuditView/AuditRule";
+import { Actions } from '@app/Actions/Actions';
+import {ActionsRules} from "@app/Actions/actions-rules";
+import {ActionsHosts} from "@app/Actions/actions-hosts";
+import {ActionsRule} from "@app/Actions/ActionsRule";
 
 export interface IAppRoute {
   label?: string; // Excluding the label will exclude the route from the nav sidebar in AppLayout
@@ -236,27 +236,27 @@ const routes: AppRouteConfig[] = [
     ],
   },
   {
-    component: AuditView,
-    label: 'Audit View',
-    path: '/audit',
-    title: 'Audit View',
+    component: Actions,
+    label: 'Actions',
+    path: '/actions',
+    title: 'Actions',
   },
   {
-    component: AuditRules,
+    component: ActionsRules,
     exact: true,
-    path: '/audit/rules',
-    title: 'Audit Rules',
+    path: '/actions/rules',
+    title: 'Actions Rules',
   },
   {
-    component: AuditHosts,
+    component: ActionsHosts,
     exact: true,
-    path: '/audit/hosts',
-    title: 'Audit Hosts',
+    path: '/actions/hosts',
+    title: 'Actions Hosts',
   },
   {
-    component: AuditRule,
-    path: '/audit-rule/:id',
-    title: 'Audit Rule',
+    component: ActionsRule,
+    path: '/actions-rule/:id',
+    title: 'Actions Rule',
   },
 ];
 

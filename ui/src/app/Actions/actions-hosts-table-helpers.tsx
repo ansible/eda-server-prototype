@@ -1,32 +1,21 @@
 import React, { Fragment } from 'react';
 import { Link } from 'react-router-dom';
 import { Text, TextVariants } from '@patternfly/react-core';
-import {statusLabel} from "@app/utils/utils";
 
-export const createRows = (data, intl) =>
-  data.map(({ rule, job, status, ruleset, fired_date }) => ({
-    rule,
+export const createRows = (data) =>
+  data.map(({ host, rule, ruleset, fired_date }) => ({
     cells: [
-      <Fragment key={`[audit-rule-${rule?.id}`}>
+      host,
+      <Fragment key={`[actions-host-${rule?.id}`}>
         <Link
           to={{
-            pathname: `/audit-rule/${rule?.id}`,
+            pathname: `/rule/${rule?.id}`,
           }}
         >
           {rule?.name || rule?.id}
         </Link>
       </Fragment>,
-      <Fragment key={`[audit-job-${job?.id}`}>
-        <Link
-          to={{
-            pathname: `/job/${job?.id}`,
-          }}
-        >
-          {job?.name || job?.id}
-        </Link>
-      </Fragment>,
-      <Fragment key={`[audit-rule-hosts-${name}`}>{statusLabel({ text: status, intl: intl })}</Fragment>,
-      <Fragment key={`[audit-ruleset-${ruleset?.id}`}>
+      <Fragment key={`[actions-ruleset-${ruleset?.id}`}>
         <Link
           to={{
             pathname: `/ruleset/${ruleset?.id}`,
@@ -35,7 +24,7 @@ export const createRows = (data, intl) =>
           {ruleset?.name || ruleset?.id}
         </Link>
       </Fragment>,
-      <Fragment key={`[audit-last_fired-${rule?.id}`}>
+      <Fragment key={`[actions-last_fired-${rule?.name}`}>
         <Text component={TextVariants.small}>
           {new Intl.DateTimeFormat('en-US', { dateStyle: 'short', timeStyle: 'long' }).format(
             new Date(fired_date || 0)

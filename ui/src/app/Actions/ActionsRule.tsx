@@ -6,14 +6,14 @@ import AppTabs from '@app/shared/app-tabs';
 import { CaretLeftIcon } from '@patternfly/react-icons';
 import { getTabFromPath } from '@app/utils/utils';
 import { TopToolbar } from '@app/shared/top-toolbar';
-import { AuditRuleDetails } from '@app/AuditView/audit-rule-details';
+import { ActionsRuleDetails } from '@app/Actions/actions-rule-details';
 import sharedMessages from '../messages/shared.messages';
 import { AnyObject } from '@app/shared/types/common-types';
-import { fetchAuditRuleDetails } from '@app/API/Audit';
-import { AuditRuleJobs } from '@app/AuditView/audit-rule-jobs';
-import { AuditRuleHosts } from '@app/AuditView/audit-rule-hosts';
+import { fetchActionsRuleDetails } from '@app/API/Actions';
+import { ActionsRuleJobs } from '@app/Actions/actions-rule-jobs';
+import { ActionsRuleHosts } from '@app/Actions/actions-rule-hosts';
 import { RuleType } from '@app/Rules/Rules';
-import { AuditRuleEvents } from '@app/AuditView/audit-rule-events';
+import { ActionsRuleEvents } from '@app/Actions/actions-rule-events';
 
 interface TabItemType {
   eventKey: number;
@@ -21,42 +21,42 @@ interface TabItemType {
   name: string;
 }
 
-const buildAuditRuleTabs = (ruleId: string, intl: AnyObject): TabItemType[] => [
+const buildActionsRuleTabs = (ruleId: string, intl: AnyObject): TabItemType[] => [
   {
     eventKey: 0,
     title: (
       <div>
         <CaretLeftIcon />
-        {intl.formatMessage(sharedMessages.backToAuditView)}
+        {intl.formatMessage(sharedMessages.backToActions)}
       </div>
     ),
-    name: `/audit`,
+    name: `/actions`,
   },
-  { eventKey: 1, title: 'Details', name: `/audit-rule/${ruleId}/details` },
-  { eventKey: 2, title: 'Jobs', name: `/audit-rule/${ruleId}/jobs` },
-  { eventKey: 3, title: 'Hosts', name: `/audit-rule/${ruleId}/hosts` },
-  { eventKey: 4, title: 'Events', name: `/audit-rule/${ruleId}/events` },
+  { eventKey: 1, title: 'Details', name: `/actions-rule/${ruleId}/details` },
+  { eventKey: 2, title: 'Jobs', name: `/actions-rule/${ruleId}/jobs` },
+  { eventKey: 3, title: 'Hosts', name: `/actions-rule/${ruleId}/hosts` },
+  { eventKey: 4, title: 'Events', name: `/actions-rule/${ruleId}/events` },
 ];
 
-export const renderAuditRuleTabs = (ruleId: string, intl) => {
-  const rule_tabs = buildAuditRuleTabs(ruleId, intl);
+export const renderActionsRuleTabs = (ruleId: string, intl) => {
+  const rule_tabs = buildActionsRuleTabs(ruleId, intl);
   return <AppTabs tabItems={rule_tabs} />;
 };
 
-const AuditRule: React.FunctionComponent = () => {
+const ActionsRule: React.FunctionComponent = () => {
   const [rule, setRule] = useState<RuleType | undefined>(undefined);
 
   const { id } = useParams<{ id: string }>();
   const intl = useIntl();
 
   useEffect(() => {
-    fetchAuditRuleDetails(id).then((data) => {
+    fetchActionsRuleDetails(id).then((data) => {
       return setRule(data?.data);
     });
   }, [id]);
   const location = useLocation();
   const currentTab = id
-    ? getTabFromPath(buildAuditRuleTabs(id, intl), location.pathname)
+    ? getTabFromPath(buildActionsRuleTabs(id, intl), location.pathname)
     : intl.formatMessage(sharedMessages.details);
 
   return rule ? (
@@ -64,14 +64,14 @@ const AuditRule: React.FunctionComponent = () => {
       <TopToolbar
         breadcrumbs={[
           {
-            title: intl.formatMessage(sharedMessages.audit_view_title),
-            key: 'audit-view',
-            to: '/audit',
+            title: intl.formatMessage(sharedMessages.actions_view_title),
+            key: 'actions-view',
+            to: '/actions',
           },
           {
             title: rule?.name || '',
             key: 'details',
-            to: `/audit-rule/${id}`,
+            to: `/actions-rule/${id}`,
           },
           {
             title: currentTab || intl.formatMessage(sharedMessages.details),
@@ -82,17 +82,17 @@ const AuditRule: React.FunctionComponent = () => {
         <Title headingLevel={'h2'}>{`${rule?.name}`}</Title>
       </TopToolbar>
       <Switch>
-        <Route exact path="/audit-rule/:id/jobs">
-          <AuditRuleJobs rule={rule} />
+        <Route exact path="/actions-rule/:id/jobs">
+          <ActionsRuleJobs rule={rule} />
         </Route>
-        <Route exact path="/audit-rule/:id/hosts">
-          <AuditRuleHosts rule={rule} />
+        <Route exact path="/actions-rule/:id/hosts">
+          <ActionsRuleHosts rule={rule} />
         </Route>
-        <Route exact path="/audit-rule/:id/events">
-          <AuditRuleEvents rule={rule} />
+        <Route exact path="/actions-rule/:id/events">
+          <ActionsRuleEvents rule={rule} />
         </Route>
-        <Route path="/audit-rule/:id">
-          <AuditRuleDetails rule={rule} />
+        <Route path="/actions-rule/:id">
+          <ActionsRuleDetails rule={rule} />
         </Route>
       </Switch>
     </React.Fragment>
@@ -101,4 +101,4 @@ const AuditRule: React.FunctionComponent = () => {
   );
 };
 
-export { AuditRule };
+export { ActionsRule };

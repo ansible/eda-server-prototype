@@ -15,7 +15,7 @@ export const createRows = (data, intl) =>
           {name || id}
         </Link>
       </Fragment>,
-      <Fragment key={`[audit-rule-jobs-${name}`}>{statusLabel({ text: status, intl: intl })}</Fragment>,
+      <Fragment key={`[actions-rule-jobs-${name}`}>{statusLabel({ text: status, intl: intl })}</Fragment>,
       last_fired_date,
     ],
   }));
