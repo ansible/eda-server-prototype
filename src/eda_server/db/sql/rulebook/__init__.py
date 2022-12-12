@@ -19,6 +19,7 @@ import enum
 from typing import Dict, List, Optional, Tuple, Union
 
 import sqlalchemy as sa
+import yaml
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from eda_server.db import models
@@ -656,3 +657,80 @@ def raise_exception(exc: Exception):
         exc.__class__.__name__, (exc.__class__, RulebookQueryEception), {}
     )
     raise err(str(exc))
+
+
+def expand_ruleset_sources(rulebook_data: dict) -> dict:
+    expanded_ruleset_sources = {}
+    if rulebook_data is not None:
+        for ruleset_data in rulebook_data:
+            xp_sources = []
+            expanded_ruleset_sources[ruleset_data["name"]] = xp_sources
+            for source in ruleset_data.get("sources", []):
+                xp_src = {"name": "<unnamed>"}
+                for src_key, src_val in source.items():
+                    if src_key == "name":
+                        xp_src["name"] = src_val
+                    else:
+                        xp_src["type"] = src_key.split(".")[-1]
+                        xp_src["source"] = src_key
+                        xp_src["config"] = src_val
+                xp_sources.append(xp_src)
+
+    return expanded_ruleset_sources
+
+
+async def insert_rulebook_related_data(
+    db: AsyncSession, rulebook_id: int, rulebook_data: dict
+):
+    expanded_sources = expand_ruleset_sources(rulebook_data)
+    ruleset_values = [
+        {
+            "name": ruleset_data["name"],
+            "rulebook_id": rulebook_id,
+            "sources": expanded_sources.get(ruleset_data["name"]),
+        }
+        for ruleset_data in (rulebook_data or [])
+    ]
+    query = (
+        sa.insert(models.rulesets)
+        .returning(models.rulesets.c.id)
+        .values(ruleset_values)
+    )
+    ruleset_ids = (await db.scalars(query)).all()
+
+    rule_values = [
+        {"name": rule["name"], "action": rule["action"], "ruleset_id": rsid}
+        for rsid, rsdata in zip(ruleset_ids, rulebook_data)
+        for rule in rsdata["rules"]
+    ]
+    query = sa.insert(models.rules).values(rule_values)
+    await db.execute(query)
+
+
+async def import_rulebook_file(
+    db: AsyncSession, filename: str, file_content: str, project_id: int
+):
+    (rulebook_id,) = (
+        await db.execute(
+            sa.insert(models.rulebooks).values(
+                name=filename,
+                rulesets=file_content,
+                project_id=project_id,
+            )
+        )
+    ).inserted_primary_key
+
+    rulebook_data = yaml.safe_load(file_content)
+    await insert_rulebook_related_data(db, rulebook_id, rulebook_data)
+
+
+async def update_rulebook(
+    db: AsyncSession, file_content: str, rulebook_id: int
+):
+    await db.execute(
+        sa.update(models.rulebooks)
+        .where(models.rulebooks.c.id == rulebook_id)
+        .values(rulesets=file_content)
+    )
+
+    # TODO: (doston) need to implement updating rulebook related data

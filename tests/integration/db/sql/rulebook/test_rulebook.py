@@ -22,7 +22,6 @@ import yaml
 from dateutil.parser import parse as dtparse
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from eda_server import project as bl_prj
 from eda_server.db import models
 from eda_server.db.sql import base as bsql, rulebook as rsql
 from eda_server.types import InventorySource
@@ -229,7 +228,7 @@ async def test_get_rulesets_base_no_data(db: AsyncSession):
 
 async def test_expand_ruleset_sources(db: AsyncSession):
     rulesets_data = yaml.safe_load(TEST_RULESET_SIMPLE)
-    res = bl_prj.expand_ruleset_sources(rulesets_data)
+    res = rsql.expand_ruleset_sources(rulesets_data)
     rs_name = "Test simple"
     assert rs_name in res
     assert len(res[rs_name]) == 2
@@ -247,9 +246,7 @@ async def test_process_ruleset_sources(db: AsyncSession):
     rulebooks = await insert_rulebooks(db, project)
     assert len(rulebooks) == 2
     rulebook_data = yaml.safe_load(rulebooks[1].rulesets)
-    await bl_prj.insert_rulebook_related_data(
-        db, rulebooks[1].id, rulebook_data
-    )
+    await rsql.insert_rulebook_related_data(db, rulebooks[1].id, rulebook_data)
     ruleset = await bsql.get_object(
         db,
         models.rulesets,

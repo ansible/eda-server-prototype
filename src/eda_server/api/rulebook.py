@@ -25,7 +25,6 @@ from eda_server.db.dependency import get_db_session
 
 # Rule, Ruleset, Rulebook query builder, enums, etc
 from eda_server.db.sql import rulebook as rsql
-from eda_server.project import insert_rulebook_related_data
 from eda_server.types import Action, ResourceType
 
 router = APIRouter(tags=["rulebooks"])
@@ -314,7 +313,7 @@ async def create_rulebook(
             )
 
     rulebook_data = yaml.safe_load(new_rulebook.rulesets)
-    await insert_rulebook_related_data(db, new_rulebook.id, rulebook_data)
+    await rsql.insert_rulebook_related_data(db, new_rulebook.id, rulebook_data)
     await db.commit()
 
     return new_rulebook
