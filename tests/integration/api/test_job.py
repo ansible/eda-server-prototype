@@ -14,6 +14,7 @@
 
 from unittest import mock
 
+import pytest
 import sqlalchemy as sa
 from fastapi import status as status_codes
 from httpx import AsyncClient
@@ -81,3 +82,57 @@ async def test_create_delete_job(
 async def test_delete_job_not_found(client: AsyncClient):
     response = await client.delete("/api/job_instance/1")
     assert response.status_code == status_codes.HTTP_404_NOT_FOUND
+
+
+@mock.patch("eda_server.ruleset.activate_rulesets")
+async def test_rerun_job_with_needed(
+    activate_rulesets: mock.Mock,
+    client: AsyncClient,
+    db: AsyncSession,
+    check_permission_spy: mock.Mock,
+):
+    # prepare job_instance
+    query = sa.insert(models.job_instances).values(
+        uuid="f4c87c90-254e-11ed-861d-0242ac120002", name="dummy-playbooks"
+    )
+    job_instance_id = (await db.execute(query)).inserted_primary_key[0]
+
+    await client.post(f"/api/job_instance/{job_instance_id}")
+
+    check_permission_spy.assert_called_once_with(
+        mock.ANY, mock.ANY, ResourceType.JOB, Action.CREATE
+    )
+
+
+async def test_rerun_job_miss_job_instance(
+    client: AsyncClient, db: AsyncSession, check_permission_spy: mock.Mock
+):
+    invalid_job_id = 10
+    response = await client.post(f"/api/job_instance/{invalid_job_id}")
+    assert response.status_code == status_codes.HTTP_404_NOT_FOUND
+
+    data = response.json()
+    assert data["detail"] == f"Job instance {invalid_job_id} not found"
+
+    check_permission_spy.assert_called_once_with(
+        mock.ANY, mock.ANY, ResourceType.JOB, Action.CREATE
+    )
+
+
+@mock.patch(
+    "eda_server.ruleset.activate_rulesets",
+    side_effect=Exception("Test exception"),
+)
+async def test_rerun_job_with_exception(client: AsyncClient, db: AsyncSession):
+    # prepare job_instance
+    invalid_playbook_name = "miss-playbooks"
+    query = sa.insert(models.job_instances).values(
+        uuid="f4c87c90-254e-11ed-861d-0242ac120002", name=invalid_playbook_name
+    )
+    job_instance_id = (await db.execute(query)).inserted_primary_key[0]
+
+    response = await client.post(f"/api/job_instance/{job_instance_id}")
+    with pytest.raises(Exception):
+        assert (
+            response.status_code == status_codes.HTTP_500_INTERNAL_SERVER_ERROR
+        )

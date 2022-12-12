@@ -308,11 +308,10 @@ async def write_job_events(event_log, job_instance_id, db_factory):
                 json.dumps(["Stdout", {"stdout": event.get("stdout")}]),
             )
 
-        async with db_factory() as db:
-            query = insert(job_instance_events).values(
-                job_uuid=event.get("job_id"),
-                counter=event.get("counter"),
-                stdout=event.get("stdout"),
-            )
-            await db.execute(query)
-            await db.commit()
+        query = insert(job_instance_events).values(
+            job_uuid=event.get("job_id"),
+            counter=event.get("counter"),
+            stdout=event.get("stdout"),
+        )
+        await db_factory.execute(query)
+        await db_factory.commit()
