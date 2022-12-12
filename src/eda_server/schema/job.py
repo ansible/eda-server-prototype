@@ -20,9 +20,14 @@ from pydantic import BaseModel, StrictStr
 
 class JobInstanceCreate(BaseModel):
     id: Optional[int]
-    playbook_id: int
-    inventory_id: int
-    extra_var_id: int
+    name: Optional[StrictStr]
+    action: Optional[StrictStr]
+    ruleset: Optional[StrictStr]
+    rule: Optional[StrictStr]
+    hosts: Optional[StrictStr]
+    playbook_id: Optional[int]
+    inventory_id: Optional[int]
+    extra_var_id: Optional[int]
 
 
 class JobInstanceBaseRead(JobInstanceCreate):
