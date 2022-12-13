@@ -1,7 +1,6 @@
 # Build eda-server
 FROM registry.access.redhat.com/ubi8/python-39
 ARG USER_ID=${USER_ID:-1001}
-ARG DEVEL_EDA_LIBRARY=1
 WORKDIR $HOME
 
 USER 0
