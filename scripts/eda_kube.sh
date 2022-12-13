@@ -39,6 +39,7 @@ usage() {
     log-info "\t port-forward-ui <port>        forward local port to Events UI (default: 8080)"
     log-info "\t add-dev-user                  add user: dev_user@redhat.com, password: none2tuff"
     log-info "\t load-rbac-data                load up RBAC users and roles"
+    log-info "\t eda-server-logs               get ede-server pod logs"
     log-info "\t help                          show usage"
 }
 
@@ -172,8 +173,15 @@ add-dev-user() {
   local eda_server_pod_name=$(kubectl get pod -l app=eda-server -o jsonpath="{.items[0].metadata.name}")
 
   log-info "Adding development admin user: dev_user@redhat.com"
-  log-debug "kubectl exec "${eda_server_pod_name}" -- scripts/adduser.py -S --password "${password}" "${user}""
+  log-debug "kubectl exec ${eda_server_pod_name} -- scripts/adduser.py -S --password ${password} ${user}"
   kubectl exec "${eda_server_pod_name}" -- scripts/adduser.py -S --password "${password}" "${user}"
+}
+
+get-eda-server-logs() {
+  local eda_server_pod_name=$(kubectl get pod -l app=eda-server -o jsonpath="{.items[0].metadata.name}")
+
+  log-debug "kubectl logs ${eda_server_pod_name} -f"
+  kubectl logs "${eda_server_pod_name}" -f
 }
 
 load-rbac-data() {
@@ -195,6 +203,7 @@ case ${CMD} in
   "port-forward-ui") port-forward-ui "${UI_LOCAL_PORT}" ;;
   "add-dev-user") add-dev-user ;;
   "load-rbac-data") load-rbac-data ;;
+  "eda-server-logs") get-eda-server-logs ;;
   "help") usage ;;
    *) usage ;;
 esac
