@@ -226,9 +226,41 @@ const sharedMessages = defineMessages({
     id: 'shared.hosts',
     defaultMessage: 'Hosts',
   },
+  time: {
+    id: 'shared.time',
+    defaultMessage: 'Time',
+  },
+  rules_fired: {
+    id: 'shared.rules_fired',
+    defaultMessage: 'Rules fired',
+  },
+  rules_over_time: {
+    id: 'shared.rules_over_time',
+    defaultMessage: 'Rules over time',
+  },
   action_type: {
     id: 'shared.action_type',
     defaultMessage: 'Action type',
+  },
+  recent_actions: {
+    id: 'shared.recent_actions',
+    defaultMessage: 'Recent actions',
+  },
+  go_to_actions: {
+    id: 'shared.go_to_actions',
+    defaultMessage: 'Go to Actions',
+  },
+  go_to_projects: {
+    id: 'shared.go_to_projects',
+    defaultMessage: 'Go to Projects list',
+  },
+  go_to_activations: {
+    id: 'shared.go_to_activations',
+    defaultMessage: 'Go to Rulebook Activations list',
+  },
+  go_to_inventories: {
+    id: 'shared.go_to_inventories',
+    defaultMessage: 'Go to Inventories list',
   },
   project: {
     id: 'project.project',
@@ -249,6 +281,10 @@ const sharedMessages = defineMessages({
   add_new_project: {
     id: 'project.addNewProject',
     defaultMessage: 'Add new project',
+  },
+  create_project: {
+    id: 'project.createProject',
+    defaultMessage: 'Create project',
   },
   projectRemoveTitle: {
     id: 'project.removeProject',
@@ -357,6 +393,10 @@ const sharedMessages = defineMessages({
   activation: {
     id: 'activation.activation',
     defaultMessage: 'Activation',
+  },
+  create_activation: {
+    id: 'activation.createActivation',
+    defaultMessage: 'Create rulebook activation',
   },
   activationRemoveTitle: {
     id: 'activation.removeActivation',
@@ -637,6 +677,10 @@ const sharedMessages = defineMessages({
   add_new_inventory: {
     id: 'inventory.addNewInventory',
     defaultMessage: 'Add new inventory',
+  },
+  create_inventory: {
+    id: 'inventory.createInventory',
+    defaultMessage: 'Create inventory',
   },
   inventoryRemoveTitle: {
     id: 'inventory.removeInventory',

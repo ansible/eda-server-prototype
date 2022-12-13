@@ -10,7 +10,7 @@ import { Dashboard } from '@app/Dashboard/Dashboard';
 import { NotificationsPortal } from '@redhat-cloud-services/frontend-components-notifications';
 import store from '../../store';
 import { Provider } from 'react-redux';
-import {Button, NavExpandable, NavItem} from "@patternfly/react-core";
+import {NavExpandable, NavItem} from "@patternfly/react-core";
 
 const ComponentWrapper = ({ children, initialEntries = ['/dashboard'] }) => (
   <Provider store={store()}>
@@ -32,6 +32,27 @@ describe('AppLayout', () => {
     mockApi
       .onGet(`/api/users/me`)
       .replyOnce(200, { email: 'test@test.com', id: '1', is_active: true, is_superuser: false, is_verified: false });
+
+    mockApi
+      .onGet(`/api/audit/rules_fired`)
+      .replyOnce(200, [
+      {
+        rule: {
+          id: 1,
+          name: 'Say Hello',
+        },
+        type: 'Playbook',
+        job: {
+          id: 1,
+          name: 'debug',
+        },
+        ruleset: {
+          id: 2,
+          name: 'Hello Events',
+        },
+        status: 'successful',
+        fired_date: '2022-11-17T14:54:37.813339+00:00',
+      }]);
 
     let wrapper;
     await act(async () => {

@@ -1,54 +1,25 @@
-import { Card, CardBody, CardTitle, Title } from '@patternfly/react-core';
-import { Link } from 'react-router-dom';
-import React, { useState, useEffect, useReducer, Fragment } from 'react';
-import { Button } from '@patternfly/react-core';
-import { PlusCircleIcon } from '@patternfly/react-icons';
-import sharedMessages from '../messages/shared.messages';
-import { TableToolbarView } from '@app/shared/table-toolbar-view';
-import TableEmptyState from '@app/shared/table-empty-state';
+import React, { useEffect, useReducer, useState } from 'react';
+import { Chart, ChartAxis, ChartLine, ChartTooltip } from '@patternfly/react-charts';
+
+import chart_color_green_400 from '@patternfly/react-tokens/dist/js/chart_color_green_400';
+import chart_color_red_300 from '@patternfly/react-tokens/dist/js/chart_color_red_300';
 import { useIntl } from 'react-intl';
-import { defaultSettings } from '@app/shared/pagination';
-import { listProjects } from '@app/API/Project';
+import { c_content_small_FontSize } from '@patternfly/react-tokens';
+import sharedMessages from '../messages/shared.messages';
+import { listActionsRules } from '@app/API/Actions';
+import { Card, CardBody, CardHeader } from '@patternfly/react-core';
 
-interface ProjectCardType {
-  id: string;
-  name: string;
-  status?: string;
-  revision?: string;
+interface TickType {
+  x: string;
+  y: number;
 }
-
-const createRows = (data: ProjectCardType[]) =>
-  data.map(({ id, name, status, revision }) => ({
-    id,
-    cells: [name, status, revision || '000000'],
-  }));
-
-const columns = (intl) => [
-  {
-    title: intl.formatMessage(sharedMessages.name),
-  },
-  {
-    title: intl.formatMessage(sharedMessages.status),
-  },
-
-  {
-    title: intl.formatMessage(sharedMessages.revision),
-  },
-];
 
 const initialState = () => ({
   isFetching: true,
-  rows: [],
 });
 
-// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-export const projectsListState = (state, action) => {
+export const actionsChartState = (state, action) => {
   switch (action.type) {
-    case 'setRows':
-      return {
-        ...state,
-        rows: action.payload,
-      };
     case 'setFetching':
       return {
         ...state,
@@ -59,73 +30,168 @@ export const projectsListState = (state, action) => {
   }
 };
 
-const ActionsCard: React.FunctionComponent = () => {
-  const intl = useIntl();
-  const [projects, setProjects] = useState<ProjectCardType[]>([]);
-  const [limit, setLimit] = useState(defaultSettings.limit);
-  const [offset, setOffset] = useState(1);
-  const [{ isFetching, rows }, stateDispatch] = useReducer(projectsListState, initialState());
+const ActionsChart = () => {
+  const [width, setWidth] = useState(window.innerWidth);
+  const [successfulRuns, setSuccessfulRuns] = useState<TickType[]>([]);
+  const [failedRuns, setFailedRuns] = useState<TickType[]>([]);
+  const [{ isFetching }, stateDispatch] = useReducer(actionsChartState, initialState());
 
-  const updateRows = () => {
-    stateDispatch({ type: 'setFetching', payload: true });
-    return listProjects()
-      .then((data) => {
-        setProjects(data?.data);
-        stateDispatch({ type: 'setRows', payload: createRows(projects) });
-      })
-      .then(() => {
-        stateDispatch({ type: 'setFetching', payload: false });
-      })
-      .catch(() => stateDispatch({ type: 'setFetching', payload: false }));
+  const intl = useIntl();
+
+  const handleResize = () => {
+    setWidth(window.innerWidth);
   };
 
   useEffect(() => {
-    updateRows();
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
   }, []);
 
-  useEffect(() => {
-    stateDispatch({ type: 'setRows', payload: createRows(projects) });
-  }, [projects]);
+  const calculateChartPoints = (data) => {
+    const tickValues: string[] = [];
+    data.forEach((item) => {
+      const keyDate = new Date(item.fired_date);
+      const key = `${keyDate.getMonth()}/${keyDate.getDate()}`;
+      const idx = tickValues.findIndex((tick) => tick === key);
+      if (idx < 0) {
+        tickValues.push(key);
+        if (item.status === 'successful') {
+          successfulRuns.push({ x: key, y: 1 });
+          failedRuns.push({ x: key, y: 0 });
+        }
+        if (item.status === 'failed') {
+          failedRuns.push({ x: key, y: 1 });
+          successfulRuns.push({ x: key, y: 0 });
+        }
+      } else {
+        if (item.status === 'successful') {
+          successfulRuns[idx].y = successfulRuns[idx].y + 1;
+        }
+        if (item.status === 'failed') {
+          failedRuns[idx].y = failedRuns[idx].y + 1;
+        }
+      }
+    });
+  };
 
+  const fetchChartData = () => {
+    stateDispatch({ type: 'setFetching', payload: true });
+    return listActionsRules()
+      .then((data) => {
+        calculateChartPoints(data?.data);
+      })
+      .finally(() => stateDispatch({ type: 'setFetching', payload: false }));
+  };
+
+  useEffect(() => {
+    fetchChartData();
+  }, []);
+
+  const renderSuccessfulRulesFired = () => {
+    const successPoints = successfulRuns.map((tick) => {
+      return {
+        x: tick.x,
+        y: tick.y,
+        name: 'Successful',
+        label: `${tick.x} Successful: ${tick.y}`,
+      };
+    });
+    return (
+      <ChartLine
+        data={successPoints}
+        style={{
+          data: { stroke: chart_color_green_400.value },
+        }}
+        labelComponent={<ChartTooltip constrainToVisibleArea />}
+      />
+    );
+  };
+
+  const renderFailedRulesFired = () => {
+    const failedPoints = failedRuns.map((tick) => {
+      return {
+        x: tick.x,
+        y: tick.y,
+        name: 'Failed',
+        label: `${tick.x} Failed: ${tick.y}`,
+      };
+    });
+    return (
+      <ChartLine
+        data={failedPoints}
+        style={{
+          data: { stroke: chart_color_red_300.value },
+        }}
+        labelComponent={<ChartTooltip constrainToVisibleArea />}
+      />
+    );
+  };
+
+  const getTickValues = () => {
+    const tickValues: string[] = [];
+    successfulRuns.forEach((item) => tickValues.push(item.x));
+    return tickValues;
+  };
+
+  const yAxisStyles = {
+    tickLabels: {
+      fontSize: 10,
+    },
+    axisLabel: {
+      padding: 45,
+      fontSize: c_content_small_FontSize.value,
+    },
+  };
+
+  const xAxisStyles = {
+    tickLabels: {
+      fontSize: 10,
+    },
+    axisLabel: {
+      padding: 30,
+      fontSize: c_content_small_FontSize.value,
+    },
+  };
   return (
-    <Fragment>
-      <Card>
-        <CardTitle>
-          <Title headingLevel={'h2'}>Projects</Title>
-        </CardTitle>
-        <CardBody>
-          <TableToolbarView
-            ouiaId={'projects-table'}
-            rows={rows}
-            setLimit={setLimit}
-            setOffset={setOffset}
-            columns={columns(intl)}
-            fetchData={updateRows}
-            plural={intl.formatMessage(sharedMessages.projects)}
-            singular={intl.formatMessage(sharedMessages.project)}
-            isLoading={isFetching}
-            renderEmptyState={() => (
-              <TableEmptyState
-                title={intl.formatMessage(sharedMessages.noprojects_description)}
-                Icon={PlusCircleIcon}
-                PrimaryAction={() => (
-                  <Link id="create-project-link" to={{ pathname: '/new-project' }}>
-                    <Button
-                      ouiaId={'create-project-link'}
-                      variant="primary"
-                      aria-label={intl.formatMessage(sharedMessages.addProject)}
-                    >
-                      {intl.formatMessage(sharedMessages.addProject)}
-                    </Button>
-                  </Link>
-                )}
-                description={intl.formatMessage(sharedMessages.noprojects_action)}
-              />
-            )}
+    <Card>
+      <CardHeader>{intl.formatMessage(sharedMessages.rules_over_time)}</CardHeader>
+      <CardBody>
+        <Chart
+          ariaDesc="Rules over time"
+          ariaTitle="Rules over time"
+          domainPadding={{ x: [30, 25] }}
+          height={225}
+          padding={{
+            bottom: 60,
+            left: 60,
+            right: 20,
+            top: 20,
+          }}
+          width={width}
+        >
+          <ChartAxis
+            tickValues={getTickValues()}
+            fixLabelOverlap
+            label={intl.formatMessage(sharedMessages.time)}
+            style={xAxisStyles}
           />
-        </CardBody>
-      </Card>
-    </Fragment>
+          <ChartAxis
+            dependentAxis
+            showGrid
+            domain={[0, 3]}
+            tickFormat={(t) => Math.round(t)}
+            style={yAxisStyles}
+            label={intl.formatMessage(sharedMessages.rules_fired)}
+          />
+          {successfulRuns && renderSuccessfulRulesFired()}
+          {failedRuns && renderFailedRulesFired()}
+        </Chart>
+      </CardBody>
+    </Card>
   );
 };
-export { ActionsCard };
+
+export default ActionsChart;

@@ -16,6 +16,7 @@ import { ProjectsCard } from '@app/Dashboard/ProjectsCard';
 import { ActivationsCard } from '@app/Dashboard/ActivationsCard';
 import { InventoriesCard } from '@app/Dashboard/InventoriesCard';
 import { ActionsCard } from '@app/Dashboard/ActionsCard';
+import ActionsChartCard from "@app/Dashboard/ActionsChartCard";
 
 const Dashboard: React.FunctionComponent = () => {
   return (
@@ -26,7 +27,7 @@ const Dashboard: React.FunctionComponent = () => {
       <PageSection>
         <Stack hasGutter>
           <StackItem>
-            <ProjectsCard />
+            <ActionsChartCard />
           </StackItem>
           <StackItem>
             <Grid hasGutter>

@@ -1,10 +1,6 @@
 import React from 'react';
 import { TabItemType } from '@app/shared/types/common-types';
-import {
-  CheckCircleIcon,
-  ExclamationCircleIcon,
-  ExclamationTriangleIcon,
-} from '@patternfly/react-icons';
+import { CheckCircleIcon, ExclamationCircleIcon, ExclamationTriangleIcon } from '@patternfly/react-icons';
 import { useEffect, useRef } from 'react';
 import { Label } from '@patternfly/react-core';
 import sharedMessages from '../messages/shared.messages';

@@ -1,5 +1,5 @@
-import { Card, CardBody, CardTitle, Title } from '@patternfly/react-core';
-import { Link } from 'react-router-dom';
+import { Card, CardBody, CardFooter, CardTitle, Level, LevelItem, Title } from '@patternfly/react-core';
+import { Link, useHistory } from 'react-router-dom';
 import React, { useState, useEffect, useReducer, Fragment } from 'react';
 import { Button } from '@patternfly/react-core';
 import { PlusCircleIcon } from '@patternfly/react-icons';
@@ -18,7 +18,7 @@ interface ProjectCardType {
 }
 
 const createRows = (data: ProjectCardType[]) =>
-  data.map(({ id, name, status, revision }) => ({
+  data.slice(-4).map(({ id, name, status, revision }) => ({
     id,
     cells: [
       <Fragment key={`[project-${id}`}>
@@ -77,6 +77,7 @@ const ProjectsCard: React.FunctionComponent = () => {
   const [limit, setLimit] = useState(defaultSettings.limit);
   const [offset, setOffset] = useState(1);
   const [{ isFetching, rows }, stateDispatch] = useReducer(projectsListState, initialState());
+  const history = useHistory();
 
   const updateRows = () => {
     stateDispatch({ type: 'setFetching', payload: true });
@@ -101,9 +102,18 @@ const ProjectsCard: React.FunctionComponent = () => {
 
   return (
     <Fragment>
-      <Card>
+      <Card style={{ transition: 'box-shadow 0.25s', minHeight: 575 }}>
         <CardTitle>
-          <Title headingLevel={'h2'}>Projects</Title>
+          <Level>
+            <LevelItem>
+              <Title headingLevel={'h2'}>{intl.formatMessage(sharedMessages.projects)}</Title>
+            </LevelItem>
+            <LevelItem>
+              <Button variant="link" onClick={() => history.push('/projects')}>
+                {intl.formatMessage(sharedMessages.go_to_projects)}
+              </Button>
+            </LevelItem>
+          </Level>
         </CardTitle>
         <CardBody>
           <TableToolbarView
@@ -136,6 +146,11 @@ const ProjectsCard: React.FunctionComponent = () => {
             )}
           />
         </CardBody>
+        <CardFooter>
+          <Button variant="link" icon={<PlusCircleIcon />} onClick={() => history.push('/new-project')}>
+            {intl.formatMessage(sharedMessages.create_project)}
+          </Button>
+        </CardFooter>
       </Card>
     </Fragment>
   );

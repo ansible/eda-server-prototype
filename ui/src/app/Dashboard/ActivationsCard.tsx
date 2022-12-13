@@ -1,5 +1,5 @@
-import { Card, CardBody, CardTitle, Title } from '@patternfly/react-core';
-import { Link } from 'react-router-dom';
+import { Card, CardBody, CardFooter, CardTitle, Level, LevelItem, Title } from '@patternfly/react-core';
+import { Link, useHistory } from 'react-router-dom';
 import React, { useState, useEffect, useReducer, Fragment } from 'react';
 import { Button } from '@patternfly/react-core';
 import { PlusCircleIcon } from '@patternfly/react-icons';
@@ -18,7 +18,7 @@ interface ActivationCardType {
 }
 
 const createRows = (data: ActivationCardType[]) =>
-  data.map(({ id, name, status }) => ({
+  data.slice(-4).map(({ id, name, status }) => ({
     id,
     cells: [
       <Fragment key={`[activation-${id}`}>
@@ -72,6 +72,7 @@ const ActivationsCard: React.FunctionComponent = () => {
   const [limit, setLimit] = useState(defaultSettings.limit);
   const [offset, setOffset] = useState(1);
   const [{ isFetching, rows }, stateDispatch] = useReducer(activationsListState, initialState());
+  const history = useHistory();
 
   const updateRows = () => {
     stateDispatch({ type: 'setFetching', payload: true });
@@ -96,11 +97,20 @@ const ActivationsCard: React.FunctionComponent = () => {
 
   return (
     <Fragment>
-      <Card>
+      <Card style={{ transition: 'box-shadow 0.25s', minHeight: 575 }}>
         <CardTitle>
-          <Title headingLevel={'h2'}>Activations</Title>
+          <Level>
+            <LevelItem>
+              <Title headingLevel={'h2'}>{intl.formatMessage(sharedMessages.activations)}</Title>
+            </LevelItem>
+            <LevelItem>
+              <Button variant="link" onClick={() => history.push('/activations')}>
+                {intl.formatMessage(sharedMessages.go_to_activations)}
+              </Button>
+            </LevelItem>
+          </Level>
         </CardTitle>
-        <CardBody>
+        <CardBody isFilled={true}>
           <TableToolbarView
             ouiaId={'activations-table'}
             rows={rows}
@@ -131,6 +141,11 @@ const ActivationsCard: React.FunctionComponent = () => {
             )}
           />
         </CardBody>
+        <CardFooter>
+          <Button variant="link" icon={<PlusCircleIcon />} onClick={() => history.push('/new-activation')}>
+            {intl.formatMessage(sharedMessages.create_activation)}
+          </Button>
+        </CardFooter>
       </Card>
     </Fragment>
   );

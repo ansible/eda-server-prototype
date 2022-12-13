@@ -1,5 +1,5 @@
-import { Card, CardBody, CardTitle, Title } from '@patternfly/react-core';
-import { Link } from 'react-router-dom';
+import { Button, Card, CardBody, CardTitle, Level, LevelItem, Title } from '@patternfly/react-core';
+import { Link, useHistory } from 'react-router-dom';
 import React, { useState, useEffect, useReducer, Fragment } from 'react';
 import { PlusCircleIcon } from '@patternfly/react-icons';
 import sharedMessages from '../messages/shared.messages';
@@ -9,16 +9,16 @@ import { useIntl } from 'react-intl';
 import { defaultSettings } from '@app/shared/pagination';
 import { listActionsRules } from '@app/API/Actions';
 import { Text, TextVariants } from '@patternfly/react-core';
-import {statusLabel} from "@app/utils/utils";
+import { statusLabel } from '@app/utils/utils';
 
 interface ActionCardType {
-  rule: {id: string; name: string;}
+  rule: { id: string; name: string };
   status?: string;
   fired_date?: string;
 }
 
-export const createRows = (data, intl) =>
-  data.map(({ rule, status, fired_date }) => ({
+export const createRows = (data, intl) => {
+  return data.slice(-5).map(({ rule, status, fired_date }) => ({
     rule,
     cells: [
       <Fragment key={`[actions-rule-${rule?.id}`}>
@@ -40,6 +40,8 @@ export const createRows = (data, intl) =>
       </Fragment>,
     ],
   }));
+};
+
 const columns = (intl) => [
   {
     title: intl.formatMessage(sharedMessages.name),
@@ -82,6 +84,7 @@ const ActionsCard: React.FunctionComponent = () => {
   const [limit, setLimit] = useState(defaultSettings.limit);
   const [offset, setOffset] = useState(1);
   const [{ isFetching, rows }, stateDispatch] = useReducer(actionsListState, initialState());
+  const history = useHistory();
 
   const updateRows = () => {
     stateDispatch({ type: 'setFetching', payload: true });
@@ -106,9 +109,18 @@ const ActionsCard: React.FunctionComponent = () => {
 
   return (
     <Fragment>
-      <Card>
+      <Card style={{ transition: 'box-shadow 0.25s', minHeight: 575 }}>
         <CardTitle>
-          <Title headingLevel={'h2'}>Actions</Title>
+          <Level>
+            <LevelItem>
+              <Title headingLevel={'h2'}>{intl.formatMessage(sharedMessages.recent_actions)}</Title>
+            </LevelItem>
+            <LevelItem>
+              <Button variant="link" onClick={() => history.push('/actions')}>
+                {intl.formatMessage(sharedMessages.go_to_actions)}
+              </Button>
+            </LevelItem>
+          </Level>
         </CardTitle>
         <CardBody>
           <TableToolbarView
@@ -123,10 +135,10 @@ const ActionsCard: React.FunctionComponent = () => {
             isLoading={isFetching}
             renderEmptyState={() => (
               <TableEmptyState
-                title={intl.formatMessage(sharedMessages.noprojects_description)}
+                title={intl.formatMessage(sharedMessages.norulesrecentlyfired)}
                 Icon={PlusCircleIcon}
                 PrimaryAction={() => null}
-                description={intl.formatMessage(sharedMessages.noprojects_description)}
+                description={intl.formatMessage(sharedMessages.norulesrecentlyfired)}
               />
             )}
           />
