@@ -250,6 +250,13 @@ tasks:
         vars:
           CLI_ARGS: load-rbac-data
 
+  minikube:logs:
+    desc: "Get eda-server pod logs"
+    cmds:
+      - task: minikube
+        vars:
+          CLI_ARGS: eda-server-logs {{.CLI_ARGS}}
+
   minikube:all:
     desc: "clean, build, deploy"
     cmds:
