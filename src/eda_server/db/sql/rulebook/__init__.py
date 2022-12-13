@@ -665,7 +665,7 @@ def expand_ruleset_sources(rulebook_data: dict) -> dict:
         for ruleset_data in rulebook_data:
             xp_sources = []
             expanded_ruleset_sources[ruleset_data["name"]] = xp_sources
-            for source in ruleset_data.get("sources", []):
+            for source in ruleset_data.get("sources", []) or []:
                 xp_src = {"name": "<unnamed>"}
                 for src_key, src_val in source.items():
                     if src_key == "name":
