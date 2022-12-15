@@ -348,6 +348,7 @@ async def test_list_rulesets(
                     "pct_window_total": 100,
                 }
             ],
+            "enabled": True,
         }
     ]
 
@@ -374,6 +375,7 @@ async def test_list_rulesets_no_stats(
             "modified_at": ruleset.created_at.isoformat(),
             "source_types": ["range"],
             "fired_stats": [],
+            "enabled": True,
         }
     ]
 

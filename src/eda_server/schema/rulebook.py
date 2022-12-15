@@ -32,6 +32,7 @@ class RulebookRead(BaseModel):
     ruleset_count: int
     created_at: datetime
     modified_at: datetime
+    enabled: bool = True
 
 
 class RulebookRulesetList(BaseModel):
@@ -84,6 +85,7 @@ class RulesetList(BaseModel):
     source_types: Optional[List[str]]
     created_at: datetime
     modified_at: datetime
+    enabled: bool = True
     fired_stats: Optional[List[FireCountsListRef]]
 
 
@@ -108,6 +110,7 @@ class RulesetDetail(BaseModel):
     rule_count: int
     created_at: datetime
     modified_at: datetime
+    enabled: bool = True
     sources: Optional[List[RulesetSourceRef]]
     rulebook: Optional[RulebookRef]
     project: Optional[RulesetProjectRef]

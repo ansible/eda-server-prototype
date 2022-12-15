@@ -55,6 +55,13 @@ rulebooks = sa.Table(
         server_default=func.now(),
         onupdate=func.now(),
     ),
+    sa.Column(
+        "enabled",
+        sa.Boolean,
+        nullable=False,
+        default=True,
+        server_default=sa.true(),
+    ),
 )
 
 
@@ -90,6 +97,13 @@ rulesets = sa.Table(
         nullable=False,
         server_default=func.now(),
         onupdate=func.now(),
+    ),
+    sa.Column(
+        "enabled",
+        sa.Boolean,
+        nullable=False,
+        default=True,
+        server_default=sa.true(),
     ),
 )
 

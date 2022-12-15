@@ -15,12 +15,14 @@
 from decimal import Decimal
 from typing import Dict, List
 
+import sqlalchemy as sa
 import yaml
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from eda_server import schema
 from eda_server.auth import requires_permission
+from eda_server.db import models
 from eda_server.db.dependency import get_db_session
 
 # Rule, Ruleset, Rulebook query builder, enums, etc
@@ -255,6 +257,74 @@ async def read_ruleset(
     return response
 
 
+@router.patch(
+    "/api/rulesets/{ruleset_id}/enable",
+    response_model=schema.RulesetDetail,
+    operation_id="enable_ruleset",
+    dependencies=[
+        Depends(requires_permission(ResourceType.RULEBOOK, Action.UPDATE)),
+    ],
+)
+async def enable_ruleset(
+    ruleset_id: int, db: AsyncSession = Depends(get_db_session)
+):
+    ruleset = await rsql.get_ruleset(db, ruleset_id)
+    if not ruleset:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Ruleset not found.",
+        )
+
+    await db.execute(
+        sa.update(models.rulesets)
+        .where(models.rulesets.c.id == ruleset_id)
+        .values(enabled=True)
+    )
+    await db.commit()
+
+    updated_ruleset = await rsql.get_ruleset(db, ruleset_id)
+    ruleset_counts = await rsql.get_ruleset_counts(db, ruleset_id)
+    response = updated_ruleset._asdict()
+    response["fired_stats"] = await build_detail_object_totals(
+        ruleset_counts, updated_ruleset.id
+    )
+    return response
+
+
+@router.patch(
+    "/api/rulesets/{ruleset_id}/disable",
+    response_model=schema.RulesetDetail,
+    operation_id="disable_ruleset",
+    dependencies=[
+        Depends(requires_permission(ResourceType.RULEBOOK, Action.UPDATE)),
+    ],
+)
+async def disable_ruleset(
+    ruleset_id: int, db: AsyncSession = Depends(get_db_session)
+):
+    ruleset = await rsql.get_ruleset(db, ruleset_id)
+    if not ruleset:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Ruleset not found.",
+        )
+
+    await db.execute(
+        sa.update(models.rulesets)
+        .where(models.rulesets.c.id == ruleset_id)
+        .values(enabled=False)
+    )
+    await db.commit()
+
+    updated_ruleset = await rsql.get_ruleset(db, ruleset_id)
+    ruleset_counts = await rsql.get_ruleset_counts(db, ruleset_id)
+    response = updated_ruleset._asdict()
+    response["fired_stats"] = await build_detail_object_totals(
+        ruleset_counts, updated_ruleset.id
+    )
+    return response
+
+
 @router.get(
     "/api/rulesets/{ruleset_id}/rules",
     response_model=List[schema.RuleList],
@@ -350,6 +420,74 @@ async def read_rulebook(
             detail="Rulebook Not Found.",
         )
     return result
+
+
+@router.patch(
+    "/api/rulebooks/{rulebook_id}/enable",
+    operation_id="enable_rulebook",
+    response_model=schema.RulebookRead,
+    dependencies=[
+        Depends(requires_permission(ResourceType.RULEBOOK, Action.UPDATE)),
+    ],
+)
+async def enable_rulebook(
+    rulebook_id: int, db: AsyncSession = Depends(get_db_session)
+):
+    result = await rsql.get_rulebook(db, rulebook_id)
+    if not result:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Rulebook Not Found.",
+        )
+
+    await db.execute(
+        sa.update(models.rulebooks)
+        .where(models.rulebooks.c.id == rulebook_id)
+        .values(enabled=True)
+    )
+    await db.execute(
+        sa.update(models.rulesets)
+        .where(models.rulesets.c.rulebook_id == rulebook_id)
+        .values(enabled=True)
+    )
+    await db.commit()
+
+    updated_rulebook = await rsql.get_rulebook(db, rulebook_id)
+    return updated_rulebook
+
+
+@router.patch(
+    "/api/rulebooks/{rulebook_id}/disable",
+    operation_id="disable_rulebook",
+    response_model=schema.RulebookRead,
+    dependencies=[
+        Depends(requires_permission(ResourceType.RULEBOOK, Action.UPDATE)),
+    ],
+)
+async def disable_rulebook(
+    rulebook_id: int, db: AsyncSession = Depends(get_db_session)
+):
+    result = await rsql.get_rulebook(db, rulebook_id)
+    if not result:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Rulebook Not Found.",
+        )
+
+    await db.execute(
+        sa.update(models.rulebooks)
+        .where(models.rulebooks.c.id == rulebook_id)
+        .values(enabled=False)
+    )
+    await db.execute(
+        sa.update(models.rulesets)
+        .where(models.rulesets.c.rulebook_id == rulebook_id)
+        .values(enabled=False)
+    )
+    await db.commit()
+
+    updated_rulebook = await rsql.get_rulebook(db, rulebook_id)
+    return updated_rulebook
 
 
 @router.get(
