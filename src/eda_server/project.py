@@ -24,10 +24,10 @@ from asyncpg_lostream.lostream import CHUNK_SIZE, PGLargeObject
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from .db import models
+from .db.sql.endpoints.rulebook import import_rulebook_file, update_rulebook
 from .db.sql.extra_var import import_extra_var_file, update_extra_var
 from .db.sql.inventory import import_inventory_file, update_inventory
 from .db.sql.playbook import import_playbook_file, update_playbook
-from .db.sql.rulebook import import_rulebook_file, update_rulebook
 from .schema import ProjectCreate
 from .utils import subprocess as subprocess_utils
 
