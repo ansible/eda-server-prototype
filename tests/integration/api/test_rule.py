@@ -17,6 +17,7 @@ from datetime import datetime, timedelta, timezone
 from typing import Tuple
 from unittest import mock
 
+import sqlalchemy as sa
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status as status_codes
@@ -35,6 +36,21 @@ TEST_RULESET_SIMPLE = """
         limit: 5
   rules:
     - name:
+      condition: event.i == 1
+      action:
+        debug:
+"""
+
+
+TEST_RULESET_BAD = """
+---
+- name: Test bad
+  hosts: all
+  sources:
+    - blah:
+
+  rules:
+    - name: Test it is bad
       condition: event.i == 1
       action:
         debug:
@@ -417,6 +433,39 @@ async def test_read_ruleset(
     check_permission_spy.assert_called_once_with(
         mock.ANY, mock.ANY, ResourceType.RULEBOOK, Action.READ
     )
+
+
+async def test_read_ruleset_no_source_config(
+    client: AsyncClient, db: AsyncSession
+):
+    test_data = await _create_rules(db)
+    project = test_data.project
+    response = await client.post(
+        "/api/rulebooks",
+        json={
+            "name": "test-ruleset-1.yml",
+            "rulesets": TEST_RULESET_BAD,
+        },
+    )
+    assert response.status_code == status_codes.HTTP_200_OK
+    data = response.json()
+    await db.execute(
+        sa.update(models.rulebooks)
+        .where(models.rulebooks.c.id == data["id"])
+        .values(project_id=project.id)
+    )
+    ruleset = await bsql.get_object(
+        db,
+        models.rulesets,
+        select_cols=[models.rulesets.c.id, models.rulesets.c.sources],
+        filters=(models.rulesets.c.rulebook_id == data["id"]),
+    )
+    assert ruleset is not None
+    assert ruleset.sources[0]["config"] is None
+    response = await client.get(f"/api/rulesets/{ruleset.id}")
+    resp_obj = response.json()
+    assert response.status_code == status_codes.HTTP_200_OK
+    assert resp_obj["sources"][0]["config"] is None
 
 
 async def test_read_ruleset_not_found(client: AsyncClient):
