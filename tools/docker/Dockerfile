@@ -6,7 +6,6 @@ WORKDIR $HOME
 USER 0
 RUN dnf install -y java-17-openjdk-devel maven
 ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk
-ENV PIP_NO_BINARY=jpy
 
 RUN pip install ansible && \
     ansible-galaxy collection install git+https://github.com/ansible/event-driven-ansible.git
