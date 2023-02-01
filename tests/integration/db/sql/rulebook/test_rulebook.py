@@ -45,6 +45,19 @@ TEST_RULESET_SIMPLE = """
         debug:
 """
 
+TEST_RULESET_BAD = """
+---
+- name: Test bad
+  hosts: all
+  sources:
+    - blah:
+
+  rules:
+    - name: Test it is bad
+      condition: event.i == 1
+      action:
+        debug:
+"""
 
 DBTestData = namedtuple(
     "DBTestData",
@@ -262,6 +275,23 @@ async def test_process_ruleset_sources(db: AsyncSession):
     assert rule.name == "Test simple rule 1"
 
 
+async def test_process_ruleset_sources_no_config(db: AsyncSession):
+    project = await insert_project(db)
+    rulebooks = await insert_rulebooks(db, project, TEST_RULESET_BAD)
+    assert len(rulebooks) == 2
+    rulebook_data = yaml.safe_load(rulebooks[1].rulesets)
+    await rsql.insert_rulebook_related_data(db, rulebooks[1].id, rulebook_data)
+    ruleset = await bsql.get_object(
+        db,
+        models.rulesets,
+        filters=models.rulesets.c.rulebook_id == rulebooks[1].id,
+    )
+    assert ruleset is not None
+    assert ruleset.name == "Test bad"
+    assert len(ruleset.sources) == 1
+    assert ruleset.sources[0]["config"] is None
+
+
 # -------------------------------------------------------------------------
 #  Test Data
 # -------------------------------------------------------------------------
@@ -284,7 +314,9 @@ async def insert_project(db: AsyncSession) -> sa.engine.Row:
 
 
 async def insert_rulebooks(
-    db: AsyncSession, project: sa.engine.Row
+    db: AsyncSession,
+    project: sa.engine.Row,
+    rulesets: str = TEST_RULESET_SIMPLE,
 ) -> sa.engine.Row:
     vals = [
         {
@@ -295,7 +327,7 @@ async def insert_rulebooks(
         {
             "name": "rulebook-2",
             "project_id": project.id,
-            "rulesets": TEST_RULESET_SIMPLE,
+            "rulesets": rulesets,
         },
     ]
     rulebooks = (
