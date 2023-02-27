@@ -91,7 +91,7 @@ class RulesetSourceRef(BaseModel):
     name: str
     type: str
     source: str
-    config: dict
+    config: Optional[dict]
 
 
 class RulesetSource(BaseModel):

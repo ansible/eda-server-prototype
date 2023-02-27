@@ -130,16 +130,23 @@ async def test_delete_project_not_found(client: AsyncClient):
 
 @mock.patch("tempfile.TemporaryDirectory")
 @mock.patch("eda_server.project.clone_project")
-@mock.patch("eda_server.project.sync_project")
+@mock.patch("eda_server.project.find_project_files")
+@mock.patch("eda_server.project.import_project_files")
+@mock.patch("eda_server.project.tar_project")
 async def test_create_project(
-    sync_project: mock.Mock,
+    tar_project: mock.Mock,
+    import_project_files: mock.Mock,
+    find_project_files: mock.Mock,
     clone_project: mock.Mock,
     tempfile: mock.Mock(),
     client: AsyncClient,
     db: AsyncSession,
     check_permission_spy: mock.Mock,
 ):
-    tempfile.return_value.__enter__.return_value = "/tmp/test-create-project"
+    project_files = {"rulebook": [("rulebook", "test-rules.yml")]}
+    repo_dir = "/tmp/test-create-project"
+    tempfile.return_value.__enter__.return_value = repo_dir
+    find_project_files.return_value = project_files
     found_hash = hashlib.sha1(b"test").hexdigest()
     clone_project.return_value = found_hash
 
@@ -160,11 +167,75 @@ async def test_create_project(
     assert project["url"] == TEST_PROJECT["url"]
 
     clone_project.assert_called_once_with(TEST_PROJECT["url"], mock.ANY)
-    sync_project.assert_called_once_with(
-        db, project["id"], project["large_data_id"], "/tmp/test-create-project"
-    )
+    import_project_files.assert_called_once_with(db, mock.ANY, project["id"])
+    find_project_files.assert_called_once_with(repo_dir)
+    tar_project.assert_called_once_with(db, project["large_data_id"], repo_dir)
     check_permission_spy.assert_called_once_with(
         mock.ANY, mock.ANY, ResourceType.PROJECT, Action.CREATE
+    )
+
+
+@mock.patch("tempfile.TemporaryDirectory")
+@mock.patch("eda_server.project.clone_project")
+@mock.patch("eda_server.project.find_project_files")
+@mock.patch(
+    "builtins.open", new_callable=mock.mock_open, read_data="test data"
+)
+@mock.patch("eda_server.project.retrieve_existing_project_files")
+@mock.patch("eda_server.project.import_project_file")
+async def test_sync_project(
+    import_project_file: mock.Mock,
+    retrieve_existing_project_files: mock.Mock,
+    project_file: mock.mock_open,
+    find_project_files: mock.Mock,
+    clone_project: mock.Mock,
+    tempfile: mock.Mock(),
+    client: AsyncClient,
+    db: AsyncSession,
+    check_permission_spy: mock.Mock,
+):
+    old_hash = hashlib.sha1(b"test").hexdigest()
+    query = sa.insert(models.projects).values(
+        git_hash=old_hash,
+        url=TEST_PROJECT["url"],
+        name=TEST_PROJECT["name"],
+        description=TEST_PROJECT["description"],
+    )
+    (project_id,) = (await db.execute(query)).inserted_primary_key
+    await db.commit()
+
+    file_type = "rulebook"
+    filename = "test-rules.yml"
+    new_files = [("rulebook", filename)]
+    project_files = {file_type: new_files}
+    repo_dir = "/tmp/test-sync-project"
+
+    tempfile.return_value.__enter__.return_value = repo_dir
+    find_project_files.return_value = project_files
+    new_hash = hashlib.sha1(b"test2").hexdigest()
+    clone_project.return_value = new_hash
+
+    response = await client.post(f"/api/projects/{project_id}")
+    assert response.status_code == status_codes.HTTP_200_OK
+
+    (_hash,) = (
+        await db.execute(
+            sa.select(models.projects.c.git_hash).where(
+                models.projects.c.id == project_id
+            )
+        )
+    ).one_or_none()
+    assert _hash == new_hash
+
+    find_project_files.assert_called_once_with(repo_dir)
+    retrieve_existing_project_files.assert_called_once_with(db, project_id)
+    assert open(repo_dir).read() == "test data"
+    project_file.assert_called_with(repo_dir)
+    import_project_file.assert_called_once_with(
+        db, filename, "test data", file_type, project_id
+    )
+    check_permission_spy.assert_called_once_with(
+        mock.ANY, mock.ANY, ResourceType.PROJECT, Action.UPDATE
     )
 
 

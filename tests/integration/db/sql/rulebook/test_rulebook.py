@@ -22,7 +22,6 @@ import yaml
 from dateutil.parser import parse as dtparse
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from eda_server import project as bl_prj
 from eda_server.db import models
 from eda_server.db.sql import base as bsql, rulebook as rsql
 from eda_server.types import InventorySource
@@ -46,6 +45,19 @@ TEST_RULESET_SIMPLE = """
         debug:
 """
 
+TEST_RULESET_BAD = """
+---
+- name: Test bad
+  hosts: all
+  sources:
+    - blah:
+
+  rules:
+    - name: Test it is bad
+      condition: event.i == 1
+      action:
+        debug:
+"""
 
 DBTestData = namedtuple(
     "DBTestData",
@@ -229,7 +241,7 @@ async def test_get_rulesets_base_no_data(db: AsyncSession):
 
 async def test_expand_ruleset_sources(db: AsyncSession):
     rulesets_data = yaml.safe_load(TEST_RULESET_SIMPLE)
-    res = bl_prj.expand_ruleset_sources(rulesets_data)
+    res = rsql.expand_ruleset_sources(rulesets_data)
     rs_name = "Test simple"
     assert rs_name in res
     assert len(res[rs_name]) == 2
@@ -247,9 +259,7 @@ async def test_process_ruleset_sources(db: AsyncSession):
     rulebooks = await insert_rulebooks(db, project)
     assert len(rulebooks) == 2
     rulebook_data = yaml.safe_load(rulebooks[1].rulesets)
-    await bl_prj.insert_rulebook_related_data(
-        db, rulebooks[1].id, rulebook_data
-    )
+    await rsql.insert_rulebook_related_data(db, rulebooks[1].id, rulebook_data)
     ruleset = await bsql.get_object(
         db,
         models.rulesets,
@@ -263,6 +273,23 @@ async def test_process_ruleset_sources(db: AsyncSession):
     )
     assert rule is not None
     assert rule.name == "Test simple rule 1"
+
+
+async def test_process_ruleset_sources_no_config(db: AsyncSession):
+    project = await insert_project(db)
+    rulebooks = await insert_rulebooks(db, project, TEST_RULESET_BAD)
+    assert len(rulebooks) == 2
+    rulebook_data = yaml.safe_load(rulebooks[1].rulesets)
+    await rsql.insert_rulebook_related_data(db, rulebooks[1].id, rulebook_data)
+    ruleset = await bsql.get_object(
+        db,
+        models.rulesets,
+        filters=models.rulesets.c.rulebook_id == rulebooks[1].id,
+    )
+    assert ruleset is not None
+    assert ruleset.name == "Test bad"
+    assert len(ruleset.sources) == 1
+    assert ruleset.sources[0]["config"] is None
 
 
 # -------------------------------------------------------------------------
@@ -287,7 +314,9 @@ async def insert_project(db: AsyncSession) -> sa.engine.Row:
 
 
 async def insert_rulebooks(
-    db: AsyncSession, project: sa.engine.Row
+    db: AsyncSession,
+    project: sa.engine.Row,
+    rulesets: str = TEST_RULESET_SIMPLE,
 ) -> sa.engine.Row:
     vals = [
         {
@@ -298,7 +327,7 @@ async def insert_rulebooks(
         {
             "name": "rulebook-2",
             "project_id": project.id,
-            "rulesets": TEST_RULESET_SIMPLE,
+            "rulesets": rulesets,
         },
     ]
     rulebooks = (

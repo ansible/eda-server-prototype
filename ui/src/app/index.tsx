@@ -18,7 +18,7 @@ const App: React.FunctionComponent = () => (
       <Provider store={store()}>
         <Router basename="/eda">
           <Switch>
-            <Route path="/" exact={true}>
+            <Route path="/" exact={true} >
               <Login />
             </Route>
             <Route>

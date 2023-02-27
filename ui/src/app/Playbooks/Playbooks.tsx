@@ -22,7 +22,7 @@ const SimpleList = styled(PFSimpleList)`
   white-space: pre-wrap;
 `;
 
-const endpoint = 'http://' + getServer() + '/api/playbooks/';
+const endpoint = 'http://' + getServer() + '/api/playbooks';
 
 const Playbooks: React.FunctionComponent = () => {
   const [playbooks, setPlaybooks] = useState<PlaybookType[]>([]);

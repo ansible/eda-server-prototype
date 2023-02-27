@@ -324,7 +324,9 @@ async def test_read_audit_rule_hosts(
     )
 
 
-async def test_list_audit_rules_fired(client: AsyncClient, db: AsyncSession):
+async def test_list_audit_rules_fired(
+    client: AsyncClient, db: AsyncSession, check_permission_spy: mock.Mock
+):
     foreign_keys = await _create_activation_dependent_objects(db)
     await _create_audit_rule(db, foreign_keys)
     await _create_audit_rule(db, foreign_keys)
@@ -342,14 +344,20 @@ async def test_list_audit_rules_fired(client: AsyncClient, db: AsyncSession):
     assert type(fired_rules) == list
     assert len(fired_rules) == 2
     rule = fired_rules[0]
-    assert rule["name"] == TEST_AUDIT_RULE["name"]
-    assert rule["job"] == TEST_AUDIT_RULE_JOB_HOST["task"]
+    assert rule["rule"]["name"] == TEST_AUDIT_RULE["name"]
+    assert rule["job"]["name"] == TEST_AUDIT_RULE_JOB_HOST["task"]
     assert rule["status"] == TEST_AUDIT_RULE["status"]
-    assert rule["ruleset"] == RULE_NAMES["ruleset_name"]
+    assert rule["ruleset"]["name"] == RULE_NAMES["ruleset_name"]
     assert fired_rules[0]["fired_date"] > fired_rules[1]["fired_date"]
 
+    check_permission_spy.assert_called_once_with(
+        mock.ANY, mock.ANY, ResourceType.AUDIT_RULE, Action.READ
+    )
 
-async def test_list_audit_hosts_changed(client: AsyncClient, db: AsyncSession):
+
+async def test_list_audit_hosts_changed(
+    client: AsyncClient, db: AsyncSession, check_permission_spy: mock.Mock
+):
     foreign_keys = await _create_activation_dependent_objects(db)
     await _create_audit_rule(db, foreign_keys)
     await _create_audit_rule(db, foreign_keys)
@@ -365,12 +373,18 @@ async def test_list_audit_hosts_changed(client: AsyncClient, db: AsyncSession):
     assert len(fired_rules) == 2
     rule = fired_rules[0]
     assert rule["host"] == TEST_AUDIT_RULE_JOB_HOST["host"]
-    assert rule["rule"] == TEST_AUDIT_RULE["name"]
-    assert rule["ruleset"] == RULE_NAMES["ruleset_name"]
+    assert rule["rule"]["name"] == TEST_AUDIT_RULE["name"]
+    assert rule["ruleset"]["name"] == RULE_NAMES["ruleset_name"]
     assert fired_rules[0]["fired_date"] > fired_rules[1]["fired_date"]
 
+    check_permission_spy.assert_called_once_with(
+        mock.ANY, mock.ANY, ResourceType.AUDIT_RULE, Action.READ
+    )
 
-async def test_empty_responses(client: AsyncClient, db: AsyncSession):
+
+async def test_empty_responses(
+    client: AsyncClient, db: AsyncSession, check_permission_spy: mock.Mock
+):
     fired_rules_response = await client.get(
         "/api/audit/rules_fired",
     )
@@ -380,6 +394,10 @@ async def test_empty_responses(client: AsyncClient, db: AsyncSession):
 
     assert fired_rules_response.json() == []
     assert fired_hosts_response.json() == []
+
+    check_permission_spy.assert_called_with(
+        mock.ANY, mock.ANY, ResourceType.AUDIT_RULE, Action.READ
+    )
 
 
 async def test_audit_rule_404(client: AsyncClient):
