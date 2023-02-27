@@ -209,7 +209,7 @@ const InventoriesSelect: React.FunctionComponent<InventoriesSelectParam> = ({
                       {intl.formatMessage(sharedMessages.clearAllFilters)}
                     </Button>
                   ) : (
-                    <Link id="create-inventory-link" to={{ pathname: '/new-inventory' }}>
+                    <Link id="create-inventory-link" to={{ pathname: '/inventories/add' }}>
                       <Button
                         ouiaId={'create-inventory-link'}
                         variant="primary"

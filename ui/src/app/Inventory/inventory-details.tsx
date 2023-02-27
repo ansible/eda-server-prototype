@@ -1,4 +1,5 @@
 import {
+  Button,
   Card,
   CardBody,
   Flex,
@@ -12,7 +13,7 @@ import {
   ToggleGroup,
   ToggleGroupItem,
 } from '@patternfly/react-core';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import React, { useState } from 'react';
 import { renderInventoryTabs, InventoryType } from '@app/Inventory/inventory';
 import { useIntl } from 'react-intl';
@@ -144,6 +145,11 @@ const InventoryDetails: React.FunctionComponent<{ inventory: InventoryType }> = 
                 </Card>
               )
             ) : null}
+          </StackItem>
+          <StackItem>
+            <Link to={`/inventories/${id}/edit`}>
+              <Button>Edit</Button>
+            </Link>
           </StackItem>
         </Stack>
       </StackItem>

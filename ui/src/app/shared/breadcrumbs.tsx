@@ -7,7 +7,7 @@ const Breadcrumbs = ({ breadcrumbs }) => {
   return breadcrumbs ? (
     <Breadcrumb>
       {breadcrumbs.map(({ to, id, title }, idx) => (
-        <BreadcrumbItem key={'title'} isActive={idx === breadcrumbs.length - 1} id={id} title={title}>
+        <BreadcrumbItem key={title} isActive={idx === breadcrumbs.length - 1} id={id} title={title}>
           {(to && (
             <NavLink isActive={() => false} exact to={to}>
               {title}
