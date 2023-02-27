@@ -1,5 +1,7 @@
 # Event Driven Ansible Server
 
+**NOTE** Maintenance temporarily on hold. This project is being reworked and will be available soon.
+
 ## Installation
 
 For instructions on how to quickly spin up a preview instance of _eda-server_, please see [INSTALL.md](./INSTALL.md).
