@@ -125,8 +125,8 @@ async def activate_rulesets(
 
     elif deployment_type == "docker" or deployment_type == "podman":
 
+        container = None
         docker = aiodocker.Docker()
-
         host = "eda-server"
 
         try:
@@ -163,7 +163,8 @@ async def activate_rulesets(
             await container.start()
         except aiodocker.exceptions.DockerError as e:
             logger.error("Failed to start container: %s", e)
-            await container.delete()
+            if container is not None:
+                await container.delete()
             await docker.close()
             raise
 
